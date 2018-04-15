@@ -55,5 +55,11 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LeafMeAloneShared\LeafMeAloneShared.csproj">
+      <Project>{3fc1602c-d2f3-4f71-b433-92c241503bcf}</Project>
+      <Name>LeafMeAloneShared</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

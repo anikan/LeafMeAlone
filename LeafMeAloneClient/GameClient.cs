@@ -20,7 +20,7 @@ namespace Client
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
 
-            Shared.GameObject test = new Shared.GameObject();
+            GameObject test = new GameObject();
         }
     }
 }

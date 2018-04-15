@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneClient", "LeafMeAloneClient\LeafMeAloneClient.csproj", "{59213063-7924-49D5-929F-E2C51382A54C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneServer", "LeafMeAloneServer\LeafMeAloneServer.csproj", "{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59213063-7924-49D5-929F-E2C51382A54C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59213063-7924-49D5-929F-E2C51382A54C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59213063-7924-49D5-929F-E2C51382A54C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59213063-7924-49D5-929F-E2C51382A54C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

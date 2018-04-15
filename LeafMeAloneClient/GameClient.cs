@@ -24,6 +24,10 @@ namespace Client
             GraphicsRenderer.Dispose();
         }
 
+
+        /// <summary>
+        /// The Main Game Loop
+        /// </summary>
         private static void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));

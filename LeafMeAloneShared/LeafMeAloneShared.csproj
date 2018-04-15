@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="GameObject.cs" />
     <Compile Include="MoveRequest.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
   </ItemGroup>

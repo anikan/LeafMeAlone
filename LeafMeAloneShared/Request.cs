@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LeafMeAloneShared
+namespace Shared
 {
-    abstract class Request
+    public abstract class Request
     {
         public enum RequestType
         {

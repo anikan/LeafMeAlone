@@ -5,17 +5,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LeafMeAloneShared
+namespace Shared
 {
     class MoveRequest : Request
     {
-        public int id;
+        private int Id;
+        private Vector3 Position;
 
-        public MoveRequest(GameObject gameObject, Vector3 movement)
+
+        public MoveRequest(GameObject gameObject, Vector3 position)
         {
-            id = gameObject.getId();
-
-
+            Id = gameObject.GetId();
+            Position = position;
         }
     }
 }

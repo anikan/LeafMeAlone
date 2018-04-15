@@ -14,6 +14,7 @@ namespace Client
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, -1);
 
+
         private Geometry m_ActiveGeo;
         private Shader m_ActiveShader;
         private Matrix m_ModelMatrix;

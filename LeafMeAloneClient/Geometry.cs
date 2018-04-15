@@ -8,26 +8,46 @@ using Assimp;
 using Assimp.Configs;
 using Shared;
 using SlimDX;
+using Buffer = SlimDX.Direct3D11.Buffer;
 namespace Client
 {
     class Geometry
     {
-        private List<Vector3> Vertices;
-        private List<Vector3> Normals;
-        private List<int> Faces;
+        private List<Vector3> VerticesList;
+        private List<Vector3> NormalsList;
+        private List<int> FacesList;
+        
+        /// <summary>
+        /// Vertex Buffer, Index Buffer
+        /// </summary>
+        public Buffer VBO, EBO;
 
+        /// <summary>
+        /// Data streams hold the actual Vertices and Faces.
+        /// </summary>
+        protected DataStream Vertices, Faces;
+
+        /// <summary>
+        /// Assimp scene containing the loaded model.
+        /// </summary>
         private Scene scene;
 
-
+        /// <summary>
+        /// Assimp importer.
+        /// </summary>
         private AssimpContext importer;
 
-
+        /// <summary>
+        /// Create a new geometry given filename
+        /// </summary>
+        /// <param name="fileName"></param>
         public Geometry(string fileName)
         {
-            Vertices = new List<Vector3>();
-            Normals = new List<Vector3>();
-            Faces = new List<int>();
+            VerticesList = new List<Vector3>();
+            NormalsList = new List<Vector3>();
+            FacesList = new List<int>();
 
+            //Create new importer.
             importer = new AssimpContext();
             scene = importer.ImportFile(fileName);
             if (scene == null)
@@ -40,15 +60,15 @@ namespace Client
                 {
                     sceneMesh.Vertices.ForEach(vertex =>
                     {
-                        Vertices.Add(vertex.ToVector3());
+                        VerticesList.Add(vertex.ToVector3());
                     });
                     sceneMesh.Normals.ForEach(normal =>
                     {
-                       Normals.Add(normal.ToVector3());
+                       NormalsList.Add(normal.ToVector3());
                     });
                     sceneMesh.Faces.ForEach(face =>
                     {
-                        Faces.AddRange(face.Indices);
+                        FacesList.AddRange(face.Indices);
                     });
 
                 }

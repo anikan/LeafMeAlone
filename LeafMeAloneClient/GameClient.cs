@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using LeafMeAloneClient;
+using Client;
 using Shared;
 using SlimDX;
 using SlimDX.DXGI;

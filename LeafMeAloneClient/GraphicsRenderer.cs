@@ -7,7 +7,7 @@ using Device = SlimDX.Direct3D11.Device;
 using Resource = SlimDX.Direct3D11.Resource;
 using System.Windows.Forms;
 
-namespace LeafMeAloneClient
+namespace Client
 {
     static class GraphicsRenderer
     {

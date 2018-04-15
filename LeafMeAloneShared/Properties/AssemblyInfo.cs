@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LeafMeAloneGeneral")]
+[assembly: AssemblyTitle("LeafMeAloneShared")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LeafMeAloneGeneral")]
+[assembly: AssemblyProduct("LeafMeAloneShared")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("623f2c1b-e00d-4aaa-9ee2-47b8411adfe7")]
+[assembly: Guid("3fc1602c-d2f3-4f71-b433-92c241503bcf")]
 
 // Version information for an assembly consists of the following four values:
 //

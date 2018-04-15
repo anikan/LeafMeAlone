@@ -9,5 +9,9 @@ namespace Server
     class GameServer
     {
         string name;
+
+        static void Main()
+        {
+        }
     }
 }

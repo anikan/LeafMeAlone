@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneClient", "LeafMe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneServer", "LeafMeAloneServer\LeafMeAloneServer.csproj", "{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneShared", "LeafMeAloneShared\LeafMeAloneShared.csproj", "{3FC1602C-D2F3-4F71-B433-92C241503BCF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +23,15 @@ Global
 		{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FC1602C-D2F3-4F71-B433-92C241503BCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FC1602C-D2F3-4F71-B433-92C241503BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FC1602C-D2F3-4F71-B433-92C241503BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FC1602C-D2F3-4F71-B433-92C241503BCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {475B0F97-3917-4CD2-B385-07652C41106F}
 	EndGlobalSection
 EndGlobal

@@ -9,7 +9,19 @@ namespace Client
 {
     class Camera
     {
-        public Vector3 CameraUp;
+        private Vector3 cameraUp;
+        public Vector3 CameraUp {
+            get
+            {
+                return cameraUp; 
+            }
+            set
+            {
+                cameraUp = value;
+                UpdateCameraView();
+
+            }
+        }
         public Vector3 CameraLookAt;
         public Vector3 CameraPosition;
         public Matrix ViewMatrix;

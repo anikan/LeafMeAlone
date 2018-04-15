@@ -20,7 +20,6 @@ namespace Client
         private static void Main()
         {
             GraphicsRenderer.Init();
-
             MessagePump.Run(GraphicsRenderer.Form, DoGameLoop);
             GraphicsRenderer.Dispose();
         }

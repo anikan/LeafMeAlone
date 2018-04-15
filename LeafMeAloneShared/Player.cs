@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
-    class Player
+    public class Player
     {
         public const float SPEED = 1.0f;
 
-        private Vector3 CurrentPos;
+        private Vector3 Position;
 
         public enum MoveDirection
         {
@@ -20,6 +20,11 @@ namespace Shared
             SOUTH,
             WEST
         };
+
+        public Player (Vector3 initialPosition)
+        {
+            Position = initialPosition;
+        }
 
         public void Move(MoveDirection dir)
         {
@@ -38,7 +43,13 @@ namespace Shared
                 case MoveDirection.WEST:
                     delta = new Vector3(-1, 0, 0);
                     break;
-            } 
+            }
+            Position = Vector3.Add(delta, Position);
+        }
+
+        public void SetPosition(Vector3 pos)
+        {
+            Position = pos;
         }
     }
 }

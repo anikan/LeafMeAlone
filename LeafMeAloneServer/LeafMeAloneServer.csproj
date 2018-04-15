@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>LeafMeAloneServer</RootNamespace>
+    <RootNamespace>Server</RootNamespace>
     <AssemblyName>LeafMeAloneServer</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -48,12 +48,19 @@
   <ItemGroup>
     <Compile Include="GameServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerNetwork.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LeafMeAloneShared\LeafMeAloneShared.csproj">
+      <Project>{3fc1602c-d2f3-4f71-b433-92c241503bcf}</Project>
+      <Name>LeafMeAloneShared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

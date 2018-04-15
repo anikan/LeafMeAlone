@@ -10,8 +10,5 @@ namespace Server
     {
         string name;
 
-        static void Main()
-        {
-        }
     }
 }

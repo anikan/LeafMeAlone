@@ -13,7 +13,8 @@ namespace Client
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        [STAThread]
+       // [STAThread]
+        /*
         static void Main()
         {
             Application.EnableVisualStyles();
@@ -21,6 +22,6 @@ namespace Client
             Application.Run(new Form1());
 
             GameObject test = new GameObject();
-        }
+        }*/
     }
 }

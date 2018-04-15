@@ -14,8 +14,8 @@ namespace Shared
     // model properties
     public struct TransformProperties
     {
-        Vector3 Position;  // location of the model in world coordinates
-        Vector3 Direction; // unit vector pointing to the direction the model is facing
-        Vector3 Scale;     // scale of the model
+        public Vector3 Position;  // location of the model in world coordinates
+        public Vector3 Direction; // unit vector pointing to the direction the model is facing
+        public Vector3 Scale;     // scale of the model
     }
 }

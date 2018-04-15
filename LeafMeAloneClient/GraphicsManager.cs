@@ -8,6 +8,11 @@ namespace Client
 {
     class GraphicsManager
     {
-        public static Dictionary<string, Geometry> Geo;
+        public static Dictionary<string, Geometry> DictGeometry;
+        public static Dictionary<string, Shader> DictShader;
+        public static Dictionary<string, Light> DictLight;
+        public static Camera ActiveCamera;
+
+
     }
 }

@@ -6,27 +6,28 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared;
 using SlimDX;
+using System.Windows.Forms;
 
 namespace Client
 {
     class InputManager
     {
-        public Dictionary<Key, Func<int>> InputMap;
+        public Dictionary<char, Func<int>> InputMap;
 
         public InputManager(Player userPlayer)
         {
-            InputMap = new Dictionary<Key, Func<int>>{
-                { Key.W, () => { userPlayer.Move(Player.MoveDirection.NORTH); return 0; } },
-                { Key.A, () => { userPlayer.Move(Player.MoveDirection.WEST); return 0; } },
-                { Key.S, () => { userPlayer.Move(Player.MoveDirection.SOUTH); return 0; } },
-                { Key.D, () => { userPlayer.Move(Player.MoveDirection.EAST); return 0; } }
+            InputMap = new Dictionary<char, Func<int>>{
+                { 'w', () => { userPlayer.Move(Player.MoveDirection.NORTH); return 0; } },
+                { 'a', () => { userPlayer.Move(Player.MoveDirection.WEST); return 0; } },
+                { 's', () => { userPlayer.Move(Player.MoveDirection.SOUTH); return 0; } },
+                { 'd', () => { userPlayer.Move(Player.MoveDirection.EAST); return 0; } }
             };
 
         }
 
-        public void OnKeyPress(Key key)
+        public void OnKeyPress(object ignored, KeyPressEventArgs keyArg)
         {
-            InputMap.TryGetValue(key, out Func<int> keyAction);
+            InputMap.TryGetValue(keyArg.KeyChar, out Func<int> keyAction);
             keyAction();
         }
 

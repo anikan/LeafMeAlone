@@ -20,7 +20,12 @@ namespace Client
         private static void Main()
         {
             GraphicsRenderer.Init();
+
+            InputManager inputManager = new InputManager(new Player(Vector3.Zero));
+            GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
+
             MessagePump.Run(GraphicsRenderer.Form, DoGameLoop);
+
             GraphicsRenderer.Dispose();
         }
 

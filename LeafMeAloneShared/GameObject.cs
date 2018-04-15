@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LeafMeAloneServer
+namespace Shared
 {
-    class Program
+    public class GameObject
     {
-        static void Main(string[] args)
-        {
-        }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace LeafMeAloneClient
+﻿namespace Client
 {
     partial class Form1
     {

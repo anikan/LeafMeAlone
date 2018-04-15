@@ -24,6 +24,10 @@ namespace Client
 
         public Geometry(string fileName)
         {
+            Vertices = new List<Vector3>();
+            Normals = new List<Vector3>();
+            Faces = new List<int>();
+
             importer = new AssimpContext();
             scene = importer.ImportFile(fileName);
             if (scene == null)
@@ -38,6 +42,15 @@ namespace Client
                     {
                         Vertices.Add(vertex.ToVector3());
                     });
+                    sceneMesh.Normals.ForEach(normal =>
+                    {
+                       Normals.Add(normal.ToVector3());
+                    });
+                    sceneMesh.Faces.ForEach(face =>
+                    {
+                        Faces.AddRange(face.Indices);
+                    });
+
                 }
             }
         }

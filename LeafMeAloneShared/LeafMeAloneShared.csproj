@@ -7,7 +7,7 @@
     <ProjectGuid>{3FC1602C-D2F3-4F71-B433-92C241503BCF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>LeafMeAloneShared</RootNamespace>
+    <RootNamespace>Shared</RootNamespace>
     <AssemblyName>LeafMeAloneShared</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

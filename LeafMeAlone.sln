@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneClient", "LeafMeAloneClient\LeafMeAloneClient.csproj", "{59213063-7924-49D5-929F-E2C51382A54C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneServer", "LeafMeAloneServer\LeafMeAloneServer.csproj", "{2FA67436-2FE5-42EF-B0A2-2F1B81374C34}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FC1602C-D2F3-4F71-B433-92C241503BCF} = {3FC1602C-D2F3-4F71-B433-92C241503BCF}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeafMeAloneShared", "LeafMeAloneShared\LeafMeAloneShared.csproj", "{3FC1602C-D2F3-4F71-B433-92C241503BCF}"
 EndProject

@@ -7,6 +7,12 @@ using SlimDX;
 
 namespace Client
 {
+    /// <summary>
+    /// A class that stores the information necessary to construct the View matrix
+    /// CameraPosition: Location of the Camera
+    /// CameraLookAt: Location of the target that the camera is looking at
+    /// CameraUp: Orientation of the camera; typically (0,0,1)
+    /// </summary>
     class Camera
     {
         private Vector3 m_CameraUp;
@@ -51,8 +57,14 @@ namespace Client
             }
         }
 
-        private Matrix m_ViewMatrix;
+        public Matrix m_ViewMatrix;
 
+        /// <summary>
+        /// Initialize the Camera parameters and the camera matrix
+        /// </summary>
+        /// <param name="pos"> position of the camera </param>
+        /// <param name="lookat"> target that the camera is looking at </param>
+        /// <param name="up"> orientation of the camera </param>
         public Camera( Vector3 pos, Vector3 lookat, Vector3 up)
         {
             m_CameraUp = up;
@@ -61,17 +73,24 @@ namespace Client
             UpdateCameraView();
         }
 
+        /// <summary>
+        /// Update the Camera matrix
+        /// </summary>
         public void UpdateCameraView()
         {
             m_ViewMatrix = Matrix.LookAtLH(m_CameraPosition, m_CameraLookAt, m_CameraUp);
         }
 
-        // move the camera by delta
+        /// <summary>
+        /// move the camera by delta
+        /// </summary>
+        /// <param name="delta"></param>
         public void MoveCamera( Vector3 delta )
         {
             m_CameraPosition += delta;
             m_CameraLookAt += delta;
             UpdateCameraView();
         }
+
     }
 }

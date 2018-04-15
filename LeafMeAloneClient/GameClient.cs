@@ -19,8 +19,14 @@ namespace Client
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());
+        }
 
-            Shared.GameObject test = new Shared.GameObject();
+        private static void DoGameLoop()
+        {
+            // Get user input
+
+
+            throw new NotImplementedException();
         }
     }
 }

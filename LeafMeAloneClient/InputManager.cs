@@ -10,9 +10,12 @@ using System.Windows.Forms;
 
 namespace Client
 {
+    /// <summary>
+    /// Handles user input and calls input mapped functions. 
+    /// </summary>
     class InputManager
     {
-        public Dictionary<char, Func<int>> InputMap;
+        public Dictionary<char, Action> InputMap;
 
         /// <summary>
         /// Constructor for the input manager. Should take in a player that will respond to input events.
@@ -21,11 +24,11 @@ namespace Client
         public InputManager(Player userPlayer)
         {
             // Dictionary to keep track of what functions should be called by what key presses.
-            InputMap = new Dictionary<char, Func<int>>{
-                { 'w', () => { userPlayer.Move(Player.MoveDirection.NORTH); return 0; } },
-                { 'a', () => { userPlayer.Move(Player.MoveDirection.WEST); return 0; } },
-                { 's', () => { userPlayer.Move(Player.MoveDirection.SOUTH); return 0; } },
-                { 'd', () => { userPlayer.Move(Player.MoveDirection.EAST); return 0; } }
+            InputMap = new Dictionary<char, Action>{
+                { 'w', () => { userPlayer.Move(Player.MoveDirection.NORTH); } },
+                { 'a', () => { userPlayer.Move(Player.MoveDirection.WEST);  } },
+                { 's', () => { userPlayer.Move(Player.MoveDirection.SOUTH); } },
+                { 'd', () => { userPlayer.Move(Player.MoveDirection.EAST);  } }
             };
 
         }
@@ -33,7 +36,7 @@ namespace Client
         // Key press event handler. Calls functions from the input map.
         public void OnKeyPress(object ignored, KeyPressEventArgs keyArg)
         {
-            InputMap.TryGetValue(keyArg.KeyChar, out Func<int> keyAction);
+            InputMap.TryGetValue(keyArg.KeyChar, out Action keyAction);
             keyAction();
         }
 

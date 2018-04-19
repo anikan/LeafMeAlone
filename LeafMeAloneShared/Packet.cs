@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
-    public class GameObject
+    abstract class Packet
     {
-        private int Id;
+        int PacketType;
 
-        public int GetId()
-        {
-            return Id;
-        }
+    }
+
+    [Serializable()]
+    class PlayerPacket : Packet
+    {
+        
     }
 }

@@ -25,7 +25,7 @@ namespace LeafMeAloneClient
         public StringBuilder sb = new StringBuilder();
     }
 
-    public class AsynchronousClient
+    public class NetworkClient
     {
         // The port number for the remote device.  
         private const int port = 11000;
@@ -41,7 +41,7 @@ namespace LeafMeAloneClient
         // The response from the remote device.  
         private static String response = String.Empty;
 
-        private static void StartClient()
+        public void StartClient()
         {
             // Connect to a remote device.  
             try
@@ -62,16 +62,20 @@ namespace LeafMeAloneClient
                     new AsyncCallback(ConnectCallback), client);
                 connectDone.WaitOne();
 
-                // Send test data to the remote device.  
-                Send(client, "This is a test<EOF>");
-                sendDone.WaitOne();
+                //Main game loop.
+                while (true)
+                {
+                    // Send test data to the remote device.  
+                    Send(client, "This is a test<EOF>");
+                    sendDone.WaitOne();
 
-                // Receive the response from the remote device.  
-                Receive(client);
-                receiveDone.WaitOne();
+                    // Receive the response from the remote device.  
+                    Receive(client);
+                    receiveDone.WaitOne();
 
-                // Write the response to the console.  
-                Console.WriteLine("Response received : {0}", response);
+                    // Write the response to the console.  
+                    Console.WriteLine("Response received : {0}", response);
+                }
 
                 // Release the socket.  
                 client.Shutdown(SocketShutdown.Both);
@@ -84,7 +88,7 @@ namespace LeafMeAloneClient
             }
         }
 
-        private static void ConnectCallback(IAsyncResult ar)
+        private void ConnectCallback(IAsyncResult ar)
         {
             try
             {
@@ -106,7 +110,7 @@ namespace LeafMeAloneClient
             }
         }
 
-        private static void Receive(Socket client)
+        private void Receive(Socket client)
         {
             try
             {
@@ -124,7 +128,7 @@ namespace LeafMeAloneClient
             }
         }
 
-        private static void ReceiveCallback(IAsyncResult ar)
+        private void ReceiveCallback(IAsyncResult ar)
         {
             try
             {
@@ -162,7 +166,7 @@ namespace LeafMeAloneClient
             }
         }
 
-        private static void Send(Socket client, String data)
+        private void Send(Socket client, String data)
         {
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.ASCII.GetBytes(data);
@@ -172,7 +176,7 @@ namespace LeafMeAloneClient
                 new AsyncCallback(SendCallback), client);
         }
 
-        private static void SendCallback(IAsyncResult ar)
+        private void SendCallback(IAsyncResult ar)
         {
             try
             {
@@ -190,12 +194,6 @@ namespace LeafMeAloneClient
             {
                 Console.WriteLine(e.ToString());
             }
-        }
-
-        public static int Main(String[] args)
-        {
-            StartClient();
-            return 0;
         }
     }
 }

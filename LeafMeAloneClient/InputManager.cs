@@ -25,12 +25,11 @@ namespace Client
         {
             // Dictionary to keep track of what functions should be called by what key presses.
             InputMap = new Dictionary<char, Action>{
-                { 'w', () => { userPlayer.Move(Player.MoveDirection.NORTH); } },
-                { 'a', () => { userPlayer.Move(Player.MoveDirection.WEST);  } },
-                { 's', () => { userPlayer.Move(Player.MoveDirection.SOUTH); } },
-                { 'd', () => { userPlayer.Move(Player.MoveDirection.EAST);  } }
+                { 'w', () => { userPlayer.RequestMove(new Vector2(0.0f, 1.0f)); } },
+                { 'a', () => { userPlayer.RequestMove(new Vector2(-1.0f, 0.0f));  } },
+                { 's', () => { userPlayer.RequestMove(new Vector2(0.0f, -1.0f)); } },
+                { 'd', () => { userPlayer.RequestMove(new Vector2(1.0f, 0.0f));  } }
             };
-
         }
 
         // Key press event handler. Calls functions from the input map.

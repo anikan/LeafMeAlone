@@ -8,11 +8,6 @@ namespace Shared
 {
     public class GameObject
     {
-        private int Id;
-
-        public int GetId()
-        {
-            return Id;
-        }
+        public int Id;
     }
 }

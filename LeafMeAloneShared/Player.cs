@@ -10,68 +10,64 @@ namespace Shared
     /// <summary>
     /// Class for an actual player of the game.
     /// </summary>
-    public class Player
+    public class Player : GameObject
     {
         // Movement speed.
         public const float SPEED = 1.0f;
 
         // Position of the player.
-        private Vector3 Position;
+        private Vector2 Position;
 
-        // Different possible movement directions.
-        public enum MoveDirection
-        {
-            NORTH,
-            EAST,
-            SOUTH,
-            WEST
-        };
+        public PlayerPacket PacketToSend;
 
         /// <summary>
         /// Initialize the player with an initial position.
         /// </summary>
         /// <param name="initialPosition"></param>
-        public Player (Vector3 initialPosition)
+        public Player (Vector2 initialPosition)
         {
             Position = initialPosition;
+            PacketToSend = new PlayerPacket(Id);
+        }
+
+        /// <summary>
+        /// Updates the player's values based on a received packet.
+        /// </summary>
+        /// <param name="packet"></param>
+        public void UpdateFromPacket(PlayerPacket packet)
+        {
+
+            Position = packet.Movement;
+
         }
 
         /// <summary>
         /// Moves the player in a specified direction (NESW)
         /// </summary>
         /// <param name="dir"></param>
-        public void Move(MoveDirection dir)
+        public void RequestMove(Vector2 dir)
         {
 
-            // Delta to determine where the player should move
-            Vector3 delta = Vector3.Zero;
-
-            // Check each direction and set the delta base on that direction.
-            switch (dir)
+            // If dir.X is nonzero (range to account for floating point errors)
+            if (dir.X < -0.01f || dir.X > 0.01f)
             {
-                case MoveDirection.NORTH:
-                    delta = new Vector3(0, 1, 0);
-                    break;
-                case MoveDirection.EAST:
-                    delta = new Vector3(1, 0, 0);
-                    break;
-                case MoveDirection.SOUTH:
-                    delta = new Vector3(0, -1, 0);
-                    break;
-                case MoveDirection.WEST:
-                    delta = new Vector3(-1, 0, 0);
-                    break;
+                // Set the X value of the movement packet
+                PacketToSend.Movement.X = dir.X;
             }
 
-            // Add in the delta to the player's position
-            Position = Vector3.Add(delta, Position);
+            // If dir.Y is nonzero (range to account for floating point errors)
+            if (dir.Y < -0.01f || dir.Y > 0.01f)
+            {
+                // Set the Y value of the movement packet
+                PacketToSend.Movement.Y = dir.Y;
+            }
         }
 
         /// <summary>
         /// Set the absolute position of the player
         /// </summary>
         /// <param name="pos"></param>
-        public void SetPosition(Vector3 pos)
+        public void SetPosition(Vector2 pos)
         {
             // Set the position of the player directly.
             Position = pos;

@@ -39,7 +39,9 @@ namespace LeafMeAloneClient
             new ManualResetEvent(false);
 
         // The response from the remote device.  
-        private static String response = String.Empty;
+        public String response = String.Empty;
+
+        private Socket client;
 
         public void StartClient()
         {
@@ -54,7 +56,7 @@ namespace LeafMeAloneClient
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
                 // Create a TCP/IP socket.  
-                Socket client = new Socket(ipAddress.AddressFamily,
+                client = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
 
                 // Connect to the remote endpoint.  
@@ -66,12 +68,10 @@ namespace LeafMeAloneClient
                 while (true)
                 {
                     // Send test data to the remote device.  
-                    Send(client, "This is a test<EOF>");
-                    sendDone.WaitOne();
+                    Send("This is a test<EOF>");
 
                     // Receive the response from the remote device.  
-                    Receive(client);
-                    receiveDone.WaitOne();
+                    Receive();
 
                     // Write the response to the console.  
                     Console.WriteLine("Response received : {0}", response);
@@ -92,9 +92,6 @@ namespace LeafMeAloneClient
         {
             try
             {
-                // Retrieve the socket from the state object.  
-                Socket client = (Socket)ar.AsyncState;
-
                 // Complete the connection.  
                 client.EndConnect(ar);
 
@@ -110,7 +107,7 @@ namespace LeafMeAloneClient
             }
         }
 
-        private void Receive(Socket client)
+        public void Receive()
         {
             try
             {
@@ -135,7 +132,6 @@ namespace LeafMeAloneClient
                 // Retrieve the state object and the client socket   
                 // from the asynchronous state object.  
                 StateObject state = (StateObject)ar.AsyncState;
-                Socket client = state.workSocket;
 
                 // Read data from the remote device.  
                 int bytesRead = client.EndReceive(ar);
@@ -164,9 +160,11 @@ namespace LeafMeAloneClient
             {
                 Console.WriteLine(e.ToString());
             }
+            receiveDone.WaitOne();
+
         }
 
-        private void Send(Socket client, String data)
+        public void Send(String data)
         {
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.ASCII.GetBytes(data);
@@ -180,9 +178,6 @@ namespace LeafMeAloneClient
         {
             try
             {
-                // Retrieve the socket from the state object.  
-                Socket client = (Socket)ar.AsyncState;
-
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(ar);
                 Console.WriteLine("Sent {0} bytes to server.", bytesSent);
@@ -194,6 +189,8 @@ namespace LeafMeAloneClient
             {
                 Console.WriteLine(e.ToString());
             }
+            sendDone.WaitOne();
+
         }
     }
 }

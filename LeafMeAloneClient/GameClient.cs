@@ -23,20 +23,27 @@ namespace Client
 
         private static void Main()
         {
-            GraphicsRenderer.Init();
-            MessagePump.Run(GraphicsRenderer.Form, DoGameLoop);
-            GraphicsRenderer.Dispose();
-
             GameClient gameClient = new GameClient();
 
-
+            GraphicsRenderer.Init();
+            MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
+            GraphicsRenderer.Dispose();
 
         }
 
-        private static void DoGameLoop()
+        private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+
+            // Send test data to the remote device.  
+            networkClient.Send("This is a test<EOF>");
+
+            // Receive the response from the remote device.  
+            networkClient.Receive();
+
+            // Write the response to the console.  
+            Console.WriteLine("Response received : {0}", networkClient.response);
         }
 
         public GameClient()

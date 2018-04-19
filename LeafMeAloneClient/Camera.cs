@@ -82,15 +82,38 @@ namespace Client
         }
 
         /// <summary>
-        /// move the camera by delta
+        /// move the camera by delta (by default)
+        /// can also specify the camera absolute position
         /// </summary>
-        /// <param name="delta"></param>
-        public void MoveCamera( Vector3 delta )
+        /// <param name="delta"> </param>
+        /// <param name="relative"> </param>
+        public void MoveCamera( Vector3 delta, bool relative=true )
         {
-            m_CameraPosition += delta;
-            m_CameraLookAt += delta;
+            if (relative)
+            {
+                m_CameraPosition += delta;
+                m_CameraLookAt += delta;
+            }
+            else
+            {
+                Vector3 diff = delta - m_CameraPosition;
+                m_CameraPosition = delta;
+                m_CameraLookAt = m_CameraLookAt + diff;
+            }
             UpdateCameraView();
         }
 
+
+        public void rotateCamera(Vector3 centerOfRotation, Vector3 direction, float angle)
+        {
+
+            Vector3 lookatDirection = Vector3.Normalize(centerOfRotation - m_CameraPosition);
+            Vector3 rotationAxis = Vector3.Cross(lookatDirection, Vector3.Normalize(direction));
+
+            Matrix rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
+
+            m_CameraPosition = Vector3.TransformCoordinate(m_CameraPosition, rotationMatrix);
+            UpdateCameraView();
+        }
     }
 }

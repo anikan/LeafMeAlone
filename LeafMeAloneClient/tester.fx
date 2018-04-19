@@ -2,44 +2,23 @@ float4x4 gWorld;
 float4x4 gView; 
 float4x4 gProj;
 
-void VS(float4 iPosL  : POSITION,
-        float4 iColor : COLOR,
-		float4 iNormL : NORMAL,
-        out float4 oPosH  : SV_POSITION,
-        out float4 oColor : COLOR,
-		out float4 oNormal: NORMAL )
+float4 VShader(float4 position : POSITION) : SV_POSITION
 {
 	float4x4 worldViewProj = mul(mul(gWorld, gView), gProj);
-	oPosH = mul(iPosL, worldViewProj);
-    oColor = iColor;
-	oNormal = mul(float4(1,1,1,1),gView);
+	return mul(position, worldViewProj);
 }
 
-float4 PS(float4 iPosH  : SV_POSITION, float4 iColor : COLOR, float4 iNormL : NORMAL) : SV_TARGET
+float4 PShader(float4 position : SV_POSITION) : SV_Target
 {
-	float3 AmbColor = float3(.1,.1,.8);
-    float3 LightDirection=normalize(float3(-2,2,-.01));
-	float3 LightColor=float3(1,1,1);
-	float3 DiffuseColor=float3(0.5,0.5,0.5);
-	
-	// Compute irradiance (sum of ambient & direct lighting)
-	float3 irradiance=AmbColor + LightColor * max(0,dot(LightDirection,iNormL));
-
-	// Diffuse reflectance
-	float3 reflectance=irradiance * DiffuseColor;
-
-	// Gamma correction
-	return float4(sqrt(reflectance),1);
-	
-	//return iNormL;
+	return float4(1.0f, 1.0f, 0.0f, 1.0f);
 }
 
 technique10 ColorTech
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_4_0, VS()));
+        SetVertexShader(CompileShader(vs_4_0, VShader()));
         SetGeometryShader(NULL);
-        SetPixelShader(CompileShader(ps_4_0, PS()));
+        SetPixelShader(CompileShader(ps_4_0, PShader()));
     }
 }	

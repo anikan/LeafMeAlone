@@ -1,5 +1,7 @@
-﻿using Assimp;
+﻿using System.Runtime.CompilerServices;
+using Assimp;
 using SlimDX;
+using SlimDX.X3DAudio;
 
 namespace Shared
 {
@@ -17,5 +19,34 @@ namespace Shared
         public Vector3 Position;  // location of the model in world coordinates
         public Vector3 Direction; // unit vector pointing to the direction the model is facing
         public Vector3 Scale;     // scale of the model
+
+        // check if the objects are logically equivalent to each other
+        public override bool Equals(object other)
+        {
+            if (other == null || GetType() != other.GetType())
+                return false;
+
+            TransformProperties other_prop = (TransformProperties) other;
+            return Position.Equals(other_prop.Position) &&
+                Direction.Equals(other_prop.Direction) &&
+                Scale.Equals(other_prop.Scale);
+
+        }
+
+        public void copyToThis(TransformProperties other)
+        {
+            Position.X = other.Position.X;
+            Position.Y = other.Position.Y;
+            Position.Z = other.Position.Z;
+
+            Direction.X = other.Direction.X;
+            Direction.Y = other.Direction.Y;
+            Direction.Z = other.Direction.Z;
+
+            Scale.X = other.Scale.X;
+            Scale.Y = other.Scale.Y;
+            Scale.Z = other.Scale.Z;
+
+        }
     }
 }

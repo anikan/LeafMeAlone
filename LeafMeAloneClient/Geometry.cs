@@ -25,7 +25,7 @@ namespace Client
         /// <summary>
         /// Data streams hold the actual Vertices and Faces.
         /// </summary>
-        protected DataStream Vertices, Normals, Faces;
+        public DataStream Vertices, Normals, Faces;
 
         /// <summary>
         /// Assimp scene containing the loaded model.
@@ -61,10 +61,15 @@ namespace Client
             importer = new AssimpContext();
             scene = importer.ImportFile(fileName);
 
+            int vertSize=0, normSize=0, faceSize=0;
 
-            int vertSize = scene.Meshes[0].VertexCount * Vector3.SizeInBytes;
-            int normSize = scene.Meshes[0].Normals.Count * Vector3.SizeInBytes;
-            int faceSize = scene.Meshes[0].FaceCount * 3 * sizeof(int);
+
+            scene.Meshes.ForEach(mesh =>
+            {
+                vertSize += mesh.VertexCount * Vector3.SizeInBytes;
+                normSize += mesh.Normals.Count * Vector3.SizeInBytes;
+                faceSize += mesh.FaceCount * mesh.Faces[0].IndexCount * sizeof(int);
+            });
 
 
             if (scene == null)
@@ -100,21 +105,25 @@ namespace Client
                 Faces.Position = 0;
 
                 VBO = new Buffer(GraphicsRenderer.Device, Vertices, vertSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-                EBO = new Buffer(GraphicsRenderer.Device, Faces, vertSize, ResourceUsage.Default, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+                EBO = new Buffer(GraphicsRenderer.Device, Faces, faceSize, ResourceUsage.Default, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
 
-                var btcode = ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "Render", "fx_5_0", ShaderFlags.None,
+                var btcode = ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "VShader", "vs_4_0", ShaderFlags.None,
                     EffectFlags.None);
+                var btcode1= ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "Render", "fx_5_0", ShaderFlags.None,
+                    EffectFlags.None);
+                var sig = ShaderSignature.GetInputSignature(btcode);
 
-                Effect = new Effect(GraphicsRenderer.Device, btcode);
+                Effect = new Effect(GraphicsRenderer.Device, btcode1);
                 EffectTechnique technique = Effect.GetTechniqueByIndex(0);
                 Pass = technique.GetPassByIndex(0);
 
                 Elements = new[] {
-                    new InputElement("POSITION", 0, Format.R32G32B32_Float, 0)//,
-                   // new InputElement("NORMAL",0,Format.R32G32B32_Float, 1)
+                    new InputElement("POSITION", 0, Format.R32G32B32_Float, 0)
                 };
-                InputLayout = new InputLayout(GraphicsRenderer.Device,ShaderSignature.GetInputSignature(btcode), Elements);
+
+                InputLayout = new InputLayout(GraphicsRenderer.Device,sig,Elements);
+                //InputLayout = new InputLayout(GraphicsRenderer.Device,ShaderSignature.GetInputSignature(btcode), Elements);
             }
         }
     }

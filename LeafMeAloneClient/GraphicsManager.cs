@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    class GraphicsManager
+    static class GraphicsManager
     {
-        public static Dictionary<string, Geometry> DictGeometry;
-        public static Dictionary<string, Shader> DictShader;
-        public static Dictionary<string, Light> DictLight;
+        public static Dictionary<string, Geometry> DictGeometry = new Dictionary<string, Geometry>();
+        public static Dictionary<string, Shader> DictShader = new Dictionary<string, Shader>();
+        public static Dictionary<string, Light> DictLight = new Dictionary<string, Light>();
         public static Camera ActiveCamera;
 
 

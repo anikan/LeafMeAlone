@@ -12,13 +12,15 @@ using SlimDX.Windows;
 
 namespace Client
 {
-    static class GameClient
+    class GameClient
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         private static void Main()
         {
+            GameClient gameClient = new GameClient();
+
             GraphicsRenderer.Init();
 
             // Create an input manager for player events.
@@ -27,16 +29,15 @@ namespace Client
             // Add the key press input handler to call our InputManager directly.
             GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
 
-            MessagePump.Run(GraphicsRenderer.Form, DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
 
-        private static void DoGameLoop()
+        private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
         }
-
     }
 }

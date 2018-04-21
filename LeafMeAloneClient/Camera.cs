@@ -28,7 +28,7 @@ namespace Client
 
             }
         }
-        public Vector3 m_CameraLookAt;
+        private Vector3 m_CameraLookAt;
         public Vector3 CameraLookAt
         {
             get
@@ -42,7 +42,7 @@ namespace Client
 
             }
         }
-        public Vector3 m_CameraPosition;
+        private Vector3 m_CameraPosition;
         public Vector3 CameraPosition
         {
             get

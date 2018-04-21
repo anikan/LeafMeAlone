@@ -6,8 +6,11 @@ using System.Windows.Forms;
 using Client;
 using Shared;
 using SlimDX;
+using SlimDX.D3DCompiler;
+using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
+using Device = SlimDX.DXGI.Device;
 
 
 namespace Client
@@ -16,6 +19,9 @@ namespace Client
     {
 
         private PlayerClient activePlayer;
+
+        private static Camera Camera;
+        private static Model testModel;
 
         /// <summary>
         /// The main entry point for the application.
@@ -34,23 +40,32 @@ namespace Client
             // Add the key press input handler to call our InputManager directly.
             GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
 
+            Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
+            GraphicsManager.ActiveCamera = Camera;
+            testModel = new Model(@"../../Pants14Triangles.fbx");
+
             MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
+
+
         }
 
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             ReceivePackets();
             SendPackets();
             Render();
             activePlayer.ResetTransientState();
+            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+
         }
 
         private void Render()
         {
+            testModel.Update();
+            testModel.Draw();
         }
 
         private void ReceivePackets()
@@ -60,8 +75,9 @@ namespace Client
 
         private void SendPackets()
         {
-            PlayerPacket playerPack = new PlayerPacket(activePlayer.Id);
+            PlayerPacket playerPack = new PlayerPacket(activePlayer.GetId());
             playerPack.Movement = activePlayer.MovementRequested;
         }
+
     }
 }

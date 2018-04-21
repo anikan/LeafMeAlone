@@ -8,7 +8,7 @@ using Shared;
 
 namespace Client
 {
-    public class PlayerClient : Player
+    public class PlayerClient : GameObjectClient, Player
     {
 
         public Vector2 MovementRequested;
@@ -22,7 +22,7 @@ namespace Client
         /// Updates the player's values based on a received packet.
         /// </summary>
         /// <param name="packet"></param>
-        public override void UpdateFromPacket(Packet packet)
+        public void UpdateFromPacket(Packet packet)
         {
 
         }

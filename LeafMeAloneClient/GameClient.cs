@@ -22,7 +22,7 @@ namespace Client
             GraphicsRenderer.Init();
 
             // Create an input manager for player events.
-            InputManager inputManager = new InputManager(new Player(Vector3.Zero));
+            InputManager inputManager = new InputManager(new Player(Vector2.Zero));
 
             // Add the key press input handler to call our InputManager directly.
             GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;

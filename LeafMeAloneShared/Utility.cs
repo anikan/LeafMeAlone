@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using Assimp;
 using SlimDX;
 using SlimDX.X3DAudio;
@@ -10,6 +11,11 @@ namespace Shared
         public static Vector3 ToVector3(this Vector3D vector)
         {
             return new Vector3(vector.X,vector.Y,vector.Z);
+        }
+
+        public static float ToRadians(this float degrees)
+        {
+            return degrees * ((float)Math.PI / 180.0f);
         }
     }
 
@@ -48,5 +54,7 @@ namespace Shared
             Scale.Z = other.Scale.Z;
 
         }
+        
+
     }
 }

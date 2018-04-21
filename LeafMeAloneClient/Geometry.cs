@@ -59,11 +59,14 @@ namespace Client
 
             //Create new importer.
             importer = new AssimpContext();
+
+            //import the file
             scene = importer.ImportFile(fileName);
 
-            int vertSize=0, normSize=0, faceSize=0;
+            //sizes for the loaded object.
+            int vertSize = 0, normSize = 0, faceSize = 0;
 
-
+            //loop through sizes and count them.
             scene.Meshes.ForEach(mesh =>
             {
                 vertSize += mesh.VertexCount * Vector3.SizeInBytes;
@@ -71,60 +74,62 @@ namespace Client
                 faceSize += mesh.FaceCount * mesh.Faces[0].IndexCount * sizeof(int);
             });
 
-
+            //make sure scene not null
             if (scene == null)
-            {
                 throw new FileNotFoundException();
-            }
-            else
+
+            //create new datastreams.
+            Vertices = new DataStream(vertSize, true, true);
+            Normals = new DataStream(normSize, true, true);
+            Faces = new DataStream(faceSize, true, true);
+
+            //loop through vertices, normals, and faces and put them in the datastreams.
+            foreach (Mesh sceneMesh in scene.Meshes)
             {
-
-                Vertices = new DataStream(vertSize, true, true);
-                Normals = new DataStream(normSize, true, true);
-                Faces = new DataStream(faceSize, true, true);
-                
-
-                foreach (Mesh sceneMesh in scene.Meshes)
+                sceneMesh.Vertices.ForEach(vertex =>
                 {
-                    sceneMesh.Vertices.ForEach(vertex =>
-                    {
-                        Vertices.Write(vertex.ToVector3());
-                    });
-                    sceneMesh.Normals.ForEach(normal =>
-                    {
-                        Normals.Write(normal.ToVector3());
-                    });
-                    sceneMesh.Faces.ForEach(face =>
-                    {
-                        Faces.WriteRange(face.Indices.ToArray());
-                    });
+                    Vertices.Write(vertex.ToVector3());
+                });
+                sceneMesh.Normals.ForEach(normal =>
+                {
+                    Normals.Write(normal.ToVector3());
+                });
+                sceneMesh.Faces.ForEach(face =>
+                {
+                    Faces.WriteRange(face.Indices.ToArray());
+                });
 
-                }
-                Vertices.Position = 0;
-                Normals.Position = 0;
-                Faces.Position = 0;
-
-                VBO = new Buffer(GraphicsRenderer.Device, Vertices, vertSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-                EBO = new Buffer(GraphicsRenderer.Device, Faces, faceSize, ResourceUsage.Default, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-
-
-                var btcode = ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "VShader", "vs_4_0", ShaderFlags.None,
-                    EffectFlags.None);
-                var btcode1= ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "Render", "fx_5_0", ShaderFlags.None,
-                    EffectFlags.None);
-                var sig = ShaderSignature.GetInputSignature(btcode);
-
-                Effect = new Effect(GraphicsRenderer.Device, btcode1);
-                EffectTechnique technique = Effect.GetTechniqueByIndex(0);
-                Pass = technique.GetPassByIndex(0);
-
-                Elements = new[] {
-                    new InputElement("POSITION", 0, Format.R32G32B32_Float, 0)
-                };
-
-                InputLayout = new InputLayout(GraphicsRenderer.Device,sig,Elements);
-                //InputLayout = new InputLayout(GraphicsRenderer.Device,ShaderSignature.GetInputSignature(btcode), Elements);
             }
+
+            //reset positions in data stream
+            Vertices.Position = 0;
+            Normals.Position = 0;
+            Faces.Position = 0;
+
+
+            //create vertex vbo and faces ebo.
+            VBO = new Buffer(GraphicsRenderer.Device, Vertices, vertSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            EBO = new Buffer(GraphicsRenderer.Device, Faces, faceSize, ResourceUsage.Default, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+
+            #region Shader Code -- To Move
+
+            var btcode = ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "VShader", "vs_4_0", ShaderFlags.None,
+                EffectFlags.None);
+            var btcode1 = ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "Render", "fx_5_0", ShaderFlags.None,
+                EffectFlags.None);
+            var sig = ShaderSignature.GetInputSignature(btcode);
+
+            Effect = new Effect(GraphicsRenderer.Device, btcode1);
+            EffectTechnique technique = Effect.GetTechniqueByIndex(0);
+            Pass = technique.GetPassByIndex(0);
+
+            Elements = new[] {
+                new InputElement("POSITION", 0, Format.R32G32B32_Float, 0)
+            };
+
+            InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
+
+            #endregion
         }
     }
 }

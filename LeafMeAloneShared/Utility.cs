@@ -23,7 +23,7 @@ namespace Shared
     public struct TransformProperties
     {
         public Vector3 Position;  // location of the model in world coordinates
-        public Vector3 Direction; // unit vector pointing to the direction the model is facing
+        public Vector3 Direction; // euler coordinate that represents the direction the object is facing
         public Vector3 Scale;     // scale of the model
 
         // check if the objects are logically equivalent to each other

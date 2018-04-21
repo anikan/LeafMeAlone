@@ -85,11 +85,11 @@ namespace Client
         /// move the camera by delta (by default)
         /// can also specify the camera absolute position
         /// </summary>
-        /// <param name="delta"> </param>
-        /// <param name="relative"> </param>
-        public void MoveCamera( Vector3 delta, bool relative=true )
+        /// <param name="delta"> move the camera by delta. If it is isRelative, the change is additve; otherwise it is absolute </param>
+        /// <param name="isRelative"> set whether or not the move is relative; true by default </param>
+        public void MoveCamera( Vector3 delta, bool isRelative=true )
         {
-            if (relative)
+            if (isRelative)
             {
                 m_CameraPosition += delta;
                 m_CameraLookAt += delta;
@@ -103,16 +103,24 @@ namespace Client
             UpdateCameraView();
         }
 
-
-        public void rotateCamera(Vector3 centerOfRotation, Vector3 direction, float angle)
+        /// <summary>
+        /// rotate the camera around the centerOfRotation by _ angle towards _ direction
+        /// Note that the input direction is in terms of camera space coordinate
+        /// </summary>
+        /// <param name="centerOfRotation"> the center around which the camera should rotate... (tested with (0,0,0) )</param>
+        /// <param name="direction"> The direction (cartesian vector) the camera should rotate towards in the </param>
+        /// <param name="angle"> The angle of rotation </param>
+        public void RotateCamera(Vector3 centerOfRotation, Vector3 direction, float angle)
         {
-
-            Vector3 lookatDirection = Vector3.Normalize(centerOfRotation - m_CameraPosition);
-            Vector3 rotationAxis = Vector3.Cross(lookatDirection, Vector3.Normalize(direction));
-
+            Vector3 rotationAxis = Vector3.Cross(new Vector3(0, 0, -1), Vector3.Normalize(direction));
+            
             Matrix rotationMatrix = Matrix.RotationAxis(rotationAxis, angle);
 
+            Vector3 offset = -1.0f * centerOfRotation;
+            m_CameraPosition += offset;
             m_CameraPosition = Vector3.TransformCoordinate(m_CameraPosition, rotationMatrix);
+            m_CameraPosition -= offset;
+
             UpdateCameraView();
         }
     }

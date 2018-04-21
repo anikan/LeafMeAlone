@@ -15,16 +15,18 @@ namespace Client
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, -1);
 
-
+        // active geometry and shader in use
         private Geometry m_ActiveGeo;
         private Shader m_ActiveShader;
+
+        // model matrix used for the rendering
         private Matrix m_ModelMatrix;
 
         // holds the transformation properties of the model
-        public TransformProperties m_Properties;
+        private TransformProperties m_Properties;
 
         // This is a duplicate used to check if there is a need to update the matrix
-        public TransformProperties m_PrevProperties;
+        private TransformProperties m_PrevProperties;
 
         // creates a new model; duplicate filepath will be used to detect
         // if a geometry already exists
@@ -60,7 +62,7 @@ namespace Client
             }
         }
 
-        // set the model matrix and draw 
+        // pass the model matrix to the shader and draw the active geometry
         public void Draw()
         {
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = m_ActiveGeo.InputLayout;
@@ -77,9 +79,17 @@ namespace Client
         
         }
 
+        // the public interface of the Update function
+        // takes in a 'properties', which is used to generate the model matrix
+        public void Update(TransformProperties properties)
+        {
+            m_Properties = properties;
+            Update();
+        }
+
         // update the model matrix based on the properties
         // assume by default the model is facing (0, 0, -1)
-        public void Update()
+        private void Update()
         {
             // update the matrix only if the properties has changes
             if (!m_Properties.Equals(m_PrevProperties))
@@ -89,19 +99,12 @@ namespace Client
 
                 m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
 
-                m_Properties.Direction =
-                    Vector3.Normalize(m_Properties
-                        .Direction); // ensure the direction is normalized so that its length is 1
-                Vector3 rotationAxis =
-                    Vector3.Cross(defaultDirection, m_Properties.Direction); // to get the rotational axis
+                // set the rotation based on the three directions
+                m_ModelMatrix = Matrix.RotationX(m_Properties.Direction.X) * 
+                                Matrix.RotationY(m_Properties.Direction.Y) * 
+                                Matrix.RotationZ(m_Properties.Direction.Z) * m_ModelMatrix;
 
-                // a dot b = |a|*|b|*cos(theta) = cos(theta) when |a| = |b| = 1
-                // we can use dot product to find the angle of rotation
-                // NOTE: Not sure if we are using radian or degree
-                float rotationAngle = (float)Math.Acos(Vector3.Dot(defaultDirection, m_Properties.Direction));
-
-                // set the rotation and translation of the model
-                m_ModelMatrix = Matrix.RotationAxis(rotationAxis, rotationAngle) * m_ModelMatrix;
+                // set the translation based on the position
                 m_ModelMatrix = Matrix.Translation(m_Properties.Position) * m_ModelMatrix;
             }
         }

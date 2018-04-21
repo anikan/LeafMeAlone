@@ -54,17 +54,18 @@ namespace Client
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-            testModel.Update();
-            testModel.Draw();
-            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             ReceivePackets();
             SendPackets();
             Render();
             activePlayer.ResetTransientState();
+            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+
         }
 
         private void Render()
         {
+            testModel.Update();
+            testModel.Draw();
         }
 
         private void ReceivePackets()

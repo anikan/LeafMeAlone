@@ -20,7 +20,7 @@ namespace Client
         {
             if (model == null)
                 return;
-            model.M = Transform;
+            model.m_Properties = Transform;
             model.Update();
         }
 

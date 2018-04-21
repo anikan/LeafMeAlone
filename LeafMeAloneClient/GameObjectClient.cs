@@ -7,7 +7,7 @@ using Shared;
 
 namespace Client
 {
-    class GameObjectClient : GameObject
+    public class GameObjectClient : GameObject
     {
         private Model model;
 

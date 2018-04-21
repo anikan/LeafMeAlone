@@ -63,18 +63,7 @@ namespace Client
         // set the model matrix and draw 
         public void Draw()
         {
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = m_ActiveGeo.InputLayout;
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(m_ActiveGeo.VBO, Vector3.SizeInBytes, 0));
-
-            m_ActiveGeo.Effect.GetVariableByName("gWorld").AsMatrix().SetMatrix(m_ModelMatrix);
-            m_ActiveGeo.Effect.GetVariableByName("gView").AsMatrix()
-                .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
-            m_ActiveGeo.Effect.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
-
-            m_ActiveGeo.Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
-            GraphicsRenderer.Device.ImmediateContext.Draw((int)m_ActiveGeo.Vertices.Length/3,0);
-        
+           m_ActiveGeo.Draw(m_ModelMatrix);
         }
 
         // update the model matrix based on the properties

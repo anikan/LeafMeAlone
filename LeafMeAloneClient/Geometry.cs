@@ -20,12 +20,12 @@ namespace Client
         /// <summary>
         /// Vertex Buffer, Index Buffer
         /// </summary>
-        public Buffer VBO, EBO;
+        private Buffer VBO, EBO;
 
         /// <summary>
         /// Data streams hold the actual Vertices and Faces.
         /// </summary>
-        public DataStream Vertices, Normals, Faces;
+        private DataStream Vertices, Normals, Faces;
 
         /// <summary>
         /// Assimp scene containing the loaded model.
@@ -40,15 +40,17 @@ namespace Client
         /// <summary>
         /// Elements are just used to put things into the shader.
         /// </summary>
-        public InputElement[] Elements;
-        public InputLayout InputLayout;
+        private InputElement[] Elements;
+
+        private InputLayout InputLayout;
 
 
         /// <summary>
         /// something to do with shaders
         /// </summary>
-        public Effect Effect;
-        public EffectPass Pass;
+        private Effect Effect;
+
+        private EffectPass Pass;
 
         /// <summary>
         /// Create a new geometry given filename
@@ -130,6 +132,22 @@ namespace Client
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
 
             #endregion
+        }
+
+
+        public void Draw(Matrix modelMatrix)
+        {
+            GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = InputLayout;
+            GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO, Vector3.SizeInBytes, 0));
+
+            Effect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
+            Effect.GetVariableByName("gView").AsMatrix()
+                .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
+            Effect.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
+
+            Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
+            GraphicsRenderer.Device.ImmediateContext.Draw((int)Vertices.Length / 3, 0);
         }
     }
 }

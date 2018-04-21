@@ -37,7 +37,7 @@ namespace Client
 
             Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActiveCamera = Camera;
-            testModel = new Model("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\Pants14Triangles.fbx", new Shader());
+            testModel = new Model("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\Pants14Triangles.fbx");
 
             MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
 
@@ -49,7 +49,8 @@ namespace Client
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-
+            testModel.Update();
+            testModel.Draw();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
         }
 

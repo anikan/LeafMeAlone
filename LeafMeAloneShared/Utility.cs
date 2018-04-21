@@ -20,7 +20,7 @@ namespace Shared
     }
 
     // model properties
-    public struct TransformProperties
+    public struct Transform
     {
         public Vector3 Position;  // location of the model in world coordinates
         public Vector3 Direction; // unit vector pointing to the direction the model is facing
@@ -32,14 +32,14 @@ namespace Shared
             if (other == null || GetType() != other.GetType())
                 return false;
 
-            TransformProperties other_prop = (TransformProperties) other;
+            Transform other_prop = (Transform) other;
             return Position.Equals(other_prop.Position) &&
                 Direction.Equals(other_prop.Direction) &&
                 Scale.Equals(other_prop.Scale);
 
         }
 
-        public void copyToThis(TransformProperties other)
+        public void copyToThis(Transform other)
         {
             Position.X = other.Position.X;
             Position.Y = other.Position.Y;

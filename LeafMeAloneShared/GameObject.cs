@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
-    public class GameObject
+    public abstract class GameObject
     {
-        private int Id;
+        private int id;
+
+        protected Transform Transform;
+
+        public abstract void Update();
+        public abstract void Draw();
 
         public int GetId()
         {
-            return Id;
+            return id;
         }
     }
 }

@@ -21,26 +21,26 @@ namespace Client
         private Matrix m_ModelMatrix;
 
         // holds the transformation properties of the model
-        public TransformProperties m_Properties;
+        public Transform M;
 
         // This is a duplicate used to check if there is a need to update the matrix
-        public TransformProperties m_PrevProperties;
+        public Transform MPrev;
 
         // creates a new model; duplicate filepath will be used to detect
         // if a geometry already exists
-        public Model(string filePath, Shader shader)
+        public Model(string filePath)
         {
             Load(filePath);
 
             // set the properties and update the model matrix
-            m_ActiveShader = shader;
-            m_Properties.Direction = new Vector3(0, 0, -1);
-            m_Properties.Position = new Vector3(0, 0, 0);
-            m_Properties.Scale = new Vector3(1, 1, 1);
+            //m_ActiveShader = shader;
+            M.Direction = new Vector3(0, 0, -1);
+            M.Position = new Vector3(0, 0, 0);
+            M.Scale = new Vector3(1, 1, 1);
 
-            m_PrevProperties.Direction = new Vector3(0, 0, 0);
-            m_PrevProperties.Position = new Vector3(0, 0, 0);
-            m_PrevProperties.Scale = new Vector3(0, 0, 0);
+            MPrev.Direction = new Vector3(0, 0, 0);
+            MPrev.Position = new Vector3(0, 0, 0);
+            MPrev.Scale = new Vector3(0, 0, 0);
             Update();
 
         }
@@ -82,27 +82,27 @@ namespace Client
         public void Update()
         {
             // update the matrix only if the properties has changes
-            if (!m_Properties.Equals(m_PrevProperties))
+            if (!M.Equals(MPrev))
             {
                 // prev properties = current properties
-                m_PrevProperties.copyToThis(m_Properties);
+                MPrev.copyToThis(M);
 
-                m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
+                m_ModelMatrix = Matrix.Scaling(M.Scale); // set the scaling of the model
 
-                m_Properties.Direction =
-                    Vector3.Normalize(m_Properties
+                M.Direction =
+                    Vector3.Normalize(M
                         .Direction); // ensure the direction is normalized so that its length is 1
                 Vector3 rotationAxis =
-                    Vector3.Cross(defaultDirection, m_Properties.Direction); // to get the rotational axis
+                    Vector3.Cross(defaultDirection, M.Direction); // to get the rotational axis
 
                 // a dot b = |a|*|b|*cos(theta) = cos(theta) when |a| = |b| = 1
                 // we can use dot product to find the angle of rotation
                 // NOTE: Not sure if we are using radian or degree
-                float rotationAngle = (float)Math.Acos(Vector3.Dot(defaultDirection, m_Properties.Direction));
+                float rotationAngle = (float)Math.Acos(Vector3.Dot(defaultDirection, M.Direction));
 
                 // set the rotation and translation of the model
                 m_ModelMatrix = Matrix.RotationAxis(rotationAxis, rotationAngle) * m_ModelMatrix;
-                m_ModelMatrix = Matrix.Translation(m_Properties.Position) * m_ModelMatrix;
+                m_ModelMatrix = Matrix.Translation(M.Position) * m_ModelMatrix;
             }
         }
 

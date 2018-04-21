@@ -42,7 +42,7 @@ namespace Client
 
             Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActiveCamera = Camera;
-            testModel = new Model("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\Pants14Triangles.fbx");
+            testModel = new Model(@"../../Pants14Triangles.fbx");
 
             MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
 

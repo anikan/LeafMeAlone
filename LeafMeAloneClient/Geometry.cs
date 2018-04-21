@@ -115,9 +115,9 @@ namespace Client
 
             #region Shader Code -- To Move
 
-            var btcode = ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "VShader", "vs_4_0", ShaderFlags.None,
+            var btcode = ShaderBytecode.CompileFromFile(@"../../tester.fx", "VShader", "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);
-            var btcode1 = ShaderBytecode.CompileFromFile("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\tester.fx", "Render", "fx_5_0", ShaderFlags.None,
+            var btcode1 = ShaderBytecode.CompileFromFile(@"../../tester.fx", "Render", "fx_5_0", ShaderFlags.None,
                 EffectFlags.None);
             var sig = ShaderSignature.GetInputSignature(btcode);
 

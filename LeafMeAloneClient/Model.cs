@@ -13,7 +13,7 @@ namespace Client
     // Also manages the Model class
     class Model
     {
-        private static Vector3 defaultDirection = new Vector3(0, 0, -1);
+        private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 
         // active geometry and shader in use
         private Geometry m_ActiveGeo;
@@ -36,7 +36,7 @@ namespace Client
 
             // set the properties and update the model matrix
             //m_ActiveShader = shader;
-            m_Properties.Direction = new Vector3(0, 0, -1);
+            m_Properties.Direction = new Vector3(0, 0, 0);
             m_Properties.Position = new Vector3(0, 0, 0);
             m_Properties.Scale = new Vector3(1, 1, 1);
 

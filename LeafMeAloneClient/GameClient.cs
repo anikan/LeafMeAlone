@@ -14,6 +14,9 @@ namespace Client
 {
     class GameClient
     {
+
+        private PlayerClient activePlayer;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -23,8 +26,10 @@ namespace Client
 
             GraphicsRenderer.Init();
 
+            gameClient.activePlayer = new PlayerClient();
+
             // Create an input manager for player events.
-            InputManager inputManager = new InputManager(new Player(Vector2.Zero));
+            InputManager inputManager = new InputManager(gameClient.activePlayer);
 
             // Add the key press input handler to call our InputManager directly.
             GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
@@ -38,6 +43,25 @@ namespace Client
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+            ReceivePackets();
+            SendPackets();
+            Render();
+            activePlayer.ResetTransientState();
+        }
+
+        private void Render()
+        {
+        }
+
+        private void ReceivePackets()
+        {
+
+        }
+
+        private void SendPackets()
+        {
+            PlayerPacket playerPack = new PlayerPacket(activePlayer.Id);
+            playerPack.Movement = activePlayer.MovementRequested;
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Client
         /// Constructor for the input manager. Should take in a player that will respond to input events.
         /// </summary>
         /// <param name="userPlayer"></param>
-        public InputManager(Player userPlayer)
+        public InputManager(PlayerClient userPlayer)
         {
             // Dictionary to keep track of what functions should be called by what key presses.
             InputMap = new Dictionary<char, Action>{

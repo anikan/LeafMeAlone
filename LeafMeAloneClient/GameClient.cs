@@ -25,26 +25,30 @@ namespace Client
         /// </summary>
         private static void Main()
         {
+            GameClient gameClient = new GameClient();
 
             GraphicsRenderer.Init();
+
+            // Create an input manager for player events.
+            InputManager inputManager = new InputManager(new Player(Vector3.Zero));
+
+            // Add the key press input handler to call our InputManager directly.
+            GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
+
             Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActiveCamera = Camera;
-            testModel = new Model("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\Pants14Triangles.fbx",new Shader());
+            testModel = new Model("C:\\Users\\CSVR\\Desktop\\CSE125\\LeafMeAlone\\LeafMeAloneClient\\Pants14Triangles.fbx", new Shader());
 
-            MessagePump.Run(GraphicsRenderer.Form, DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
+
             GraphicsRenderer.Dispose();
+
+
         }
 
-
-        /// <summary>
-        /// The Main Game Loop
-        /// </summary>
-        private static void DoGameLoop()
+        private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-            testModel.Update();
-            testModel.Draw();
-
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
         }

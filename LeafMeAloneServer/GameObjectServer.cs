@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 
-namespace Shared
+namespace Server
 {
-    public class GameObject
+    class GameObjectServer : GameObject
     {
-        public int Id;
+
+
+
     }
 }

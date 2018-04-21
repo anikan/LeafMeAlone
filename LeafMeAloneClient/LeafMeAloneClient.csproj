@@ -58,6 +58,7 @@
     <Compile Include="GameClient.cs" />
     <Compile Include="InputManager.cs" />
     <Compile Include="GraphicsRenderer.cs" />
+    <Compile Include="PlayerClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

@@ -9,8 +9,14 @@ namespace Server
 {
     class GameObjectServer : GameObject
     {
+        public override void Draw()
+        {
+            throw new NotImplementedException();
+        }
 
-
-
+        public override void Update()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

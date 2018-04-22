@@ -22,9 +22,9 @@ namespace Shared
         /// Creates the packet
         /// </summary>
         /// <param name="id"></param>
-        public Packet(int id)
+        public Packet()
         {
-            ObjectID = id;
+
         }
 
         /// <summary>

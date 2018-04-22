@@ -20,7 +20,7 @@ namespace Client
 
         private PlayerClient ActivePlayer;
         private InputManager InputManager;
-        
+
         private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
@@ -35,15 +35,48 @@ namespace Client
             Client.ActivePlayer = new PlayerClient();
 
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
+            GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.
             Client.SetupInputManager();
+
+            GraphicsRenderer.Form.KeyDown += Client.InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += Client.InputManager.OnKeyUp;
+
+            //TODO FOR TESTING ONLY
+            GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
 
+
+        public static void TestPlayerMovementWithoutNetworking(object ignore, KeyEventArgs keyArg)
+        {
+            if (keyArg.KeyCode == Keys.Up)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position += Vector3.UnitY;
+            }
+            if (keyArg.KeyCode == Keys.Down)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position -= Vector3.UnitY;
+            }
+            if (keyArg.KeyCode == Keys.Left)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position += Vector3.UnitX;
+            }
+            if (keyArg.KeyCode == Keys.Right)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position -= Vector3.UnitX;
+            }
+            if (keyArg.KeyCode == Keys.Space)
+            {
+                GraphicsManager.ActivePlayer.Transform.Direction += Vector3.UnitY * 20;
+            }
+
+
+        }
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
@@ -56,7 +89,7 @@ namespace Client
             // Send any packets to the server.
             SendPackets();
 
-            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.0001f);
+            //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
 
             Render();
 

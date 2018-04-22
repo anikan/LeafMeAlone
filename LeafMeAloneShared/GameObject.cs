@@ -19,7 +19,7 @@ namespace Shared
         /// </summary>
         public string Name;
 
-        protected Transform Transform;
+        public Transform Transform;
 
         public abstract void Update();
         public abstract void Draw();

@@ -51,7 +51,7 @@ namespace Client
         {
             Rasterizer = new RasterizerStateDescription()
             {
-                FillMode = FillMode.Wireframe,
+                FillMode = FillMode.Solid,
                 CullMode = CullMode.Back,
                 IsFrontCounterclockwise = false,
                 IsDepthClipEnabled = true

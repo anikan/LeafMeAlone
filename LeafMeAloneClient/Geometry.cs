@@ -18,9 +18,9 @@ namespace Client
     {
 
         /// <summary>
-        /// Vertex Buffer, Index Buffer
+        /// Vertex Buffer,Normal Buffer Index Buffer
         /// </summary>
-        private Buffer VBO, EBO;
+        private Buffer VBOPositions, VBONormals, EBO;
 
         /// <summary>
         /// Data streams hold the actual Vertices and Faces.
@@ -110,12 +110,13 @@ namespace Client
 
 
             //create vertex vbo and faces ebo.
-            VBO = new Buffer(GraphicsRenderer.Device, Vertices, vertSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            VBOPositions = new Buffer(GraphicsRenderer.Device, Vertices, vertSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            VBONormals = new Buffer(GraphicsRenderer.Device, Normals, normSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None,0);
             EBO = new Buffer(GraphicsRenderer.Device, Faces, faceSize, ResourceUsage.Default, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
             #region Shader Code -- To Move
 
-            var btcode = ShaderBytecode.CompileFromFile(@"../../tester.fx", "VShader", "vs_4_0", ShaderFlags.None,
+            var btcode = ShaderBytecode.CompileFromFile(@"../../tester.fx", "VS", "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);
             var btcode1 = ShaderBytecode.CompileFromFile(@"../../tester.fx", "Render", "fx_5_0", ShaderFlags.None,
                 EffectFlags.None);
@@ -126,7 +127,8 @@ namespace Client
             Pass = technique.GetPassByIndex(0);
 
             Elements = new[] {
-                new InputElement("POSITION", 0, Format.R32G32B32_Float, 0)
+                new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
+                new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1)
             };
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
@@ -139,7 +141,8 @@ namespace Client
         {
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = InputLayout;
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO, Vector3.SizeInBytes, 0));
+            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBOPositions, Vector3.SizeInBytes, 0));
+            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBONormals, Vector3.SizeInBytes, 0));
 
             Effect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
             Effect.GetVariableByName("gView").AsMatrix()

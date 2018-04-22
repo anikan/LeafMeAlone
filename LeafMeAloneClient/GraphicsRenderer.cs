@@ -37,6 +37,60 @@ namespace Client
 
         public static Matrix ProjectionMatrix;
 
+        #region Depth Buffer and Rasterizer
+        private static Texture2DDescription depthBufferDesc;
+        private static Texture2D DepthBuffer;
+        public static DepthStencilView DepthView;
+        private static DepthStencilState DepthState;
+        private static DepthStencilStateDescription dsStateDesc;
+        private static RasterizerStateDescription Rasterizer;
+        #endregion
+
+
+        static void InitializeRasterizer()
+        {
+            Rasterizer = new RasterizerStateDescription()
+            {
+                FillMode = FillMode.Solid,
+                CullMode = CullMode.Back,
+                IsFrontCounterclockwise = false,
+                IsDepthClipEnabled = true
+            };
+            DeviceContext.Rasterizer.State = RasterizerState.FromDescription(Device, Rasterizer);
+        }
+
+        static void InitializeDepthBuffer()
+        {
+            Format depthFormat = Format.D32_Float;
+            depthBufferDesc = new Texture2DDescription
+            {
+                ArraySize = 1,
+                BindFlags = BindFlags.DepthStencil,
+                CpuAccessFlags = CpuAccessFlags.None,
+                Format = depthFormat,
+                Height = Form.Height,
+                Width = Form.Width,
+                MipLevels = 1,
+                OptionFlags = ResourceOptionFlags.None,
+                SampleDescription = new SampleDescription(1, 0),
+                Usage = ResourceUsage.Default
+            };
+
+            DepthBuffer = new Texture2D(Device, depthBufferDesc);
+            DepthView = new DepthStencilView(Device, DepthBuffer);
+
+            dsStateDesc = new DepthStencilStateDescription()
+            {
+                IsDepthEnabled = true,
+                IsStencilEnabled = false,
+                DepthWriteMask = DepthWriteMask.All,
+                DepthComparison = Comparison.Less,
+            };
+
+            DepthState = DepthStencilState.FromDescription(Device, dsStateDesc);
+            DeviceContext.OutputMerger.DepthStencilState = DepthState;
+
+        }
 
         /// <summary>
         /// Initialize graphics properties and create the main window.
@@ -62,6 +116,8 @@ namespace Client
             //create new device (with directx) which can be used throughout the project.
             Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, description, out Device, out SwapChain);
 
+
+
             // create a view of our render target, which is the backbuffer of the swap chain we just created
             using (var resource = Resource.FromSwapChain<Texture2D>(SwapChain, 0))
                 RenderTarget = new RenderTargetView(Device, resource);
@@ -69,8 +125,12 @@ namespace Client
             //get device context so we can render to it.
             DeviceContext = Device.ImmediateContext;
 
+            InitializeRasterizer();
+            InitializeDepthBuffer();
+
             Viewport = new Viewport(0.0f, 0.0f, Form.ClientSize.Width, Form.ClientSize.Height);
-            DeviceContext.OutputMerger.SetTargets(RenderTarget);
+            //DeviceContext.OutputMerger.SetTargets(RenderTarget);
+            DeviceContext.OutputMerger.SetTargets(DepthView, RenderTarget);
             DeviceContext.Rasterizer.SetViewports(Viewport);
 
             Form.Resize += FormOnResize;

@@ -21,9 +21,9 @@ namespace Client
         public bool UseToolPrimaryRequest;
         public bool UseToolSecondaryRequest;
 
-        public PlayerClient()
+        public PlayerClient() : base()
         {
-
+            SetModel(@"../../Models/Version1.fbx");
         }
 
         /// <summary>

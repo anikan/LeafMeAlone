@@ -20,9 +20,8 @@ namespace Client
 
         private PlayerClient ActivePlayer;
         private InputManager InputManager;
-
-        private static Camera Camera;
-        private static Model testModel;
+        
+        private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
         /// The main entry point for the application.
@@ -35,25 +34,20 @@ namespace Client
 
             Client.ActivePlayer = new PlayerClient();
 
+            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
+
             // Set up the input manager.
             Client.SetupInputManager();
-
-            Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
-            GraphicsManager.ActiveCamera = Camera;
-            testModel = new Model(@"../../Pants14Triangles.fbx");
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
-
-
         }
 
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-
-            // Receive any packets from the server.
+            GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             ReceivePackets();
 
             // Update input events.
@@ -62,7 +56,8 @@ namespace Client
             // Send any packets to the server.
             SendPackets();
 
-            // Render on screen.
+            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.0001f);
+
             Render();
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
@@ -71,8 +66,8 @@ namespace Client
 
         private void Render()
         {
-            testModel.Update();
-            testModel.Draw();
+            ActivePlayer.Update();
+            ActivePlayer.Draw();
         }
 
         private void ReceivePackets()

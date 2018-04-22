@@ -14,6 +14,7 @@ namespace Client
         public void SetModel(string filePath)
         {
             model = new Model(filePath);
+            Name = filePath.Split('.')[0];
         }
 
         public override void Update()

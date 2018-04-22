@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,8 +33,11 @@ namespace Client
         // if a geometry already exists
         public Model(string filePath)
         {
-            Load(filePath);
+            //confirm the file exists
+            System.Diagnostics.Debug.Assert(File.Exists(filePath));
 
+            Load(filePath);
+            m_ModelMatrix = Matrix.Identity;
             // set the properties and update the model matrix
             //m_ActiveShader = shader;
             m_Properties.Direction = new Vector3(0, 0, 0);
@@ -44,7 +48,6 @@ namespace Client
             m_PrevProperties.Position = new Vector3(0, 0, 0);
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
             Update();
-
         }
 
         // load the geometry if it is not available, or find

@@ -17,11 +17,9 @@ namespace Client
 {
     class GameClient
     {
-
         private PlayerClient activePlayer;
 
-        private static Camera Camera;
-        private static Model testModel;
+        private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
         /// The main entry point for the application.
@@ -33,16 +31,13 @@ namespace Client
             GraphicsRenderer.Init();
 
             gameClient.activePlayer = new PlayerClient();
+            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
 
             // Create an input manager for player events.
             InputManager inputManager = new InputManager(gameClient.activePlayer);
 
             // Add the key press input handler to call our InputManager directly.
             GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
-
-            Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
-            GraphicsManager.ActiveCamera = Camera;
-            testModel = new Model(@"../../Pants14Triangles.fbx");
 
             MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
 
@@ -64,8 +59,8 @@ namespace Client
 
         private void Render()
         {
-            testModel.Update();
-            testModel.Draw();
+            activePlayer.Update();
+            activePlayer.Draw();
         }
 
         private void ReceivePackets()

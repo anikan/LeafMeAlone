@@ -13,9 +13,9 @@ namespace Client
 
         public Vector2 MovementRequested;
 
-        public PlayerClient()
+        public PlayerClient() : base()
         {
-
+            SetModel(@"../../Pants14Triangles.fbx");
         }
 
         /// <summary>

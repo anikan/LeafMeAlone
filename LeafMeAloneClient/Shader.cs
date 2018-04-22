@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    class Shader
+    public class Shader
     {
+       
     }
 }

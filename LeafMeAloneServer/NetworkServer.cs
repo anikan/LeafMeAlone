@@ -42,7 +42,7 @@ namespace Server
         //Socket to communicate with client.
         private Socket clientSocket;
 
-        public List<PlayerPacket> PlayerPackets;
+        public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
         public NetworkServer()
         {
@@ -111,12 +111,12 @@ namespace Server
 
             // Get the socket that handles the client request.  
             Socket listener = (Socket)ar.AsyncState;
-            Socket handler = listener.EndAccept(ar);
+            clientSocket = listener.EndAccept(ar);
 
             // Create the state object.  
             StateObject state = new StateObject();
-            state.workSocket = handler;
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+            state.workSocket = clientSocket;
+            clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
         }
 
@@ -138,24 +138,15 @@ namespace Server
                 state.sb.Append(Encoding.ASCII.GetString(
                     state.buffer, 0, bytesRead));
 
-                // Check for end-of-file tag. If it is not there, read   
-                // more data.  
-                content = state.sb.ToString();
-                if (content.IndexOf("<EOF>") > -1)
-                {
-                    // All the data has been read from the   
-                    // client. Display it on the console.  
-                    Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                        content.Length, content);
-                    // Echo the data back to the client.  
-                    Send(handler, content);
-                }
-                else
-                {
-                    // Not all data received. Get more.  
-                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReadCallback), state);
-                }
+                PlayerPacket packet = PlayerPacket.Deserialize(state.buffer);
+
+                PlayerPackets.Add(packet);
+                
+                // All the data has been read from the   
+                // client. Display it on the console.  
+                Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
+                    content.Length, content);
+
             }
 
             // Create a new state object for the next packet.  
@@ -168,20 +159,19 @@ namespace Server
         }
 
         /// <summary>
-        /// Given a player and a socket, generate a PlayerPacket and send it.
+        /// Given a player, generate a PlayerPacket and send it.
         /// </summary>
         /// <param name="handler"></param>
         /// <param name="player"></param>
-        private void SendPlayer(Socket handler, PlayerServer player)
+        public void SendPlayer(PlayerServer player)
         {
-            
+            PlayerPacket packet = PacketFactory.CreatePacket(player);
+
+            Send(clientSocket, PlayerPacket.Serialize(packet));
         }
 
-        private void Send(Socket handler, String data)
+        private void Send(Socket handler, byte[] byteData)
         {
-            // Convert the string data to byte data using ASCII encoding.  
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
-
             // Begin sending the data to the remote device.  
             handler.BeginSend(byteData, 0, byteData.Length, 0,
                 new AsyncCallback(SendCallback), handler);

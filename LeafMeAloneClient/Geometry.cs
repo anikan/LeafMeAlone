@@ -66,7 +66,9 @@ namespace Client
             importer = new AssimpContext();
 
             //import the file
-            scene = importer.ImportFile(fileName);
+            scene = importer.ImportFile(fileName,
+                PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate |
+                PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.SortByPrimitiveType);
 
             //make sure scene not null
             if (scene == null)

@@ -112,6 +112,7 @@ namespace Client
             GraphicsRenderer.Form.KeyUp += InputManager.OnKeyUp;
             GraphicsRenderer.Form.MouseDown += InputManager.OnMouseDown;
             GraphicsRenderer.Form.MouseUp += InputManager.OnMouseUp;
+            GraphicsRenderer.Form.MouseMove += InputManager.OnMouseMove;
         }
 
     }

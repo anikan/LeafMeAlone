@@ -21,7 +21,9 @@ namespace Client
 
         // List of the keys that are currently being pressed.
         public List<Keys> KeysPressed;
-        MouseButtons MouseButtonPressed = MouseButtons.None;
+        public MouseButtons MouseButtonPressed = MouseButtons.None;
+
+        public Vector2 lastMousePos;
 
         /// <summary>
         /// Constructor for the input manager. Should take in a player that will respond to input events.
@@ -137,9 +139,13 @@ namespace Client
         }
 
         // Mouse movement event handler.
-        public void OnMouseMove(Vector2 mousePosition)
+        public void OnMouseMove(object sender, MouseEventArgs args)
         {
-            // TODO
+            // Get the new position of the mouse.
+            Vector2 mousePos = new Vector2(args.X, args.Y);
+
+            // Updaate last mouse position.
+            lastMousePos = mousePos;
         }
     }
 }

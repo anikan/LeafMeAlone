@@ -6,8 +6,11 @@ using System.Windows.Forms;
 using Client;
 using Shared;
 using SlimDX;
+using SlimDX.D3DCompiler;
+using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
+using Device = SlimDX.DXGI.Device;
 
 
 namespace Client
@@ -17,6 +20,9 @@ namespace Client
 
         private PlayerClient ActivePlayer;
         private InputManager InputManager;
+
+        private static Camera Camera;
+        private static Model testModel;
 
         /// <summary>
         /// The main entry point for the application.
@@ -31,12 +37,19 @@ namespace Client
 
             // Create an input manager for player events.
             GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
+
             GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
             GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
+
+            Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
+            GraphicsManager.ActiveCamera = Camera;
+            testModel = new Model(@"../../Pants14Triangles.fbx");
 
             MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
+
+
         }
 
         private void DoGameLoop()
@@ -55,13 +68,14 @@ namespace Client
             // Render on screen.
             Render();
 
-
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 
         }
 
         private void Render()
         {
+            testModel.Update();
+            testModel.Draw();
         }
 
         private void ReceivePackets()
@@ -73,7 +87,7 @@ namespace Client
         {
 
             // Create a new player packet, and fill it with player's relevant info.
-            PlayerPacket playerPack = new PlayerPacket(ActivePlayer.Id);
+            PlayerPacket playerPack = new PlayerPacket();
             playerPack.Movement = ActivePlayer.MovementRequested;
 
             // Handy print statement to check if input is working.
@@ -90,5 +104,6 @@ namespace Client
             ActivePlayer.ResetRequestedMovement();
 
         }
+
     }
 }

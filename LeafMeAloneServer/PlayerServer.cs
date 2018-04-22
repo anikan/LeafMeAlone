@@ -9,7 +9,7 @@ namespace Server
 {
     public class PlayerServer : Player
     {
-        public override void UpdateFromPacket(Packet packet)
+        public void UpdateFromPacket(Packet packet)
         {
             throw new NotImplementedException();
         }

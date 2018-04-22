@@ -10,19 +10,9 @@ namespace Shared
     /// <summary>
     /// Class for an actual player of the game.
     /// </summary>
-    public abstract class Player : GameObject
+    public interface Player
     {
-
-
-        /// <summary>
-        /// Initialize the player with an initial position.
-        /// </summary>
-        public Player ()
-        {
-
-        }
-
-        public abstract void UpdateFromPacket(Packet packet);
+        void UpdateFromPacket(Packet packet);
 
     }
 }

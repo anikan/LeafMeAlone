@@ -289,11 +289,6 @@ namespace Client
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = InputLayout;
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            //GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBOPositions, Vector3.SizeInBytes, 0));
-            //GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBONormals, Vector3.SizeInBytes, 0));
-            //GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO,Format.R32_UInt, 0);
-
-
             Effect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
             Effect.GetVariableByName("gView").AsMatrix()
                 .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
@@ -306,6 +301,13 @@ namespace Client
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1,
                     new VertexBufferBinding(VBONormals[i], Vector3.SizeInBytes, 0));
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO[i], Format.R32_UInt, 0);
+				
+				if (Materials[i].texCount > 0)
+				{
+					// note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
+					GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(2,
+						new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
+				}
 
                 Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
                 GraphicsRenderer.Device.ImmediateContext.DrawIndexed(faceSize[i] / sizeof(int), 0, 0);

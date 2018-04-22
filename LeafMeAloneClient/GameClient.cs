@@ -106,12 +106,13 @@ namespace Client
 
             // Create a new player packet, and fill it with player's relevant info.
             PlayerPacket playerPack = new PlayerPacket();
-            playerPack.Movement = ActivePlayer.MovementRequested;
+            playerPack.MovementX = ActivePlayer.MovementRequested.X;
+            playerPack.MovementY = ActivePlayer.MovementRequested.Y;
 
             // Handy print statement to check if input is working.
-            if (playerPack.Movement.X != 0 || playerPack.Movement.Y != 0)
+            if (playerPack.MovementX != 0 || playerPack.MovementY != 0)
             {
-                Console.WriteLine("Movement Requested: " + playerPack.Movement);
+                Console.WriteLine("Movement Requested: " + playerPack.MovementX + "," + playerPack.MovementY);
             }
 
 

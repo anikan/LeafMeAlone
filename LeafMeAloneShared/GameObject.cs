@@ -7,12 +7,8 @@ using SlimDX;
 
 namespace Shared
 {
-    public abstract class GameObject
+    public abstract class GameObject : INetworked
     {
-        /// <summary>
-        /// ID is given to gameobjects to distinguish between them.
-        /// </summary>
-        private int id;
 
         /// <summary>
         /// Name can be given to gameobjects for debugging purposes.
@@ -20,6 +16,7 @@ namespace Shared
         public string Name;
 
         protected Transform Transform;
+        public int Id { get; set; }
 
         public abstract void Update();
         public abstract void Draw();
@@ -31,24 +28,5 @@ namespace Shared
             Transform.Position = new Vector3(0, 0, 0);
             Transform.Scale = new Vector3(1, 1, 1);
         }
-        
-        /// <summary>
-        /// Get the current ID of the GameObject
-        /// </summary>
-        /// <returns></returns>
-        public int GetId()
-        {
-            return id;
-        }
-
-        /// <summary>
-        /// Set the current ID of the GameObject
-        /// </summary>
-        /// <param name="id"></param>
-        public void SetId(int myId)
-        {
-            id = myId;
-        }
-
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Shared;
 using SlimDX;
 
-namespace Server
+namespace Shared
 {
     /// <summary>
     /// Handles the generation of packets on the server
@@ -17,14 +17,15 @@ namespace Server
         /// Creates a network packet used to update the state of the player in the client
         /// </summary>
         /// <param name="player">The player object to serialize into a player</param>
-        public PlayerPacket CreatePacket(PlayerServer player)
+        public static PlayerPacket CreatePacket(IPlayer player)
         {
             PlayerPacket packet = new PlayerPacket()
             {
                 Dead = player.Dead,
-                Movement = player.transform.Get2dPosition(),
+                MovementX = player.Transform.Get2dPosition().X,
+                MovementY = player.Transform.Get2dPosition().Y,
                 ObjectID = player.Id,
-                Rotation = player.transform.Direction.Y,
+                Rotation = player.Transform.Direction.Y,
                 ToolEquipped = player.ToolEquipped,
                 UsingTool = player.UsingTool
             };

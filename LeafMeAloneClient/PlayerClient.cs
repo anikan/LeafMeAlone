@@ -15,35 +15,15 @@ namespace Client
 
         public Vector2 MovementRequested;
 
-        public bool GetUsingTool()
-        {
-            throw new NotImplementedException();
-        }
+        private PlayerPacket.ToolType toolEquipped;
+        private Transform transform;
+        private bool usingTool;
+        private bool dead;
 
-        public void SetUsingTool(bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool GetDead()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetDead(bool value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public PlayerPacket.ToolType GetToolEquipped()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetToolEquipped(PlayerPacket.ToolType value)
-        {
-            throw new NotImplementedException();
-        }
+        public bool UsingTool { get => usingTool; set => usingTool = value; }
+        Transform IPlayer.Transform { get => transform; set => transform = value; }
+        public bool Dead { get => dead; set => dead = value; }
+        public PlayerPacket.ToolType ToolEquipped { get => toolEquipped; set => toolEquipped = value; }
 
         public PlayerClient() : base()
         {
@@ -102,10 +82,9 @@ namespace Client
             MovementRequested = Vector2.Zero;
         }
 
-
-
+        public void UpdateFromPacket(PlayerPacket packet)
+        {
+            throw new NotImplementedException();
+        }
     }
-
-
-
 }

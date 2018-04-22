@@ -55,7 +55,6 @@
     <Compile Include="GameObjectServer.cs" />
     <Compile Include="GameServer.cs" />
     <Compile Include="NetworkServer.cs" />
-    <Compile Include="PacketFactory.cs" />
     <Compile Include="PlayerServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

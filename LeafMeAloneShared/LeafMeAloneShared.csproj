@@ -54,10 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="INetworked.cs" />
+    <Compile Include="PacketFactory.cs" />
     <Compile Include="PlayerPacket.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="GameObject.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="IPlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>

@@ -9,10 +9,25 @@ namespace Client
 {
     public class GameObjectClient : GameObject
     {
+        private Model model;
 
-        // TODO: Model variable here
+        public void SetModel(string filePath)
+        {
+            model = new Model(filePath);
+            Name = filePath.Split('.')[0];
+        }
 
-        // TODO: Draw method
+        public override void Update()
+        {
+            if (model == null)
+                return;
+            model.m_Properties = Transform;
+            model.Update();
+        }
 
+        public override void Draw()
+        {
+            model?.Draw();
+        }
     }
 }

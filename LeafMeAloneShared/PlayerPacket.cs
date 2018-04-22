@@ -45,7 +45,7 @@ namespace Shared
         /// Initializes a player packet, calls base constructor.
         /// </summary>
         /// <param name="id"></param>
-        public PlayerPacket(int id) : base(id)
+        public PlayerPacket()
         {
         }
 

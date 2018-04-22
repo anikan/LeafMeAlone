@@ -10,7 +10,7 @@ namespace Shared
     /// <summary>
     /// Class for an actual player of the game.
     /// </summary>
-    public abstract class Player : GameObject
+    public interface Player
     {
         /// <summary>
         /// Whether the player is using a tool
@@ -26,17 +26,6 @@ namespace Shared
         /// Currently Equipped Tool
         /// </summary>
         public PlayerPacket.ToolType ToolEquipped;
-
-
-        /// <summary>
-        /// Initialize the player with an initial position.
-        /// </summary>
-        public Player ()
-        {
-
-        }
-
-        public abstract void UpdateFromPacket(Packet packet);
 
     }
 }

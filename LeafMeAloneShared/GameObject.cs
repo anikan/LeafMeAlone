@@ -27,7 +27,7 @@ namespace Shared
 
         protected GameObject()
         {
-            Transform.Direction = new Vector3(0, 0, 0);
+            Transform.Rotation = new Vector3(0, 0, 0);
             Transform.Position = new Vector3(0, 0, 0);
             Transform.Scale = new Vector3(1, 1, 1);
         }

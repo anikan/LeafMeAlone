@@ -40,11 +40,11 @@ namespace Client
             m_ModelMatrix = Matrix.Identity;
             // set the properties and update the model matrix
             //m_ActiveShader = shader;
-            m_Properties.Direction = new Vector3(0, 0, 0);
+            m_Properties.Rotation = new Vector3(0, 0, 0);
             m_Properties.Position = new Vector3(0, 0, 0);
             m_Properties.Scale = new Vector3(1, 1, 1);
 
-            m_PrevProperties.Direction = new Vector3(0, 0, 0);
+            m_PrevProperties.Rotation = new Vector3(0, 0, 0);
             m_PrevProperties.Position = new Vector3(0, 0, 0);
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
             Update();

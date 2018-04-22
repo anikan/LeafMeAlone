@@ -39,7 +39,7 @@ namespace Shared
 
         }
 
-        public void copyToThis(Transform other)
+        public void CopyToThis(Transform other)
         {
             Position.X = other.Position.X;
             Position.Y = other.Position.Y;

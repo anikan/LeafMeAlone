@@ -7,30 +7,46 @@ using Shared;
 
 namespace Server
 {
-    public class PlayerServer : Player
+    public class PlayerServer : IPlayer
     {
         /// <summary>
         /// Data on the character's position, rotation ...
         /// </summary>
         public Transform transform;
-        /// <summary>
-        /// Whether the player is using a tool
-        /// </summary>
+        public bool Dead;
         public bool UsingTool;
-
-        /// <summary>
-        /// Currently Equipped Tool
-        /// </summary>
         public PlayerPacket.ToolType ToolEquipped;
 
-        /// <summary>
-        /// Whether the player is Dead or not
-        /// </summary>
-        public bool Dead;
+        public int Id { get; internal set; }
 
-        public void UpdateFromPacket(Packet packet)
+        bool IPlayer.GetUsingTool()
         {
-            throw new NotImplementedException();
+            return UsingTool;
+        }
+
+        void IPlayer.SetUsingTool(bool value)
+        {
+            UsingTool = value;
+        }
+
+        bool IPlayer.GetDead()
+        {
+            return Dead;
+        }
+
+        void IPlayer.SetDead(bool value)
+        {
+            Dead = value;
+        }
+
+        PlayerPacket.ToolType IPlayer.GetToolEquipped()
+        {
+            return ToolEquipped;
+        }
+
+        void IPlayer.SetToolEquipped(PlayerPacket.ToolType value)
+        {
+            ToolEquipped = value;
         }
     }
 }

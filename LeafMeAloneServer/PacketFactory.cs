@@ -19,15 +19,16 @@ namespace Server
         /// <param name="player">The player object to serialize into a player</param>
         public PlayerPacket CreatePacket(PlayerServer player)
         {
-            PlayerPacket packet = new PlayerPacket(player.Id)
+            PlayerPacket packet = new PlayerPacket()
             {
                 Dead = player.Dead,
                 Movement = player.transform.Get2dPosition(),
                 ObjectID = player.Id,
-                Rotation = player.transform.Y,
+                Rotation = player.transform.Direction.Y,
                 ToolEquipped = player.ToolEquipped,
                 UsingTool = player.UsingTool
             };
+
             return packet;
         }
 

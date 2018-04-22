@@ -132,16 +132,17 @@ namespace LeafMeAloneClient
                     client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                         new AsyncCallback(ReceiveCallback), state);
                 }
-                else
+
+                //Note: Assuming data will never be greater than the buffer size.
+                // All the data has arrived; put it in response.  
+                if (state.sb.Length > 1)
                 {
-                    // All the data has arrived; put it in response.  
-                    if (state.sb.Length > 1)
-                    {
-                        response = state.sb.ToString();
-                    }
-                    // Signal that all bytes have been received.  
-                    receiveDone.Set();
+                    response = state.sb.ToString();
+                    Console.WriteLine("Response received : {0}", response);
+
                 }
+                // Signal that all bytes have been received.  
+                receiveDone.Set();
             }
             catch (Exception e)
             {

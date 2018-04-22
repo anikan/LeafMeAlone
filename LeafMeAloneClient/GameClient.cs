@@ -56,7 +56,7 @@ namespace Client
             networkClient.Receive();
 
             // Write the response to the console.  
-            Console.WriteLine("Response received : {0}", networkClient.response);
+            //Console.WriteLine("Response received : {0}", networkClient.response);
 
             ReceivePackets();
             SendPackets();

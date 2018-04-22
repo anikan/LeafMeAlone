@@ -28,25 +28,18 @@ namespace Client
         /// </summary>
         private static void Main()
         {
-            GameClient GameClient = new GameClient();
+            GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
 
-            GameClient.ActivePlayer = new PlayerClient();
-           // gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
-            //gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-            //gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
-
+            Client.ActivePlayer = new PlayerClient();
 
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
 
-            // Create an input manager for player events.
-            GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
+            // Set up the input manager.
+            Client.SetupInputManager();
 
-            GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
-            GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
-
-            MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
@@ -82,26 +75,43 @@ namespace Client
 
         }
 
+        /// <summary>
+        /// Sends all packets this frame.
+        /// </summary>
         private void SendPackets()
         {
 
             // Create a new player packet, and fill it with player's relevant info.
             PlayerPacket playerPack = new PlayerPacket();
+
             playerPack.Movement = ActivePlayer.MovementRequested;
+            playerPack.UsingToolPrimary = ActivePlayer.UseToolPrimaryRequest;
+            playerPack.UsingToolSecondary = ActivePlayer.UseToolSecondaryRequest;
 
-            // Handy print statement to check if input is working.
-            if (playerPack.Movement.X != 0 || playerPack.Movement.Y != 0)
-            {
-                Console.WriteLine("Movement Requested: " + playerPack.Movement);
-            }
-
+            Console.WriteLine(playerPack.ToString());
 
             // TODO: SEND THE ACTUAL PACKET
 
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
-            ActivePlayer.ResetRequestedMovement();
+            ActivePlayer.ResetRequests();
 
+        }
+
+        /// <summary>
+        /// Sets up the input manager and relevant input events.
+        /// </summary>
+        private void SetupInputManager()
+        {
+
+            // Create an input manager for player events.
+            InputManager = new InputManager(ActivePlayer);
+
+            // Input events for the input manager.
+            GraphicsRenderer.Form.KeyDown += InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += InputManager.OnKeyUp;
+            GraphicsRenderer.Form.MouseDown += InputManager.OnMouseDown;
+            GraphicsRenderer.Form.MouseUp += InputManager.OnMouseUp;
         }
 
     }

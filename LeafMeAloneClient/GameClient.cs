@@ -35,18 +35,18 @@ namespace Client
             Client.ActivePlayer = new PlayerClient();
 
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
-            GraphicsManager.ActivePlayer = GameClient.ActivePlayer;
+            GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.
             Client.SetupInputManager();
 
-            GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
-            GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
+            GraphicsRenderer.Form.KeyDown += Client.InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += Client.InputManager.OnKeyUp;
 
             //TODO FOR TESTING ONLY
             GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
-            MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }

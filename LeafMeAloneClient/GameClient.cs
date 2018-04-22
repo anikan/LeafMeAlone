@@ -17,10 +17,10 @@ namespace Client
 {
     class GameClient
     {
-        private PlayerClient activePlayer;
 
-        private Model cockleModel;
-
+        private PlayerClient ActivePlayer;
+        private InputManager InputManager;
+        
         private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
@@ -28,11 +28,11 @@ namespace Client
         /// </summary>
         private static void Main()
         {
-            GameClient gameClient = new GameClient();
+            GameClient GameClient = new GameClient();
 
             GraphicsRenderer.Init();
 
-            gameClient.activePlayer = new PlayerClient();
+            GameClient.ActivePlayer = new PlayerClient();
            // gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
             //gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
             //gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
@@ -41,12 +41,12 @@ namespace Client
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
 
             // Create an input manager for player events.
-            InputManager inputManager = new InputManager(gameClient.activePlayer);
+            GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
 
-            // Add the key press input handler to call our InputManager directly.
-            GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
+            GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
 
-            MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
@@ -56,23 +56,25 @@ namespace Client
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             ReceivePackets();
+
+            // Update input events.
+            InputManager.Update();
+
+            // Send any packets to the server.
             SendPackets();
 
             GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.0001f);
 
             Render();
-            //cockleModel.Update();
-            //cockleModel.Draw();
 
-            activePlayer.ResetTransientState();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 
         }
 
         private void Render()
         {
-            activePlayer.Update();
-            activePlayer.Draw();
+            ActivePlayer.Update();
+            ActivePlayer.Draw();
         }
 
         private void ReceivePackets()
@@ -82,8 +84,24 @@ namespace Client
 
         private void SendPackets()
         {
-            PlayerPacket playerPack = new PlayerPacket(activePlayer.GetId());
-            playerPack.Movement = activePlayer.MovementRequested;
+
+            // Create a new player packet, and fill it with player's relevant info.
+            PlayerPacket playerPack = new PlayerPacket();
+            playerPack.Movement = ActivePlayer.MovementRequested;
+
+            // Handy print statement to check if input is working.
+            if (playerPack.Movement.X != 0 || playerPack.Movement.Y != 0)
+            {
+                Console.WriteLine("Movement Requested: " + playerPack.Movement);
+            }
+
+
+            // TODO: SEND THE ACTUAL PACKET
+
+            // Reset the player's requested movement after the packet is sent.
+            // Note: This should be last!
+            ActivePlayer.ResetRequestedMovement();
+
         }
 
     }

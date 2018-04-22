@@ -33,9 +33,9 @@ namespace Client
             GraphicsRenderer.Init();
 
             gameClient.activePlayer = new PlayerClient();
-            gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
-            gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-            gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
+           // gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
+            //gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
 
 
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
@@ -61,8 +61,8 @@ namespace Client
             GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.0001f);
 
             Render();
-            cockleModel.Update();
-            cockleModel.Draw();
+            //cockleModel.Update();
+            //cockleModel.Draw();
 
             activePlayer.ResetTransientState();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);

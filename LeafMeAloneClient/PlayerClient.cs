@@ -18,7 +18,7 @@ namespace Client
 
         public PlayerClient() : base()
         {
-            SetModel(@"../../Version1.fbx");
+            SetModel(@"../../Models/Version1.fbx");
         }
 
         /// <summary>

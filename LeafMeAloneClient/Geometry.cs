@@ -143,6 +143,7 @@ namespace Client
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBOPositions, Vector3.SizeInBytes, 0));
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBONormals, Vector3.SizeInBytes, 0));
+            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO,Format.R32_UInt, 0);
 
             Effect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
             Effect.GetVariableByName("gView").AsMatrix()

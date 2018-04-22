@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 
 namespace Client
 {
@@ -28,6 +29,8 @@ namespace Client
         /// ActiveCamera contains the currently active camera.
         /// </summary>
         public static Camera ActiveCamera;
+
+        public static PlayerClient ActivePlayer;
 
 
     }

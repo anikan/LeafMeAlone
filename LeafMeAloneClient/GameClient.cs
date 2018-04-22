@@ -20,7 +20,7 @@ namespace Client
 
         private PlayerClient ActivePlayer;
         private InputManager InputManager;
-        
+
         private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
@@ -33,12 +33,10 @@ namespace Client
             GraphicsRenderer.Init();
 
             GameClient.ActivePlayer = new PlayerClient();
-           // gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
-            //gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-            //gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
 
 
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
+            GraphicsManager.ActivePlayer = GameClient.ActivePlayer;
 
             // Create an input manager for player events.
             GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
@@ -46,11 +44,40 @@ namespace Client
             GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
             GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
 
+            //TODO FOR TESTING ONLY
+            GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
+
             MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
 
+
+        public static void TestPlayerMovementWithoutNetworking(object ignore, KeyEventArgs keyArg)
+        {
+            if (keyArg.KeyCode == Keys.Up)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position += Vector3.UnitY;
+            }
+            if (keyArg.KeyCode == Keys.Down)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position -= Vector3.UnitY;
+            }
+            if (keyArg.KeyCode == Keys.Left)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position += Vector3.UnitX;
+            }
+            if (keyArg.KeyCode == Keys.Right)
+            {
+                GraphicsManager.ActivePlayer.Transform.Position -= Vector3.UnitX;
+            }
+            if (keyArg.KeyCode == Keys.Space)
+            {
+                GraphicsManager.ActivePlayer.Transform.Direction += Vector3.UnitY * 20;
+            }
+
+
+        }
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
@@ -63,7 +90,7 @@ namespace Client
             // Send any packets to the server.
             SendPackets();
 
-            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.0001f);
+            //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
 
             Render();
 

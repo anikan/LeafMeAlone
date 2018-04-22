@@ -19,6 +19,7 @@ namespace Client
         public PlayerClient() : base()
         {
             SetModel(@"../../Models/Version1.fbx");
+            Transform.Direction.Y += 180;
         }
 
         /// <summary>

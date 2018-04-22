@@ -40,11 +40,11 @@ namespace Client
             m_ModelMatrix = Matrix.Identity;
             // set the properties and update the model matrix
             //m_ActiveShader = shader;
-            m_Properties.Direction = new Vector3(0, 0, 0);
+            m_Properties.Rotation = new Vector3(0, 0, 0);
             m_Properties.Position = new Vector3(0, 0, 0);
             m_Properties.Scale = new Vector3(1, 1, 1);
 
-            m_PrevProperties.Direction = new Vector3(0, 0, 0);
+            m_PrevProperties.Rotation = new Vector3(0, 0, 0);
             m_PrevProperties.Position = new Vector3(0, 0, 0);
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
             Update();
@@ -92,9 +92,9 @@ namespace Client
                 m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
 
                 // set the rotation based on the three directions
-                m_ModelMatrix = Matrix.RotationX(m_Properties.Direction.X) * 
-                                Matrix.RotationY(m_Properties.Direction.Y) * 
-                                Matrix.RotationZ(m_Properties.Direction.Z) * m_ModelMatrix;
+                m_ModelMatrix = Matrix.RotationX(m_Properties.Rotation.X) * 
+                                Matrix.RotationY(m_Properties.Rotation.Y) * 
+                                Matrix.RotationZ(m_Properties.Rotation.Z) * m_ModelMatrix;
 
                 // set the translation based on the position
                 m_ModelMatrix = Matrix.Translation(m_Properties.Position) * m_ModelMatrix;

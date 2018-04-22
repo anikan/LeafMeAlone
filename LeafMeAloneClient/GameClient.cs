@@ -72,7 +72,7 @@ namespace Client
             }
             if (keyArg.KeyCode == Keys.Space)
             {
-                GraphicsManager.ActivePlayer.Transform.Direction += Vector3.UnitY * 20;
+                GraphicsManager.ActivePlayer.Transform.Rotation += Vector3.UnitY * 20;
             }
 
 

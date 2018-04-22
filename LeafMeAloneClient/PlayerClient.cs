@@ -15,9 +15,10 @@ namespace Client
 
         public Vector2 MovementRequested;
 
-        public PlayerClient()
-        {
 
+        public PlayerClient() : base()
+        {
+            SetModel(@"../../Models/Version1.fbx");
         }
 
         /// <summary>

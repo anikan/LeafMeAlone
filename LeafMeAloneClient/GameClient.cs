@@ -20,9 +20,8 @@ namespace Client
 
         private PlayerClient ActivePlayer;
         private InputManager InputManager;
-
-        private static Camera Camera;
-        private static Model testModel;
+        
+        private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
         /// The main entry point for the application.
@@ -34,6 +33,12 @@ namespace Client
             GraphicsRenderer.Init();
 
             GameClient.ActivePlayer = new PlayerClient();
+           // gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
+            //gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
+
+
+            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
 
             // Create an input manager for player events.
             GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
@@ -41,22 +46,15 @@ namespace Client
             GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
             GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
 
-            Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
-            GraphicsManager.ActiveCamera = Camera;
-            testModel = new Model(@"../../Pants14Triangles.fbx");
-
             MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
-
-
         }
 
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-
-            // Receive any packets from the server.
+            GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             ReceivePackets();
 
             // Update input events.
@@ -65,7 +63,8 @@ namespace Client
             // Send any packets to the server.
             SendPackets();
 
-            // Render on screen.
+            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.0001f);
+
             Render();
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
@@ -74,8 +73,8 @@ namespace Client
 
         private void Render()
         {
-            testModel.Update();
-            testModel.Draw();
+            ActivePlayer.Update();
+            ActivePlayer.Draw();
         }
 
         private void ReceivePackets()

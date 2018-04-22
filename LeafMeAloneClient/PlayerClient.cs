@@ -11,10 +11,15 @@ namespace Client
     public class PlayerClient : GameObjectClient, Player
     {
 
+        // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
 
+        // Direction of movement the player is requesting. Should be between -1 and 1 each axis.
         public Vector2 MovementRequested;
 
+        // Requests for the use of primary/secondary features of tools.
+        public bool UseToolPrimaryRequest;
+        public bool UseToolSecondaryRequest;
 
         public PlayerClient() : base()
         {
@@ -51,7 +56,25 @@ namespace Client
                 //// Request in the y direction.
                 MovementRequested.Y = dir.Y;
             }
+        }
 
+        /// <summary>
+        /// Request the use of the primary function of the equipped tool.
+        /// </summary>
+        public void RequestUsePrimary()
+        {
+            // Set request bool to true.
+            UseToolPrimaryRequest = true;
+
+        }
+
+        /// <summary>
+        /// Request the use of the secondary function of the equipped tool.
+        /// </summary>
+        public void RequestUseSecondary()
+        {
+            // Set request bool to true.
+            UseToolSecondaryRequest = true;
         }
 
         /// <summary>
@@ -69,15 +92,11 @@ namespace Client
         /// <summary>
         /// Resets the player's requested movement.
         /// </summary>
-        public void ResetRequestedMovement()
+        public void ResetRequests()
         {
             MovementRequested = Vector2.Zero;
+            UseToolPrimaryRequest = false;
+            UseToolSecondaryRequest = false;
         }
-
-
-
     }
-
-
-
 }

@@ -77,6 +77,22 @@ namespace Client
             UseToolSecondaryRequest = true;
         }
 
+        public void RequestLookAt(Vector2 position)
+        {
+            Vector2 screenSize = new Vector2(GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height);
+
+            position.X -= screenSize.X / 2;
+            position.Y -= screenSize.Y / 2;
+
+            position.Normalize();
+
+            Console.WriteLine("New Direction: " + position);
+
+            Transform.Direction = new Vector3();
+
+
+        }
+
         /// <summary>
         /// Set the absolute position of the player
         /// </summary>

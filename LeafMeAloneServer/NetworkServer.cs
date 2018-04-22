@@ -172,9 +172,17 @@ namespace Server
 
         private void Send(Socket handler, byte[] byteData)
         {
-            // Begin sending the data to the remote device.  
-            handler.BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(SendCallback), handler);
+            if (handler != null)
+            {
+                // Begin sending the data to the remote device.  
+                handler.BeginSend(byteData, 0, byteData.Length, 0,
+                    new AsyncCallback(SendCallback), handler);
+            }
+
+            else
+            {
+                Console.WriteLine("No socket connected.");
+            }
         }
 
         private void SendCallback(IAsyncResult ar)

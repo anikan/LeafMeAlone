@@ -62,6 +62,7 @@
     <Compile Include="Light.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="InputManager.cs" />
+    <Compile Include="ParticleSystem.cs" />
     <Compile Include="PlayerClient.cs" />
     <Compile Include="GraphicsRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    class ParticleSystem
+    public class ParticleSystem
     {
     }
 }

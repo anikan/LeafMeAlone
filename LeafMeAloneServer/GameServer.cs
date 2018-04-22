@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
+using SlimDX;
 
 namespace Server
 {
@@ -28,9 +30,20 @@ namespace Server
             while (true)
             {
                 networkServer.CheckForConnections();
+
+                for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
+                {
+                    ReceivePlayerPacket(networkServer.PlayerPackets[i]);
+                }
+
+                //Clear for next frame.
+                networkServer.PlayerPackets.Clear();
+
+
                 System.Threading.Thread.Sleep(10);
 
             }
         }
+
     }
 }

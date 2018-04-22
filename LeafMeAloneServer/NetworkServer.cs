@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Shared;
 
 namespace Server
 {
@@ -40,6 +41,8 @@ namespace Server
 
         //Socket to communicate with client.
         private Socket clientSocket;
+
+        public List<PlayerPacket> PlayerPackets;
 
         public NetworkServer()
         {

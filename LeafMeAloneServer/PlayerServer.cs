@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using SlimDX;
 
 namespace Server
 {
@@ -28,9 +29,11 @@ namespace Server
         /// </summary>
         public bool Dead;
 
-        public void UpdateFromPacket(Packet packet)
+        public void UpdateFromPacket(PlayerPacket packet)
         {
-            throw new NotImplementedException();
+            transform.Position += new Vector3(packet.Movement, 0.0f);
+
+            transform.Direction.Y = packet.Rotation;
         }
     }
 }

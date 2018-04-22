@@ -8,6 +8,11 @@ namespace Shared
 {
     public class GameObject
     {
+        /// <summary>
+        /// Data on the object's position, rotation ...
+        /// </summary>
+        public TransformProperties transform;
+
         public int Id;
     }
 }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Shared
 {
@@ -45,26 +47,10 @@ namespace Shared
         /// <param name="id"></param>
         public PlayerPacket(int id) : base(id)
         {
-
-
         }
 
-        /// <summary>
-        /// Sends the packet to server.
-        /// </summary>
-        public override void Send()
+        public void Serialize()
         {
-
-        }
-
-        /// <summary>
-        /// Receives a packet from the server.
-        /// </summary>
-        public override void Receive()
-        {
-
-
-
         }
     }
 }

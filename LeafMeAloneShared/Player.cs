@@ -12,6 +12,20 @@ namespace Shared
     /// </summary>
     public abstract class Player : GameObject
     {
+        /// <summary>
+        /// Whether the player is using a tool
+        /// </summary>
+        public bool UsingTool;
+
+        /// <summary>
+        /// Whether the player is Dead or not
+        /// </summary>
+        public bool Dead;
+
+        /// <summary>
+        /// Currently Equipped Tool
+        /// </summary>
+        public PlayerPacket.ToolType ToolEquipped;
 
 
         /// <summary>

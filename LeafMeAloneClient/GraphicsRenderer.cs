@@ -40,7 +40,7 @@ namespace Client
         #region Depth Buffer and Rasterizer
         private static Texture2DDescription depthBufferDesc;
         private static Texture2D DepthBuffer;
-        private static DepthStencilView DepthView;
+        public static DepthStencilView DepthView;
         private static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
         private static RasterizerStateDescription Rasterizer;
@@ -51,7 +51,7 @@ namespace Client
         {
             Rasterizer = new RasterizerStateDescription()
             {
-                FillMode = FillMode.Wireframe,
+                FillMode = FillMode.Solid,
                 CullMode = CullMode.Back,
                 IsFrontCounterclockwise = false,
                 IsDepthClipEnabled = true
@@ -129,7 +129,8 @@ namespace Client
             InitializeDepthBuffer();
 
             Viewport = new Viewport(0.0f, 0.0f, Form.ClientSize.Width, Form.ClientSize.Height);
-            DeviceContext.OutputMerger.SetTargets(RenderTarget);
+            //DeviceContext.OutputMerger.SetTargets(RenderTarget);
+            DeviceContext.OutputMerger.SetTargets(DepthView, RenderTarget);
             DeviceContext.Rasterizer.SetViewports(Viewport);
 
             Form.Resize += FormOnResize;

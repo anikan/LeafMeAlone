@@ -27,16 +27,30 @@ namespace Server
         public SlimDX.Vector3 pos;
     }
 
-    public class AsynchronousSocketListener
+    public class NetworkServer
     {
+        private const int BufferSize = 1024;
+
+        //Allocated 33ms per frame.
+        static int tickTime = 33;
+
         // Thread signal.  
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
-        public AsynchronousSocketListener()
+        //Socket on server listening for requests.
+        private Socket listener;
+
+        //If false, then set the async call to accept requests.
+        private bool isListening = false;
+
+        //Socket to communicate with client.
+        private Socket clientSocket;
+
+        public NetworkServer()
         {
         }
 
-        public static void StartListening()
+        public void StartListening()
         {
             // Data buffer for incoming data.  
             byte[] bytes = new Byte[1024];
@@ -49,7 +63,7 @@ namespace Server
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
             // Create a TCP/IP socket.  
-            Socket listener = new Socket(ipAddress.AddressFamily,
+            listener = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.  
@@ -61,16 +75,36 @@ namespace Server
                 while (true)
                 {
                     // Set the event to nonsignaled state.  
-                    allDone.Reset();
+                    //allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.  
-                    Console.WriteLine("Waiting for a connection...");
-                    listener.BeginAccept(
-                        new AsyncCallback(AcceptCallback),
-                        listener);
+
+                    if (!isListening)
+                    {
+                        Console.WriteLine("Waiting for a connection...");
+
+                        listener.BeginAccept(
+                            new AsyncCallback(AcceptCallback),
+                            listener);
+
+                        isListening = true;
+                    }
+
+                    //If there's data available on the socket, then receive it. 
+                    if (clientSocket != null && clientSocket.Available > 0)
+                    {
+
+                        // Create the state object.  
+                        StateObject state = new StateObject();
+                        state.workSocket = clientSocket;
+                        clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                            new AsyncCallback(ReadCallback), state);
+                    }
 
                     // Wait until a connection is made before continuing.  
-                    allDone.WaitOne();
+                    //allDone.WaitOne();
+
+                    System.Threading.Thread.Sleep(10);
                 }
 
             }
@@ -84,43 +118,39 @@ namespace Server
 
         }
 
-        public static void AcceptCallback(IAsyncResult ar)
+        public void AcceptCallback(IAsyncResult ar)
         {
             // Signal the main thread to continue.  
             allDone.Set();
 
             // Get the socket that handles the client request.  
-            Socket listener = (Socket)ar.AsyncState;
-            Socket handler = listener.EndAccept(ar);
+            clientSocket = listener.EndAccept(ar);
 
-            // Create the state object.  
-            StateObject state = new StateObject();
-            state.workSocket = handler;
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReadCallback), state);
+            //Disable Nagle's algorithm
+            clientSocket.NoDelay = true;
         }
 
-        public static void ReadCallback(IAsyncResult ar)
+        public void Receive(Socket receivingSocket)
         {
             String content = String.Empty;
 
-            // Retrieve the state object and the handler socket  
-            // from the asynchronous state object.  
-            StateObject state = (StateObject)ar.AsyncState;
-            Socket handler = state.workSocket;
+            // Receive buffer.  
+            byte[] buffer = new byte[BufferSize];
+            // Received data string.  
+            StringBuilder sb = new StringBuilder();
 
             // Read data from the client socket.   
-            int bytesRead = handler.EndReceive(ar);
+            int bytesRead = receivingSocket.Receive(buffer);
 
             if (bytesRead > 0)
             {
                 // There  might be more data, so store the data received so far.  
-                state.sb.Append(Encoding.ASCII.GetString(
-                    state.buffer, 0, bytesRead));
+                sb.Append(Encoding.ASCII.GetString(
+                    buffer, 0, bytesRead));
 
                 // Check for end-of-file tag. If it is not there, read   
                 // more data.  
-                content = state.sb.ToString();
+                content = sb.ToString();
                 if (content.IndexOf("<EOF>") > -1)
                 {
                     // All the data has been read from the   
@@ -128,18 +158,18 @@ namespace Server
                     Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
                         content.Length, content);
                     // Echo the data back to the client.  
-                    Send(handler, content);
+                    Send(receivingSocket, content);
                 }
                 else
                 {
                     // Not all data received. Get more.  
-                    handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    receivingSocket.BeginReceive(buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ReadCallback), state);
                 }
             }
         }
 
-        private static void Send(Socket handler, String data)
+        private void Send(Socket handler, String data)
         {
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.ASCII.GetBytes(data);
@@ -149,7 +179,7 @@ namespace Server
                 new AsyncCallback(SendCallback), handler);
         }
 
-        private static void SendCallback(IAsyncResult ar)
+        private void SendCallback(IAsyncResult ar)
         {
             try
             {
@@ -160,8 +190,8 @@ namespace Server
                 int bytesSent = handler.EndSend(ar);
                 Console.WriteLine("Sent {0} bytes to client.", bytesSent);
 
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
+                //handler.Shutdown(SocketShutdown.Both);
+                //handler.Close();
 
             }
             catch (Exception e)
@@ -172,7 +202,8 @@ namespace Server
 
         public static int Main(String[] args)
         {
-            StartListening();
+            NetworkServer networkServer = new NetworkServer();
+            networkServer.StartListening();
             return 0;
         }
     }

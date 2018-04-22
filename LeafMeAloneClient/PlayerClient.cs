@@ -11,6 +11,8 @@ namespace Client
     public class PlayerClient : Player
     {
 
+        public const float FLOAT_RANGE = 0.01f;
+
         public Vector2 MovementRequested;
 
         public PlayerClient()
@@ -34,29 +36,20 @@ namespace Client
         public void RequestMove(Vector2 dir)
         {
 
-            // If dir.X is nonzero (range to account for floating point errors)
-            if (dir.X < -0.01f || dir.X > 0.01f)
+            // If the direction requested is non-zero in the X axis (account for floating point error).
+            if (dir.X < 0.0f - FLOAT_RANGE || dir.X > 0.0f + FLOAT_RANGE)
             {
-                // Set the X value of the movement packet
+                // Request in the x direction.
                 MovementRequested.X = dir.X;
             }
 
-            // If dir.Y is nonzero (range to account for floating point errors)
-            if (dir.Y < -0.01f || dir.Y > 0.01f)
+            // If the direction requested is non-zero in the Y axis (account for floating point error).
+            if (dir.Y < 0.0f - FLOAT_RANGE || dir.Y > 0.0f + FLOAT_RANGE)
             {
-                // Set the Y value of the movement packet
+                //// Request in the y direction.
                 MovementRequested.Y = dir.Y;
             }
-        }
 
-        /// <summary>
-        /// Resets all transient state of the player object; e.g. the object's 
-        /// requested movement.
-        /// </summary>
-        internal void ResetTransientState()
-        {
-            MovementRequested.X = 0;
-            MovementRequested.Y = 0;
         }
 
         /// <summary>
@@ -69,6 +62,14 @@ namespace Client
 
             // Update Transform on GameObject
 
+        }
+
+        /// <summary>
+        /// Resets the player's requested movement.
+        /// </summary>
+        public void ResetRequestedMovement()
+        {
+            MovementRequested = Vector2.Zero;
         }
 
 

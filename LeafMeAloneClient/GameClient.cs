@@ -15,26 +15,26 @@ namespace Client
     class GameClient
     {
 
-        private PlayerClient activePlayer;
+        private PlayerClient ActivePlayer;
+        private InputManager InputManager;
 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         private static void Main()
         {
-            GameClient gameClient = new GameClient();
+            GameClient GameClient = new GameClient();
 
             GraphicsRenderer.Init();
 
-            gameClient.activePlayer = new PlayerClient();
+            GameClient.ActivePlayer = new PlayerClient();
 
             // Create an input manager for player events.
-            InputManager inputManager = new InputManager(gameClient.activePlayer);
+            GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
+            GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
 
-            // Add the key press input handler to call our InputManager directly.
-            GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
-
-            MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
@@ -42,11 +42,22 @@ namespace Client
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+
+            // Receive any packets from the server.
             ReceivePackets();
+
+            // Update input events.
+            InputManager.Update();
+
+            // Send any packets to the server.
             SendPackets();
+
+            // Render on screen.
             Render();
-            activePlayer.ResetTransientState();
+
+
+            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+
         }
 
         private void Render()
@@ -60,8 +71,24 @@ namespace Client
 
         private void SendPackets()
         {
-            PlayerPacket playerPack = new PlayerPacket(activePlayer.Id);
-            playerPack.Movement = activePlayer.MovementRequested;
+
+            // Create a new player packet, and fill it with player's relevant info.
+            PlayerPacket playerPack = new PlayerPacket(ActivePlayer.Id);
+            playerPack.Movement = ActivePlayer.MovementRequested;
+
+            // Handy print statement to check if input is working.
+            if (playerPack.Movement.X != 0 || playerPack.Movement.Y != 0)
+            {
+                Console.WriteLine("Movement Requested: " + playerPack.Movement);
+            }
+
+
+            // TODO: SEND THE ACTUAL PACKET
+
+            // Reset the player's requested movement after the packet is sent.
+            // Note: This should be last!
+            ActivePlayer.ResetRequestedMovement();
+
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Shared
 
         }
 
-        public void copyToThis(Transform other)
+        public void CopyToThis(Transform other)
         {
             Position.X = other.Position.X;
             Position.Y = other.Position.Y;
@@ -54,7 +54,10 @@ namespace Shared
             Scale.Z = other.Scale.Z;
 
         }
-        
 
+        public Vector2 Get2dPosition()
+        {
+            return new Vector2(Position.X, Position.Y);
+        }
     }
 }

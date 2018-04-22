@@ -10,9 +10,15 @@ namespace Shared
     /// <summary>
     /// Class for an actual player of the game.
     /// </summary>
-    public interface Player
+    public interface IPlayer
     {
-        void UpdateFromPacket(Packet packet);
+        bool GetUsingTool();
+        void SetUsingTool(bool value);
 
+        bool GetDead();
+        void SetDead(bool value);
+
+        PlayerPacket.ToolType GetToolEquipped();
+        void SetToolEquipped(PlayerPacket.ToolType value);
     }
 }

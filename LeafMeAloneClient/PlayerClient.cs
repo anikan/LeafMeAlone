@@ -8,13 +8,42 @@ using Shared;
 
 namespace Client
 {
-    public class PlayerClient : GameObjectClient, Player
+    public class PlayerClient : GameObjectClient, IPlayer
     {
 
         public const float FLOAT_RANGE = 0.01f;
 
         public Vector2 MovementRequested;
 
+        public bool GetUsingTool()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetUsingTool(bool value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool GetDead()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetDead(bool value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public PlayerPacket.ToolType GetToolEquipped()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetToolEquipped(PlayerPacket.ToolType value)
+        {
+            throw new NotImplementedException();
+        }
 
         public PlayerClient() : base()
         {

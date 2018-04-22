@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using SlimDX;
 
 namespace Server
 {
@@ -18,11 +19,17 @@ namespace Server
         /// <param name="player">The player object to serialize into a player</param>
         public PlayerPacket CreatePacket(PlayerServer player)
         {
-            PlayerPacket packet = new PlayerPacket();
-            packet.Dead = player.Dead;
+            PlayerPacket packet = new PlayerPacket()
+            {
+                Dead = player.Dead,
+                Movement = player.transform.Get2dPosition(),
+                ObjectID = player.Id,
+                Rotation = player.transform.Direction.Y,
+                ToolEquipped = player.ToolEquipped,
+                UsingTool = player.UsingTool
+            };
 
             return packet;
-
         }
 
     }

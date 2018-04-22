@@ -33,15 +33,15 @@ namespace Server
 
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {
-                    ReceivePlayerPacket(networkServer.PlayerPackets[i]);
+                    playerServer.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
                 //Clear for next frame.
                 networkServer.PlayerPackets.Clear();
 
-
+                networkServer.SendPlayer(playerServer);
+                
                 System.Threading.Thread.Sleep(10);
-
             }
         }
 

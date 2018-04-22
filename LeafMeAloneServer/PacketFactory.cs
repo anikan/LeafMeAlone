@@ -17,7 +17,7 @@ namespace Server
         /// Creates a network packet used to update the state of the player in the client
         /// </summary>
         /// <param name="player">The player object to serialize into a player</param>
-        public PlayerPacket CreatePacket(PlayerServer player)
+        public static PlayerPacket CreatePacket(PlayerServer player)
         {
             PlayerPacket packet = new PlayerPacket()
             {

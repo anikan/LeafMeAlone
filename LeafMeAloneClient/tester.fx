@@ -27,7 +27,6 @@ float4 PS(float4 iPosH  : SV_POSITION, float4 iNormL : NORMAL) : SV_TARGET
 
 	// Gamma correction
 	return float4(sqrt(reflectance),1);
-	
 }
 
 technique10 ColorTech

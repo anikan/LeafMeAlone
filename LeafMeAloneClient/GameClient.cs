@@ -19,6 +19,8 @@ namespace Client
     {
         private PlayerClient activePlayer;
 
+        private Model cockleModel;
+
         private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
@@ -31,6 +33,11 @@ namespace Client
             GraphicsRenderer.Init();
 
             gameClient.activePlayer = new PlayerClient();
+            gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
+            gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
+
+
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
 
             // Create an input manager for player events.
@@ -42,8 +49,6 @@ namespace Client
             MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
-
-
         }
 
         private void DoGameLoop()
@@ -52,9 +57,13 @@ namespace Client
             ReceivePackets();
             SendPackets();
 
-            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.01f);
+            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.001f);
+
 
             Render();
+            cockleModel.Update();
+            cockleModel.Draw();
+
             activePlayer.ResetTransientState();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 

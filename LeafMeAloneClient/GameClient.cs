@@ -51,6 +51,9 @@ namespace Client
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
             ReceivePackets();
             SendPackets();
+
+            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.01f);
+
             Render();
             activePlayer.ResetTransientState();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);

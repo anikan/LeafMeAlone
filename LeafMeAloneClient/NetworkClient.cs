@@ -62,24 +62,11 @@ namespace LeafMeAloneClient
                 // Connect to the remote endpoint.  
                 client.BeginConnect(remoteEP,
                     new AsyncCallback(ConnectCallback), client);
-                connectDone.WaitOne();
-
-                //Main game loop.
-                while (true)
-                {
-                    // Send test data to the remote device.  
-                    Send("This is a test<EOF>");
-
-                    // Receive the response from the remote device.  
-                    Receive();
-
-                    // Write the response to the console.  
-                    Console.WriteLine("Response received : {0}", response);
-                }
+                //connectDone.WaitOne();
 
                 // Release the socket.  
-                client.Shutdown(SocketShutdown.Both);
-                client.Close();
+                //client.Shutdown(SocketShutdown.Both);
+                //client.Close();
 
             }
             catch (Exception e)
@@ -180,7 +167,7 @@ namespace LeafMeAloneClient
             {
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to server.", bytesSent);
+                Console.WriteLine("Sent {0} bytes to server.\n", bytesSent);
 
                 // Signal that all bytes have been sent.  
                 sendDone.Set();

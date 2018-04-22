@@ -27,16 +27,25 @@ namespace Server
         public SlimDX.Vector3 pos;
     }
 
-    public class AsynchronousSocketListener
+    public class NetworkServer
     {
         // Thread signal.  
         public static ManualResetEvent allDone = new ManualResetEvent(false);
 
-        public AsynchronousSocketListener()
+        //Socket on server listening for requests.
+        private Socket listener;
+
+        //If false, then set the async call to accept requests.
+        private bool isListening = false;
+
+        //Socket to communicate with client.
+        private Socket clientSocket;
+
+        public NetworkServer()
         {
         }
 
-        public static void StartListening()
+        public void StartListening()
         {
             // Data buffer for incoming data.  
             byte[] bytes = new Byte[1024];
@@ -61,16 +70,24 @@ namespace Server
                 while (true)
                 {
                     // Set the event to nonsignaled state.  
-                    allDone.Reset();
+                    //allDone.Reset();
 
                     // Start an asynchronous socket to listen for connections.  
-                    Console.WriteLine("Waiting for a connection...");
-                    listener.BeginAccept(
-                        new AsyncCallback(AcceptCallback),
-                        listener);
+                    if (!isListening)
+                    {
+                        Console.WriteLine("Waiting for a connection...");
+
+                        listener.BeginAccept(
+                            new AsyncCallback(AcceptCallback),
+                            listener);
+
+                        isListening = true;
+                    }
 
                     // Wait until a connection is made before continuing.  
-                    allDone.WaitOne();
+                    //allDone.WaitOne();
+                    System.Threading.Thread.Sleep(10);
+
                 }
 
             }
@@ -84,7 +101,7 @@ namespace Server
 
         }
 
-        public static void AcceptCallback(IAsyncResult ar)
+        public void AcceptCallback(IAsyncResult ar)
         {
             // Signal the main thread to continue.  
             allDone.Set();
@@ -100,7 +117,7 @@ namespace Server
                 new AsyncCallback(ReadCallback), state);
         }
 
-        public static void ReadCallback(IAsyncResult ar)
+        public void ReadCallback(IAsyncResult ar)
         {
             String content = String.Empty;
 
@@ -137,9 +154,13 @@ namespace Server
                     new AsyncCallback(ReadCallback), state);
                 }
             }
+
+            //Begin listening again for more packets.
+            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                new AsyncCallback(ReadCallback), state);
         }
 
-        private static void Send(Socket handler, String data)
+        private void Send(Socket handler, String data)
         {
             // Convert the string data to byte data using ASCII encoding.  
             byte[] byteData = Encoding.ASCII.GetBytes(data);
@@ -149,7 +170,7 @@ namespace Server
                 new AsyncCallback(SendCallback), handler);
         }
 
-        private static void SendCallback(IAsyncResult ar)
+        private void SendCallback(IAsyncResult ar)
         {
             try
             {
@@ -158,10 +179,10 @@ namespace Server
 
                 // Complete sending the data to the remote device.  
                 int bytesSent = handler.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to client.", bytesSent);
+                Console.WriteLine("Sent {0} bytes to client.\n", bytesSent);
 
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
+                //handler.Shutdown(SocketShutdown.Both);
+                //handler.Close();
 
             }
             catch (Exception e)
@@ -172,7 +193,8 @@ namespace Server
 
         public static int Main(String[] args)
         {
-            StartListening();
+            NetworkServer networkServer = new NetworkServer();
+            networkServer.StartListening();
             return 0;
         }
     }

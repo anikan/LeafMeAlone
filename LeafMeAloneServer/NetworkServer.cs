@@ -155,9 +155,23 @@ namespace Server
                 }
             }
 
+            // Create a new state object for the next packet.  
+            StateObject newState = new StateObject();
+            newState.workSocket = handler;
+
             //Begin listening again for more packets.
-            handler.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReadCallback), state);
+            handler.BeginReceive(newState.buffer, 0, StateObject.BufferSize, 0,
+                new AsyncCallback(ReadCallback), newState);
+        }
+
+        /// <summary>
+        /// Given a player and a socket, generate a PlayerPacket and send it.
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="player"></param>
+        private void SendPlayer(Socket handler, PlayerServer player)
+        {
+            
         }
 
         private void Send(Socket handler, String data)

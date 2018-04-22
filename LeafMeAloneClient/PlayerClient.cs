@@ -16,14 +16,23 @@ namespace Client
         public Vector2 MovementRequested;
 
         private PlayerPacket.ToolType toolEquipped;
-        private Transform transform;
         private bool usingTool;
         private bool dead;
+        private Transform transform;
 
         public bool UsingTool { get => usingTool; set => usingTool = value; }
-        Transform IPlayer.Transform { get => transform; set => transform = value; }
         public bool Dead { get => dead; set => dead = value; }
         public PlayerPacket.ToolType ToolEquipped { get => toolEquipped; set => toolEquipped = value; }
+
+        public Transform GetTransform()
+        {
+            return transform;
+        }
+
+        public void SetTransform(Transform value)
+        {
+            transform = value;
+        }
 
         public PlayerClient() : base()
         {

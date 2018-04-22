@@ -152,13 +152,10 @@ namespace LeafMeAloneClient
 
         }
 
-        public void Send(String data)
+        public void Send(byte[] data)
         {
-            // Convert the string data to byte data using ASCII encoding.  
-            byte[] byteData = Encoding.ASCII.GetBytes(data);
-
             // Begin sending the data to the remote device.  
-            client.BeginSend(byteData, 0, byteData.Length, 0,
+            client.BeginSend(data, 0, data.Length, 0,
                 new AsyncCallback(SendCallback), client);
         }
 

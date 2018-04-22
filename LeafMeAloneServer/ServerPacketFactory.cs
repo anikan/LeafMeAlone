@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Shared;
 using SlimDX;
 
-namespace Shared
+namespace Server
 {
     /// <summary>
     /// Handles the generation of packets on the server
     /// </summary>
-    class PacketFactory
+    public class ServerPacketFactory
     {
         /// <summary>
         /// Creates a network packet used to update the state of the player in the client
@@ -22,10 +22,10 @@ namespace Shared
             PlayerPacket packet = new PlayerPacket()
             {
                 Dead = player.Dead,
-                MovementX = player.Transform.Get2dPosition().X,
-                MovementY = player.Transform.Get2dPosition().Y,
+                MovementX = player.GetTransform().Get2dPosition().X,
+                MovementY = player.GetTransform().Get2dPosition().Y,
                 ObjectID = player.Id,
-                Rotation = player.Transform.Direction.Y,
+                Rotation = player.GetTransform().Direction.Y,
                 ToolEquipped = player.ToolEquipped,
                 UsingTool = player.UsingTool
             };

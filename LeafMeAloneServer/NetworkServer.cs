@@ -165,7 +165,7 @@ namespace Server
         /// <param name="player"></param>
         public void SendPlayer(PlayerServer player)
         {
-            PlayerPacket packet = PacketFactory.CreatePacket(player);
+            PlayerPacket packet = ServerPacketFactory.CreatePacket(player);
 
             Send(clientSocket, PlayerPacket.Serialize(packet));
         }

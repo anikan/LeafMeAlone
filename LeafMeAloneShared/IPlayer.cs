@@ -13,7 +13,10 @@ namespace Shared
     public interface IPlayer : INetworked
     {
         bool UsingTool { get; set; }
-        Transform Transform { get; set; }
+
+        Transform GetTransform();
+        void SetTransform(Transform value);
+
         bool Dead { get; set; }
         PlayerPacket.ToolType ToolEquipped { get; set; }
         void UpdateFromPacket(PlayerPacket packet);

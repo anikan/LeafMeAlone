@@ -66,6 +66,7 @@
     <Compile Include="PlayerClient.cs" />
     <Compile Include="GraphicsRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ClientPacketFactory.cs" />
     <Compile Include="Shader.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

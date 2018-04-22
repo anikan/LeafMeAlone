@@ -59,8 +59,6 @@ namespace Client
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-            // Send test data to the remote device.  
-            networkClient.Send("This is a test<EOF>");
 
             // Receive the response from the remote device.  
             networkClient.Receive();
@@ -103,25 +101,19 @@ namespace Client
 
         private void SendPackets()
         {
-
-            // Create a new player packet, and fill it with player's relevant info.
-            PlayerPacket playerPack = new PlayerPacket();
-            playerPack.MovementX = ActivePlayer.MovementRequested.X;
-            playerPack.MovementY = ActivePlayer.MovementRequested.Y;
+            PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
+            byte[] data = PlayerPacket.Serialize(toSend);
+            networkClient.Send(data);
 
             // Handy print statement to check if input is working.
-            if (playerPack.MovementX != 0 || playerPack.MovementY != 0)
+            if (toSend.MovementX != 0 || toSend.MovementY != 0)
             {
-                Console.WriteLine("Movement Requested: " + playerPack.MovementX + "," + playerPack.MovementY);
+                Console.WriteLine("Movement Requested: " + toSend.MovementX + "," + toSend.MovementY);
             }
-
-
-            // TODO: SEND THE ACTUAL PACKET
 
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
             ActivePlayer.ResetRequestedMovement();
-
         }
 
     }

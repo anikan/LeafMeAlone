@@ -17,11 +17,20 @@ namespace Server
         bool IPlayer.Dead { get; set; }
         PlayerPacket.ToolType IPlayer.ToolEquipped { get; set; }
         int INetworked.Id { get; set; }
-        public Transform Transform { get => transform; set => transform = value; }
+
+        public Transform GetTransform()
+        {
+            return transform;
+        }
+
+        public void SetTransform(Transform value)
+        {
+            transform = value;
+        }
 
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            transform.Position += new Vector3(packet.Movement, 0.0f);
+            transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f);
 
             transform.Direction.Y = packet.Rotation;
         }

@@ -20,12 +20,12 @@ namespace Client
         /// <summary>
         /// Vertex Buffer,Normal Buffer Index Buffer
         /// </summary>
-        private Buffer VBOPositions, VBONormals, EBO;
+        private List<Buffer> VBOPositions, VBONormals, EBO;
 
         /// <summary>
         /// Data streams hold the actual Vertices and Faces.
         /// </summary>
-        private DataStream Vertices, Normals, Faces;
+        private List<DataStream> Vertices, Normals, Faces;
 
         /// <summary>
         /// Assimp scene containing the loaded model.
@@ -52,6 +52,9 @@ namespace Client
 
         private EffectPass Pass;
 
+        //sizes for the loaded object.
+        private List<int> vertSize, normSize, faceSize;
+
         /// <summary>
         /// Create a new geometry given filename
         /// </summary>
@@ -65,54 +68,70 @@ namespace Client
             //import the file
             scene = importer.ImportFile(fileName);
 
-            //sizes for the loaded object.
-            int vertSize = 0, normSize = 0, faceSize = 0;
-
-            //loop through sizes and count them.
-            scene.Meshes.ForEach(mesh =>
-            {
-                vertSize += mesh.VertexCount * Vector3.SizeInBytes;
-                normSize += mesh.Normals.Count * Vector3.SizeInBytes;
-                faceSize += mesh.FaceCount * mesh.Faces[0].IndexCount * sizeof(int);
-            });
-
             //make sure scene not null
             if (scene == null)
                 throw new FileNotFoundException();
 
-            //create new datastreams.
-            Vertices = new DataStream(vertSize, true, true);
-            Normals = new DataStream(normSize, true, true);
-            Faces = new DataStream(faceSize, true, true);
-
-            //loop through vertices, normals, and faces and put them in the datastreams.
-            foreach (Mesh sceneMesh in scene.Meshes)
+            //loop through sizes and count them.
+            vertSize = new List<int>(scene.MeshCount);
+            normSize = new List<int>(scene.MeshCount);
+            faceSize = new List<int>(scene.MeshCount);
+            vertSize.AddRange(Enumerable.Repeat(0, scene.MeshCount));
+            normSize.AddRange(Enumerable.Repeat(0, scene.MeshCount));
+            faceSize.AddRange(Enumerable.Repeat(0, scene.MeshCount));
+            for (int idx = 0; idx < scene.MeshCount; idx++)
             {
-                sceneMesh.Vertices.ForEach(vertex =>
+                vertSize[idx] = scene.Meshes[idx].VertexCount * Vector3.SizeInBytes;
+                normSize[idx] = scene.Meshes[idx].Normals.Count * Vector3.SizeInBytes;
+                faceSize[idx] = scene.Meshes[idx].FaceCount * scene.Meshes[idx].Faces[0].IndexCount * sizeof(int);
+            }
+            
+            Vertices = new List<DataStream>(scene.MeshCount);
+            Normals = new List<DataStream>(scene.MeshCount);
+            Faces = new List<DataStream>(scene.MeshCount);
+            VBOPositions = new List<Buffer>(scene.MeshCount);
+            VBONormals = new List<Buffer>(scene.MeshCount);
+            EBO = new List<Buffer>(scene.MeshCount);
+            Vertices.AddRange(Enumerable.Repeat((DataStream) null, scene.MeshCount));
+            Normals.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
+            Faces.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
+            VBOPositions.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
+            VBONormals.AddRange(Enumerable.Repeat((Buffer) null, scene.MeshCount));
+            EBO.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
+            for (int idx = 0; idx < scene.MeshCount; idx++)
+            {
+                //create new datastreams.
+                Vertices[idx] = new DataStream(vertSize[idx], true, true);
+                Normals[idx] = new DataStream(normSize[idx], true, true);
+                Faces[idx] = new DataStream(faceSize[idx], true, true);
+
+                scene.Meshes[idx].Vertices.ForEach(vertex =>
                 {
-                    Vertices.Write(vertex.ToVector3());
+                    Vertices[idx].Write(vertex.ToVector3());
                 });
-                sceneMesh.Normals.ForEach(normal =>
+                scene.Meshes[idx].Normals.ForEach(normal =>
                 {
-                    Normals.Write(normal.ToVector3());
+                    Normals[idx].Write(normal.ToVector3());
                 });
-                sceneMesh.Faces.ForEach(face =>
+                scene.Meshes[idx].Faces.ForEach(face =>
                 {
-                    Faces.WriteRange(face.Indices.ToArray());
+                    Faces[idx].WriteRange(face.Indices.ToArray());
                 });
 
+                //create vertex vbo and faces ebo.
+                VBOPositions[idx] = new Buffer(GraphicsRenderer.Device, Vertices[idx], vertSize[idx], ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+                VBONormals[idx] = new Buffer(GraphicsRenderer.Device, Normals[idx], normSize[idx], ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+
+                var ibd = new BufferDescription(
+                    faceSize[idx],
+                    ResourceUsage.Immutable,
+                    BindFlags.IndexBuffer,
+                    CpuAccessFlags.None,
+                    ResourceOptionFlags.None,
+                    0);
+                EBO[idx] = new Buffer(GraphicsRenderer.Device, Faces[idx], ibd);
             }
 
-            //reset positions in data stream
-            Vertices.Position = 0;
-            Normals.Position = 0;
-            Faces.Position = 0;
-
-
-            //create vertex vbo and faces ebo.
-            VBOPositions = new Buffer(GraphicsRenderer.Device, Vertices, vertSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            VBONormals = new Buffer(GraphicsRenderer.Device, Normals, normSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None,0);
-            EBO = new Buffer(GraphicsRenderer.Device, Faces, faceSize, ResourceUsage.Default, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
             #region Shader Code -- To Move
 
@@ -128,7 +147,7 @@ namespace Client
 
             Elements = new[] {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
-                new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1)
+                new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
             };
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
@@ -141,16 +160,24 @@ namespace Client
         {
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = InputLayout;
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBOPositions, Vector3.SizeInBytes, 0));
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBONormals, Vector3.SizeInBytes, 0));
 
             Effect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
             Effect.GetVariableByName("gView").AsMatrix()
                 .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
             Effect.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
 
-            Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
-            GraphicsRenderer.Device.ImmediateContext.Draw((int)Vertices.Length / 3, 0);
+            for (int i = 0; i < scene.MeshCount; i++)
+            {
+                GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0,
+                    new VertexBufferBinding(VBOPositions[i], Vector3.SizeInBytes, 0));
+                GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1,
+                    new VertexBufferBinding(VBONormals[i], Vector3.SizeInBytes, 0));
+                GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO[i], Format.R32_UInt, 0);
+
+                Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
+                GraphicsRenderer.Device.ImmediateContext.DrawIndexed(faceSize[i] / sizeof(int), 0, 0);
+                //GraphicsRenderer.Device.ImmediateContext.Draw(vertSize / sizeof(float), 0);
+            }
         }
     }
 }

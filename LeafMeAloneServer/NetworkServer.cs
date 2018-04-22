@@ -58,7 +58,7 @@ namespace Server
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
             // Create a TCP/IP socket.  
-            Socket listener = new Socket(ipAddress.AddressFamily,
+            listener = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.  
@@ -66,39 +66,39 @@ namespace Server
             {
                 listener.Bind(localEndPoint);
                 listener.Listen(100);
-
-                while (true)
-                {
-                    // Set the event to nonsignaled state.  
-                    //allDone.Reset();
-
-                    // Start an asynchronous socket to listen for connections.  
-                    if (!isListening)
-                    {
-                        Console.WriteLine("Waiting for a connection...");
-
-                        listener.BeginAccept(
-                            new AsyncCallback(AcceptCallback),
-                            listener);
-
-                        isListening = true;
-                    }
-
-                    // Wait until a connection is made before continuing.  
-                    //allDone.WaitOne();
-                    System.Threading.Thread.Sleep(10);
-
-                }
-
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
             }
+        }
 
-            Console.WriteLine("\nPress ENTER to continue...");
-            Console.Read();
+        public void CheckForConnections()
+        {
+            try
+            {
+                // Set the event to nonsignaled state.  
+                //allDone.Reset();
 
+                // Start an asynchronous socket to listen for connections.  
+                if (!isListening)
+                {
+                    Console.WriteLine("Waiting for a connection...");
+
+                    listener.BeginAccept(
+                        new AsyncCallback(AcceptCallback),
+                        listener);
+
+                    isListening = true;
+                }
+
+                // Wait until a connection is made before continuing.  
+                //allDone.WaitOne();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         public void AcceptCallback(IAsyncResult ar)
@@ -189,13 +189,6 @@ namespace Server
             {
                 Console.WriteLine(e.ToString());
             }
-        }
-
-        public static int Main(String[] args)
-        {
-            NetworkServer networkServer = new NetworkServer();
-            networkServer.StartListening();
-            return 0;
         }
     }
 }

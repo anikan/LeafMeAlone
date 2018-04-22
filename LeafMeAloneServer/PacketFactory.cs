@@ -18,7 +18,7 @@ namespace Server
         /// <param name="player">The player object to serialize into a player</param>
         public PlayerPacket CreatePacket(PlayerServer player)
         {
-            PlayerPacket packet = new PlayerPacket(player.Id);
+            PlayerPacket packet = new PlayerPacket();
             packet.Dead = player.Dead;
 
             return packet;

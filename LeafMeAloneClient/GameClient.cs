@@ -7,8 +7,11 @@ using Client;
 using LeafMeAloneClient;
 using Shared;
 using SlimDX;
+using SlimDX.D3DCompiler;
+using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
+using Device = SlimDX.DXGI.Device;
 
 
 namespace Client
@@ -16,7 +19,10 @@ namespace Client
     class GameClient
     {
 
-        private PlayerClient activePlayer;
+        private PlayerClient ActivePlayer;
+        private InputManager InputManager;
+        
+        private Camera Camera => GraphicsManager.ActiveCamera;
 
         /// <summary>
         /// The main entry point for the application.
@@ -26,19 +32,25 @@ namespace Client
 
         private static void Main()
         {
-            GameClient gameClient = new GameClient();
+            GameClient GameClient = new GameClient();
 
             GraphicsRenderer.Init();
 
-            gameClient.activePlayer = new PlayerClient();
+            GameClient.ActivePlayer = new PlayerClient();
+           // gameClient.cockleModel = new Model(@"../../model-cockle/common-cockle.obj");
+            //gameClient.cockleModel.m_Properties.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //gameClient.cockleModel.m_Properties.Position = new Vector3(0f, -10.0f, 0f);
+
+
+            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
 
             // Create an input manager for player events.
-            InputManager inputManager = new InputManager(gameClient.activePlayer);
+            GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
 
-            // Add the key press input handler to call our InputManager directly.
-            GraphicsRenderer.Form.KeyPress += inputManager.OnKeyPress;
+            GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
 
-            MessagePump.Run(GraphicsRenderer.Form, gameClient.DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
 
             GraphicsRenderer.Dispose();
 
@@ -47,8 +59,6 @@ namespace Client
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
-
             // Send test data to the remote device.  
             networkClient.Send("This is a test<EOF>");
 
@@ -58,10 +68,21 @@ namespace Client
             // Write the response to the console.  
             //Console.WriteLine("Response received : {0}", networkClient.response);
 
+            GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             ReceivePackets();
+
+            // Update input events.
+            InputManager.Update();
+
+            // Send any packets to the server.
             SendPackets();
+
+            GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0,0,0), new Vector3(1,0,0), 0.0001f);
+
             Render();
-            activePlayer.ResetTransientState();
+
+            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+
         }
 
         public GameClient()
@@ -71,6 +92,8 @@ namespace Client
 
         private void Render()
         {
+            ActivePlayer.Update();
+            ActivePlayer.Draw();
         }
 
         private void ReceivePackets()
@@ -80,8 +103,25 @@ namespace Client
 
         private void SendPackets()
         {
-            PlayerPacket playerPack = new PlayerPacket(activePlayer.Id);
-            playerPack.Movement = activePlayer.MovementRequested;
+
+            // Create a new player packet, and fill it with player's relevant info.
+            PlayerPacket playerPack = new PlayerPacket();
+            playerPack.Movement = ActivePlayer.MovementRequested;
+
+            // Handy print statement to check if input is working.
+            if (playerPack.Movement.X != 0 || playerPack.Movement.Y != 0)
+            {
+                Console.WriteLine("Movement Requested: " + playerPack.Movement);
+            }
+
+
+            // TODO: SEND THE ACTUAL PACKET
+
+            // Reset the player's requested movement after the packet is sent.
+            // Note: This should be last!
+            ActivePlayer.ResetRequestedMovement();
+
         }
+
     }
 }

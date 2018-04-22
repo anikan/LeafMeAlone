@@ -12,7 +12,7 @@ namespace Server
         /// <summary>
         /// Data on the character's position, rotation ...
         /// </summary>
-        public TransformProperties transform;
+        public Transform transform;
         /// <summary>
         /// Whether the player is using a tool
         /// </summary>
@@ -28,7 +28,7 @@ namespace Server
         /// </summary>
         public bool Dead;
 
-        public override void UpdateFromPacket(Packet packet)
+        public void UpdateFromPacket(Packet packet)
         {
             throw new NotImplementedException();
         }

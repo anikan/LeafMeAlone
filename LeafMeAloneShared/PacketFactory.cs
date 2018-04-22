@@ -11,7 +11,7 @@ namespace Shared
     /// <summary>
     /// Handles the generation of packets on the server
     /// </summary>
-    class PacketFactory
+    public class PacketFactory
     {
         /// <summary>
         /// Creates a network packet used to update the state of the player in the client

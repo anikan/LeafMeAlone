@@ -21,7 +21,7 @@ namespace Server
 
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            transform.Position += new Vector3(packet.Movement, 0.0f);
+            transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f);
 
             transform.Direction.Y = packet.Rotation;
         }

@@ -16,10 +16,12 @@ namespace Client
     class InputManager
     {
         // Maps keys presesd to functions they should call.
-        public Dictionary<Keys, Action<int>> InputMap;
+        public Dictionary<Keys, Action> KeyInputMap;
+        public Dictionary<MouseButtons, Action> MouseButtonMap;
 
         // List of the keys that are currently being pressed.
         public List<Keys> KeysPressed;
+        MouseButtons MouseButtonPressed = MouseButtons.None;
 
         /// <summary>
         /// Constructor for the input manager. Should take in a player that will respond to input events.
@@ -28,15 +30,24 @@ namespace Client
         public InputManager(PlayerClient userPlayer)
         {
             // Initialize structures.
-            InputMap = new Dictionary<Keys, Action<int>>();
             KeysPressed = new List<Keys>();
 
             // Dictionary to keep track of what functions should be called by what key presses.
-            InputMap = new Dictionary<Keys, Action<int>> {
-                {Keys.W, (int dir) => { userPlayer.RequestMove(dir * new Vector2(0.0f, 1.0f)); } },
-                {Keys.A, (int dir) => { userPlayer.RequestMove(dir * new Vector2(-1.0f, 0.0f));  } },
-                {Keys.S, (int dir) => { userPlayer.RequestMove(dir * new Vector2(0.0f, -1.0f)); } },
-                {Keys.D, (int dir) => { userPlayer.RequestMove(dir * new Vector2(1.0f, 0.0f));  } }
+            KeyInputMap = new Dictionary<Keys, Action>
+            {
+                {Keys.W, () => { userPlayer.RequestMove(new Vector2(0.0f, 1.0f)); } },
+                {Keys.A, () => { userPlayer.RequestMove(new Vector2(-1.0f, 0.0f));  } },
+                {Keys.S, () => { userPlayer.RequestMove(new Vector2(0.0f, -1.0f)); } },
+                {Keys.D, () => { userPlayer.RequestMove(new Vector2(1.0f, 0.0f));  } }
+            };
+
+            // Dictionary to keep track of what functions should be called by what mouse presses
+            MouseButtonMap = new Dictionary<MouseButtons, Action>
+            {
+
+                {MouseButtons.Left, () => { userPlayer.RequestUsePrimary(); } },
+                {MouseButtons.Right, () => { userPlayer.RequestUseSecondary(); } }
+
             };
         }
 
@@ -51,14 +62,21 @@ namespace Client
             {
 
                 // The key that was pressed in the list.
-                Keys key = KeysPressed[i];
+                Keys Key = KeysPressed[i];
 
                 // Check if the key is in the input map.
-                if (InputMap.TryGetValue(key, out Action<int> keyAction))
+                if (KeyInputMap.TryGetValue(Key, out Action KeyAction))
                 {
                     // If in the map, call the associated action.
-                    keyAction(1);
+                    KeyAction();
                 }
+            }
+
+            // Check if the active mouse button is mapped.
+            if (MouseButtonMap.TryGetValue(MouseButtonPressed, out Action MouseAction))
+            {
+                // Call the mapped function.
+                MouseAction();
             }
         }
 
@@ -75,8 +93,6 @@ namespace Client
                 // Add key to the list of keys pressed.
                 KeysPressed.Add(keyArg.KeyCode);
             }
-
-
         }
 
         /// <summary>
@@ -91,6 +107,32 @@ namespace Client
             if (KeysPressed.Contains(keyArg.KeyCode))
             {
                 KeysPressed.Remove(keyArg.KeyCode);
+            }
+        }
+
+        /// <summary>
+        /// Called when a mouse button is pressed down.
+        /// </summary>
+        /// <param name="ignore"> Ignored. </param>
+        /// <param name="arg"> Information about the mouse button pressed. </param>
+        public void OnMouseDown(object ignore, MouseEventArgs arg)
+        {
+            // Set the mouse button that's been pressed this frame.
+            MouseButtonPressed = arg.Button;
+        }
+
+        /// <summary>
+        /// Called when the mouse button is lifted.
+        /// </summary>
+        /// <param name="ignore"> Ignored. </param>
+        /// <param name="arg"> Information about the mouse button lifted. </param>
+        public void OnMouseUp(object ignore, MouseEventArgs arg)
+        {
+            // Check if the lifted button is the active one.
+            if (MouseButtonPressed == arg.Button)
+            {
+                // If so, there's no mouse button being pressed anymore this frame.
+                MouseButtonPressed = MouseButtons.None;
             }
         }
 

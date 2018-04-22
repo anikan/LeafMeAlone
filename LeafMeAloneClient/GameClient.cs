@@ -29,23 +29,20 @@ namespace Client
         /// </summary>
         private static void Main()
         {
-            GameClient GameClient = new GameClient();
+            GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
 
-            GameClient.ActivePlayer = new PlayerClient();
+            Client.ActivePlayer = new PlayerClient();
 
-            // Create an input manager for player events.
-            GameClient.InputManager = new InputManager(GameClient.ActivePlayer);
-
-            GraphicsRenderer.Form.KeyDown += GameClient.InputManager.OnKeyDown;
-            GraphicsRenderer.Form.KeyUp += GameClient.InputManager.OnKeyUp;
+            // Set up the input manager.
+            Client.SetupInputManager();
 
             Camera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActiveCamera = Camera;
             testModel = new Model(@"../../Pants14Triangles.fbx");
 
-            MessagePump.Run(GraphicsRenderer.Form, GameClient.DoGameLoop);
+            MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
 
@@ -83,26 +80,43 @@ namespace Client
 
         }
 
+        /// <summary>
+        /// Sends all packets this frame.
+        /// </summary>
         private void SendPackets()
         {
 
             // Create a new player packet, and fill it with player's relevant info.
             PlayerPacket playerPack = new PlayerPacket();
+
             playerPack.Movement = ActivePlayer.MovementRequested;
+            playerPack.UsingToolPrimary = ActivePlayer.UseToolPrimaryRequest;
+            playerPack.UsingToolSecondary = ActivePlayer.UseToolSecondaryRequest;
 
-            // Handy print statement to check if input is working.
-            if (playerPack.Movement.X != 0 || playerPack.Movement.Y != 0)
-            {
-                Console.WriteLine("Movement Requested: " + playerPack.Movement);
-            }
-
+            Console.WriteLine(playerPack.ToString());
 
             // TODO: SEND THE ACTUAL PACKET
 
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
-            ActivePlayer.ResetRequestedMovement();
+            ActivePlayer.ResetRequests();
 
+        }
+
+        /// <summary>
+        /// Sets up the input manager and relevant input events.
+        /// </summary>
+        private void SetupInputManager()
+        {
+
+            // Create an input manager for player events.
+            InputManager = new InputManager(ActivePlayer);
+
+            // Input events for the input manager.
+            GraphicsRenderer.Form.KeyDown += InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += InputManager.OnKeyUp;
+            GraphicsRenderer.Form.MouseDown += InputManager.OnMouseDown;
+            GraphicsRenderer.Form.MouseUp += InputManager.OnMouseUp;
         }
 
     }

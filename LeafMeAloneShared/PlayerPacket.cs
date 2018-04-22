@@ -31,7 +31,10 @@ namespace Shared
         public float Rotation;
 
         // If the player is actively using their tool this frame.
-        public bool UsingTool;
+        public bool UsingToolPrimary;
+
+        // If the player is using the secondary ability of their tool this frame.
+        public bool UsingToolSecondary;
 
         // Currently equipped tool.
         public ToolType ToolEquipped;
@@ -64,6 +67,16 @@ namespace Shared
         {
 
 
+
+        }
+
+        public override string ToString()
+        {
+
+            string printString = string.Format("Player packet info: Movement={0}, UseToolPrimary={1}, UseToolSecondary={2}", 
+                Movement, UsingToolPrimary, UsingToolSecondary);
+
+            return printString;
 
         }
     }

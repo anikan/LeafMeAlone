@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.XPath;
@@ -17,16 +18,16 @@ using Texture2D = SlimDX.Direct3D10.Texture2D;
 
 namespace Client
 {
-    public struct Material
+    public class MyMaterial
     {
         public Vector4 diffuse;
         public Vector4 ambient;
         public Vector4 specular;
         public Vector4 emissive;
+        public ShaderResourceView texSRV;
         public float shininess;
         public float opacity;
         public int texCount;   // will be 0 if there is no texture
-        public int texID;      // the textureID of the texture created
 
         public void setTexCount(int t)
         {
@@ -63,15 +64,14 @@ namespace Client
             opacity = x;
         }
 
-        public void setTexID(int id)
+        public void setDiffuseTexture(ShaderResourceView tex)
         {
-            texID = id;
+            texSRV = tex;
         }
     }
 
     class Geometry
     {
-
         /// <summary>
         /// Vertex Buffer,Normal Buffer Index Buffer
         /// </summary>
@@ -85,7 +85,20 @@ namespace Client
         /// </summary>
         private List<DataStream> Vertices, Normals, Faces, TexCoords;
 
-        private List<Material> Materials;
+        /// <summary>
+        /// Holds the material properties of each mesh
+        /// </summary>
+        private List<MyMaterial> Materials;
+
+        /// <summary>
+        /// Holds references to the textures
+        /// </summary>
+        private Dictionary<String, ShaderResourceView> diffuseTextureSRV;
+
+        /// <summary>
+        /// stores the source file name of the input file
+        /// </summary>
+        private String sourceFileName;
 
         /// <summary>
         /// Assimp scene containing the loaded model.
@@ -101,23 +114,21 @@ namespace Client
         /// Elements are just used to put things into the shader.
         /// </summary>
         private InputElement[] Elements;
-
-        private InputLayout InputLayout;
-
-
+        
         /// <summary>
         /// something to do with shaders
         /// </summary>
-        private Effect Effect;
-
+        private InputLayout InputLayout;
+        private Effect Effects;
         private EffectPass Pass;
 
         /// <summary>
         /// Create a new geometry given filename
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="fileName"> filepath to the 3D model file </param>
         public Geometry(string fileName)
         {
+            sourceFileName = fileName;
 
             //Create new importer.
             importer = new AssimpContext();
@@ -125,7 +136,8 @@ namespace Client
             //import the file
             scene = importer.ImportFile(fileName,
                 PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate |
-                PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.SortByPrimitiveType);
+                PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.SortByPrimitiveType |
+                PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs);
 
             //make sure scene not null
             if (scene == null)
@@ -151,7 +163,7 @@ namespace Client
                 faceSize[idx] = scene.Meshes[idx].FaceCount * scene.Meshes[idx].Faces[0].IndexCount * sizeof(int);
                 if (scene.Meshes[idx].HasTextureCoords(0))
                 {
-                    texSize[idx] = scene.Meshes[idx].TextureCoordinateChannels[0].Count * Vector2.SizeInBytes;
+                    texSize[idx] = scene.Meshes[idx].TextureCoordinateChannels[0].Count * Vector3.SizeInBytes;
                 }
             }
 
@@ -180,11 +192,8 @@ namespace Client
             EBO.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
 
             // create empty lists of the material properties and textures
-            Materials = new List<Material>(scene.MeshCount);
-
-            
-            // this will be used for the texture loading
-            Vector2 tempVec2 = new Vector2();
+            Materials = new List<MyMaterial>(scene.MeshCount);
+            diffuseTextureSRV = new Dictionary<string, ShaderResourceView>();
 
             // main loading loop; copy cover the scene content into the datastreams and then to the buffers
             for (int idx = 0; idx < scene.MeshCount; idx++)
@@ -195,7 +204,7 @@ namespace Client
                 Faces[idx] = new DataStream(faceSize[idx], true, true);
 
                 // create a new material
-                Materials.Add(new Material());
+                Materials.Add(new MyMaterial());
 
                 // copy the buffers
                 scene.Meshes[idx].Vertices.ForEach(vertex =>
@@ -216,24 +225,12 @@ namespace Client
                 {
                     TexCoords[idx] = new DataStream(texSize[idx], true, true);
                     scene.Meshes[idx].TextureCoordinateChannels[0].ForEach(texture => {
-                        tempVec2.X = texture.X;
-                        tempVec2.Y = texture.Y;
-                        TexCoords[idx].Write(tempVec2);
+                        TexCoords[idx].Write(texture);
                     });
-                    Materials[idx].setTexCount(1);
                 }
-                else
-                {
-                    Materials[idx].setTexCount(0);
-                }
-
 
                 // Parse material properties
-                int matIndex;
-                if ((matIndex = scene.Meshes[idx].MaterialIndex) >= 0)
-                {
-                    
-                }
+                ApplyMaterial(scene.Materials[scene.Meshes[idx].MaterialIndex], Materials[idx]);
 
                 // reset datastream positions
                 Vertices[idx].Position = 0;
@@ -269,13 +266,14 @@ namespace Client
                 EffectFlags.None);
             var sig = ShaderSignature.GetInputSignature(btcode);
 
-            Effect = new Effect(GraphicsRenderer.Device, btcode1);
-            EffectTechnique technique = Effect.GetTechniqueByIndex(0);
+            Effects = new Effect(GraphicsRenderer.Device, btcode1);
+            EffectTechnique technique = Effects.GetTechniqueByIndex(0);
             Pass = technique.GetPassByIndex(0);
 
             Elements = new[] {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
+                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2) 
             };
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
@@ -283,25 +281,142 @@ namespace Client
             #endregion
         }
 
+        /// <summary>
+        /// Create a texture resource using the complete filepath to the texture file
+        /// </summary>
+        /// <param name="fileName"> filepath to the texture file </param>
+        /// <returns></returns>
+        private ShaderResourceView CreateTexture(String fileName)
+        {
+            if (!diffuseTextureSRV.ContainsKey(fileName))
+            {
+                if (File.Exists(fileName))
+                {
+                    diffuseTextureSRV[fileName] = ShaderResourceView.FromFile(GraphicsRenderer.Device, fileName);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            return diffuseTextureSRV[fileName];
+        }
 
+        /// <summary>
+        /// Helper method, used to transfer information from Material to MyMaterial
+        /// </summary>
+        /// <param name="mat"> the source Material </param>
+        /// <param name="myMat"> the destination MyMaterial </param>
+        private void ApplyMaterial(Material mat, MyMaterial myMat)
+        {
+            if (mat.GetMaterialTextureCount(TextureType.Diffuse) > 0)
+            {
+                TextureSlot tex;
+                if (mat.GetMaterialTexture(TextureType.Diffuse, 0, out tex))
+                {
+                    myMat.setDiffuseTexture( CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)) );
+                    myMat.setTexCount(1);
+                }
+                else
+                {
+                    myMat.setDiffuseTexture( null );
+                    myMat.setTexCount(1);
+                }
+            }
+
+            // copies over all the material properties to the struct
+            // sets the diffuse color
+            Color4 color = new Color4(.8f, .8f, .8f, 1.0f); // default is light grey
+            if (mat.HasColorDiffuse)
+            {
+                myMat.setDiffuse( mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
+            }
+            else
+            {
+                myMat.setDiffuse( color.Red, color.Green, color.Blue, color.Alpha );
+            }
+
+            // sets the specular color
+            color = new Color4(0, 0, 0, 1.0f);  // default is non-specular 
+            if (mat.HasColorSpecular)
+            {
+                myMat.setSpecular(mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
+            }
+            else
+            {
+                myMat.setSpecular(color.Red, color.Green, color.Blue, color.Alpha);
+            }
+
+            // sets the ambient color
+            color = new Color4(.2f, .2f, .2f, 1.0f);    // default is dark grey
+            if (mat.HasColorAmbient)
+            {
+                myMat.setAmbient(mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
+            }
+            else
+            {
+                myMat.setAmbient(color.Red, color.Green, color.Blue, color.Alpha);
+            }
+
+            // sets the emissive color
+            color = new Color4(0, 0, 0, 1.0f);  // default is black
+            if (mat.HasColorEmissive)
+            {
+                myMat.setEmissive(mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
+            }
+            else
+            {
+                myMat.setEmissive(color.Red, color.Green, color.Blue, color.Alpha);
+            }
+
+            // sets the shininess
+            float shininess = 1;    // default is 1
+            if (mat.HasShininess)
+            {
+                myMat.setShininess(mat.Shininess);
+            }
+            else
+            {
+                myMat.setShininess(shininess);
+            }
+
+            // sets the opacity
+            float opacity = 1;      // default is 1
+            if (mat.HasOpacity)
+            {
+                myMat.setOpacity(mat.Opacity);
+            }
+            else
+            {
+                myMat.setOpacity(mat.Opacity);
+            }
+        }
+
+        /// <summary>
+        /// Draw a model by using the modelmatrix it is assigned to
+        /// </summary>
+        /// <param name="modelMatrix"> describes how the object is viewed in the world space </param>
         public void Draw(Matrix modelMatrix)
         {
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = InputLayout;
             GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            Effect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
-            Effect.GetVariableByName("gView").AsMatrix()
+            Effects.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
+            Effects.GetVariableByName("gView").AsMatrix()
                 .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
-            Effect.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
+            Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
+
 
             for (int i = 0; i < scene.MeshCount; i++)
             {
+                // pass vertices, normals, and indices into the shader
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(0,
                     new VertexBufferBinding(VBOPositions[i], Vector3.SizeInBytes, 0));
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1,
                     new VertexBufferBinding(VBONormals[i], Vector3.SizeInBytes, 0));
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO[i], Format.R32_UInt, 0);
 				
+                // pass texture coordinates into the shader if applicable
 				if (Materials[i].texCount > 0)
 				{
 					// note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
@@ -309,9 +424,24 @@ namespace Client
 						new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
 				}
 
+                // pass texture resource into the shader if applicable
+                if (Materials[i].texSRV != null)
+                {
+                    Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(Materials[i].texSRV);
+                }
+
+                // pass material properties into the shader
+                Effects.GetVariableByName("Diffuse").AsVector().Set(Materials[i].diffuse);
+                Effects.GetVariableByName("Specular").AsVector().Set(Materials[i].specular);
+                Effects.GetVariableByName("Ambient").AsVector().Set(Materials[i].ambient);
+                Effects.GetVariableByName("Emissive").AsVector().Set(Materials[i].emissive);
+                Effects.GetVariableByName("Shininess").AsScalar().Set(Materials[i].shininess);
+                Effects.GetVariableByName("Opacity").AsScalar().Set(Materials[i].opacity);
+                Effects.GetVariableByName("texCount").AsScalar().Set(Materials[i].texCount);
+
+                // Draw the object using the indices
                 Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
                 GraphicsRenderer.Device.ImmediateContext.DrawIndexed(faceSize[i] / sizeof(int), 0, 0);
-                //GraphicsRenderer.Device.ImmediateContext.Draw(vertSize / sizeof(float), 0);
             }
         }
     }

@@ -34,7 +34,7 @@ namespace Client
 
             Client.ActivePlayer = new PlayerClient();
 
-            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 30, -6), Vector3.Zero, Vector3.UnitY);
+            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 100, -6), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.

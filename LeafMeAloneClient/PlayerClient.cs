@@ -81,15 +81,18 @@ namespace Client
         {
             Vector2 screenSize = new Vector2(GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height);
 
-            position.X -= screenSize.X / 2;
-            position.Y -= screenSize.Y / 2;
+            Vector3 testPos = GraphicsManager.ScreenToWorldPoint(position);
 
-            position.Normalize();
+            double angle = Math.Atan(position.Y / position.X) * (180.0f / Math.PI);
 
-            Console.WriteLine("New Direction: " + position);
+            Console.WriteLine("Position is " + testPos); ;
 
-            Transform.Direction = new Vector3();
+            /*
+            double xVal = Math.Acos(position.X / h) * (180.0f / Math.PI);
+            double yVal = (float)Math.Asin(position.Y / h) * (180.0f / Math.PI);
 
+            Transform.Rotation = new Vector3(Transform.Rotation.X, (float)yVal, Transform.Rotation.Z);
+*/
 
         }
 

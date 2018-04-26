@@ -17,6 +17,11 @@ namespace Shared
         {
             return degrees * ((float)Math.PI / 180.0f);
         }
+
+        public static Vector4 Mult(this Matrix m, Vector4 multBy)
+        {
+            return Vector4.Transform(multBy, Matrix.Transpose(m));
+        }
     }
 
     // model properties

@@ -40,15 +40,6 @@ namespace Client
         }
 
         /// <summary>
-        /// Updates the player's values based on a received packet.
-        /// </summary>
-        /// <param name="packet"></param>
-        public void UpdateFromPacket(Packet packet)
-        {
-
-        }
-
-        /// <summary>
         /// Moves the player in a specified direction (NESW)
         /// </summary>
         /// <param name="dir"></param>
@@ -91,9 +82,18 @@ namespace Client
             MovementRequested = Vector2.Zero;
         }
 
+        /// <summary>
+        /// Updates the player's values based on a received packet.
+        /// </summary>
+        /// <param name="packet">The packet to update from.</param>
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            throw new NotImplementedException();
+            dead = packet.Dead;
+            toolEquipped = packet.ToolEquipped;
+            usingTool = packet.UsingTool;
+            transform.Position.X = packet.MovementX;
+            transform.Position.Y = packet.MovementY;
+            transform.Direction.Y = packet.Rotation;
         }
     }
 }

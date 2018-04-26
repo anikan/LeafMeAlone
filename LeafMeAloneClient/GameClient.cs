@@ -94,22 +94,28 @@ namespace Client
             ActivePlayer.Draw();
         }
 
+        /// <summary>
+        /// Recieves packets for the server, updates the player
+        /// TODO: Make this hash the first 4 bytes into an object ID
+        /// </summary>
         private void ReceivePackets()
         {
+            for (int i = 0; i < networkClient.PlayerPackets.Count(); i++)
+            {
+                ActivePlayer.UpdateFromPacket(networkClient.PlayerPackets[i]);
+            }
 
+            networkClient.PlayerPackets.Clear();
         }
 
+        /// <summary>
+        /// Sends out the data associated with the active player's input, resets requested movement
+        /// </summary>
         private void SendPackets()
         {
             PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
             byte[] data = PlayerPacket.Serialize(toSend);
             networkClient.Send(data);
-
-            // Handy print statement to check if input is working.
-            if (toSend.MovementX != 0 || toSend.MovementY != 0)
-            {
-                Console.WriteLine("Movement Requested: " + toSend.MovementX + "," + toSend.MovementY);
-            }
 
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!

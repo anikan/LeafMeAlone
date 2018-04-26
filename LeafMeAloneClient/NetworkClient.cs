@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-
+using Shared;
 
 namespace LeafMeAloneClient
 {
@@ -42,6 +42,8 @@ namespace LeafMeAloneClient
         public String response = String.Empty;
 
         private Socket client;
+
+        public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
         public void StartClient()
         {
@@ -128,9 +130,13 @@ namespace LeafMeAloneClient
                     // There might be more data, so store the data received so far.  
                     state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
 
-                    // Get the rest of the data.  
-                    client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                        new AsyncCallback(ReceiveCallback), state);
+                    byte[] resizedBuffer = new byte[bytesRead];
+                    Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
+
+
+                    PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
+
+                    PlayerPackets.Add(packet);
                 }
 
                 //Note: Assuming data will never be greater than the buffer size.
@@ -143,6 +149,10 @@ namespace LeafMeAloneClient
                 }
                 // Signal that all bytes have been received.  
                 receiveDone.Set();
+
+                // Get the rest of the data.  
+                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReceiveCallback), state);
             }
             catch (Exception e)
             {

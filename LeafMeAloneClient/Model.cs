@@ -92,9 +92,9 @@ namespace Client
                 m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
 
                 // set the rotation based on the three directions
-                m_ModelMatrix = m_ModelMatrix * Matrix.RotationX(m_Properties.Direction.X) * 
-                                Matrix.RotationY(m_Properties.Direction.Y) * 
-                                Matrix.RotationZ(m_Properties.Direction.Z);
+                m_ModelMatrix = m_ModelMatrix * Matrix.RotationX(m_Properties.Rotation.X) * 
+                                Matrix.RotationY(m_Properties.Rotation.Y) * 
+                                Matrix.RotationZ(m_Properties.Rotation.Z);
 
                 // set the translation based on the position
                 m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position) ;

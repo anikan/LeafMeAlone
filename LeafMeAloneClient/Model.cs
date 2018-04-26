@@ -48,6 +48,13 @@ namespace Client
             m_PrevProperties.Position = new Vector3(0, 0, 0);
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
             Update();
+
+            m_ActiveShader = GraphicsManager.DictShader[@"../../tester.fx"];
+        }
+
+        public Model(string filepath, Shader shader) : this(filepath)
+        {
+            m_ActiveShader = shader;
         }
 
         // load the geometry if it is not available, or find
@@ -68,7 +75,8 @@ namespace Client
         // pass the model matrix to the shader and draw the active geometry
         public void Draw()
         {
-           m_ActiveGeo.Draw(m_ModelMatrix);
+           m_ActiveShader.UseShader();
+           m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
         }
 
         // the public interface of the Update function

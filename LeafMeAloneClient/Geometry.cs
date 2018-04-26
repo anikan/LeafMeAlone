@@ -111,18 +111,6 @@ namespace Client
         private AssimpContext importer;
 
         /// <summary>
-        /// Elements are just used to put things into the shader.
-        /// </summary>
-        private InputElement[] Elements;
-        
-        /// <summary>
-        /// something to do with shaders
-        /// </summary>
-        private InputLayout InputLayout;
-        private Effect Effects;
-        private EffectPass Pass;
-
-        /// <summary>
         /// Create a new geometry given filename
         /// </summary>
         /// <param name="fileName"> filepath to the 3D model file </param>
@@ -256,29 +244,6 @@ namespace Client
                     0);
                 EBO[idx] = new Buffer(GraphicsRenderer.Device, Faces[idx], ibd);
             }
-
-
-            #region Shader Code -- To Move
-
-            var btcode = ShaderBytecode.CompileFromFile(@"../../tester.fx", "VS", "vs_4_0", ShaderFlags.None,
-                EffectFlags.None);
-            var btcode1 = ShaderBytecode.CompileFromFile(@"../../tester.fx", "Render", "fx_5_0", ShaderFlags.None,
-                EffectFlags.None);
-            var sig = ShaderSignature.GetInputSignature(btcode);
-
-            Effects = new Effect(GraphicsRenderer.Device, btcode1);
-            EffectTechnique technique = Effects.GetTechniqueByIndex(0);
-            Pass = technique.GetPassByIndex(0);
-
-            Elements = new[] {
-                new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
-                new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
-                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2) 
-            };
-
-            InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
-
-            #endregion
         }
 
         /// <summary>
@@ -396,15 +361,14 @@ namespace Client
         /// Draw a model by using the modelmatrix it is assigned to
         /// </summary>
         /// <param name="modelMatrix"> describes how the object is viewed in the world space </param>
-        public void Draw(Matrix modelMatrix)
+        /// <param name="shader"> the shader that is used to draw the geometry </param>
+        public void Draw(Matrix modelMatrix, Shader shader)
         {
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = InputLayout;
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            Effects.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
-            Effects.GetVariableByName("gView").AsMatrix()
+            shader.ShaderEffect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
+            shader.ShaderEffect.GetVariableByName("gView").AsMatrix()
                 .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
-            Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
+            shader.ShaderEffect.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
 
 
             for (int i = 0; i < scene.MeshCount; i++)
@@ -427,20 +391,20 @@ namespace Client
                 // pass texture resource into the shader if applicable
                 if (Materials[i].texSRV != null)
                 {
-                    Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(Materials[i].texSRV);
+                    shader.ShaderEffect.GetVariableByName("tex_diffuse").AsResource().SetResource(Materials[i].texSRV);
                 }
 
                 // pass material properties into the shader
-                Effects.GetVariableByName("Diffuse").AsVector().Set(Materials[i].diffuse);
-                Effects.GetVariableByName("Specular").AsVector().Set(Materials[i].specular);
-                Effects.GetVariableByName("Ambient").AsVector().Set(Materials[i].ambient);
-                Effects.GetVariableByName("Emissive").AsVector().Set(Materials[i].emissive);
-                Effects.GetVariableByName("Shininess").AsScalar().Set(Materials[i].shininess);
-                Effects.GetVariableByName("Opacity").AsScalar().Set(Materials[i].opacity);
-                Effects.GetVariableByName("texCount").AsScalar().Set(Materials[i].texCount);
+                shader.ShaderEffect.GetVariableByName("Diffuse").AsVector().Set(Materials[i].diffuse);
+                shader.ShaderEffect.GetVariableByName("Specular").AsVector().Set(Materials[i].specular);
+                shader.ShaderEffect.GetVariableByName("Ambient").AsVector().Set(Materials[i].ambient);
+                shader.ShaderEffect.GetVariableByName("Emissive").AsVector().Set(Materials[i].emissive);
+                shader.ShaderEffect.GetVariableByName("Shininess").AsScalar().Set(Materials[i].shininess);
+                shader.ShaderEffect.GetVariableByName("Opacity").AsScalar().Set(Materials[i].opacity);
+                shader.ShaderEffect.GetVariableByName("texCount").AsScalar().Set(Materials[i].texCount);
 
                 // Draw the object using the indices
-                Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
+                shader.ShaderPass.Apply(GraphicsRenderer.Device.ImmediateContext);
                 GraphicsRenderer.Device.ImmediateContext.DrawIndexed(faceSize[i] / sizeof(int), 0, 0);
             }
         }

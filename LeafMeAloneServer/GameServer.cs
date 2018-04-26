@@ -36,6 +36,8 @@ namespace Server
                     playerServer.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
+                //Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);
+
                 //Clear for next frame.
                 networkServer.PlayerPackets.Clear();
 

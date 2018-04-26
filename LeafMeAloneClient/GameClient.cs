@@ -31,7 +31,7 @@ namespace Client
             GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
-            GraphicsManager.loadAllShaders();
+            GraphicsManager.Init();
 
             Client.ActivePlayer = new PlayerClient();
 

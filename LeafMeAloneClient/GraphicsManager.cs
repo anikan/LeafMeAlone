@@ -37,12 +37,23 @@ namespace Client
 
         public static Shader ActiveShader;
 
-        public static void loadAllShaders()
+        /// <summary>
+        /// Initialize the graphics manager
+        /// </summary>
+        public static void Init()
+        {
+            LoadAllShaders();
+        }
+
+        /// <summary>
+        /// Initialize all the default shaders
+        /// </summary>
+        private static void LoadAllShaders()
         {
             // add more argument to each list as needed
             List <string> allShaderPaths = new List<string>( new string[]
             {
-                @"../../tester.fx"
+                @"../../defaultShader.fx"
             } );
 
             List <string> allShaderVSName = new List<string>(new string[]

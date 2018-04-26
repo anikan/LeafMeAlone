@@ -30,7 +30,7 @@ namespace Server
 
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f);
+            transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f) * GameServer.TICK_TIME_S;
 
             transform.Direction.Y = packet.Rotation;
         }

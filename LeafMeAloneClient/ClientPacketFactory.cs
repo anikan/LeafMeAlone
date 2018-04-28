@@ -22,13 +22,13 @@ namespace Client
             PlayerPacket packet = new PlayerPacket()
             {
                 Dead = player.Dead,
-                MovementX = player.MovementRequested.X,
-                MovementY = player.MovementRequested.Y,
+                MovementX = player.PlayerRequests.MovementRequested.X,
+                MovementY = player.PlayerRequests.MovementRequested.Y,
                 ObjectID = player.Id,
                 Rotation = player.Transform.Rotation.Y,
                 ToolEquipped = player.ToolEquipped,
-                UsingToolPrimary = player.UseToolPrimaryRequest,
-                UsingToolSecondary = player.UseToolSecondaryRequest
+                UsingToolPrimary = player.PlayerRequests.UseToolPrimaryRequest,
+                UsingToolSecondary = player.PlayerRequests.UseToolSecondaryRequest
             };
 
             return packet;

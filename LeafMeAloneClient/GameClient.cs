@@ -38,7 +38,7 @@ namespace Client
 
             Client.ActivePlayer = new PlayerClient();
 
-            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
+            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.
@@ -140,9 +140,19 @@ namespace Client
         /// </summary>
         private void SendPackets()
         {
+            // Create a new player packet, and fill it with player's relevant info.
             PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
             byte[] data = PlayerPacket.Serialize(toSend);
             networkClient.Send(data);
+            
+            //PlayerPacket playerPack = ActivePlayer.PlayerRequests.ToPacket();
+
+            // COMMENT OUT WHEN SERVER IS INTEGRATED
+            /*ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,
+                                                          ActivePlayer.Transform.Position.Y,
+                                                          ActivePlayer.Transform.Position.Z - playerPack.Movement.Y * 0.01f );*/
+        
+            //Console.WriteLine(playerPack.ToString());
 
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
@@ -163,6 +173,7 @@ namespace Client
             GraphicsRenderer.Form.KeyUp += InputManager.OnKeyUp;
             GraphicsRenderer.Form.MouseDown += InputManager.OnMouseDown;
             GraphicsRenderer.Form.MouseUp += InputManager.OnMouseUp;
+            GraphicsRenderer.Form.MouseMove += InputManager.OnMouseMove;
         }
 
     }

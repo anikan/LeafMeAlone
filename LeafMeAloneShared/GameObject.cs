@@ -15,7 +15,7 @@ namespace Shared
         /// </summary>
         public string Name;
 
-        protected Transform Transform;
+        public Transform Transform;
         public int Id { get; set; }
 
         public abstract void Update();
@@ -24,7 +24,7 @@ namespace Shared
 
         protected GameObject()
         {
-            Transform.Direction = new Vector3(0, 0, 0);
+            Transform.Rotation = new Vector3(0, 0, 0);
             Transform.Position = new Vector3(0, 0, 0);
             Transform.Scale = new Vector3(1, 1, 1);
         }

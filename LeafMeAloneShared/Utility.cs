@@ -17,13 +17,18 @@ namespace Shared
         {
             return degrees * ((float)Math.PI / 180.0f);
         }
+
+        public static Vector4 Mult(this Matrix m, Vector4 multBy)
+        {
+            return Vector4.Transform(multBy, Matrix.Transpose(m));
+        }
     }
 
     // model properties
     public struct Transform
     {
         public Vector3 Position;  // location of the model in world coordinates
-        public Vector3 Direction; // euler coordinate that represents the direction the object is facing
+        public Vector3 Rotation; // euler coordinate that represents the direction the object is facing
         public Vector3 Scale;     // scale of the model
 
         // check if the objects are logically equivalent to each other
@@ -34,7 +39,7 @@ namespace Shared
 
             Transform other_prop = (Transform) other;
             return Position.Equals(other_prop.Position) &&
-                Direction.Equals(other_prop.Direction) &&
+                Rotation.Equals(other_prop.Rotation) &&
                 Scale.Equals(other_prop.Scale);
 
         }
@@ -45,9 +50,9 @@ namespace Shared
             Position.Y = other.Position.Y;
             Position.Z = other.Position.Z;
 
-            Direction.X = other.Direction.X;
-            Direction.Y = other.Direction.Y;
-            Direction.Z = other.Direction.Z;
+            Rotation.X = other.Rotation.X;
+            Rotation.Y = other.Rotation.Y;
+            Rotation.Z = other.Rotation.Z;
 
             Scale.X = other.Scale.X;
             Scale.Y = other.Scale.Y;

@@ -8,31 +8,29 @@ using SlimDX;
 
 namespace Server
 {
-    public class PlayerServer : IPlayer
+    public class PlayerServer : GameObjectServer, IPlayer
     {
 
-        public int Id { get; internal set; }
-        bool IPlayer.UsingTool { get; set; }
-        private Transform transform;
-        bool IPlayer.Dead { get; set; }
-        PlayerPacket.ToolType IPlayer.ToolEquipped { get; set; }
-        int INetworked.Id { get; set; }
+        public bool Dead { get; set; }
+        public PlayerPacket.ToolType ToolEquipped { get; set; }
+        public bool usingToolPrimary { get; set; }
+        public bool usingToolSecondary { get; set; }
 
         public Transform GetTransform()
         {
-            return transform;
+            return Transform;
         }
 
         public void SetTransform(Transform value)
         {
-            transform = value;
+            Transform = value;
         }
 
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f) * GameServer.TICK_TIME_S;
+            Transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f) * GameServer.TICK_TIME_S;
 
-            transform.Direction.Y = packet.Rotation;
+            Transform.Rotation.Y = packet.Rotation;
         }
     }
 }

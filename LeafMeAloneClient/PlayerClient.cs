@@ -10,33 +10,27 @@ namespace Client
 {
     public class PlayerClient : GameObjectClient, IPlayer
     {
-
+        // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
 
+        // Direction of movement the player is requesting. Should be between -1 and 1 each axis.
         public Vector2 MovementRequested;
 
         private PlayerPacket.ToolType toolEquipped;
-        private bool usingTool;
-        private bool dead;
-        private Transform transform;
 
-        public bool UsingTool { get => usingTool; set => usingTool = value; }
-        public bool Dead { get => dead; set => dead = value; }
-        public PlayerPacket.ToolType ToolEquipped { get => toolEquipped; set => toolEquipped = value; }
+        // Requests for the use of primary/secondary features of tools.
+        public bool UseToolPrimaryRequest;
+        public bool UseToolSecondaryRequest;
 
-        public Transform GetTransform()
-        {
-            return transform;
-        }
-
-        public void SetTransform(Transform value)
-        {
-            transform = value;
-        }
+        public bool Dead { get; set; }
+        public PlayerPacket.ToolType ToolEquipped { get; set; }
+        public bool usingToolPrimary { get; set; }
+        public bool usingToolSecondary { get; set; }
 
         public PlayerClient() : base()
         {
             SetModel(@"../../Models/Version1.fbx");
+            Transform.Rotation.Y += 180f.ToRadians();
         }
 
         /// <summary>
@@ -59,7 +53,25 @@ namespace Client
                 //// Request in the y direction.
                 MovementRequested.Y = dir.Y;
             }
+        }
 
+        /// <summary>
+        /// Request the use of the primary function of the equipped tool.
+        /// </summary>
+        public void RequestUsePrimary()
+        {
+            // Set request bool to true.
+            UseToolPrimaryRequest = true;
+
+        }
+
+        /// <summary>
+        /// Request the use of the secondary function of the equipped tool.
+        /// </summary>
+        public void RequestUseSecondary()
+        {
+            // Set request bool to true.
+            UseToolSecondaryRequest = true;
         }
 
         /// <summary>
@@ -77,9 +89,11 @@ namespace Client
         /// <summary>
         /// Resets the player's requested movement.
         /// </summary>
-        public void ResetRequestedMovement()
+        public void ResetRequests()
         {
             MovementRequested = Vector2.Zero;
+            UseToolPrimaryRequest = false;
+            UseToolSecondaryRequest = false;
         }
 
         /// <summary>
@@ -88,12 +102,13 @@ namespace Client
         /// <param name="packet">The packet to update from.</param>
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            dead = packet.Dead;
+            Dead = packet.Dead;
             toolEquipped = packet.ToolEquipped;
-            usingTool = packet.UsingTool;
-            transform.Position.X = packet.MovementX;
-            transform.Position.Y = packet.MovementY;
-            transform.Direction.Y = packet.Rotation;
+            usingToolPrimary = packet.UsingToolPrimary;
+            usingToolSecondary = packet.UsingToolSecondary;
+            Transform.Position.X = packet.MovementX;
+            Transform.Position.Y = packet.MovementY;
+            Transform.Rotation.Y = packet.Rotation;
         }
     }
 }

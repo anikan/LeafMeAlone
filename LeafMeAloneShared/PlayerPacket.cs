@@ -45,15 +45,20 @@ namespace Shared
         public float Rotation;
 
         // If the player is actively using their tool this frame.
+
         [ProtoMember(4)]
-        public bool UsingTool;
+        public bool UsingToolPrimary;
+
+        // If the player is using the secondary ability of their tool this frame.
+        [ProtoMember(5)]
+        public bool UsingToolSecondary;
 
         // Currently equipped tool.
-        [ProtoMember(5)]
+        [ProtoMember(6)]
         public ToolType ToolEquipped;
 
         // Is the player dead? RIP.
-        [ProtoMember(6)]
+        [ProtoMember(7)]
         public bool Dead;
 
         /// <summary>
@@ -83,6 +88,16 @@ namespace Shared
         public static PlayerPacket Deserialize(byte[] data)
         {
             return Serializer.Deserialize<PlayerPacket>(new MemoryStream(data));
+        }
+
+        public override string ToString()
+        {
+
+            string printString = string.Format("Player packet info: Movement={0}, UseToolPrimary={1}, UseToolSecondary={2}", 
+                MovementX, UsingToolPrimary, UsingToolSecondary);
+
+            return printString;
+
         }
     }
 }

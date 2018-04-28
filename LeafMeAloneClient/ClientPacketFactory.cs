@@ -25,9 +25,10 @@ namespace Client
                 MovementX = player.MovementRequested.X,
                 MovementY = player.MovementRequested.Y,
                 ObjectID = player.Id,
-                Rotation = player.GetTransform().Direction.Y,
+                Rotation = player.Transform.Rotation.Y,
                 ToolEquipped = player.ToolEquipped,
-                UsingTool = player.UsingTool
+                UsingToolPrimary = player.UseToolPrimaryRequest,
+                UsingToolSecondary = player.UseToolSecondaryRequest
             };
 
             return packet;

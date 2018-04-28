@@ -17,7 +17,7 @@ namespace Server
         /// Creates a network packet used to update the state of the player in the client
         /// </summary>
         /// <param name="player">The player object to serialize into a player</param>
-        public static PlayerPacket CreatePacket(IPlayer player)
+        public static PlayerPacket CreatePacket(PlayerServer player)
         {
             PlayerPacket packet = new PlayerPacket()
             {
@@ -25,9 +25,10 @@ namespace Server
                 MovementX = player.GetTransform().Get2dPosition().X,
                 MovementY = player.GetTransform().Get2dPosition().Y,
                 ObjectID = player.Id,
-                Rotation = player.GetTransform().Direction.Y,
+                Rotation = player.Transform.Rotation.Y,
                 ToolEquipped = player.ToolEquipped,
-                UsingTool = player.UsingTool
+                UsingToolPrimary = player.usingToolPrimary,
+                UsingToolSecondary = player.usingToolSecondary
             };
 
             return packet;

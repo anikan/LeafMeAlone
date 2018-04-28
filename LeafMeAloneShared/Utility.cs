@@ -17,6 +17,36 @@ namespace Shared
         {
             return degrees * ((float)Math.PI / 180.0f);
         }
+
+        public static void Copy(this Vector4 dest, Vector4 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+            dest.W = src.W;
+        }
+
+        public static void Copy(this Vector3 dest, Vector3 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+        }
+
+        public static void Copy(this Vector4 dest, Vector3 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+            dest.W = 1;
+        }
+
+        public static void Copy(this Vector3 dest, Vector4 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+        }
     }
 
     // model properties

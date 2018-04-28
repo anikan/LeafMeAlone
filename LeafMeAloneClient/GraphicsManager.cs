@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 
@@ -37,11 +38,29 @@ namespace Client
 
         public static Shader ActiveShader;
 
+        public static Light ActiveLightSystem;
+
+        public static void Update()
+        {
+            UpdateLights();
+        }
+
+        public static void UpdateLights()
+        {
+            foreach (KeyValuePair<string, Shader> val in DictShader)
+            {
+                Shader shader = val.Value;
+                ActiveLightSystem.UpdateShader(shader);
+            }
+        }
+
         /// <summary>
         /// Initialize the graphics manager
         /// </summary>
         public static void Init()
         {
+            ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
+            ActiveLightSystem = new Light(20);
             LoadAllShaders();
         }
 

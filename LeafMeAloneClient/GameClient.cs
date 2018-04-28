@@ -34,9 +34,7 @@ namespace Client
             GraphicsManager.Init();
 
             Client.ActivePlayer = new PlayerClient();
-
-            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
-            //GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 40, -50), Vector3.Zero, Vector3.UnitY);
+            
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.
@@ -92,7 +90,7 @@ namespace Client
             SendPackets();
 
             //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
-
+            GraphicsManager.Update();
             Render();
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);

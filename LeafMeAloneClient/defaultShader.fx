@@ -11,6 +11,27 @@ uniform extern int texCount;
 uniform extern float4 Diffuse, Specular, Ambient, Emissive;
 uniform extern float Shininess, Opacity;
 
+// light parameters
+static const int NUM_LIGHTS = 20;
+
+
+uniform extern struct LightParameters
+{
+	float4 position; // also used as direction for directional light
+	float4 intensities; // a.k.a the color of the light
+	float4 coneDirection; // only needed for spotlights
+
+	float attenuation; // only needed for point and spotlights
+	float ambientCoefficient; // how strong the light ambience should be... 0 if there's no ambience (background reflection) at all
+	float coneAngle; // only needed for spotlights
+	float exponent; // cosine exponent for how light tapers off
+	int type; // specify the type of the light (directional = 0, spotlight = 2, pointlight = 1)
+	int attenuationType; // specify the type of attenuation to use
+	int status;         // 0 for turning off the light, 1 for turning on the light
+	int PADDING;		// ignore this
+
+} lights[NUM_LIGHTS];
+
 SamplerState MeshTextureSampler
 {
 	Filter = MIN_MAG_MIP_LINEAR;
@@ -59,6 +80,7 @@ float4 PS(float4 iPosH  : SV_POSITION,
 		// use this to find the texture color
 		retColor = retColor * tex_diffuse.Sample(MeshTextureSampler, iTex);
 	}
+
 
 	return retColor;
 }

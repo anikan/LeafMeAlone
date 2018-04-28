@@ -36,7 +36,7 @@ namespace Client
 
         public void setDiffuse(float x, float y, float z, float w)
         {
-            diffuse = new Vector4(x,y,z,w);
+            diffuse = new Vector4(x, y, z, w);
         }
 
         public void setAmbient(float x, float y, float z, float w)
@@ -114,7 +114,7 @@ namespace Client
         /// Elements are just used to put things into the shader.
         /// </summary>
         private InputElement[] Elements;
-        
+
         /// <summary>
         /// something to do with shaders
         /// </summary>
@@ -180,14 +180,14 @@ namespace Client
             EBO = new List<Buffer>(scene.MeshCount);
 
             //add empties to the lists of datastreams
-            Vertices.AddRange(Enumerable.Repeat((DataStream) null, scene.MeshCount));
+            Vertices.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
             Normals.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
             Faces.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
             TexCoords.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
 
             //add empties to lists of buffers.
             VBOPositions.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
-            VBONormals.AddRange(Enumerable.Repeat((Buffer) null, scene.MeshCount));
+            VBONormals.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
             VBOTexCoords.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
             EBO.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
 
@@ -224,7 +224,8 @@ namespace Client
                 if (scene.Meshes[idx].HasTextureCoords(0))
                 {
                     TexCoords[idx] = new DataStream(texSize[idx], true, true);
-                    scene.Meshes[idx].TextureCoordinateChannels[0].ForEach(texture => {
+                    scene.Meshes[idx].TextureCoordinateChannels[0].ForEach(texture =>
+                    {
                         TexCoords[idx].Write(texture);
                     });
                 }
@@ -273,12 +274,14 @@ namespace Client
             Elements = new[] {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
-                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2) 
+                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2)
             };
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
 
             #endregion
+
+            importer.Dispose();
         }
 
         /// <summary>
@@ -314,12 +317,12 @@ namespace Client
                 TextureSlot tex;
                 if (mat.GetMaterialTexture(TextureType.Diffuse, 0, out tex))
                 {
-                    myMat.setDiffuseTexture( CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)) );
+                    myMat.setDiffuseTexture(CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)));
                     myMat.setTexCount(1);
                 }
                 else
                 {
-                    myMat.setDiffuseTexture( null );
+                    myMat.setDiffuseTexture(null);
                     myMat.setTexCount(1);
                 }
             }
@@ -329,11 +332,11 @@ namespace Client
             Color4 color = new Color4(.8f, .8f, .8f, 1.0f); // default is light grey
             if (mat.HasColorDiffuse)
             {
-                myMat.setDiffuse( mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
+                myMat.setDiffuse(mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
             }
             else
             {
-                myMat.setDiffuse( color.Red, color.Green, color.Blue, color.Alpha );
+                myMat.setDiffuse(color.Red, color.Green, color.Blue, color.Alpha);
             }
 
             // sets the specular color
@@ -415,14 +418,14 @@ namespace Client
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1,
                     new VertexBufferBinding(VBONormals[i], Vector3.SizeInBytes, 0));
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO[i], Format.R32_UInt, 0);
-				
+
                 // pass texture coordinates into the shader if applicable
-				if (Materials[i].texCount > 0)
-				{
-					// note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
-					GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(2,
-						new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
-				}
+                if (Materials[i].texCount > 0)
+                {
+                    // note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
+                    GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(2,
+                        new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
+                }
 
                 // pass texture resource into the shader if applicable
                 if (Materials[i].texSRV != null)

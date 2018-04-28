@@ -17,6 +17,11 @@ namespace Shared
         {
             return degrees * ((float)Math.PI / 180.0f);
         }
+
+        public static float NextFloat(this Random r)
+        {
+            return (float) r.NextDouble();
+        }
     }
 
     // model properties

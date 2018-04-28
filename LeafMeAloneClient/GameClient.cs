@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,6 +23,8 @@ namespace Client
         private InputManager InputManager;
 
         private Camera Camera => GraphicsManager.ActiveCamera;
+
+        private ParticleSystem p;
 
         /// <summary>
         /// The main entry point for the application.
@@ -46,6 +49,10 @@ namespace Client
 
             //TODO FOR TESTING ONLY
             GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
+
+
+            
+            Client.p =new ParticleSystem();
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -100,8 +107,11 @@ namespace Client
 
         private void Render()
         {
-            ActivePlayer.Update();
-            ActivePlayer.Draw();
+            //ActivePlayer.Update();
+            //ActivePlayer.Draw();
+
+            p.Update();
+            p.Draw();
         }
 
         private void ReceivePackets()

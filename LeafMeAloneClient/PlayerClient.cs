@@ -14,12 +14,37 @@ namespace Client
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
 
-        // Direction of movement the player is requesting. Should be between -1 and 1 each axis.
-        public Vector2 MovementRequested;
+        // Struct to contain all player info that will send via packets
+        public struct PlayerRequestInfo
+        {
+            // Direction of movement the player is requesting. Should be between -1 and 1 each axis.
+            public Vector2 MovementRequested;
 
-        // Requests for the use of primary/secondary features of tools.
-        public bool UseToolPrimaryRequest;
-        public bool UseToolSecondaryRequest;
+            // Amount of rotation the player is requested.
+            public float RotationRequested;
+
+            // Requests for the use of primary/secondary features of tools.
+            public bool UseToolPrimaryRequest;
+            public bool UseToolSecondaryRequest;
+
+            // Convert this request info to a packet.
+            public PlayerPacket ToPacket()
+            {
+
+                // Create a new packet and fill it's values with player's request info.
+                PlayerPacket returnPacket = new PlayerPacket();
+                returnPacket.Movement = MovementRequested;
+                returnPacket.Rotation = RotationRequested;
+                returnPacket.UsingToolPrimary = UseToolPrimaryRequest;
+                returnPacket.UsingToolSecondary = UseToolSecondaryRequest;
+
+                return returnPacket;
+
+            }
+        };
+        
+        // All of the requests from the player that will go into a packet.
+        public PlayerRequestInfo PlayerRequests;
 
         public PlayerClient() : base()
         {
@@ -47,14 +72,14 @@ namespace Client
             if (dir.X < 0.0f - FLOAT_RANGE || dir.X > 0.0f + FLOAT_RANGE)
             {
                 // Request in the x direction.
-                MovementRequested.X = dir.X;
+                PlayerRequests.MovementRequested.X = dir.X;
             }
 
             // If the direction requested is non-zero in the Y axis (account for floating point error).
             if (dir.Y < 0.0f - FLOAT_RANGE || dir.Y > 0.0f + FLOAT_RANGE)
             {
                 //// Request in the y direction.
-                MovementRequested.Y = dir.Y;
+                PlayerRequests.MovementRequested.Y = dir.Y;
             }
         }
 
@@ -64,7 +89,7 @@ namespace Client
         public void RequestUsePrimary()
         {
             // Set request bool to true.
-            UseToolPrimaryRequest = true;
+            PlayerRequests.UseToolPrimaryRequest = true;
 
         }
 
@@ -74,25 +99,73 @@ namespace Client
         public void RequestUseSecondary()
         {
             // Set request bool to true.
-            UseToolSecondaryRequest = true;
+            PlayerRequests.UseToolSecondaryRequest = true;
         }
 
-        public void RequestLookAt(Vector2 position)
+        // Note: Causes weird behaviour sometimes. Needs to be fixed if want to use.
+        public void RequestLookAtWorldSpace(Vector2 position)
         {
             Vector2 screenSize = new Vector2(GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height);
 
-            Vector3 testPos = GraphicsManager.ScreenToWorldPoint(position);
+            Vector3 worldPos = GraphicsManager.ScreenToWorldPoint(position);
+            Vector3 playerToPos = worldPos - Transform.Position;
+            playerToPos.Y = 0.0f;
 
-            double angle = Math.Atan(position.Y / position.X) * (180.0f / Math.PI);
+            Vector3 forward = new Vector3(0.0f, 0.0f, 1.0f);
 
-            Console.WriteLine("Position is " + testPos); ;
+            float dot = Vector3.Dot(playerToPos, forward);
+            float mag = forward.Length() * playerToPos.Length();
 
-            /*
-            double xVal = Math.Acos(position.X / h) * (180.0f / Math.PI);
-            double yVal = (float)Math.Asin(position.Y / h) * (180.0f / Math.PI);
+            float angle = (float)Math.Acos(dot / mag);
 
-            Transform.Rotation = new Vector3(Transform.Rotation.X, (float)yVal, Transform.Rotation.Z);
-*/
+            if (playerToPos.X < 0)
+            {
+                angle = -angle;
+            }
+       
+            Transform.Rotation = new Vector3(Transform.Rotation.X, angle, Transform.Rotation.Z);
+
+        }
+
+        public void RequestLookAtScreenSpace(Vector2 position)
+        {
+            // Screen sizes
+            float widthOffset = GraphicsRenderer.Form.Width / 2;
+            float heightOffset = GraphicsRenderer.Form.Height / 2;
+
+            // Up direction of the screen
+            Vector3 screenUp = new Vector3(0.0f, 0.0f, -1.0f);
+
+            // Mouse position as a Vector3. "Up" on screen is Z axis in world.
+            Vector3 mousePos = new Vector3(position.X - widthOffset, 0.0f, position.Y - heightOffset);
+
+            // Vector from the center of the screen to the mouse position.
+            Vector3 centerToMouse = mousePos - Vector3.Zero;
+
+            // Remove y component of vector.
+            centerToMouse.Y = 0.0f;
+
+            // Calculate the angle between the up (forward) vector and the center to mouse vector.
+            float dotMouse = Vector3.Dot(screenUp, centerToMouse);
+            float magMouse = screenUp.Length() * centerToMouse.Length();
+            float angleMouse = (float)Math.Acos(dotMouse / magMouse);
+
+            // If the mouse is on the left half of the screen, negate the angle.
+            if (centerToMouse.X < 0)
+            {
+                angleMouse = -angleMouse;
+            }
+
+            // Get angle in degrees for easy printing.
+            float angleDegrees = angleMouse * (180.0f / (float)Math.PI);
+
+            //Console.WriteLine("Angle is: " + angleDegrees);
+
+            PlayerRequests.RotationRequested = angleMouse;
+
+            // TEMPORARY FOR TESTING
+            // Set rotation of player
+            Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
 
         }
 
@@ -113,9 +186,9 @@ namespace Client
         /// </summary>
         public void ResetRequests()
         {
-            MovementRequested = Vector2.Zero;
-            UseToolPrimaryRequest = false;
-            UseToolSecondaryRequest = false;
+            // Reset the player requests struct to clear all info.
+            PlayerRequests = new PlayerRequestInfo();
+
         }
     }
 }

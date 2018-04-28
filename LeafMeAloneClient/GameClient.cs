@@ -34,7 +34,7 @@ namespace Client
 
             Client.ActivePlayer = new PlayerClient();
 
-            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 100, -6), Vector3.Zero, Vector3.UnitY);
+            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.
@@ -115,11 +115,7 @@ namespace Client
         {
 
             // Create a new player packet, and fill it with player's relevant info.
-            PlayerPacket playerPack = new PlayerPacket();
-
-            playerPack.Movement = ActivePlayer.MovementRequested;
-            playerPack.UsingToolPrimary = ActivePlayer.UseToolPrimaryRequest;
-            playerPack.UsingToolSecondary = ActivePlayer.UseToolSecondaryRequest;
+            PlayerPacket playerPack = ActivePlayer.PlayerRequests.ToPacket();
 
             // COMMENT OUT WHEN SERVER IS INTEGRATED
             ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,

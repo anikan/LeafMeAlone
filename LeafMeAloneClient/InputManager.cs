@@ -148,7 +148,7 @@ namespace Client
             // Get the new position of the mouse.
             Vector2 mousePos = new Vector2(args.X, args.Y);
 
-            userPlayer.RequestLookAt(mousePos);
+            userPlayer.RequestLookAtScreenSpace(mousePos);
 
             // Updaate last mouse position.
            // lastMousePos = mousePos;

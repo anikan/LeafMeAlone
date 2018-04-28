@@ -50,9 +50,6 @@ namespace Client
             return result;
             */
 
-            
-
-
             SlimDX.Matrix resultMat = viewMat * projectMat;
             resultMat.Invert();
 

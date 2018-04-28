@@ -36,7 +36,7 @@ namespace Client
 
         public void setDiffuse(float x, float y, float z, float w)
         {
-            diffuse = new Vector4(x, y, z, w);
+            diffuse = new Vector4(x,y,z,w);
         }
 
         public void setAmbient(float x, float y, float z, float w)
@@ -111,18 +111,6 @@ namespace Client
         private AssimpContext importer;
 
         /// <summary>
-        /// Elements are just used to put things into the shader.
-        /// </summary>
-        private InputElement[] Elements;
-
-        /// <summary>
-        /// something to do with shaders
-        /// </summary>
-        private InputLayout InputLayout;
-        private Effect Effects;
-        private EffectPass Pass;
-
-        /// <summary>
         /// Create a new geometry given filename
         /// </summary>
         /// <param name="fileName"> filepath to the 3D model file </param>
@@ -180,14 +168,14 @@ namespace Client
             EBO = new List<Buffer>(scene.MeshCount);
 
             //add empties to the lists of datastreams
-            Vertices.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
+            Vertices.AddRange(Enumerable.Repeat((DataStream) null, scene.MeshCount));
             Normals.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
             Faces.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
             TexCoords.AddRange(Enumerable.Repeat((DataStream)null, scene.MeshCount));
 
             //add empties to lists of buffers.
             VBOPositions.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
-            VBONormals.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
+            VBONormals.AddRange(Enumerable.Repeat((Buffer) null, scene.MeshCount));
             VBOTexCoords.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
             EBO.AddRange(Enumerable.Repeat((Buffer)null, scene.MeshCount));
 
@@ -224,8 +212,7 @@ namespace Client
                 if (scene.Meshes[idx].HasTextureCoords(0))
                 {
                     TexCoords[idx] = new DataStream(texSize[idx], true, true);
-                    scene.Meshes[idx].TextureCoordinateChannels[0].ForEach(texture =>
-                    {
+                    scene.Meshes[idx].TextureCoordinateChannels[0].ForEach(texture => {
                         TexCoords[idx].Write(texture);
                     });
                 }
@@ -257,31 +244,6 @@ namespace Client
                     0);
                 EBO[idx] = new Buffer(GraphicsRenderer.Device, Faces[idx], ibd);
             }
-
-
-            #region Shader Code -- To Move
-
-            var btcode = ShaderBytecode.CompileFromFile(@"../../tester.fx", "VS", "vs_4_0", ShaderFlags.None,
-                EffectFlags.None);
-            var btcode1 = ShaderBytecode.CompileFromFile(@"../../tester.fx", "Render", "fx_5_0", ShaderFlags.None,
-                EffectFlags.None);
-            var sig = ShaderSignature.GetInputSignature(btcode);
-
-            Effects = new Effect(GraphicsRenderer.Device, btcode1);
-            EffectTechnique technique = Effects.GetTechniqueByIndex(0);
-            Pass = technique.GetPassByIndex(0);
-
-            Elements = new[] {
-                new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
-                new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
-                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2)
-            };
-
-            InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
-
-            #endregion
-
-            importer.Dispose();
         }
 
         /// <summary>
@@ -317,12 +279,12 @@ namespace Client
                 TextureSlot tex;
                 if (mat.GetMaterialTexture(TextureType.Diffuse, 0, out tex))
                 {
-                    myMat.setDiffuseTexture(CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)));
+                    myMat.setDiffuseTexture( CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)) );
                     myMat.setTexCount(1);
                 }
                 else
                 {
-                    myMat.setDiffuseTexture(null);
+                    myMat.setDiffuseTexture( null );
                     myMat.setTexCount(1);
                 }
             }
@@ -332,11 +294,11 @@ namespace Client
             Color4 color = new Color4(.8f, .8f, .8f, 1.0f); // default is light grey
             if (mat.HasColorDiffuse)
             {
-                myMat.setDiffuse(mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
+                myMat.setDiffuse( mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
             }
             else
             {
-                myMat.setDiffuse(color.Red, color.Green, color.Blue, color.Alpha);
+                myMat.setDiffuse( color.Red, color.Green, color.Blue, color.Alpha );
             }
 
             // sets the specular color
@@ -399,15 +361,14 @@ namespace Client
         /// Draw a model by using the modelmatrix it is assigned to
         /// </summary>
         /// <param name="modelMatrix"> describes how the object is viewed in the world space </param>
-        public void Draw(Matrix modelMatrix)
+        /// <param name="shader"> the shader that is used to draw the geometry </param>
+        public void Draw(Matrix modelMatrix, Shader shader)
         {
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.InputLayout = InputLayout;
-            GraphicsRenderer.Device.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 
-            Effects.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
-            Effects.GetVariableByName("gView").AsMatrix()
+            shader.ShaderEffect.GetVariableByName("gWorld").AsMatrix().SetMatrix(modelMatrix);
+            shader.ShaderEffect.GetVariableByName("gView").AsMatrix()
                 .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
-            Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
+            shader.ShaderEffect.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
 
 
             for (int i = 0; i < scene.MeshCount; i++)
@@ -418,32 +379,32 @@ namespace Client
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1,
                     new VertexBufferBinding(VBONormals[i], Vector3.SizeInBytes, 0));
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO[i], Format.R32_UInt, 0);
-
+				
                 // pass texture coordinates into the shader if applicable
-                if (Materials[i].texCount > 0)
-                {
-                    // note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
-                    GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(2,
-                        new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
-                }
+				if (Materials[i].texCount > 0)
+				{
+					// note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
+					GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(2,
+						new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
+				}
 
                 // pass texture resource into the shader if applicable
                 if (Materials[i].texSRV != null)
                 {
-                    Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(Materials[i].texSRV);
+                    shader.ShaderEffect.GetVariableByName("tex_diffuse").AsResource().SetResource(Materials[i].texSRV);
                 }
 
                 // pass material properties into the shader
-                Effects.GetVariableByName("Diffuse").AsVector().Set(Materials[i].diffuse);
-                Effects.GetVariableByName("Specular").AsVector().Set(Materials[i].specular);
-                Effects.GetVariableByName("Ambient").AsVector().Set(Materials[i].ambient);
-                Effects.GetVariableByName("Emissive").AsVector().Set(Materials[i].emissive);
-                Effects.GetVariableByName("Shininess").AsScalar().Set(Materials[i].shininess);
-                Effects.GetVariableByName("Opacity").AsScalar().Set(Materials[i].opacity);
-                Effects.GetVariableByName("texCount").AsScalar().Set(Materials[i].texCount);
+                shader.ShaderEffect.GetVariableByName("Diffuse").AsVector().Set(Materials[i].diffuse);
+                shader.ShaderEffect.GetVariableByName("Specular").AsVector().Set(Materials[i].specular);
+                shader.ShaderEffect.GetVariableByName("Ambient").AsVector().Set(Materials[i].ambient);
+                shader.ShaderEffect.GetVariableByName("Emissive").AsVector().Set(Materials[i].emissive);
+                shader.ShaderEffect.GetVariableByName("Shininess").AsScalar().Set(Materials[i].shininess);
+                shader.ShaderEffect.GetVariableByName("Opacity").AsScalar().Set(Materials[i].opacity);
+                shader.ShaderEffect.GetVariableByName("texCount").AsScalar().Set(Materials[i].texCount);
 
                 // Draw the object using the indices
-                Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
+                shader.ShaderPass.Apply(GraphicsRenderer.Device.ImmediateContext);
                 GraphicsRenderer.Device.ImmediateContext.DrawIndexed(faceSize[i] / sizeof(int), 0, 0);
             }
         }

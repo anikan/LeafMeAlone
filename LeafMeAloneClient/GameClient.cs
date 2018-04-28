@@ -34,6 +34,7 @@ namespace Client
             GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
+            GraphicsManager.Init();
 
             Client.ActivePlayer = new PlayerClient();
 

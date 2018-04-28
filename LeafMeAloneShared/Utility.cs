@@ -17,7 +17,7 @@ namespace Shared
         {
             return degrees * ((float)Math.PI / 180.0f);
         }
-
+        
         public static void Copy(this Vector4 dest, Vector4 src)
         {
             dest.X = src.X;
@@ -46,6 +46,11 @@ namespace Shared
             dest.X = src.X;
             dest.Y = src.Y;
             dest.Z = src.Z;
+        }
+        
+        public static float NextFloat(this Random r)
+        {
+            return (float) r.NextDouble();
         }
     }
 

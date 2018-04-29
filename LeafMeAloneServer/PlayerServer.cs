@@ -13,8 +13,8 @@ namespace Server
 
         public bool Dead { get; set; }
         public PlayerPacket.ToolType ToolEquipped { get; set; }
-        public bool usingToolPrimary { get; set; }
-        public bool usingToolSecondary { get; set; }
+        public bool UsingToolPrimary { get; set; }
+        public bool UsingToolSecondary { get; set; }
 
         public Transform GetTransform()
         {

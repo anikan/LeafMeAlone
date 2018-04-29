@@ -27,8 +27,8 @@ namespace Server
                 ObjectID = player.Id,
                 Rotation = player.Transform.Rotation.Y,
                 ToolEquipped = player.ToolEquipped,
-                UsingToolPrimary = player.usingToolPrimary,
-                UsingToolSecondary = player.usingToolSecondary
+                UsingToolPrimary = player.UsingToolPrimary,
+                UsingToolSecondary = player.UsingToolSecondary
             };
 
             return packet;

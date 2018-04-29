@@ -12,19 +12,24 @@ namespace LeafMeAloneClient
 {
 
 
-    // State object for receiving data from remote device.  
+    /// <summary>
+    /// State object for receiving data from remote device. 
+    /// </summary>
     public class StateObject
     {
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public const int BufferSize = 256;
+        public static int BufferSize = 256;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
         public StringBuilder sb = new StringBuilder();
     }
 
+    /// <summary>
+    /// Handles network activity for sending and receiving packets.
+    /// </summary>
     public class NetworkClient
     {
         // The port number for the remote device.  
@@ -41,19 +46,21 @@ namespace LeafMeAloneClient
         // The response from the remote device.  
         public String response = String.Empty;
 
+        //Socket to communicate with the server.
         private Socket client;
 
+        //List of received packets. Populated by ReadCallback
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
+        /// <summary>
+        /// Try to connect to the host.
+        /// </summary>
         public void StartClient()
         {
             // Connect to a remote device.  
             try
             {
-                // Establish the remote endpoint for the socket.  
-                // The name of the   
-                // remote device is "host.contoso.com".  
-                //IPHostEntry ipHostInfo = Dns.GetHostEntry("host.contoso.com");
+                //For testing purposes, connect to Loopback. 
                 IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
 
@@ -64,12 +71,6 @@ namespace LeafMeAloneClient
                 // Connect to the remote endpoint.  
                 client.BeginConnect(remoteEP,
                     new AsyncCallback(ConnectCallback), client);
-                //connectDone.WaitOne();
-
-                // Release the socket.  
-                //client.Shutdown(SocketShutdown.Both);
-                //client.Close();
-
             }
             catch (Exception e)
             {
@@ -77,6 +78,10 @@ namespace LeafMeAloneClient
             }
         }
 
+        /// <summary>
+        /// Finalize the connection
+        /// </summary>
+        /// <param name="ar">Stores buffer and socket.</param>
         private void ConnectCallback(IAsyncResult ar)
         {
             try
@@ -86,9 +91,6 @@ namespace LeafMeAloneClient
 
                 Console.WriteLine("Socket connected to {0}",
                     client.RemoteEndPoint.ToString());
-
-                // Signal that the connection has been made.  
-                connectDone.Set();
             }
             catch (Exception e)
             {
@@ -96,72 +98,31 @@ namespace LeafMeAloneClient
             }
         }
 
+        /// <summary>
+        /// Receive packets from the server and add them to the appropriate queue.
+        /// </summary>
         public void Receive()
         {
-            try
+            byte[] buffer = new byte[StateObject.BufferSize];
+            if (client.Available > 0)
             {
-                // Create the state object.  
-                StateObject state = new StateObject();
-                state.workSocket = client;
+                int bytesRead = client.Receive(buffer, 0, StateObject.BufferSize, 0);
 
-                // Begin receiving the data from the remote device.  
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
+                byte[] resizedBuffer = new byte[bytesRead];
+                Buffer.BlockCopy(buffer, 0, resizedBuffer, 0, bytesRead);
+
+                PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
+
+                //Console.WriteLine("Received packet {0}.", packet.ToString());
+
+                PlayerPackets.Add(packet);
             }
         }
 
-        private void ReceiveCallback(IAsyncResult ar)
-        {
-            try
-            {
-                // Retrieve the state object and the client socket   
-                // from the asynchronous state object.  
-                StateObject state = (StateObject)ar.AsyncState;
-
-                // Read data from the remote device.  
-                int bytesRead = client.EndReceive(ar);
-
-                if (bytesRead > 0)
-                {
-                    // There might be more data, so store the data received so far.  
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-                    byte[] resizedBuffer = new byte[bytesRead];
-                    Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
-
-
-                    PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
-
-                    PlayerPackets.Add(packet);
-                }
-
-                //Note: Assuming data will never be greater than the buffer size.
-                // All the data has arrived; put it in response.  
-                if (state.sb.Length > 1)
-                {
-                    response = state.sb.ToString();
-                    Console.WriteLine("Response received : {0}", response);
-
-                }
-                // Signal that all bytes have been received.  
-                receiveDone.Set();
-
-                // Get the rest of the data.  
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            receiveDone.WaitOne();
-
-        }
-
+        /// <summary>
+        /// Send the given data to the server.
+        /// </summary>
+        /// <param name="data">Byte array of data</param>
         public void Send(byte[] data)
         {
             // Begin sending the data to the remote device.  
@@ -169,13 +130,16 @@ namespace LeafMeAloneClient
                 new AsyncCallback(SendCallback), client);
         }
 
+        /// <summary>
+        /// Called when send succeeds or fails.
+        /// </summary>
+        /// <param name="ar">Stores buffer and socket.</param>
         private void SendCallback(IAsyncResult ar)
         {
             try
             {
                 // Complete sending the data to the remote device.  
                 int bytesSent = client.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to server.\n", bytesSent);
 
                 // Signal that all bytes have been sent.  
                 sendDone.Set();

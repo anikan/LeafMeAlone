@@ -14,8 +14,8 @@ namespace Shared
     {
         bool Dead { get; set; }
         PlayerPacket.ToolType ToolEquipped { get; set; }
-        bool usingToolPrimary { get; set; }
-        bool usingToolSecondary { get; set; }
+        bool UsingToolPrimary { get; set; }
+        bool UsingToolSecondary { get; set; }
 
         void UpdateFromPacket(PlayerPacket packet);
 

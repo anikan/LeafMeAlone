@@ -17,7 +17,7 @@ float4 PS(float4 iPosH  : SV_POSITION, float4 iColor : COLOR0) : SV_TARGET
 	return iColor;
 }
 
-void GS(point 
+//void GS(point 
 
 technique10 ColorTech
 {

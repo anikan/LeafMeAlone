@@ -35,7 +35,7 @@ namespace Server
         private bool isListening = false;
 
         //Socket to communicate with client.
-        private Socket clientSocket;
+        private List<Socket> clientSockets;
 
         //List of packets for Game to process.
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
@@ -110,28 +110,42 @@ namespace Server
 
             // Get the socket that handles the client request.  
             Socket listener = (Socket)ar.AsyncState;
-            clientSocket = listener.EndAccept(ar);
+            Socket clientSocket = listener.EndAccept(ar);
 
-            GameObject player = GameServer.instance.CreateNewPlayer();
-            CreateObjectPacket setPlayerPacket = new CreateObjectPacket(player,
-                );
-            // Create createObjectPacket, send to client
-            byte[] data = CreateObjectPacket.Serialize(setPlayerPacket);
-            Send(clientSocket,data);
-            List<GameObject> currentGameObjects =
-                GameServer.instance.gameObjectList;
-            foreach (GameObject objToSend in currentGameObjects)
-            {
-                CreateObjectPacket packetToSend = 
-                    new CreateObjectPacket(objToSend);
-                clientSocket.Send(CreateObjectPacket.Serialize(packetToSend));
-            }
+            // Create a new player and send them the world 
+            ProcessNewPlayer(clientSocket);
+            SendWorldToClient(clientSocket);
+
+            // Add the new socket to the list of sockets recieving updates
+            clientSockets.Add(clientSocket);
 
             // Create the state object.  
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
             clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
+        }
+
+        private void SendWorldToClient(Socket clientSocket)
+        {
+            List<GameObject> currentGameObjects =
+                GameServer.instance.gameObjectList;
+            foreach (GameObject objToSend in currentGameObjects)
+            {
+                CreateObjectPacket packetToSend =
+                    new CreateObjectPacket(objToSend);
+                clientSocket.Send(CreateObjectPacket.Serialize(packetToSend));
+            }
+        }
+
+        private void ProcessNewPlayer(Socket clientSocket)
+        {
+            GameObject player = GameServer.instance.CreateNewPlayer();
+            CreateObjectPacket setPlayerPacket =
+                new CreateObjectPacket(player);
+            // Create createObjectPacket, send to client
+            byte[] data = CreateObjectPacket.Serialize(setPlayerPacket);
+            Send(clientSocket, data);
         }
 
         /// <summary>

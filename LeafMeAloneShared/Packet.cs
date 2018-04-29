@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
-    public enum PacketType
+    public enum PacketType : byte
     {
         CreateObjectPacket,
         PlayerPacket,

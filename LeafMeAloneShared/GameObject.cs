@@ -7,8 +7,16 @@ using SlimDX;
 
 namespace Shared
 {
+    public enum ObjectType
+    {
+        ACTIVE_PLAYER,
+        PLAYER,
+        LEAF
+    };
+
     public abstract class GameObject : INetworked
     {
+        public ObjectType ObjectType;
 
         /// <summary>
         /// Name can be given to gameobjects for debugging purposes.
@@ -21,8 +29,9 @@ namespace Shared
         public abstract void Update();
         public abstract void Draw();
         
-        protected GameObject()
+        protected GameObject(ObjectType objectType)
         {
+            ObjectType = objectType;
             Transform.Rotation = new Vector3(0, 0, 0);
             Transform.Position = new Vector3(0, 0, 0);
             Transform.Scale = new Vector3(1, 1, 1);

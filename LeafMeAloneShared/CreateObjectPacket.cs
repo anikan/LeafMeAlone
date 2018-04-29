@@ -17,12 +17,6 @@ namespace Shared
     [ProtoContract]
     public class CreateObjectPacket : Packet
     {
-        public enum ObjectType
-        {
-            ACTIVE_PLAYER,
-            PLAYER,
-            LEAF
-        };
 
         [ProtoMember(1)]
         public long Id;
@@ -36,23 +30,26 @@ namespace Shared
         [ProtoMember(4)]
         public ObjectType objectType;
 
-        public CreateObjectPacket(GameObject gameObject, ObjectType type)
+        public CreateObjectPacket(GameObject gameObject)
         {
             Id = gameObject.Id;
             InitialX = gameObject.Transform.Position.X;
             InitialY = gameObject.Transform.Position.Y;
-            objectType = type;
+            objectType = gameObject.ObjectType;
         }
 
         /// <summary>
         /// Serializes the packet object into an array of bytes
         /// </summary>
         /// <returns>the serialized packet</returns>
-        public static byte[] Serialize(PlayerPacket packet)
+        public static byte[] Serialize(CreateObjectPacket packet)
         {
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
-            return ms.ToArray();
+
+            // Add packetType as first byte, send over
+            return (new byte[] { (byte)PacketType.CreateObjectPacket })
+                            .Concat(ms.ToArray()).ToArray();
         }
 
         /// <summary>
@@ -60,20 +57,9 @@ namespace Shared
         /// </summary>
         /// <param name="data">The byte array of the player packet</param>
         /// <returns>The deserialized playerpacket</returns>
-        public static PlayerPacket Deserialize(byte[] data)
+        public static CreateObjectPacket Deserialize(byte[] data)
         {
-            return Serializer.Deserialize<PlayerPacket>(new MemoryStream(data));
-        }
-
-        public override string ToString()
-        {
-
-            string printString = string.Format(
-                "Player packet info: Movement=({0}, {1}), Rotation={2}, UseToolPrimary={3}, UseToolSecondary={4}",
-                MovementX, MovementY, Rotation, UsingToolPrimary, UsingToolSecondary);
-
-            return printString;
-
+            return Serializer.Deserialize<CreateObjectPacket>(new MemoryStream(data));
         }
     }
 }

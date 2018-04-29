@@ -9,6 +9,11 @@ namespace Server
 {
     public class GameObjectServer : GameObject
     {
+        public GameObjectServer(ObjectType objectType) : base(objectType)
+        {
+
+        }
+
         public override void Draw()
         {
             throw new NotImplementedException();

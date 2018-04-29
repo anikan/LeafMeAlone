@@ -112,13 +112,19 @@ namespace Server
             Socket listener = (Socket)ar.AsyncState;
             clientSocket = listener.EndAccept(ar);
 
-            GameObject player= GameServer.CreateNewPlayer();
-            CreateObjectPacket setPlayerPacket = new CreateObjectPacket(player, CreateObjectPacket.ObjectType.ACTIVE_PLAYER);
-            Send(clientSocket,);
-            List<GameObject> currentGameObjects = GameServer.GetCreatedObjects();
-            foreach (GameObject toSend in currentGameObjects)
+            GameObject player = GameServer.instance.CreateNewPlayer();
+            CreateObjectPacket setPlayerPacket = new CreateObjectPacket(player,
+                );
+            // Create createObjectPacket, send to client
+            byte[] data = CreateObjectPacket.Serialize(setPlayerPacket);
+            Send(clientSocket,data);
+            List<GameObject> currentGameObjects =
+                GameServer.instance.gameObjectList;
+            foreach (GameObject objToSend in currentGameObjects)
             {
-                clientSocket.Send(new CreateObjectPacket(toSend).serialize());
+                CreateObjectPacket packetToSend = 
+                    new CreateObjectPacket(objToSend);
+                clientSocket.Send(CreateObjectPacket.Serialize(packetToSend));
             }
 
             // Create the state object.  
@@ -153,11 +159,11 @@ namespace Server
                 byte[] resizedBuffer = new byte[bytesRead];
 
                 Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
-                    
+
                 PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
 
                 PlayerPackets.Add(packet);
-                
+
                 //Console.WriteLine("Read new player packet: Data : {0}",
                 //    packet.ToString());
 

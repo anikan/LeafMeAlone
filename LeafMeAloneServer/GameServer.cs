@@ -93,19 +93,24 @@ namespace Server
             //Assign id based on the next spot in the gameObjectList.
             int id = gameObjectList.Count();
 
+            PlayerServer newActivePlayer = new PlayerServer();
+            newActivePlayer.objectType = ObjectType.ACTIVE_PLAYER;
             PlayerServer newPlayer = new PlayerServer();
+            newPlayer.objectType = ObjectType.PLAYER;
             
             playerServerList.Add(newPlayer);
             gameObjectList.Add(newPlayer);
 
             //Note currently assuming players get ids 0-3
+            newActivePlayer.Transform.Position = spawnPoints[id];
             newPlayer.Transform.Position = spawnPoints[id];
             
-            CreateObjectPacket objPacket = new CreateObjectPacket(newPlayer, PLAYER);
+            CreateObjectPacket objPacket = 
+                new CreateObjectPacket(newPlayer);
 
             networkServer.SendAll(objPacket);
                
-            return newPlayer;
+            return newActivePlayer;
         }
     }
 }

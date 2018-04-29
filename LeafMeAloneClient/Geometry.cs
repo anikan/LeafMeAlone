@@ -379,14 +379,14 @@ namespace Client
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(1,
                     new VertexBufferBinding(VBONormals[i], Vector3.SizeInBytes, 0));
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetIndexBuffer(EBO[i], Format.R32_UInt, 0);
-				
+                
                 // pass texture coordinates into the shader if applicable
-				if (Materials[i].texCount > 0)
-				{
-					// note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
-					GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(2,
-						new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
-				}
+                if (Materials[i].texCount > 0)
+                {
+                    // note that the raw parsed tex coords are in vec3, we just need the first 2 elements of the vector
+                    GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(2,
+                        new VertexBufferBinding(VBOTexCoords[i], Vector3.SizeInBytes, 0));
+                }
 
                 // pass texture resource into the shader if applicable
                 if (Materials[i].texSRV != null)

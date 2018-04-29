@@ -52,6 +52,11 @@ namespace Shared
         {
             return (float) r.NextDouble();
         }
+
+        public static float Range(this Random r, float max)
+        {
+            return r.NextFloat() * max;
+        }
     }
 
     // model properties

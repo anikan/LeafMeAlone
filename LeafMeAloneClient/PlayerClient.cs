@@ -36,10 +36,13 @@ namespace Client
         public bool UsingToolPrimary { get; set; }
         public bool UsingToolSecondary { get; set; }
 
-        public PlayerClient() : base()
+        public PlayerClient(CreateObjectPacket createPacket) : base()
         {
             SetModel(@"../../Models/Player_V2.fbx");
             Transform.Rotation.Y += 180f.ToRadians();
+            Id = createPacket.Id;
+            Transform.Position.X = createPacket.InitialX;
+            Transform.Position.Y = createPacket.InitialY;
         }
 
         /// <summary>
@@ -172,6 +175,7 @@ namespace Client
 
         }
 
+
         /// <summary>
         /// Updates the player's values based on a received packet.
         /// </summary>
@@ -185,6 +189,17 @@ namespace Client
             Transform.Position.X = packet.MovementX;
             Transform.Position.Y = packet.MovementY;
             Transform.Rotation.Y = packet.Rotation;
+        }
+
+        /// <summary>
+        /// Facade method which calls to the actual packet processor after 
+        /// casting
+        /// </summary>
+        /// <param name="packet">Abstract packet which gets casted to an actual 
+        /// object type</param>
+        public override void UpdateFromPacket(Packet packet)
+        {
+            UpdateFromPacket(packet as PlayerPacket);
         }
     }
 }

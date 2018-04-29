@@ -145,6 +145,14 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Creates a new player in the game, sends it out to all the clients,
+        /// and then sends that active player to the clientSocket that is 
+        /// specified
+        /// </summary>
+        /// <param name="clientSocket">
+        /// The socket that needs an active player
+        /// </param>
         private void ProcessNewPlayer(Socket clientSocket)
         {
             GameObject player = GameServer.instance.CreateNewPlayer();

@@ -19,7 +19,7 @@ namespace Shared
     {
 
         [ProtoMember(1)]
-        public long Id;
+        public int Id;
 
         [ProtoMember(2)]
         public float InitialX;

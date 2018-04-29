@@ -50,7 +50,7 @@ namespace Client
         private Socket client;
 
         //List of received packets. Populated by ReadCallback
-        public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
+        public List<Packet> PacketQueue = new List<Packet>();
 
         /// <summary>
         /// Try to connect to the host.
@@ -106,16 +106,34 @@ namespace Client
             byte[] buffer = new byte[StateObject.BufferSize];
             if (client.Available > 0)
             {
-                int bytesRead = client.Receive(buffer, 0, StateObject.BufferSize, 0);
+                int bytesRead =
+                    client.Receive(buffer, 0, StateObject.BufferSize, 0);
 
-                byte[] resizedBuffer = new byte[bytesRead];
-                Buffer.BlockCopy(buffer, 0, resizedBuffer, 0, bytesRead);
+                // Read everything but the first byte, which gives the packet
+                // Type
+                byte[] resizedBuffer = new byte[bytesRead - 1];
+                Buffer.BlockCopy(buffer, 1, resizedBuffer, 0, bytesRead - 1);
 
-                PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
+                ProcessPacket((PacketType) buffer[0], resizedBuffer);
+            }
+        }
 
-                //Console.WriteLine("Received packet {0}.", packet.ToString());
-
-                PlayerPackets.Add(packet);
+        private void ProcessPacket(PacketType packetType, byte[] resizedBuffer)
+        {
+            switch (packetType)
+            {
+                case PacketType.CreateObjectPacket:
+                    PacketQueue.Add(
+                        CreateObjectPacket.Deserialize(resizedBuffer)
+                        );
+                    break;
+                case PacketType.PlayerPacket:
+                    PacketQueue.Add(
+                        PlayerPacket.Deserialize(resizedBuffer)
+                        );
+                    break;
+                case PacketType.LeafPacket:
+                    break;
             }
         }
 

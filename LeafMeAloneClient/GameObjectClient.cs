@@ -7,7 +7,7 @@ using Shared;
 
 namespace Client
 {
-    public class GameObjectClient : GameObject
+    public abstract class GameObjectClient : GameObject
     {
         private Model model;
 
@@ -29,5 +29,7 @@ namespace Client
         {
             model?.Draw();
         }
+
+        public abstract void UpdateFromPacket(Packet packet);
     }
 }

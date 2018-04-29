@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Client;
+using LeafMeAloneClient;
 using Shared;
 using SlimDX;
 using SlimDX.D3DCompiler;
@@ -26,6 +27,9 @@ namespace Client
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        /// 
+        private NetworkClient networkClient = new NetworkClient();
+
         private static void Main()
         {
             GameClient Client = new GameClient();
@@ -44,11 +48,12 @@ namespace Client
             GraphicsRenderer.Form.KeyUp += Client.InputManager.OnKeyUp;
 
             //TODO FOR TESTING ONLY
-            GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
+            //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
+
         }
 
 
@@ -80,6 +85,7 @@ namespace Client
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
+
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             ReceivePackets();
 
@@ -97,47 +103,64 @@ namespace Client
 
         }
 
+        public GameClient()
+        {
+            networkClient.StartClient();
+            
+            // Receive the response from the remote device.  
+            //networkClient.Receive();
+        }
+
         private void Render()
         {
             ActivePlayer.Update();
             ActivePlayer.Draw();
         }
 
+        /// <summary>
+        /// Recieves packets from the server, updates the player
+        /// TODO: Make this hash the first 4 bytes into an object ID
+        /// </summary>
         private void ReceivePackets()
         {
+            // Receive the response from the remote device.  
+            networkClient.Receive();
 
+            for (int i = 0; i < networkClient.PlayerPackets.Count(); i++)
+            {
+                ActivePlayer.UpdateFromPacket(networkClient.PlayerPackets[i]);
+            }
+
+            networkClient.PlayerPackets.Clear();
         }
 
         /// <summary>
-        /// Sends all packets this frame.
+
+        /// Sends out the data associated with the active player's input, resets requested movement
         /// </summary>
         private void SendPackets()
         {
-
             // Create a new player packet, and fill it with player's relevant info.
-            PlayerPacket playerPack = ActivePlayer.PlayerRequests.ToPacket();
-
+            PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
+            byte[] data = PlayerPacket.Serialize(toSend);
+            networkClient.Send(data);
+            
             // COMMENT OUT WHEN SERVER IS INTEGRATED
-            ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,
+            /*ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,
                                                           ActivePlayer.Transform.Position.Y,
-                                                          ActivePlayer.Transform.Position.Z - playerPack.Movement.Y * 0.01f );
+                                                          ActivePlayer.Transform.Position.Z - playerPack.Movement.Y * 0.01f );*/
         
-            //Console.WriteLine(playerPack.ToString());
-
-            // TODO: SEND THE ACTUAL PACKET
-
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
             ActivePlayer.ResetRequests();
-
         }
+
 
         /// <summary>
         /// Sets up the input manager and relevant input events.
         /// </summary>
         private void SetupInputManager()
-        {
-
+        { 
             // Create an input manager for player events.
             InputManager = new InputManager(ActivePlayer);
 

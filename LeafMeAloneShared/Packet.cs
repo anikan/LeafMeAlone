@@ -26,16 +26,5 @@ namespace Shared
         {
 
         }
-
-        /// <summary>
-        /// Send function for the packet
-        /// </summary>
-        public abstract void Send();
-
-        /// <summary>
-        /// Receive function for the packet, coming from the server
-        /// </summary>
-        public abstract void Receive();
-
     }
 }

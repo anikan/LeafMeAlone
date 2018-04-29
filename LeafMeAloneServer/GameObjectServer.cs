@@ -7,7 +7,7 @@ using Shared;
 
 namespace Server
 {
-    class GameObjectServer : GameObject
+    public class GameObjectServer : GameObject
     {
         public override void Draw()
         {

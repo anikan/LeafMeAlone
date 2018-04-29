@@ -50,7 +50,6 @@ namespace Server
             
             gameServer.networkServer.StartListening();
 
-
             gameServer.DoGameLoop();
 
             return 0;
@@ -153,6 +152,11 @@ namespace Server
 
                 Console.WriteLine("Creating leaf at position " + pos);
             }
+        }
+
+        public void AddUniversalPhysics()
+        {
+
         }
     }
 }

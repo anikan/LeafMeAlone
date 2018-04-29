@@ -16,7 +16,8 @@ namespace Server
         private Vector3 Acceleration;
         private Vector3 Velocity;
         private float Mass = 1.0f;
-        private float FrictionCoefficient = 0.1f;
+
+        private float FakeFrictionFactor = 0.1f;
 
         private Vector3 Force;
 
@@ -38,8 +39,6 @@ namespace Server
         public override void Update(float deltaTime)
         {
 
-            AddFriction();
-
             Acceleration = Force / Mass;
 
             Velocity = Velocity + (Acceleration * deltaTime);
@@ -50,12 +49,10 @@ namespace Server
 
         }
 
-        public void AddFriction()
+        public void ApplyFakeFriction()
         {
 
-            Vector3 NormalForce = Mass * new Vector3(0.0f, Gravity, 0.0f);
-            Vector3 Friction = FrictionCoefficient * NormalForce;
-            ApplyForce(Friction);
+            // Add in some friction stuff here.
 
         }
     }

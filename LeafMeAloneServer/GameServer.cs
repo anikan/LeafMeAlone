@@ -127,7 +127,7 @@ namespace Server
                 new CreateObjectPacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-            // networkServer.SendAll(objPacket);
+             networkServer.SendAll(CreateObjectPacket.Serialize(objPacket));
                
             return newActivePlayer;
         }

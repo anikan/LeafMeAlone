@@ -13,6 +13,8 @@ namespace Server
     {
         private List<PlayerServer> playerServerList = new List<PlayerServer>();
 
+        private List<GameObject> gameObjectList = new List<GameObject>();
+
         private NetworkServer networkServer = new NetworkServer();
 
         //Time in ms for each tick.
@@ -23,9 +25,17 @@ namespace Server
 
         private Stopwatch timer;
 
+        private List<Vector3> spawnPoints = new List<Vector3>();
+
         public GameServer()
         {
             timer = new Stopwatch();
+
+            spawnPoints.Add(new Vector3(-10, -10, 0));
+            spawnPoints.Add(new Vector3(-10, 10, 0));
+            spawnPoints.Add(new Vector3(10, -10, 0));
+            spawnPoints.Add(new Vector3(10, 10, 0));
+            
         }
 
         public static int Main(String[] args)
@@ -56,7 +66,7 @@ namespace Server
                 {
 
 
-                    playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
+                    //playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
                 //Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);
@@ -65,7 +75,7 @@ namespace Server
                 networkServer.PlayerPackets.Clear();
 
                 //Send player data to all clients.
-                networkServer.SendPlayer(playerServer);
+                //networkServer.SendPlayer(playerServer);
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
@@ -77,9 +87,25 @@ namespace Server
             }
         }
 
-        internal static GameObject CreateNewPlayer()
+
+        public PlayerServer CreateNewPlayer()
         {
-            throw new NotImplementedException();
+            //Assign id based on the next spot in the gameObjectList.
+            int id = gameObjectList.Count();
+
+            PlayerServer newPlayer = new PlayerServer();
+            
+            playerServerList.Add(newPlayer);
+            gameObjectList.Add(newPlayer);
+
+            //Note currently assuming players get ids 0-3
+            newPlayer.Transform.Position = spawnPoints[id];
+            
+            CreateObjectPacket objPacket = new CreateObjectPacket(newPlayer, PLAYER);
+
+            networkServer.SendAll(objPacket);
+               
+            return newPlayer;
         }
     }
 }

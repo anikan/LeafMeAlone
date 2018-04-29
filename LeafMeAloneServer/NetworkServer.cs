@@ -23,11 +23,6 @@ namespace Server
         public StringBuilder sb = new StringBuilder();
     }
 
-    public struct Test
-    {
-        public SlimDX.Vector3 pos;
-    }
-
     public class NetworkServer
     {
         // Thread signal.  
@@ -42,12 +37,16 @@ namespace Server
         //Socket to communicate with client.
         private Socket clientSocket;
 
+        //List of packets for Game to process.
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
         public NetworkServer()
         {
         }
 
+        /// <summary>
+        /// Open a socket for clients to conenct to.
+        /// </summary>
         public void StartListening()
         {
             // Data buffer for incoming data.  
@@ -55,8 +54,7 @@ namespace Server
 
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
-            // running the listener is "host.contoso.com".  
-            //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+
             IPAddress ipAddress = IPAddress.Loopback;//ipHostInfo.AddressList[0];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 

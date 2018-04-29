@@ -20,7 +20,7 @@ namespace LeafMeAloneClient
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public const int BufferSize = 256;
+        public static int BufferSize = 256;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -102,68 +102,24 @@ namespace LeafMeAloneClient
         }
 
         /// <summary>
-        /// Start callback to receive packets from the server.
+        /// Receive packets from the server and add them to the appropriate queue.
         /// </summary>
         public void Receive()
         {
-            try
+            byte[] buffer = new byte[StateObject.BufferSize];
+            if (client.Available > 0)
             {
-                // Create the state object.  
-                StateObject state = new StateObject();
-                state.workSocket = client;
+                int bytesRead = client.Receive(buffer, 0, StateObject.BufferSize, 0);
 
-                // Begin receiving the data from the remote device.  
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
+                byte[] resizedBuffer = new byte[bytesRead];
+                Buffer.BlockCopy(buffer, 0, resizedBuffer, 0, bytesRead);
+
+                PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
+
+                //Console.WriteLine("Received packet {0}.", packet.ToString());
+
+                PlayerPackets.Add(packet);
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-        }
-
-        /// <summary>
-        /// The callback to receive packets. Currently only accepts player packets.
-        /// </summary>
-        /// <param name="ar">Stores buffer and socket.</param>
-        private void ReceiveCallback(IAsyncResult ar)
-        {
-            try
-            {
-                //Console.WriteLine("Received data");
-
-                // Retrieve the state object and the client socket   
-                // from the asynchronous state object.  
-                StateObject state = (StateObject)ar.AsyncState;
-
-                // Read data from the remote device.  
-                int bytesRead = client.EndReceive(ar);
-
-                if (bytesRead > 0)
-                {
-                    //Store the data received so far.  
-                    state.sb.Append(Encoding.ASCII.GetString(state.buffer, 0, bytesRead));
-
-                    byte[] resizedBuffer = new byte[bytesRead];
-                    Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
-                    
-                    PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
-
-                    Console.WriteLine("Received packet {0}.", packet.ToString());
-
-                    PlayerPackets.Add(packet);
-                }
-
-                // Get the next packet
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-            receiveDone.WaitOne();
-
         }
 
         /// <summary>

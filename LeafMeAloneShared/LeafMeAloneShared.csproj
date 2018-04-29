@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="INetworked.cs" />
+    <Compile Include="CreateObjectPacket.cs" />
     <Compile Include="PlayerPacket.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="GameObject.cs" />

@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
+    public enum PacketType
+    {
+        CreateObjectPacket,
+        PlayerPacket,
+        LeafPacket
+    }
+
     /// <summary>
     /// Packet to send or receive from the server
     /// </summary>

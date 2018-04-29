@@ -112,6 +112,15 @@ namespace Server
             Socket listener = (Socket)ar.AsyncState;
             clientSocket = listener.EndAccept(ar);
 
+            GameObject player= GameServer.CreateNewPlayer();
+            CreateObjectPacket setPlayerPacket = new CreateObjectPacket(player, CreateObjectPacket.ObjectType.ACTIVE_PLAYER);
+            Send(clientSocket,);
+            List<GameObject> currentGameObjects = GameServer.GetCreatedObjects();
+            foreach (GameObject toSend in currentGameObjects)
+            {
+                clientSocket.Send(new CreateObjectPacket(toSend).serialize());
+            }
+
             // Create the state object.  
             StateObject state = new StateObject();
             state.workSocket = clientSocket;

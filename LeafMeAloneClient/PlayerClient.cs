@@ -8,12 +8,11 @@ using Shared;
 
 namespace Client
 {
-    public class PlayerClient : GameObjectClient, Player
+    public class PlayerClient : GameObjectClient, IPlayer
     {
-
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
-
+        
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {
@@ -26,39 +25,21 @@ namespace Client
             // Requests for the use of primary/secondary features of tools.
             public bool UseToolPrimaryRequest;
             public bool UseToolSecondaryRequest;
-
-            // Convert this request info to a packet.
-            public PlayerPacket ToPacket()
-            {
-
-                // Create a new packet and fill it's values with player's request info.
-                PlayerPacket returnPacket = new PlayerPacket();
-                returnPacket.Movement = MovementRequested;
-                returnPacket.Rotation = RotationRequested;
-                returnPacket.UsingToolPrimary = UseToolPrimaryRequest;
-                returnPacket.UsingToolSecondary = UseToolSecondaryRequest;
-
-                return returnPacket;
-
-            }
         };
         
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
+        //Implementations of IPlayer fields
+        public bool Dead { get; set; }
+        public PlayerPacket.ToolType ToolEquipped { get; set; }
+        public bool UsingToolPrimary { get; set; }
+        public bool UsingToolSecondary { get; set; }
+
         public PlayerClient() : base()
         {
             SetModel(@"../../Models/Player_V2.fbx");
             Transform.Rotation.Y += 180f.ToRadians();
-        }
-
-        /// <summary>
-        /// Updates the player's values based on a received packet.
-        /// </summary>
-        /// <param name="packet"></param>
-        public void UpdateFromPacket(Packet packet)
-        {
-
         }
 
         /// <summary>
@@ -189,6 +170,21 @@ namespace Client
             // Reset the player requests struct to clear all info.
             PlayerRequests = new PlayerRequestInfo();
 
+        }
+
+        /// <summary>
+        /// Updates the player's values based on a received packet.
+        /// </summary>
+        /// <param name="packet">The packet to update from.</param>
+        public void UpdateFromPacket(PlayerPacket packet)
+        {
+            Dead = packet.Dead;
+            ToolEquipped = packet.ToolEquipped;
+            UsingToolPrimary = packet.UsingToolPrimary;
+            UsingToolSecondary = packet.UsingToolSecondary;
+            Transform.Position.X = packet.MovementX;
+            Transform.Position.Y = packet.MovementY;
+            Transform.Rotation.Y = packet.Rotation;
         }
     }
 }

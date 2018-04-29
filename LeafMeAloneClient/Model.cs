@@ -87,7 +87,7 @@ namespace Client
             if (!m_Properties.Equals(m_PrevProperties))
             {
                 // prev properties = current properties
-                m_PrevProperties.copyToThis(m_Properties);
+                m_PrevProperties.CopyToThis(m_Properties);
 
                 m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
 
@@ -100,6 +100,5 @@ namespace Client
                 m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);
             }
         }
-
     }
 }

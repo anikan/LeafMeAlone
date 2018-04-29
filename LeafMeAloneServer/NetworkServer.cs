@@ -112,7 +112,7 @@ namespace Server
             Socket listener = (Socket)ar.AsyncState;
             clientSocket = listener.EndAccept(ar);
 
-            GameObject player= GameServer.CreateNewPlayer();
+            GameObject player= GameServer.instance.CreateNewPlayer();
             CreateObjectPacket setPlayerPacket = new CreateObjectPacket(player, CreateObjectPacket.ObjectType.ACTIVE_PLAYER);
             Send(clientSocket,);
             List<GameObject> currentGameObjects = GameServer.GetCreatedObjects();

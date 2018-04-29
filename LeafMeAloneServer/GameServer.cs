@@ -13,9 +13,9 @@ namespace Server
     {
         public static GameServer instance;
 
-        private List<PlayerServer> playerServerList = new List<PlayerServer>();
+        public List<PlayerServer> playerServerList = new List<PlayerServer>();
 
-        private List<GameObject> gameObjectList = new List<GameObject>();
+        public List<GameObject> gameObjectList = new List<GameObject>();
 
         private NetworkServer networkServer = new NetworkServer();
 

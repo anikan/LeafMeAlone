@@ -29,15 +29,15 @@ namespace Client
         private EffectPass Pass;
 
 
-
         //number of particles emitted per 100 frames.
         public int emissionRate = 1;
-        public int maxParticles = 1;
+        public int maxParticles = 1000;
 
-        public int size = Vector3.SizeInBytes * 3;
+        public int size = Vector3.SizeInBytes * 4;
 
 
 
+        float delta = .1f;
 
         private Random r;
         public ParticleSystem()
@@ -51,37 +51,54 @@ namespace Client
 
             Verts = new DataStream(Particles.Count * size, true, true);
             Colors = new DataStream(Particles.Count * size, true, true);
-            Faces = new DataStream(Particles.Count * sizeof(int) * 3,true,true);
+            Faces = new DataStream(Particles.Count * sizeof(int) * 6,true,true);
+            Tex = new DataStream(Particles.Count * size,true,true);
 
             for (var index = 0; index < Particles.Count; index++)
             {
                 var pt = Particles[index];
-                Vector3 v2 = pt.Position;
-                v2.X += 1.0f;
-                Vector3 v3 = pt.Position;
-                v3.Y -= 1.0f;
+                var initPos = pt.Position;
+
+                Vector3 topLeft_Both = new Vector3(initPos.X - delta,initPos.Y + delta, initPos.Z);
+                Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z); 
+                Vector3 topRight = new Vector3(initPos.X + delta, initPos.Y + delta, initPos.Z);
+                Vector3 bottomLeft = new Vector3(initPos.X - delta, initPos.Y - delta, initPos.Z);
+                
+
+                Verts.Write(topLeft_Both);
+                Verts.Write(bottomRight_Both);
+                Verts.Write(topRight);
+                Verts.Write(bottomLeft);
+
+                Tex.Write(new Vector3(0f, 0f, 0f));
+                Tex.Write(new Vector3(1f, 1f, 0f));
+                Tex.Write(new Vector3(0f, 1f, 0f));
+                Tex.Write(new Vector3(1f, 0f, 0f));
+
+                Vector3 color = new Vector3((float) r.NextDouble(), (float) r.NextDouble(), (float) r.NextDouble());
+                Colors.Write(color);
+                Colors.Write(color);
+                Colors.Write(color);
+                Colors.Write(color);
 
 
-                Verts.Write(pt.Position);
-                Verts.Write(v2);
-                Verts.Write(v3);
-
-                Colors.Write(new Vector3((float) r.NextDouble(), (float) r.NextDouble(), (float) r.NextDouble()));
-                Colors.Write(new Vector3((float) r.NextDouble(), (float) r.NextDouble(), (float) r.NextDouble()));
-                Colors.Write(new Vector3((float) r.NextDouble(), (float) r.NextDouble(), (float) r.NextDouble()));
-
-                Faces.Write(index * 3);
-                Faces.Write((index *3) +1);
-                Faces.Write((index * 3) +2);
+                Faces.Write(index * 4);
+                Faces.Write((index * 4) + 2);
+                Faces.Write((index * 4) + 1);
+                Faces.Write((index * 4));
+                Faces.Write((index * 4) + 1);
+                Faces.Write((index * 4) + 3);
 
             }
             Verts.Position = 0;
             Colors.Position = 0;
             Faces.Position = 0;
+            Tex.Position = 0;
 
             VBO_Verts = new Buffer(GraphicsRenderer.Device, Verts, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             VBO_Colors = new Buffer(GraphicsRenderer.Device, Colors, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 3 * sizeof(int), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(int), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             var btcode = ShaderBytecode.CompileFromFile(@"../../Shaders/particle.fx", "VS", "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);
             var btcode1 = ShaderBytecode.CompileFromFile(@"../../Shaders/particle.fx", "Render", "fx_5_0", ShaderFlags.None,
@@ -95,7 +112,8 @@ namespace Client
             Elements = new[]
             {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
-                new InputElement("COLOR", 0, Format.R32G32B32_Float, 1)
+               // new InputElement("COLOR", 0, Format.R32G32B32_Float, 1),
+                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 1)
             };
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
@@ -105,16 +123,23 @@ namespace Client
         public void UpdateBuffer()
         {
             Verts.Position = 0;
-            Particles.ForEach(pt =>
+            for (var index = 0; index < Particles.Count; index++)
             {
-                Verts.Write(pt.Position);
-                Vector3 v2 = pt.Position;
-                v2.X += 1.0f;
-                Verts.Write(v2);
-                Vector3 v3 = pt.Position;
-                v3.Y -= 1.0f;
-                Verts.Write(v3);
-            });
+                var pt = Particles[index];
+                var initPos = pt.Position;
+
+                Vector3 topLeft_Both = new Vector3(initPos.X - delta, initPos.Y + delta, initPos.Z);
+                Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z);
+                Vector3 topRight = new Vector3(initPos.X + delta, initPos.Y + delta, initPos.Z);
+                Vector3 bottomLeft = new Vector3(initPos.X - delta, initPos.Y - delta, initPos.Z);
+
+ 
+                Verts.Write(topLeft_Both);
+                Verts.Write(bottomRight_Both);
+                Verts.Write(topRight);
+                Verts.Write(bottomLeft);
+
+            }
             Verts.Position = 0;
 
             VBO_Verts.Dispose();
@@ -128,7 +153,8 @@ namespace Client
             GraphicsRenderer.DeviceContext.InputAssembler.InputLayout = InputLayout;
             GraphicsRenderer.DeviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO_Verts, Vector3.SizeInBytes, 0));
-            GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBO_Colors, Vector3.SizeInBytes, 0));
+            //GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBO_Colors, Vector3.SizeInBytes, 0));
+            GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBO_Tex, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO,Format.R32_UInt,0);
 
 
@@ -141,7 +167,7 @@ namespace Client
 
             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
 
-            GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 3,0,0);
+            GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6,0,0);
            //GraphicsRenderer.DeviceContext.Draw(Particles.Count * 3, 0);
         }
 
@@ -157,7 +183,7 @@ namespace Client
                         particle.Position = Vector3.Zero;
                         particle.Acceleration = Vector3.Zero;
                         particle.Velocity = Vector3.Zero;
-                        particle.LifeRemaining = r.Range(5f);
+                        particle.LifeRemaining = r.Range(20f);
                         emissionThisFrame++;
                     }
                 }

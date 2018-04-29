@@ -12,11 +12,14 @@ namespace Client
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
-        
+
+        public const string PlayerModelPath = @"../../Models/Player_V2.fbx";
+
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {
-            // Direction of movement the player is requesting. Should be between -1 and 1 each axis.
+            // Direction of movement the player is requesting. Should be 
+            // between -1 and 1 each axis.
             public Vector2 MovementRequested;
 
             // Amount of rotation the player is requested.
@@ -36,10 +39,8 @@ namespace Client
         public bool UsingToolPrimary { get; set; }
         public bool UsingToolSecondary { get; set; }
 
-        public PlayerClient(CreateObjectPacket createPacket) : base()
+        public PlayerClient(CreateObjectPacket createPacket) : base(PlayerModelPath)
         {
-            SetModel(@"../../Models/Player_V2.fbx");
-            Transform.Rotation.Y += 180f.ToRadians();
             Id = createPacket.Id;
             Transform.Position.X = createPacket.InitialX;
             Transform.Position.Y = createPacket.InitialY;
@@ -52,14 +53,16 @@ namespace Client
         public void RequestMove(Vector2 dir)
         {
 
-            // If the direction requested is non-zero in the X axis (account for floating point error).
+            // If the direction requested is non-zero in the X axis 
+            // (account for floating point error).
             if (dir.X < 0.0f - FLOAT_RANGE || dir.X > 0.0f + FLOAT_RANGE)
             {
                 // Request in the x direction.
                 PlayerRequests.MovementRequested.X = dir.X;
             }
 
-            // If the direction requested is non-zero in the Y axis (account for floating point error).
+            // If the direction requested is non-zero in the Y axis (account 
+            // for floating point error).
             if (dir.Y < 0.0f - FLOAT_RANGE || dir.Y > 0.0f + FLOAT_RANGE)
             {
                 //// Request in the y direction.

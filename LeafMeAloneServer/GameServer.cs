@@ -39,7 +39,9 @@ namespace Server
             spawnPoints.Add(new Vector3(-10, 10, 0));
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
-            
+
+            CreateLeaves(100, -10, 10, -10, 10);
+
         }
 
         public static int Main(String[] args)
@@ -47,6 +49,7 @@ namespace Server
             GameServer gameServer = new GameServer();
             
             gameServer.networkServer.StartListening();
+
 
             gameServer.DoGameLoop();
 
@@ -73,6 +76,8 @@ namespace Server
                     //playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
+                UpdateObjects(timer.ElapsedMilliseconds);
+
                 //Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);
 
                 //Clear list for next frame.
@@ -89,6 +94,16 @@ namespace Server
                 //Sleep for the rest of this tick.
                 System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
             }
+        }
+
+        public void UpdateObjects(float deltaTime)
+        {
+
+            for (int i = 0; i < gameObjectList.Count; i++)
+            {
+                gameObjectList[i].Update(deltaTime);
+            }
+
         }
 
 
@@ -112,9 +127,32 @@ namespace Server
                 new CreateObjectPacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-            // networkServer.SendAll(objPacket);
+             networkServer.SendAll(CreateObjectPacket.Serialize(objPacket));
                
             return newActivePlayer;
+        }
+
+        public void CreateLeaves(int num, float minX, float maxX, float minY, float maxY)
+        {
+            Random rnd = new Random();
+
+            for (int i = 0; i < num; i++)
+            {
+
+                double randX = rnd.NextDouble();
+                double randY = rnd.NextDouble();
+
+                randX = (randX * (maxX - minX)) + minX;
+                randY = (randY * (maxY - minY)) + maxY;
+
+                Vector3 pos = new Vector3((float)randX, 0.0f, (float)randY);
+
+                LeafServer newLeaf = new LeafServer();
+                newLeaf.Transform.Position = pos;
+                gameObjectList.Add(newLeaf);
+
+                Console.WriteLine("Creating leaf at position " + pos);
+            }
         }
     }
 }

@@ -241,6 +241,20 @@ namespace Server
         }
 
         /// <summary>
+        /// Send given data to all connected sockets. 
+        /// </summary>
+        /// <param name="byteData">Data to send.</param>
+        public void SendAll(byte[] byteData)
+        {
+            foreach (Socket socket in clientSockets)
+            {
+                // Begin sending the data to the remote device.  
+                socket.BeginSend(byteData, 0, byteData.Length, 0,
+                    new AsyncCallback(SendCallback), socket);
+            }
+        }
+
+        /// <summary>
         /// Called when send was successful.
         /// </summary>
         /// <param name="ar">Stores socket and buffer data</param>

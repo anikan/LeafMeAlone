@@ -9,9 +9,16 @@ namespace Server
 {
     public class GameObjectServer : GameObject
     {
-        public GameObjectServer(ObjectType objectType) : base(objectType)
-        {
 
+
+        public GameObjectServer(ObjectType objectType) : base()
+        {
+            ObjectType = objectType;
+        }
+
+        public GameObjectServer(ObjectType objectType, Transform startPosition) : base(startPosition)
+        {
+            ObjectType = objectType;
         }
 
         public override void Draw()
@@ -19,7 +26,7 @@ namespace Server
             throw new NotImplementedException();
         }
 
-        public override void Update()
+        public override void Update(float deltaTime)
         {
             throw new NotImplementedException();
         }

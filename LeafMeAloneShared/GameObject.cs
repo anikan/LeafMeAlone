@@ -16,6 +16,7 @@ namespace Shared
 
     public abstract class GameObject : INetworked
     {
+
         public ObjectType ObjectType;
 
         /// <summary>
@@ -26,15 +27,23 @@ namespace Shared
         public Transform Transform;
         public int Id { get; set; }
 
-        public abstract void Update();
+        public abstract void Update(float deltaTime);
         public abstract void Draw();
-        
-        protected GameObject(ObjectType objectType)
+          
+        protected GameObject()
         {
-            ObjectType = objectType;
-            Transform.Rotation = new Vector3(0, 0, 0);
-            Transform.Position = new Vector3(0, 0, 0);
-            Transform.Scale = new Vector3(1, 1, 1);
+            Transform EmptyTransform = new Transform();
+
+            EmptyTransform.Rotation = new Vector3(0, 0, 0);
+            EmptyTransform.Position = new Vector3(0, 0, 0);
+            EmptyTransform.Scale = new Vector3(1, 1, 1);
+
+            Transform = EmptyTransform;
+        }
+
+        protected GameObject(Transform startTransform)
+        {
+            Transform = startTransform;
         }
     }
 }

@@ -11,6 +11,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using Device = SlimDX.DXGI.Device;
+using System.Diagnostics;
 
 
 namespace Client
@@ -24,6 +25,10 @@ namespace Client
 
         private Camera Camera => GraphicsManager.ActiveCamera;
 
+        public List<LeafClient> leaves;
+
+        public Stopwatch Timer;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -33,13 +38,29 @@ namespace Client
         private static void Main()
         {
             GameClient Client = new GameClient();
+            Client.Timer = new Stopwatch();
 
             GraphicsRenderer.Init();
 
+            GraphicsManager.ActiveCamera =
+                new Camera(
+                    new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY
+                    );
 
-            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
-            GraphicsManager.ActivePlayer = Client.ActivePlayer;
+            /*
+            Client.leaves = new List<LeafClient>();
 
+            for (int x = -5; x < 5; x++)
+            {
+                for (int y = -5; y < 5; y++)
+                {
+
+                    LeafClient newLeaf = new LeafClient();
+                    newLeaf.Transform.Position = new Vector3(x * 5, 0.0f, y * 5);
+                    Client.GameObjects.Add(newLeaf.Id, newLeaf);
+                }
+            }
+            */
 
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
@@ -92,10 +113,8 @@ namespace Client
 
             }
 
-            //GraphicsManager.ActiveCamera.RotateCamera(
-            // new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
+            Update();
             Render();
-
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 
@@ -110,17 +129,36 @@ namespace Client
         }
 
         /// <summary>
+        /// Updates each of the game object's models with the time
+        /// </summary>
+        private void Update()
+        {
+            float delta = Timer.ElapsedMilliseconds;
+
+            foreach (KeyValuePair<int, GameObjectClient> kv in
+                gameObjects.AsEnumerable())
+            {
+                GameObjectClient gameObject = kv.Value;
+                gameObject.Update(delta);
+            }
+
+            Timer.Restart();
+
+        }
+
+        /// <summary>
         /// Loops through the hashtable of gameobjects and draws them
         /// </summary>
         private void Render()
         {
             foreach (KeyValuePair<int, GameObjectClient> kv in
-                gameObjects.AsEnumerable()) {
+                gameObjects.AsEnumerable())
+            {
                 GameObjectClient gameObject = kv.Value;
-                gameObject.Update();
                 gameObject.Draw();
             }
         }
+
 
         /// <summary>
         /// Recieves packets from the server, updates objects or creates 
@@ -181,6 +219,7 @@ namespace Client
             )
         {
             ActivePlayer = new PlayerClient(createPacket);
+            GraphicsManager.ActivePlayer = ActivePlayer;
             gameObjects.Add(ActivePlayer.Id, ActivePlayer);
             // Set up the input manager.
             SetupInputManager();

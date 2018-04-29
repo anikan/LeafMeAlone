@@ -144,11 +144,11 @@ namespace Server
                 byte[] resizedBuffer = new byte[bytesRead];
 
                 Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
-                    
+
                 PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
 
                 PlayerPackets.Add(packet);
-                
+
                 //Console.WriteLine("Read new player packet: Data : {0}",
                 //    packet.ToString());
 

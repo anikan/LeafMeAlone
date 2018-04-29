@@ -9,8 +9,10 @@ using SlimDX;
 
 namespace Server
 {
-    class GameServer
+    public class GameServer
     {
+        public static GameServer instance;
+
         private List<PlayerServer> playerServerList = new List<PlayerServer>();
 
         private List<GameObject> gameObjectList = new List<GameObject>();
@@ -29,6 +31,8 @@ namespace Server
 
         public GameServer()
         {
+            instance = this; 
+
             timer = new Stopwatch();
 
             spawnPoints.Add(new Vector3(-10, -10, 0));
@@ -103,6 +107,7 @@ namespace Server
             
             CreateObjectPacket objPacket = new CreateObjectPacket(newPlayer, PLAYER);
 
+            //Sending this new packet before the new client joins. 
             networkServer.SendAll(objPacket);
                
             return newPlayer;

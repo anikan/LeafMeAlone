@@ -116,9 +116,7 @@ namespace Client
             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
             GraphicsRenderer.DeviceContext.Draw(Particles.Count, 0);
         }
-
-
-
+        
         public override void Update()
         {
             int emissionThisFrame = 0;

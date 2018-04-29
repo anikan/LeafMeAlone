@@ -11,7 +11,7 @@ namespace Server
 {
     class GameServer
     {
-        private PlayerServer playerServer = new PlayerServer();
+        private List<PlayerServer> playerServerList = new List<PlayerServer>();
 
         private NetworkServer networkServer = new NetworkServer();
 
@@ -54,7 +54,9 @@ namespace Server
                 //Update the server players based on received packets.
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {
-                    playerServer.UpdateFromPacket(networkServer.PlayerPackets[i]);
+
+
+                    playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
                 //Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);

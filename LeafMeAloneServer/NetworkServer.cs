@@ -113,8 +113,8 @@ namespace Server
             Socket clientSocket = listener.EndAccept(ar);
 
             // Create a new player and send them the world 
-            ProcessNewPlayer(clientSocket);
             SendWorldToClient(clientSocket);
+            ProcessNewPlayer(clientSocket);
 
             // Add the new socket to the list of sockets recieving updates
             clientSockets.Add(clientSocket);
@@ -126,6 +126,13 @@ namespace Server
                 new AsyncCallback(ReadCallback), state);
         }
 
+        /// <summary>
+        /// Sends all the game objects that exist within the game world to 
+        /// a client 
+        /// </summary>
+        /// <param name="clientSocket">
+        /// The client to send all the game objects in the world to 
+        /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
             List<GameObject> currentGameObjects =
@@ -196,14 +203,14 @@ namespace Server
         /// Given a player, generate a PlayerPacket and send it.
         /// </summary>
         /// <param name="player">Player to send.</param>
-        public void SendPlayer(PlayerServer player)
+        /* public void SendPlayer(PlayerServer player)
         {
             PlayerPacket packet = ServerPacketFactory.CreatePacket(player);
 
             //Console.WriteLine("Sending packet {0}.", packet.ToString());
 
             Send(clientSocket, PlayerPacket.Serialize(packet));
-        }
+        } */
 
         /// <summary>
         /// Send the byteData to the socket.

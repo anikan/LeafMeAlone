@@ -98,9 +98,8 @@ namespace Server
             int id = gameObjectList.Count();
 
             PlayerServer newActivePlayer = new PlayerServer();
-            newActivePlayer.objectType = ObjectType.ACTIVE_PLAYER;
+            newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
             PlayerServer newPlayer = new PlayerServer();
-            newPlayer.objectType = ObjectType.PLAYER;
             
             playerServerList.Add(newPlayer);
             gameObjectList.Add(newPlayer);
@@ -112,8 +111,8 @@ namespace Server
             CreateObjectPacket objPacket = 
                 new CreateObjectPacket(newPlayer);
 
-            //Sending this new packet before the new client joins. 
-            networkServer.SendAll(objPacket);
+            // Sending this new packet before the new client joins. 
+            // networkServer.SendAll(objPacket);
                
             return newActivePlayer;
         }

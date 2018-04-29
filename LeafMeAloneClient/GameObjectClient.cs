@@ -11,6 +11,16 @@ namespace Client
     {
         private Model model;
 
+        protected GameObjectClient(string modelPath) : base()
+        {
+            SetModel(modelPath);
+        }
+
+        protected GameObjectClient(string modelPath, Transform startTransform) : base(startTransform)
+        {
+            SetModel(modelPath);
+        }
+
         public void SetModel(string filePath)
         {
             model = new Model(filePath);

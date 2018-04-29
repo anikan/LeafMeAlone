@@ -20,13 +20,21 @@ namespace Shared
 
         public abstract void Update();
         public abstract void Draw();
-
-
+          
         protected GameObject()
         {
-            Transform.Rotation = new Vector3(0, 0, 0);
-            Transform.Position = new Vector3(0, 0, 0);
-            Transform.Scale = new Vector3(1, 1, 1);
+            Transform EmptyTransform = new Transform();
+
+            EmptyTransform.Rotation = new Vector3(0, 0, 0);
+            EmptyTransform.Position = new Vector3(0, 0, 0);
+            EmptyTransform.Scale = new Vector3(1, 1, 1);
+
+            Transform = EmptyTransform;
+        }
+
+        protected GameObject(Transform startTransform)
+        {
+            Transform = startTransform;
         }
     }
 }

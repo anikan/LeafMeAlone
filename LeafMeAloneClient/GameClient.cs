@@ -101,7 +101,7 @@ namespace Client
             // Send any packets to the server.
             SendPackets();
 
-            //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
+            // GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
 
             Render();
 

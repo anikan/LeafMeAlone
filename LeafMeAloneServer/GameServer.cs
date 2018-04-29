@@ -76,5 +76,10 @@ namespace Server
                 System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
             }
         }
+
+        internal static GameObject CreateNewPlayer()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

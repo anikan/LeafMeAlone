@@ -7,8 +7,17 @@ using SlimDX;
 
 namespace Shared
 {
+    public enum ObjectType
+    {
+        ACTIVE_PLAYER,
+        PLAYER,
+        LEAF
+    };
+
     public abstract class GameObject : INetworked
     {
+
+        public ObjectType ObjectType;
 
         /// <summary>
         /// Name can be given to gameobjects for debugging purposes.

@@ -12,7 +12,12 @@ namespace Server
         public bool Burning { get; set; }
         public float TimeBurning { get; set; }
 
-        public LeafServer(Transform startTransform) : base(startTransform)
+        public LeafServer() : base(ObjectType.LEAF)
+        {
+
+        }
+
+        public LeafServer(Transform startTransform) : base (ObjectType.LEAF, startTransform)
         {
 
         }

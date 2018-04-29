@@ -20,12 +20,12 @@ namespace Server
 
         private Vector3 Force;
 
-        public PhysicsObject() : base()
+        public PhysicsObject(ObjectType objectType) : base(objectType)
         {
 
         }
 
-        public PhysicsObject(Transform startTransform) : base(startTransform)
+        public PhysicsObject(ObjectType objectType, Transform startTransform) : base(objectType, startTransform)
         {
 
         }

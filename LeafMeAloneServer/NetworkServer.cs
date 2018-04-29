@@ -35,7 +35,7 @@ namespace Server
         private bool isListening = false;
 
         //Socket to communicate with client.
-        private Socket clientSocket;
+        private List<Socket> clientSockets;
 
         //List of packets for Game to process.
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
@@ -110,13 +110,49 @@ namespace Server
 
             // Get the socket that handles the client request.  
             Socket listener = (Socket)ar.AsyncState;
-            clientSocket = listener.EndAccept(ar);
+            Socket clientSocket = listener.EndAccept(ar);
+
+            // Create a new player and send them the world 
+            SendWorldToClient(clientSocket);
+            ProcessNewPlayer(clientSocket);
+
+            // Add the new socket to the list of sockets recieving updates
+            clientSockets.Add(clientSocket);
 
             // Create the state object.  
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
             clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
+        }
+
+        /// <summary>
+        /// Sends all the game objects that exist within the game world to 
+        /// a client 
+        /// </summary>
+        /// <param name="clientSocket">
+        /// The client to send all the game objects in the world to 
+        /// </param>
+        private void SendWorldToClient(Socket clientSocket)
+        {
+            List<GameObject> currentGameObjects =
+                GameServer.instance.gameObjectList;
+            foreach (GameObject objToSend in currentGameObjects)
+            {
+                CreateObjectPacket packetToSend =
+                    new CreateObjectPacket(objToSend);
+                clientSocket.Send(CreateObjectPacket.Serialize(packetToSend));
+            }
+        }
+
+        private void ProcessNewPlayer(Socket clientSocket)
+        {
+            GameObject player = GameServer.instance.CreateNewPlayer();
+            CreateObjectPacket setPlayerPacket =
+                new CreateObjectPacket(player);
+            // Create createObjectPacket, send to client
+            byte[] data = CreateObjectPacket.Serialize(setPlayerPacket);
+            Send(clientSocket, data);
         }
 
         /// <summary>
@@ -144,11 +180,11 @@ namespace Server
                 byte[] resizedBuffer = new byte[bytesRead];
 
                 Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
-                    
+
                 PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
 
                 PlayerPackets.Add(packet);
-                
+
                 //Console.WriteLine("Read new player packet: Data : {0}",
                 //    packet.ToString());
 
@@ -167,14 +203,14 @@ namespace Server
         /// Given a player, generate a PlayerPacket and send it.
         /// </summary>
         /// <param name="player">Player to send.</param>
-        public void SendPlayer(PlayerServer player)
+        /* public void SendPlayer(PlayerServer player)
         {
             PlayerPacket packet = ServerPacketFactory.CreatePacket(player);
 
             //Console.WriteLine("Sending packet {0}.", packet.ToString());
 
             Send(clientSocket, PlayerPacket.Serialize(packet));
-        }
+        } */
 
         /// <summary>
         /// Send the byteData to the socket.

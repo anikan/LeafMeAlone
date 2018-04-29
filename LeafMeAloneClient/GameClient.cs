@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Client;
-using LeafMeAloneClient;
 using Shared;
 using SlimDX;
 using SlimDX.D3DCompiler;

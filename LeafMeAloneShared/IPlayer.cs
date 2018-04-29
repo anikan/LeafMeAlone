@@ -20,4 +20,5 @@ namespace Shared
         void UpdateFromPacket(PlayerPacket packet);
 
     }
+
 }

@@ -16,6 +16,9 @@ namespace Server
         public bool UsingToolPrimary { get; set; }
         public bool UsingToolSecondary { get; set; }
 
+        public PlayerServer() : base(ObjectType.PLAYER)
+        { }
+
         public Transform GetTransform()
         {
             return Transform;

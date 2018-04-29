@@ -28,8 +28,8 @@ SamplerState MeshTextureSampler
 //}
 
 
-float VS(float4 iPosL : POSITION,
-	float4 iTex : UV_TEX,
+void VS(float4 iPosL : POSITION,
+	float4 iTex : TEXTURE,
 	out float4 oPosH : SV_POSITION,
 	out float2 oTex : UV_TEX)
 {
@@ -42,6 +42,7 @@ float4 PS(float4 iPosH  : SV_POSITION,
 	float2 iTex : UV_TEX)
 	: SV_TARGET
 {
+	//return float4(iTex.x, iTex.y, 0, 1);
 	return tex_diffuse.Sample(MeshTextureSampler, iTex);
 }
 

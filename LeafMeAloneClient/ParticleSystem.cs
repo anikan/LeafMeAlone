@@ -28,6 +28,8 @@ namespace Client
         private Effect Effects;
         private EffectPass Pass;
 
+        private ShaderResourceView TexSRV;
+
 
         //number of particles emitted per 100 frames.
         public int emissionRate = 1;
@@ -101,7 +103,7 @@ namespace Client
             EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(int), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             var btcode = ShaderBytecode.CompileFromFile(@"../../Shaders/particle.fx", "VS", "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);
-            var btcode1 = ShaderBytecode.CompileFromFile(@"../../Shaders/particle.fx", "Render", "fx_5_0", ShaderFlags.None,
+            var btcode1 = ShaderBytecode.CompileFromFile(@"../../Shaders/particle.fx", "PS", "fx_5_0", ShaderFlags.None,
                 EffectFlags.None);
             var sig = ShaderSignature.GetInputSignature(btcode);
 
@@ -118,6 +120,7 @@ namespace Client
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
 
+            TexSRV = CreateTexture(@"../../fire.png");
         }
 
         public void UpdateBuffer()
@@ -162,7 +165,7 @@ namespace Client
             Effects.GetVariableByName("gView").AsMatrix()
                 .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
             Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
-
+            Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(TexSRV);
 
 
             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);

@@ -20,8 +20,7 @@ namespace Shared
 
         public abstract void Update();
         public abstract void Draw();
-
-
+        
         protected GameObject()
         {
             Transform.Rotation = new Vector3(0, 0, 0);

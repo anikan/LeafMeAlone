@@ -48,7 +48,7 @@ namespace Client
             GraphicsRenderer.Form.KeyUp += Client.InputManager.OnKeyUp;
 
             //TODO FOR TESTING ONLY
-            GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
+            //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -87,7 +87,7 @@ namespace Client
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
 
             // Receive the response from the remote device.  
-            networkClient.Receive();
+            //networkClient.Receive();
 
             // Write the response to the console.  
             //Console.WriteLine("Response received : {0}", networkClient.response);
@@ -112,6 +112,9 @@ namespace Client
         public GameClient()
         {
             networkClient.StartClient();
+            
+            // Receive the response from the remote device.  
+            networkClient.Receive();
         }
 
         private void Render()

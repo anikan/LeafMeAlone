@@ -148,8 +148,8 @@ namespace Server
                 
                 // All the data has been read from the   
                 // client. Display it on the console.  
-                Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                    content.Length, content);
+                //Console.WriteLine("Read new player packet: Data : {0}",
+                //    packet.ToString());
 
             }
 
@@ -170,6 +170,10 @@ namespace Server
         public void SendPlayer(PlayerServer player)
         {
             PlayerPacket packet = ServerPacketFactory.CreatePacket(player);
+
+            Console.WriteLine("Sending packet {0}.", packet.ToString());
+
+            //PlayerPacket testPacket = PlayerPacket.Deserialize(PlayerPacket.Serialize(packet));
 
             Send(clientSocket, PlayerPacket.Serialize(packet));
         }

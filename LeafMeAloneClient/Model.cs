@@ -100,6 +100,5 @@ namespace Client
                 m_ModelMatrix = Matrix.Translation(m_Properties.Position) * m_ModelMatrix;
             }
         }
-
     }
 }

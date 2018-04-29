@@ -27,6 +27,7 @@ namespace Server
         public GameServer()
         {
             timer = new Stopwatch();
+            playerServer.Transform.Position = Vector3.UnitX;
         }
 
         public static int Main(String[] args)
@@ -36,7 +37,6 @@ namespace Server
             gameServer.networkServer.StartListening();
 
             gameServer.DoGameLoop();
-
 
             return 0;
         }
@@ -54,15 +54,19 @@ namespace Server
                     playerServer.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
-                Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);
+                //Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);
 
                 //Clear for next frame.
                 networkServer.PlayerPackets.Clear();
 
                 networkServer.SendPlayer(playerServer);
 
-                Console.WriteLine("Sleeping for {0}", (int)(TICK_TIME - timer.ElapsedMilliseconds));
-                
+                if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
+                {
+                    //Console.WriteLine("Sleeping for {0}", (int)(TICK_TIME - timer.ElapsedMilliseconds));
+                    Console.WriteLine("Warning: Server is falling behind.");
+                }
+
                 System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
             }
         }

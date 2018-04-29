@@ -12,8 +12,6 @@ namespace Client
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
-
-        private PlayerPacket.ToolType toolEquipped;
         
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
@@ -23,7 +21,6 @@ namespace Client
 
             // Amount of rotation the player is requested.
             public float RotationRequested;
-            
 
             // Requests for the use of primary/secondary features of tools.
             public bool UseToolPrimaryRequest;
@@ -33,10 +30,11 @@ namespace Client
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
+        //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public PlayerPacket.ToolType ToolEquipped { get; set; }
-        public bool usingToolPrimary { get; set; }
-        public bool usingToolSecondary { get; set; }
+        public bool UsingToolPrimary { get; set; }
+        public bool UsingToolSecondary { get; set; }
 
         public PlayerClient() : base()
         {
@@ -181,9 +179,9 @@ namespace Client
         public void UpdateFromPacket(PlayerPacket packet)
         {
             Dead = packet.Dead;
-            toolEquipped = packet.ToolEquipped;
-            usingToolPrimary = packet.UsingToolPrimary;
-            usingToolSecondary = packet.UsingToolSecondary;
+            ToolEquipped = packet.ToolEquipped;
+            UsingToolPrimary = packet.UsingToolPrimary;
+            UsingToolSecondary = packet.UsingToolSecondary;
             Transform.Position.X = packet.MovementX;
             Transform.Position.Y = packet.MovementY;
             Transform.Rotation.Y = packet.Rotation;

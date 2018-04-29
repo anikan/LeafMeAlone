@@ -60,9 +60,6 @@ namespace LeafMeAloneClient
             // Connect to a remote device.  
             try
             {
-                // Establish the remote endpoint for the socket.  
-                //IPHostEntry ipHostInfo = Dns.GetHostEntry("host.contoso.com");
-
                 //For testing purposes, connect to Loopback. 
                 IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
                 IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);

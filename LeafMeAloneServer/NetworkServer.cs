@@ -74,13 +74,13 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// If not already listening, start a callback for accepting a connection.
+        /// </summary>
         public void CheckForConnections()
         {
             try
             {
-                // Set the event to nonsignaled state.  
-                //allDone.Reset();
-
                 // Start an asynchronous socket to listen for connections.  
                 if (!isListening)
                 {
@@ -92,9 +92,6 @@ namespace Server
 
                     isListening = true;
                 }
-
-                // Wait until a connection is made before continuing.  
-                //allDone.WaitOne();
             }
             catch (Exception e)
             {
@@ -102,6 +99,10 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Connect to a requesting socket.
+        /// </summary>
+        /// <param name="ar">Stores socket and buffer data</param>
         public void AcceptCallback(IAsyncResult ar)
         {
             // Signal the main thread to continue.  
@@ -118,6 +119,10 @@ namespace Server
                 new AsyncCallback(ReadCallback), state);
         }
 
+        /// <summary>
+        /// When receiving a packet, process it.
+        /// </summary>
+        /// <param name="ar">Stores socket and buffer data</param>
         public void ReadCallback(IAsyncResult ar)
         {
             String content = String.Empty;
@@ -144,8 +149,6 @@ namespace Server
 
                 PlayerPackets.Add(packet);
                 
-                // All the data has been read from the   
-                // client. Display it on the console.  
                 //Console.WriteLine("Read new player packet: Data : {0}",
                 //    packet.ToString());
 
@@ -163,19 +166,21 @@ namespace Server
         /// <summary>
         /// Given a player, generate a PlayerPacket and send it.
         /// </summary>
-        /// <param name="handler"></param>
-        /// <param name="player"></param>
+        /// <param name="player">Player to send.</param>
         public void SendPlayer(PlayerServer player)
         {
             PlayerPacket packet = ServerPacketFactory.CreatePacket(player);
 
-            Console.WriteLine("Sending packet {0}.", packet.ToString());
-
-            //PlayerPacket testPacket = PlayerPacket.Deserialize(PlayerPacket.Serialize(packet));
+            //Console.WriteLine("Sending packet {0}.", packet.ToString());
 
             Send(clientSocket, PlayerPacket.Serialize(packet));
         }
 
+        /// <summary>
+        /// Send the byteData to the socket.
+        /// </summary>
+        /// <param name="handler">Socket to send to</param>
+        /// <param name="byteData">Data to send</param>
         private void Send(Socket handler, byte[] byteData)
         {
             if (handler != null)
@@ -191,6 +196,10 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Called when send was successful.
+        /// </summary>
+        /// <param name="ar">Stores socket and buffer data</param>
         private void SendCallback(IAsyncResult ar)
         {
             try
@@ -200,11 +209,8 @@ namespace Server
 
                 // Complete sending the data to the remote device.  
                 int bytesSent = handler.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to client.\n", bytesSent);
 
-                //handler.Shutdown(SocketShutdown.Both);
-                //handler.Close();
-
+                //Console.WriteLine("Sent {0} bytes to client.\n", bytesSent);
             }
             catch (Exception e)
             {

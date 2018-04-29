@@ -67,7 +67,6 @@ namespace Server
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
-                    //Console.WriteLine("Sleeping for {0}", (int)(TICK_TIME - timer.ElapsedMilliseconds));
                     Console.WriteLine("Warning: Server is falling behind.");
                 }
 

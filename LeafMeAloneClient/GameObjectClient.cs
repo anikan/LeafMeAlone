@@ -27,7 +27,7 @@ namespace Client
             Name = filePath.Split('.')[0];
         }
 
-        public override void Update()
+        public override void Update(float deltaTime)
         {
             if (model == null)
                 return;

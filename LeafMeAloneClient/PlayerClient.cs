@@ -12,7 +12,9 @@ namespace Client
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
-        
+
+        public const string PlayerModelPath = @"../../Models/Player_V2.fbx";
+
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {
@@ -36,9 +38,8 @@ namespace Client
         public bool UsingToolPrimary { get; set; }
         public bool UsingToolSecondary { get; set; }
 
-        public PlayerClient() : base()
+        public PlayerClient() : base(PlayerModelPath)
         {
-            SetModel(@"../../Models/Player_V2.fbx");
             Transform.Rotation.Y += 180f.ToRadians();
         }
 

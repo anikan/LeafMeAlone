@@ -7,7 +7,7 @@ using Shared;
 
 namespace Server
 {
-    class LeafServer : GameObjectServer, ILeaf
+    class LeafServer : PhysicsObject, ILeaf
     {
         public bool Burning { get; set; }
         public float TimeBurning { get; set; }

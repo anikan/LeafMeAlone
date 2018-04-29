@@ -12,7 +12,7 @@ namespace Client
         public bool Burning { get; set; }
         public float TimeBurning { get; set; }
 
-        public const string LeafModelPath = @"../../Models/LeafModel.fbx";
+        public const string LeafModelPath = @"../../Models/Leaf_V1.fbx";
 
         public LeafClient() : base(LeafModelPath)
         {

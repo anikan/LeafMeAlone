@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ILeaf.cs" />
     <Compile Include="INetworked.cs" />
     <Compile Include="PlayerPacket.cs" />
     <Compile Include="Packet.cs" />

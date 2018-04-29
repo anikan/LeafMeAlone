@@ -12,6 +12,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using Device = SlimDX.DXGI.Device;
+using System.Diagnostics;
 
 
 namespace Client
@@ -24,6 +25,10 @@ namespace Client
 
         private Camera Camera => GraphicsManager.ActiveCamera;
 
+        public List<LeafClient> leaves;
+
+        public Stopwatch Timer;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -32,7 +37,10 @@ namespace Client
 
         private static void Main()
         {
+
+
             GameClient Client = new GameClient();
+            Client.Timer = new Stopwatch();
 
             GraphicsRenderer.Init();
 
@@ -40,6 +48,21 @@ namespace Client
 
             GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
+
+            Client.leaves = new List<LeafClient>();
+
+            for (int x = -5; x < 5; x++)
+            {
+                for (int y = -5; y < 5; y++)
+                {
+
+                    LeafClient newLeaf = new LeafClient();
+                    newLeaf.Transform.Position = new Vector3(x * 5, 0.0f, y * 5);
+                    Client.leaves.Add(newLeaf);
+
+
+                }
+            }
 
             // Set up the input manager.
             Client.SetupInputManager();
@@ -96,6 +119,7 @@ namespace Client
             SendPackets();
 
             // GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
+            Update();
 
             Render();
 
@@ -111,10 +135,34 @@ namespace Client
             //networkClient.Receive();
         }
 
+        private void Update()
+        {
+            float delta = Timer.ElapsedMilliseconds;
+
+            ActivePlayer.Update(delta);
+
+            for (int i = 0; i < leaves.Count; i++)
+            {
+                leaves[i].Update(delta);
+            }
+
+            Timer.Restart();
+
+
+        }
+
         private void Render()
         {
-            ActivePlayer.Update();
+
+       
             ActivePlayer.Draw();
+
+            for (int i = 0; i < leaves.Count; i++)
+            {
+                leaves[i].Draw();
+            }
+
+
         }
 
         /// <summary>

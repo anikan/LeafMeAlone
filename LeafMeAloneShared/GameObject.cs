@@ -18,7 +18,7 @@ namespace Shared
         public Transform Transform;
         public int Id { get; set; }
 
-        public abstract void Update();
+        public abstract void Update(float deltaTime);
         public abstract void Draw();
           
         protected GameObject()

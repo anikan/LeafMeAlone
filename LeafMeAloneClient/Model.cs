@@ -113,8 +113,8 @@ namespace Client
         // pass the model matrix to the shader and draw the active geometry
         public void Draw()
         {
-           m_ActiveShader.UseShader();
-           m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+            m_ActiveShader.UseShader();
+            m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
         }
 
         // the public interface of the Update function

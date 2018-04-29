@@ -106,8 +106,8 @@ namespace Client
 
         private void Render()
         {
-            //ActivePlayer.Update();
-            //ActivePlayer.Draw();
+            ActivePlayer.Update();
+            ActivePlayer.Draw();
 
             p.Update();
             p.Draw();

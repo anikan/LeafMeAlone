@@ -370,6 +370,9 @@ namespace Client
                 .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
             shader.ShaderEffect.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
 
+            GraphicsManager.ActiveLightSystem.UpdateShader(shader, modelMatrix);
+            shader.ShaderEffect.GetVariableByName("CamPosObj").AsVector().Set(
+                Vector4.Transform( new Vector4(GraphicsManager.ActiveCamera.CameraPosition, 1.0f), Matrix.Invert(modelMatrix)) );
 
             for (int i = 0; i < scene.MeshCount; i++)
             {

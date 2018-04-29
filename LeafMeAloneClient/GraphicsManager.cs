@@ -42,16 +42,7 @@ namespace Client
 
         public static void Update()
         {
-            UpdateLights();
-        }
 
-        public static void UpdateLights()
-        {
-            foreach (KeyValuePair<string, Shader> val in DictShader)
-            {
-                Shader shader = val.Value;
-                ActiveLightSystem.UpdateShader(shader);
-            }
         }
 
         /// <summary>
@@ -61,6 +52,28 @@ namespace Client
         {
             ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
             ActiveLightSystem = new Light(20);
+            LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
+            {
+                light0.UseDirectionalPreset();
+                light0.intensities = new Vector4(1.3f,1.2f,1.0f,0);
+                light0.status = LightParameters.STATUS_ON;
+            }
+            LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
+            {
+                light1.UseDirectionalPreset();
+                light1.status = LightParameters.STATUS_ON;
+                light1.intensities = new Vector4(0.8f,0.8f,0.8f,0);
+                light1.position = Vector4.Normalize(new Vector4(0,-1,0,0));
+            }
+
+            LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
+            {
+                light2.UseDirectionalPreset();
+                light2.status = LightParameters.STATUS_ON;
+                light2.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
+                light2.position = Vector4.Normalize(new Vector4(0, 1, 0, 0));
+            }
+
             LoadAllShaders();
         }
 

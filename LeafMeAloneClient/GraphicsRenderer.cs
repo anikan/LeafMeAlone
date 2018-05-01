@@ -41,9 +41,12 @@ namespace Client
         private static Texture2DDescription depthBufferDesc;
         private static Texture2D DepthBuffer;
         public static DepthStencilView DepthView;
-        private static DepthStencilState DepthState;
+        public static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
         private static RasterizerStateDescription Rasterizer;
+
+        public static BlendState BlendState;
+
         #endregion
 
 
@@ -52,7 +55,7 @@ namespace Client
             Rasterizer = new RasterizerStateDescription()
             {
                 FillMode = FillMode.Solid,
-                CullMode = CullMode.Back,
+                CullMode = CullMode.None,
                 IsFrontCounterclockwise = false,
                 IsDepthClipEnabled = true
             };
@@ -89,8 +92,26 @@ namespace Client
 
             DepthState = DepthStencilState.FromDescription(Device, dsStateDesc);
             DeviceContext.OutputMerger.DepthStencilState = DepthState;
-
         }
+
+        static void InitializeBlending()
+        {
+            BlendStateDescription bs = new BlendStateDescription()
+            {
+                AlphaToCoverageEnable = false,
+                IndependentBlendEnable = false
+            };
+            bs.RenderTargets[0].BlendEnable = true;
+            bs.RenderTargets[0].SourceBlend = BlendOption.Zero;
+            bs.RenderTargets[0].DestinationBlend = BlendOption.Zero;
+            bs.RenderTargets[0].BlendOperation = BlendOperation.Minimum;
+            bs.RenderTargets[0].SourceBlendAlpha = BlendOption.Zero;
+            bs.RenderTargets[0].DestinationBlendAlpha = BlendOption.Zero;
+            bs.RenderTargets[0].BlendOperationAlpha = BlendOperation.Minimum;
+            bs.RenderTargets[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+            BlendState = BlendState.FromDescription(Device, bs);
+        }
+
 
         /// <summary>
         /// Initialize graphics properties and create the main window.
@@ -127,6 +148,7 @@ namespace Client
 
             InitializeRasterizer();
             InitializeDepthBuffer();
+            InitializeBlending();
 
             Viewport = new Viewport(0.0f, 0.0f, Form.ClientSize.Width, Form.ClientSize.Height);
             //DeviceContext.OutputMerger.SetTargets(RenderTarget);

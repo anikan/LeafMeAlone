@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -32,7 +33,7 @@ namespace Client
 
 
         //number of particles emitted per 100 frames.
-        public int emissionRate = 1;
+        public int emissionRate = 10;
         public int maxParticles = 1000;
 
         public int size = Vector3.SizeInBytes * 4;
@@ -120,7 +121,7 @@ namespace Client
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
 
-            TexSRV = CreateTexture(@"../../fire.png");
+            TexSRV = CreateTexture(@"../../fire3.png");
         }
 
         public void UpdateBuffer()
@@ -167,11 +168,21 @@ namespace Client
             Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
             Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(TexSRV);
 
+           // var blendFactor = new Color4(1,1,1,1);
+            GraphicsRenderer.DeviceContext.OutputMerger.BlendState = GraphicsRenderer.BlendState;
+            //GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
+            GraphicsRenderer.DeviceContext.OutputMerger.BlendSampleMask = ~0;
 
+
+            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = null;
             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
 
             GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6,0,0);
-           //GraphicsRenderer.DeviceContext.Draw(Particles.Count * 3, 0);
+
+            GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
+            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
+
+            //GraphicsRenderer.DeviceContext.Draw(Particles.Count * 3, 0);
         }
 
         public override void Update()

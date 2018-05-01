@@ -1,11 +1,6 @@
 ﻿using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Client
 {
@@ -19,7 +14,7 @@ namespace Client
         // pass in the filepath to the shader, the vertex shader function name, and pixel shader function name
         public Shader(string p_filepath, string p_VS_name, string p_PS_name, InputElement[] p_elements)
         {
-            loadShader(p_filepath, p_VS_name, p_PS_name, p_elements);
+            LoadShader(p_filepath, p_VS_name, p_PS_name, p_elements);
         }
 
         // uses default name for the VS/PS functions
@@ -28,7 +23,7 @@ namespace Client
             string VS_name = "VS";
             string PS_name = "PS";
 
-            loadShader(p_filepath, VS_name, PS_name, p_elements);
+            LoadShader(p_filepath, VS_name, PS_name, p_elements);
         }
 
         // uses default element layout and VS/PS functions
@@ -43,10 +38,10 @@ namespace Client
             string VS_name = "VS";
             string PS_name = "PS";
 
-            loadShader(p_filepath, VS_name, PS_name, elem);
+            LoadShader(p_filepath, VS_name, PS_name, elem);
         }
 
-        private void loadShader(string p_filepath, string p_VS_name, string p_PS_name, InputElement[] p_elements)
+        private void LoadShader(string p_filepath, string p_VS_name, string p_PS_name, InputElement[] p_elements)
         {
             var vshader = ShaderBytecode.CompileFromFile(p_filepath, p_VS_name, "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);

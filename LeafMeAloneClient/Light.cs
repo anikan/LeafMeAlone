@@ -214,8 +214,8 @@ namespace Client
             coneAngle = 0.0f; // cone angle
             exponent = 0.0f; // spot exponent
             type = TYPE_DIRECTIONAL; // light type, set to directional
-            attenuationType = 0; // attenuation type, set to constant
-            status = 0; // light status, set to off
+            attenuationType = ATTENUATION_CONSTANT; // attenuation type, set to constant
+            status = STATUS_OFF; // light status, set to off
         }
 
         public void UsePointLightPreset()
@@ -228,8 +228,8 @@ namespace Client
             coneAngle = 0.0f; // cone angle
             exponent = 0.0f; // spot exponent
             type = TYPE_POINTLIGHT; // light type, set to directional
-            attenuationType = 1; // attenuation type, set to constant
-            status = 0; // light status, set to off
+            attenuationType = ATTENUATION_LINEAR; // attenuation type, set to constant
+            status = STATUS_OFF; // light status, set to off
         }
 
         public void UseSpotLightPreset()
@@ -242,8 +242,8 @@ namespace Client
             coneAngle = 15.0f.ToRadians(); // cone angle
             exponent = 32.0f; // spot exponent
             type = TYPE_SPOTLIGHT; // light type, set to directional
-            attenuationType = 1; // attenuation type, set to constant
-            status = 0; // light status, set to off
+            attenuationType = ATTENUATION_LINEAR; // attenuation type, set to constant
+            status = STATUS_OFF; // light status, set to off
         }
 
 

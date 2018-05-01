@@ -51,7 +51,9 @@ namespace Client
         public static void Init()
         {
             ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
-            ActiveLightSystem = new Light(20);
+            
+            // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
+            ActiveLightSystem = new Light(20);  
             LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
             {
                 light0.UseDirectionalPreset();

@@ -40,7 +40,7 @@ namespace Server
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            CreateLeaves(100, -10, 10, -10, 10);
+            //CreateLeaves(100, -10, 10, -10, 10);
 
         }
 
@@ -71,8 +71,6 @@ namespace Server
                 //Update the server players based on received packets.
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {
-
-
                     //playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
@@ -120,8 +118,8 @@ namespace Server
             gameObjectList.Add(newPlayer);
 
             //Note currently assuming players get ids 0-3
-            newActivePlayer.Transform.Position = spawnPoints[id];
-            newPlayer.Transform.Position = spawnPoints[id];
+            newActivePlayer.Transform.Position = spawnPoints[0];
+            newPlayer.Transform.Position = spawnPoints[0];
             
             CreateObjectPacket objPacket = 
                 new CreateObjectPacket(newPlayer);

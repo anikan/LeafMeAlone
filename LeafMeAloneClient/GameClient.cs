@@ -40,6 +40,8 @@ namespace Client
             GameClient Client = new GameClient();
             Client.Timer = new Stopwatch();
 
+            Client.gameObjects = new Dictionary<int, GameObjectClient>();
+
             GraphicsRenderer.Init();
 
             GraphicsManager.ActiveCamera =

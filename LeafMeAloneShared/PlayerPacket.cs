@@ -77,7 +77,9 @@ namespace Shared
         {
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
-            return ms.ToArray();
+            byte[] serializedObject = ms.ToArray();
+            return (new byte[] { (byte)PacketType.PlayerPacket })
+                            .Concat(serializedObject).ToArray();
         }
 
         /// <summary>

@@ -42,6 +42,7 @@ namespace Server
 
         public NetworkServer()
         {
+            clientSockets = new List<Socket>();
         }
 
         /// <summary>
@@ -185,9 +186,11 @@ namespace Server
                 state.sb.Append(Encoding.ASCII.GetString(
                     state.buffer, 0, bytesRead));
 
-                byte[] resizedBuffer = new byte[bytesRead];
+                byte[] resizedBuffer = new byte[bytesRead - 1];
 
-                Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
+                Buffer.BlockCopy(
+                    state.buffer, 1, resizedBuffer, 0, bytesRead - 1
+                    );
 
                 PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
 

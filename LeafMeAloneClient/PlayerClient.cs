@@ -38,7 +38,7 @@ namespace Client
 
         public PlayerClient() : base()
         {
-            SetModel(@"../../Models/Player_V2.fbx");
+            SetModel(@"../../Models/05.01.18_Version2.fbx");
             Transform.Rotation.Y += 180f.ToRadians();
         }
 

@@ -42,6 +42,7 @@ namespace Server
 
         public NetworkServer()
         {
+            clientSockets = new List<Socket>();
         }
 
         /// <summary>
@@ -145,6 +146,14 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Creates a new player in the game, sends it out to all the clients,
+        /// and then sends that active player to the clientSocket that is 
+        /// specified
+        /// </summary>
+        /// <param name="clientSocket">
+        /// The socket that needs an active player
+        /// </param>
         private void ProcessNewPlayer(Socket clientSocket)
         {
             GameObject player = GameServer.instance.CreateNewPlayer();
@@ -177,9 +186,11 @@ namespace Server
                 state.sb.Append(Encoding.ASCII.GetString(
                     state.buffer, 0, bytesRead));
 
-                byte[] resizedBuffer = new byte[bytesRead];
+                byte[] resizedBuffer = new byte[bytesRead - 1];
 
-                Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
+                Buffer.BlockCopy(
+                    state.buffer, 1, resizedBuffer, 0, bytesRead - 1
+                    );
 
                 PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
 

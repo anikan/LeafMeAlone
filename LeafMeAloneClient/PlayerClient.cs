@@ -18,7 +18,8 @@ namespace Client
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {
-            // Direction of movement the player is requesting. Should be between -1 and 1 each axis.
+            // Direction of movement the player is requesting. Should be 
+            // between -1 and 1 each axis.
             public Vector2 MovementRequested;
 
             // Amount of rotation the player is requested.
@@ -38,9 +39,11 @@ namespace Client
         public bool UsingToolPrimary { get; set; }
         public bool UsingToolSecondary { get; set; }
 
-        public PlayerClient() : base(PlayerModelPath)
+        public PlayerClient(CreateObjectPacket createPacket) : base(PlayerModelPath)
         {
-            Transform.Rotation.Y += 180f.ToRadians();
+            Id = createPacket.Id;
+            Transform.Position.X = createPacket.InitialX;
+            Transform.Position.Y = createPacket.InitialY;
         }
 
         /// <summary>
@@ -50,14 +53,16 @@ namespace Client
         public void RequestMove(Vector2 dir)
         {
 
-            // If the direction requested is non-zero in the X axis (account for floating point error).
+            // If the direction requested is non-zero in the X axis 
+            // (account for floating point error).
             if (dir.X < 0.0f - FLOAT_RANGE || dir.X > 0.0f + FLOAT_RANGE)
             {
                 // Request in the x direction.
                 PlayerRequests.MovementRequested.X = dir.X;
             }
 
-            // If the direction requested is non-zero in the Y axis (account for floating point error).
+            // If the direction requested is non-zero in the Y axis (account 
+            // for floating point error).
             if (dir.Y < 0.0f - FLOAT_RANGE || dir.Y > 0.0f + FLOAT_RANGE)
             {
                 //// Request in the y direction.
@@ -173,6 +178,7 @@ namespace Client
 
         }
 
+
         /// <summary>
         /// Updates the player's values based on a received packet.
         /// </summary>
@@ -186,6 +192,17 @@ namespace Client
             Transform.Position.X = packet.MovementX;
             Transform.Position.Y = packet.MovementY;
             Transform.Rotation.Y = packet.Rotation;
+        }
+
+        /// <summary>
+        /// Facade method which calls to the actual packet processor after 
+        /// casting
+        /// </summary>
+        /// <param name="packet">Abstract packet which gets casted to an actual 
+        /// object type</param>
+        public override void UpdateFromPacket(Packet packet)
+        {
+            UpdateFromPacket(packet as PlayerPacket);
         }
     }
 }

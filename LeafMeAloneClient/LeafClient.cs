@@ -23,5 +23,10 @@ namespace Client
         {
 
         }
+
+        public override void UpdateFromPacket(Packet packet)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

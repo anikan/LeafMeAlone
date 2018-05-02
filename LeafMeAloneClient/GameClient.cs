@@ -21,6 +21,7 @@ namespace Client
 
         private PlayerClient ActivePlayer;
         private InputManager InputManager;
+        private Dictionary<int, GameObjectClient> gameObjects;
 
         private Camera Camera => GraphicsManager.ActiveCamera;
 
@@ -36,18 +37,19 @@ namespace Client
 
         private static void Main()
         {
-
-
             GameClient Client = new GameClient();
             Client.Timer = new Stopwatch();
 
+            Client.gameObjects = new Dictionary<int, GameObjectClient>();
+
             GraphicsRenderer.Init();
 
-            Client.ActivePlayer = new PlayerClient();
+            GraphicsManager.ActiveCamera =
+                new Camera(
+                    new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY
+                    );
 
-            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
-            GraphicsManager.ActivePlayer = Client.ActivePlayer;
-
+            /*
             Client.leaves = new List<LeafClient>();
 
             for (int x = -5; x < 5; x++)
@@ -57,17 +59,10 @@ namespace Client
 
                     LeafClient newLeaf = new LeafClient();
                     newLeaf.Transform.Position = new Vector3(x * 5, 0.0f, y * 5);
-                    Client.leaves.Add(newLeaf);
-
-
+                    Client.GameObjects.Add(newLeaf.Id, newLeaf);
                 }
             }
-
-            // Set up the input manager.
-            Client.SetupInputManager();
-
-            GraphicsRenderer.Form.KeyDown += Client.InputManager.OnKeyDown;
-            GraphicsRenderer.Form.KeyUp += Client.InputManager.OnKeyUp;
+            */
 
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
@@ -111,15 +106,16 @@ namespace Client
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             ReceivePackets();
 
-            // Update input events.
-            InputManager.Update();
+            if (ActivePlayer != null)
+            {
+                // Update input events.
+                InputManager.Update();
+                // Send any packets to the server.
+                SendPackets();
 
-            // Send any packets to the server.
-            SendPackets();
+            }
 
-            // GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
             Update();
-
             Render();
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
@@ -129,60 +125,112 @@ namespace Client
         public GameClient()
         {
             networkClient.StartClient();
-            
+
             // Receive the response from the remote device.  
             //networkClient.Receive();
         }
 
+        /// <summary>
+        /// Updates each of the game object's models with the time
+        /// </summary>
         private void Update()
         {
             float delta = Timer.ElapsedMilliseconds;
 
-            ActivePlayer.Update(delta);
-
-            for (int i = 0; i < leaves.Count; i++)
+            foreach (KeyValuePair<int, GameObjectClient> kv in
+                gameObjects.AsEnumerable())
             {
-                leaves[i].Update(delta);
+                GameObjectClient gameObject = kv.Value;
+                gameObject.Update(delta);
             }
 
             Timer.Restart();
 
-
-        }
-
-        private void Render()
-        {
-
-       
-            ActivePlayer.Draw();
-
-            for (int i = 0; i < leaves.Count; i++)
-            {
-                leaves[i].Draw();
-            }
-
-
         }
 
         /// <summary>
-        /// Recieves packets from the server, updates the player
-        /// TODO: Make this hash the first 4 bytes into an object ID
+        /// Loops through the hashtable of gameobjects and draws them
+        /// </summary>
+        private void Render()
+        {
+            foreach (KeyValuePair<int, GameObjectClient> kv in
+                gameObjects.AsEnumerable())
+            {
+                GameObjectClient gameObject = kv.Value;
+                gameObject.Draw();
+            }
+        }
+
+
+        /// <summary>
+        /// Recieves packets from the server, updates objects or creates 
+        /// objects based on the packet type
         /// </summary>
         private void ReceivePackets()
         {
             // Receive the response from the remote device.  
             networkClient.Receive();
 
-            for (int i = 0; i < networkClient.PlayerPackets.Count(); i++)
+            foreach (Packet packet in networkClient.PacketQueue)
             {
-                ActivePlayer.UpdateFromPacket(networkClient.PlayerPackets[i]);
+                if (packet is CreateObjectPacket)
+                {
+                    CreateObjectFromPacket(packet as CreateObjectPacket);
+                }
+                else
+                {
+                    gameObjects.TryGetValue(
+                        packet.ObjectID, out GameObjectClient toUpdate);
+                    toUpdate.UpdateFromPacket(packet);
+                }
             }
 
-            networkClient.PlayerPackets.Clear();
+            networkClient.PacketQueue.Clear();
         }
 
         /// <summary>
+        /// Creates a new object from a given packet, whether that be a leaf 
+        /// or a player.
+        /// </summary>
+        /// <param name="createPacket"></param>
+        private void CreateObjectFromPacket(CreateObjectPacket createPacket)
+        {
+            switch (createPacket.objectType)
+            {
+                case (ObjectType.ACTIVE_PLAYER):
+                    InitializeUserPlayerAndMovement(createPacket);
+                    break;
+                case (ObjectType.PLAYER):
+                    gameObjects.Add(
+                        createPacket.Id, new PlayerClient(createPacket)
+                        );
+                    break;
+                case (ObjectType.LEAF):
+                    break;
+            }
+        }
 
+        /// <summary>
+        /// Creates the activeplayer object and hooks up the input so that the 
+        /// player moves
+        /// </summary>
+        /// <param name="createPacket">The createPacket that holds info 
+        /// on intitial pos, etc</param>
+        private void InitializeUserPlayerAndMovement(
+            CreateObjectPacket createPacket
+            )
+        {
+            ActivePlayer = new PlayerClient(createPacket);
+            GraphicsManager.ActivePlayer = ActivePlayer;
+            gameObjects.Add(ActivePlayer.Id, ActivePlayer);
+            // Set up the input manager.
+            SetupInputManager();
+            GraphicsRenderer.Form.KeyDown +=
+                InputManager.OnKeyDown;
+            GraphicsRenderer.Form.KeyUp += InputManager.OnKeyUp;
+        }
+
+        /// <summary>
         /// Sends out the data associated with the active player's input, resets requested movement
         /// </summary>
         private void SendPackets()
@@ -191,12 +239,12 @@ namespace Client
             PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
             byte[] data = PlayerPacket.Serialize(toSend);
             networkClient.Send(data);
-            
+
             // COMMENT OUT WHEN SERVER IS INTEGRATED
             /*ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,
                                                           ActivePlayer.Transform.Position.Y,
                                                           ActivePlayer.Transform.Position.Z - playerPack.Movement.Y * 0.01f );*/
-        
+
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
             ActivePlayer.ResetRequests();
@@ -207,7 +255,7 @@ namespace Client
         /// Sets up the input manager and relevant input events.
         /// </summary>
         private void SetupInputManager()
-        { 
+        {
             // Create an input manager for player events.
             InputManager = new InputManager(ActivePlayer);
 

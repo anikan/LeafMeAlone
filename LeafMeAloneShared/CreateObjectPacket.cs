@@ -19,7 +19,7 @@ namespace Shared
     {
 
         [ProtoMember(1)]
-        public long Id;
+        public int Id;
 
         [ProtoMember(2)]
         public float InitialX;
@@ -29,6 +29,8 @@ namespace Shared
 
         [ProtoMember(4)]
         public ObjectType objectType;
+
+        public CreateObjectPacket() { }
 
         public CreateObjectPacket(GameObject gameObject)
         {
@@ -46,10 +48,11 @@ namespace Shared
         {
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
+            byte[] serializedObject = ms.ToArray();
 
             // Add packetType as first byte, send over
             return (new byte[] { (byte)PacketType.CreateObjectPacket })
-                            .Concat(ms.ToArray()).ToArray();
+                            .Concat(serializedObject).ToArray();
         }
 
         /// <summary>

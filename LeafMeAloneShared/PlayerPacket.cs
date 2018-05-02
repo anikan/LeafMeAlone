@@ -75,11 +75,12 @@ namespace Shared
         /// <returns>the serialized packet</returns>
         public static byte[] Serialize(PlayerPacket packet)
         {
+            byte[] header = Packet.GetHeader(packet, PacketType.PlayerPacket);
+
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
             byte[] serializedObject = ms.ToArray();
-            return (new byte[] { (byte)PacketType.PlayerPacket })
-                            .Concat(serializedObject).ToArray();
+            return (header.Concat(serializedObject).ToArray());
         }
 
         /// <summary>
@@ -89,7 +90,7 @@ namespace Shared
         /// <returns>The deserialized playerpacket</returns>
         public static PlayerPacket Deserialize(byte[] data)
         {
-            return Serializer.Deserialize<PlayerPacket>(new MemoryStream(data));
+            return Serializer.Deserialize<PlayerPacket>(new MemoryStream(RemoveHeader(data)));
         }
 
         public override string ToString()

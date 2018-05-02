@@ -111,8 +111,8 @@ namespace Client
 
                 // Read everything but the first byte, which gives the packet
                 // Type
-                byte[] resizedBuffer = new byte[bytesRead - 1];
-                Buffer.BlockCopy(buffer, 1, resizedBuffer, 0, bytesRead - 1);
+                byte[] resizedBuffer = new byte[bytesRead];
+                Buffer.BlockCopy(buffer, 0, resizedBuffer, 0, bytesRead);
 
                 ProcessPacket((PacketType) buffer[0], resizedBuffer);
             }

@@ -43,6 +43,14 @@ namespace Client
         public static DepthStencilView DepthView;
         public static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
+
+
+        private static Texture2DDescription depthBufferDesc_off;
+        private static Texture2D DepthBuffer_off;
+        public static DepthStencilView DepthView_off;
+        public static DepthStencilState DepthState_off;
+        private static DepthStencilStateDescription dsStateDesc_off;
+
         public static RasterizerStateDescription Rasterizer;
 
         public static BlendState BlendState;
@@ -89,8 +97,16 @@ namespace Client
                 DepthWriteMask = DepthWriteMask.All,
                 DepthComparison = Comparison.Less,
             };
-
+            dsStateDesc_off = new DepthStencilStateDescription()
+            {
+                IsDepthEnabled = true,
+                IsStencilEnabled = false,
+                DepthWriteMask = DepthWriteMask.All,
+                DepthComparison = Comparison.Less,
+            };
+            DepthState_off = DepthStencilState.FromDescription(Device, dsStateDesc);
             DepthState = DepthStencilState.FromDescription(Device, dsStateDesc);
+
             DeviceContext.OutputMerger.DepthStencilState = DepthState;
         }
 
@@ -101,14 +117,24 @@ namespace Client
                 AlphaToCoverageEnable = false,
                 IndependentBlendEnable = false
             };
-            bs.RenderTargets[0].BlendEnable = true;
-            bs.RenderTargets[0].SourceBlend = BlendOption.SourceAlpha;
-            bs.RenderTargets[0].DestinationBlend = BlendOption.Zero;
-            bs.RenderTargets[0].BlendOperation = BlendOperation.Minimum;
-            bs.RenderTargets[0].SourceBlendAlpha = BlendOption.Zero;
-            bs.RenderTargets[0].DestinationBlendAlpha = BlendOption.Zero;
-            bs.RenderTargets[0].BlendOperationAlpha = BlendOperation.Minimum;
-            bs.RenderTargets[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+            for (int i = 0; i < bs.RenderTargets.Length; i++)
+            {
+                bs.RenderTargets[i].BlendEnable = true;
+                bs.RenderTargets[i].SourceBlend = BlendOption.One;
+                bs.RenderTargets[i].DestinationBlend = BlendOption.Zero;
+                bs.RenderTargets[i].BlendOperation = BlendOperation.Minimum;
+                bs.RenderTargets[i].SourceBlendAlpha = BlendOption.Zero;
+                bs.RenderTargets[i].DestinationBlendAlpha = BlendOption.One;
+                bs.RenderTargets[i].BlendOperationAlpha = BlendOperation.Minimum;
+                bs.RenderTargets[i].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+            }
+            //bs.RenderTargets[0].SourceBlend = BlendOption.SourceAlpha;
+            //bs.RenderTargets[0].DestinationBlend = BlendOption.Zero;
+            //bs.RenderTargets[0].BlendOperation = BlendOperation.Add;
+            //bs.RenderTargets[0].SourceBlendAlpha = BlendOption.One;
+            //bs.RenderTargets[0].DestinationBlendAlpha = BlendOption.Zero;
+            //bs.RenderTargets[0].BlendOperationAlpha = BlendOperation.Add;
+            //bs.RenderTargets[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
             BlendState = BlendState.FromDescription(Device, bs);
         }
 

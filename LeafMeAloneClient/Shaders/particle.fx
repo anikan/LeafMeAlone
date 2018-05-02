@@ -43,7 +43,8 @@ float4 PS(float4 iPosH  : SV_POSITION,
 	: SV_TARGET
 {
 	float4 ret = tex_diffuse.Sample(MeshTextureSampler, iTex);
-	//ret.a = .5;
+
+	//return float4(0,ret.y,ret.z,1.0f);
 	return ret;
 }
 

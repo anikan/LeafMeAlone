@@ -168,28 +168,15 @@ namespace Client
             Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
             Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(TexSRV);
 
-           // var blendFactor = new Color4(1,1,1,1);
+            var blendFactor = new Color4(1,1,1,1);
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = GraphicsRenderer.BlendState;
-            //GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
+            GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
             GraphicsRenderer.DeviceContext.OutputMerger.BlendSampleMask = ~0;
 
-            var noDepth = new RasterizerStateDescription()
-            {
-                FillMode = FillMode.Solid,
-                CullMode = CullMode.None,
-                IsFrontCounterclockwise = false,
-                IsDepthClipEnabled = false
-            };
-            GraphicsRenderer.DeviceContext.Rasterizer.State = RasterizerState.FromDescription(GraphicsRenderer.Device, noDepth);
-            Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
+            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState_off;
+             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
             GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6,0,0);
-
-            GraphicsRenderer.DeviceContext.Rasterizer.State = RasterizerState.FromDescription(GraphicsRenderer.Device, GraphicsRenderer.Rasterizer);
-
-            GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
-
-            //GraphicsRenderer.DeviceContext.Draw(Particles.Count * 3, 0);
         }
 
         public override void Update()

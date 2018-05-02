@@ -79,12 +79,13 @@ namespace Client
 
         public static Light ActiveLightSystem;
 
+        // the offset of the camera from the player. Can be changed anytime to update the camera
+        public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
+
         public static void Update()
         {
-            Vector3 pos = ActivePlayer.Transform.Position;
-            Vector3 offset = new Vector3(0, 50, -30);
-
-            ActiveCamera.MoveCamera(pos + offset, false);
+            // update the camera position based on the player position
+            ActiveCamera.MoveCameraAbsolute( ActivePlayer.Transform.Position + PlayerToCamOffset, ActivePlayer.Transform.Position );
         }
 
         /// <summary>

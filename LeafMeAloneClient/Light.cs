@@ -122,17 +122,22 @@ namespace Client
     
     public class LightParameters
     {
+        // some constants that describe the states of the lights
         public const int TYPE_DIRECTIONAL = 0;
         public const int TYPE_POINTLIGHT = 1;
         public const int TYPE_SPOTLIGHT = 2;
+
         public const int ATTENUATION_CONSTANT = 0;
         public const int ATTENUATION_LINEAR = 1;
         public const int ATTENUATION_QUADRATIC = 2;
+
         public const int STATUS_OFF = 0;
         public const int STATUS_ON = 1;
 
+        // struct size of light parameters in a corresponding shader
         public const int STRUCT_SIZE = sizeof(float) * 16 + sizeof(int) * 4;
 
+        // actual light parameters
         public Vector4 position; // also used as direction for directional light
         public Vector4 intensities; // a.k.a the color of the light
         public Vector4 coneDirection; // only needed for spotlights
@@ -204,6 +209,9 @@ namespace Client
             //stream.Write(stream, 0, structSize);
         }
 
+        /// <summary>
+        /// Make the current light a directional light that uses some preset parameters
+        /// </summary>
         public void UseDirectionalPreset()
         {
             position = new Vector4(Vector3.Normalize(new Vector3(-1.0f, -1.0f, -1.0f)), 0.0f); // light direction
@@ -218,6 +226,9 @@ namespace Client
             status = STATUS_OFF; // light status, set to off
         }
 
+        /// <summary>
+        /// Make the current light a point light that uses some preset parameters
+        /// </summary>
         public void UsePointLightPreset()
         {
             position = new Vector4(0, 5.0f, 0, 1.0f); // light direction
@@ -232,6 +243,9 @@ namespace Client
             status = STATUS_OFF; // light status, set to off
         }
 
+        /// <summary>
+        /// Make the current light a spot light that uses some preset parameters
+        /// </summary>
         public void UseSpotLightPreset()
         {
             position = new Vector4(0, 20.0f, 0.0f, 1.0f); // light direction

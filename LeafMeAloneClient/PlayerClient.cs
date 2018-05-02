@@ -152,7 +152,7 @@ namespace Client
 
             // TEMPORARY FOR TESTING
             // Set rotation of player
-            Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
+            //Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
 
         }
 

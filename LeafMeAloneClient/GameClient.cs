@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Client;
+using LeafMeAloneClient;
 using Shared;
 using SlimDX;
 using SlimDX.D3DCompiler;
@@ -29,6 +30,9 @@ namespace Client
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
+        /// 
+        private NetworkClient networkClient = new NetworkClient();
+
         private static void Main()
         {
             GameClient Client = new GameClient();
@@ -37,7 +41,8 @@ namespace Client
             GraphicsManager.Init();
 
             Client.ActivePlayer = new PlayerClient();
-            
+
+            //GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.
@@ -47,7 +52,7 @@ namespace Client
             GraphicsRenderer.Form.KeyUp += Client.InputManager.OnKeyUp;
 
             //TODO FOR TESTING ONLY
-            GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
+            //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
 
             
@@ -104,6 +109,14 @@ namespace Client
 
         }
 
+        public GameClient()
+        {
+            networkClient.StartClient();
+            
+            // Receive the response from the remote device.  
+            //networkClient.Receive();
+        }
+
         private void Render()
         {
             ActivePlayer.Update();
@@ -113,40 +126,50 @@ namespace Client
             p.Draw();
         }
 
+        /// <summary>
+        /// Recieves packets from the server, updates the player
+        /// TODO: Make this hash the first 4 bytes into an object ID
+        /// </summary>
         private void ReceivePackets()
         {
+            // Receive the response from the remote device.  
+            networkClient.Receive();
 
+            for (int i = 0; i < networkClient.PlayerPackets.Count(); i++)
+            {
+                ActivePlayer.UpdateFromPacket(networkClient.PlayerPackets[i]);
+            }
+
+            networkClient.PlayerPackets.Clear();
         }
 
         /// <summary>
-        /// Sends all packets this frame.
+
+        /// Sends out the data associated with the active player's input, resets requested movement
         /// </summary>
         private void SendPackets()
         {
-
             // Create a new player packet, and fill it with player's relevant info.
-            PlayerPacket playerPack = new PlayerPacket();
-
-            playerPack.Movement = ActivePlayer.MovementRequested;
-            playerPack.UsingToolPrimary = ActivePlayer.UseToolPrimaryRequest;
-            playerPack.UsingToolSecondary = ActivePlayer.UseToolSecondaryRequest;
-
-            Console.WriteLine(playerPack.ToString());
-
-            // TODO: SEND THE ACTUAL PACKET
-
+            PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
+            byte[] data = PlayerPacket.Serialize(toSend);
+            networkClient.Send(data);
+            
+            // COMMENT OUT WHEN SERVER IS INTEGRATED
+            /*ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,
+                                                          ActivePlayer.Transform.Position.Y,
+                                                          ActivePlayer.Transform.Position.Z - playerPack.Movement.Y * 0.01f );*/
+        
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
             ActivePlayer.ResetRequests();
-
         }
+
 
         /// <summary>
         /// Sets up the input manager and relevant input events.
         /// </summary>
         private void SetupInputManager()
-        {
-
+        { 
             // Create an input manager for player events.
             InputManager = new InputManager(ActivePlayer);
 
@@ -155,6 +178,7 @@ namespace Client
             GraphicsRenderer.Form.KeyUp += InputManager.OnKeyUp;
             GraphicsRenderer.Form.MouseDown += InputManager.OnMouseDown;
             GraphicsRenderer.Form.MouseUp += InputManager.OnMouseUp;
+            GraphicsRenderer.Form.MouseMove += InputManager.OnMouseMove;
         }
 
     }

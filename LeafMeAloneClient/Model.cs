@@ -133,19 +133,18 @@ namespace Client
             if (!m_Properties.Equals(m_PrevProperties))
             {
                 // prev properties = current properties
-                m_PrevProperties.copyToThis(m_Properties);
+                m_PrevProperties.CopyToThis(m_Properties);
 
                 m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
 
                 // set the rotation based on the three directions
                 m_ModelMatrix = m_ModelMatrix * Matrix.RotationX(m_Properties.Rotation.X) * 
                                 Matrix.RotationY(m_Properties.Rotation.Y) * 
-                                Matrix.RotationZ(m_Properties.Rotation.Z);
+                                Matrix.RotationZ(m_Properties.Rotation.Z) ;
 
                 // set the translation based on the position
-                m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position) ;
+                m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);
             }
         }
-
     }
 }

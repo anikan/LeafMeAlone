@@ -10,14 +10,14 @@ namespace Shared
     {
         public static Vector3 ToVector3(this Vector3D vector)
         {
-            return new Vector3(vector.X,vector.Y,vector.Z);
+            return new Vector3(vector.X, vector.Y, vector.Z);
         }
 
         public static float ToRadians(this float degrees)
         {
-            return degrees * ((float)Math.PI / 180.0f);
+            return degrees * ((float) Math.PI / 180.0f);
         }
-        
+
         public static void Copy(this Vector4 dest, Vector4 src)
         {
             dest.X = src.X;
@@ -47,7 +47,7 @@ namespace Shared
             dest.Y = src.Y;
             dest.Z = src.Z;
         }
-        
+
         public static float NextFloat(this Random r)
         {
             return (float) r.NextDouble();
@@ -57,9 +57,15 @@ namespace Shared
         {
             return r.NextFloat() * max;
         }
+
+
+        public static Vector4 Mult(this Matrix m, Vector4 multBy)
+        {
+            return Vector4.Transform(multBy, Matrix.Transpose(m));
+        }
     }
 
-    // model properties
+// model properties
     public struct Transform
     {
         public Vector3 Position;  // location of the model in world coordinates
@@ -79,7 +85,7 @@ namespace Shared
 
         }
 
-        public void copyToThis(Transform other)
+        public void CopyToThis(Transform other)
         {
             Position.X = other.Position.X;
             Position.Y = other.Position.Y;
@@ -94,7 +100,10 @@ namespace Shared
             Scale.Z = other.Scale.Z;
 
         }
-        
 
+        public Vector2 Get2dPosition()
+        {
+            return new Vector2(Position.X, Position.Y);
+        }
     }
 }

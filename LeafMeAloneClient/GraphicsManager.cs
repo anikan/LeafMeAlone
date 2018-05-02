@@ -33,8 +33,47 @@ namespace Client
         /// ActiveCamera contains the currently active camera.
         /// </summary>
         public static Camera ActiveCamera;
-
+        
+        // Current player.
         public static PlayerClient ActivePlayer;
+
+        // Converts a screen point to a world position.
+        // Converts a screen point to a world position.
+        public static Vector3 ScreenToWorldPoint(Vector2 screenPos)
+        {
+
+            // Get the view and projection matrices
+            Matrix viewMat = ActiveCamera.m_ViewMatrix;
+            Matrix projectMat = GraphicsRenderer.ProjectionMatrix;
+
+            // Multiply them together and take inverse
+            Matrix resultMat = viewMat * projectMat;
+            resultMat.Invert();
+
+            // Args for a vector
+            float[] args = new float[4];
+            float winZ = 1.0f;
+
+            // Calculate vector arguments for final vector
+            args[0] = (2.0f * ((float)(screenPos.X - 0) / (GraphicsRenderer.Form.Width - 0))) - 1.0f;
+            args[1] = 1.0f - (2.0f * ((float)(screenPos.Y - 0) / (GraphicsRenderer.Form.Height - 0)));
+            args[2] = 2.0f * winZ - 1.0f;
+            args[3] = 1.0f;
+
+            // Fill vector with arguments and multiply the view/projection matrix inverse.
+            Vector4 vArg = new Vector4(args[0], args[1], args[2], args[3]);
+            Vector4 pos = Vector4.Transform(vArg, resultMat);
+
+            pos.W = 1.0f / pos.W;
+
+            // Multiply all args by last arg
+            pos.X *= pos.W;
+            pos.Y *= pos.W;
+            pos.Z *= pos.W;
+
+            // Return final position in world space.
+            return new Vector3(pos.X, pos.Y, pos.Z);
+        }
 
         public static Shader ActiveShader;
 
@@ -50,8 +89,8 @@ namespace Client
         /// </summary>
         public static void Init()
         {
-            ActiveCamera = new Camera(new Vector3(0, 0, -10), Vector3.Zero, Vector3.UnitY);
-            
+            ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
+
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  
             LightParameters light0 = ActiveLightSystem.GetLightParameters(0);

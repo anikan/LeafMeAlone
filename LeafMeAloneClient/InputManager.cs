@@ -21,7 +21,10 @@ namespace Client
 
         // List of the keys that are currently being pressed.
         public List<Keys> KeysPressed;
-        MouseButtons MouseButtonPressed = MouseButtons.None;
+        public MouseButtons MouseButtonPressed = MouseButtons.None;
+
+        public Vector2 lastMousePos;
+        public PlayerClient userPlayer;
 
         /// <summary>
         /// Constructor for the input manager. Should take in a player that will respond to input events.
@@ -29,6 +32,9 @@ namespace Client
         /// <param name="userPlayer"></param>
         public InputManager(PlayerClient userPlayer)
         {
+
+            this.userPlayer = userPlayer;
+
             // Initialize structures.
             KeysPressed = new List<Keys>();
 
@@ -137,9 +143,15 @@ namespace Client
         }
 
         // Mouse movement event handler.
-        public void OnMouseMove(Vector2 mousePosition)
+        public void OnMouseMove(object sender, MouseEventArgs args)
         {
-            // TODO
+            // Get the new position of the mouse.
+            Vector2 mousePos = new Vector2(args.X, args.Y);
+
+            userPlayer.RequestLookAtScreenSpace(mousePos);
+
+            // Updaate last mouse position.
+           // lastMousePos = mousePos;
         }
     }
 }

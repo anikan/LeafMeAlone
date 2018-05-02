@@ -14,6 +14,12 @@ using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace Client
 {
+    public enum ParticleSystemType
+    {
+        FIRE,
+        WIND
+    }
+
     public class ParticleSystem : GameObject
     {
         //list of particles in the system.
@@ -54,10 +60,11 @@ namespace Client
         /// <summary>
         /// Make a new particle system.
         /// </summary>
+        /// <param name="type"></param>
         /// <param name="sizedelta"></param>
         /// <param name="emissionrate"></param>
         /// <param name="maxparticles"></param>
-        public ParticleSystem(float sizedelta = .15f, int emissionrate = 1, int maxparticles = 1000)
+        public ParticleSystem(ParticleSystemType type, float sizedelta = .15f, int emissionrate = 1, int maxparticles = 1000)
         {
             delta = sizedelta;
             emissionRate = emissionrate;
@@ -131,7 +138,18 @@ namespace Client
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
 
-            TexSRV = CreateTexture(@"../../Particles/fire3.png");
+            switch (type)
+            {
+                case ParticleSystemType.FIRE:
+                    TexSRV = CreateTexture(@"../../Particles/fire3.png");
+                    break;
+                case ParticleSystemType.WIND:
+                    TexSRV = CreateTexture(@"../../Particles/wind.png");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+            
         }
 
         /// <summary>

@@ -56,7 +56,7 @@ namespace Client
 
 
             
-            Client.p =new ParticleSystem();
+            Client.p =new ParticleSystem(ParticleSystemType.WIND);
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 

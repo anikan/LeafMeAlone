@@ -33,14 +33,14 @@ namespace Client
 
 
         //number of particles emitted per 100 frames.
-        public int emissionRate = 10;
+        public int emissionRate = 1;
         public int maxParticles = 1000;
 
         public int size = Vector3.SizeInBytes * 4;
 
 
 
-        float delta = .1f;
+        float delta = .15f;
 
         private Random r;
         public ParticleSystem()
@@ -173,11 +173,18 @@ namespace Client
             //GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
             GraphicsRenderer.DeviceContext.OutputMerger.BlendSampleMask = ~0;
 
-
-            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = null;
+            var noDepth = new RasterizerStateDescription()
+            {
+                FillMode = FillMode.Solid,
+                CullMode = CullMode.None,
+                IsFrontCounterclockwise = false,
+                IsDepthClipEnabled = false
+            };
+            GraphicsRenderer.DeviceContext.Rasterizer.State = RasterizerState.FromDescription(GraphicsRenderer.Device, noDepth);
             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
-
             GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6,0,0);
+
+            GraphicsRenderer.DeviceContext.Rasterizer.State = RasterizerState.FromDescription(GraphicsRenderer.Device, GraphicsRenderer.Rasterizer);
 
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
@@ -202,7 +209,7 @@ namespace Client
                     }
                 }
 
-                particle.Force = new Vector3(r.NextFloat(), r.Range(10) - 5.0f, r.NextFloat());
+                particle.Force = new Vector3(r.NextFloat(), particle.LifeRemaining - r.Range(10) , r.NextFloat());
                 particle.Update(.001f);
             }
             UpdateBuffer();

@@ -43,7 +43,7 @@ namespace Client
         public static DepthStencilView DepthView;
         public static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
-        private static RasterizerStateDescription Rasterizer;
+        public static RasterizerStateDescription Rasterizer;
 
         public static BlendState BlendState;
 
@@ -102,7 +102,7 @@ namespace Client
                 IndependentBlendEnable = false
             };
             bs.RenderTargets[0].BlendEnable = true;
-            bs.RenderTargets[0].SourceBlend = BlendOption.Zero;
+            bs.RenderTargets[0].SourceBlend = BlendOption.SourceAlpha;
             bs.RenderTargets[0].DestinationBlend = BlendOption.Zero;
             bs.RenderTargets[0].BlendOperation = BlendOperation.Minimum;
             bs.RenderTargets[0].SourceBlendAlpha = BlendOption.Zero;

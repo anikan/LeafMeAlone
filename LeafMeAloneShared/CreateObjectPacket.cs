@@ -62,7 +62,11 @@ namespace Shared
         /// <returns>The deserialized playerpacket</returns>
         public static CreateObjectPacket Deserialize(byte[] data)
         {
-            return Serializer.Deserialize<CreateObjectPacket>(new MemoryStream(data));
+            // Remove packet type
+            data = data.Skip(1).ToArray();
+            return Serializer.Deserialize<CreateObjectPacket>(
+                new MemoryStream(data)
+                );
         }
     }
 }

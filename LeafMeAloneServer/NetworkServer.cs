@@ -186,10 +186,10 @@ namespace Server
                 state.sb.Append(Encoding.ASCII.GetString(
                     state.buffer, 0, bytesRead));
 
-                byte[] resizedBuffer = new byte[bytesRead - 1];
+                byte[] resizedBuffer = new byte[bytesRead];
 
                 Buffer.BlockCopy(
-                    state.buffer, 1, resizedBuffer, 0, bytesRead - 1
+                    state.buffer, 0, resizedBuffer, 0, bytesRead
                     );
 
                 PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);

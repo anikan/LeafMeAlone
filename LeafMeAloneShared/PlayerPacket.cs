@@ -89,6 +89,8 @@ namespace Shared
         /// <returns>The deserialized playerpacket</returns>
         public static PlayerPacket Deserialize(byte[] data)
         {
+            // Remove packet type
+            data = data.Skip(1).ToArray();
             return Serializer.Deserialize<PlayerPacket>(new MemoryStream(data));
         }
 

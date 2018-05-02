@@ -17,7 +17,7 @@ namespace Server
         private Vector3 Velocity;
         private float Mass = 1.0f;
 
-        private float FakeFrictionFactor = 0.1f;
+        private float FakeFrictionFactor = 0.2f;
 
         private Vector3 Force;
 
@@ -47,12 +47,15 @@ namespace Server
 
             Force = Vector3.Zero;
 
-        }
+            ApplyFakeFriction();
 
+        }
+        
         public void ApplyFakeFriction()
         {
 
-            // Add in some friction stuff here.
+            Vector3 FakeFriction = -Velocity * FakeFrictionFactor;
+            ApplyForce(FakeFriction);
 
         }
     }

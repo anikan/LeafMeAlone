@@ -81,7 +81,10 @@ namespace Client
 
         public static void Update()
         {
+            Vector3 pos = ActivePlayer.Transform.Position;
+            Vector3 offset = new Vector3(0, 50, -30);
 
+            ActiveCamera.MoveCamera(pos + offset, false);
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ using SlimDX;
 
 namespace Server
 {
-    class LeafServer : PhysicsObject, ILeaf
+    public class LeafServer : PhysicsObject, ILeaf
     {
         public bool Burning { get; set; }
         public float TimeBurning { get; set; }
@@ -48,7 +48,7 @@ namespace Server
         {
             
             // Get the player's equipped tool.
-            ToolInfo equippedToolInfo = Tool.GetToolInfo(player.ToolEquipped);
+            ToolInfo equippedToolInfo = Tool.GetToolInfo(player. ToolEquipped);
 
             // Check if the leaf is within range of the player.
             if (GetDistanceToPlayer(player) <= equippedToolInfo.Range)

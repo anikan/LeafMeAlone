@@ -16,6 +16,7 @@ namespace Server
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
 
         public List<GameObject> gameObjectList = new List<GameObject>();
+        public List<LeafServer> LeafList = new List<LeafServer>();
 
         private NetworkServer networkServer = new NetworkServer();
 
@@ -149,6 +150,7 @@ namespace Server
                 LeafServer newLeaf = new LeafServer();
                 newLeaf.Transform.Position = pos;
                 gameObjectList.Add(newLeaf);
+                LeafList.Add(newLeaf);
 
                 Console.WriteLine("Creating leaf at position " + pos);
             }

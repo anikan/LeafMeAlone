@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,6 +25,8 @@ namespace Client
 
         private Camera Camera => GraphicsManager.ActiveCamera;
 
+        private ParticleSystem p;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -35,10 +38,11 @@ namespace Client
             GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
+            GraphicsManager.Init();
 
             Client.ActivePlayer = new PlayerClient();
 
-            GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
+            //GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
 
             // Set up the input manager.
@@ -50,10 +54,13 @@ namespace Client
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
+
+            
+            Client.p =new ParticleSystem();
+
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
-
         }
 
 
@@ -85,7 +92,6 @@ namespace Client
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
             ReceivePackets();
 
@@ -96,7 +102,7 @@ namespace Client
             SendPackets();
 
             //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
-
+            GraphicsManager.Update();
             Render();
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
@@ -115,6 +121,9 @@ namespace Client
         {
             ActivePlayer.Update();
             ActivePlayer.Draw();
+
+            p.Update();
+            p.Draw();
         }
 
         /// <summary>

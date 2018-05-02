@@ -39,11 +39,18 @@ namespace Client
 
         #region Depth Buffer and Rasterizer
         private static Texture2DDescription depthBufferDesc;
-        private static Texture2D DepthBuffer;
+        private static Texture2D depthBuffer;
         public static DepthStencilView DepthView;
-        private static DepthStencilState DepthState;
+        public static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
-        private static RasterizerStateDescription Rasterizer;
+        
+        public static DepthStencilState DepthStateOff;
+        private static DepthStencilStateDescription dsStateDescOff;
+
+        public static RasterizerStateDescription Rasterizer;
+
+        public static BlendState BlendState;
+
         #endregion
 
 
@@ -52,7 +59,7 @@ namespace Client
             Rasterizer = new RasterizerStateDescription()
             {
                 FillMode = FillMode.Solid,
-                CullMode = CullMode.Back,
+                CullMode = CullMode.None,
                 IsFrontCounterclockwise = false,
                 IsDepthClipEnabled = true
             };
@@ -76,8 +83,8 @@ namespace Client
                 Usage = ResourceUsage.Default
             };
 
-            DepthBuffer = new Texture2D(Device, depthBufferDesc);
-            DepthView = new DepthStencilView(Device, DepthBuffer);
+            depthBuffer = new Texture2D(Device, depthBufferDesc);
+            DepthView = new DepthStencilView(Device, depthBuffer);
 
             dsStateDesc = new DepthStencilStateDescription()
             {
@@ -86,11 +93,47 @@ namespace Client
                 DepthWriteMask = DepthWriteMask.All,
                 DepthComparison = Comparison.Less,
             };
-
+            dsStateDescOff = new DepthStencilStateDescription()
+            {
+                IsDepthEnabled = true,
+                IsStencilEnabled = false,
+                DepthWriteMask = DepthWriteMask.All,
+                DepthComparison = Comparison.Less,
+            };
+            DepthStateOff = DepthStencilState.FromDescription(Device, dsStateDescOff);
             DepthState = DepthStencilState.FromDescription(Device, dsStateDesc);
-            DeviceContext.OutputMerger.DepthStencilState = DepthState;
 
+            DeviceContext.OutputMerger.DepthStencilState = DepthState;
         }
+
+        static void InitializeBlending()
+        {
+            BlendStateDescription bs = new BlendStateDescription()
+            {
+                AlphaToCoverageEnable = false,
+                IndependentBlendEnable = false
+            };
+            for (int i = 0; i < bs.RenderTargets.Length; i++)
+            {
+                bs.RenderTargets[i].BlendEnable = true;
+                bs.RenderTargets[i].SourceBlend = BlendOption.One;
+                bs.RenderTargets[i].DestinationBlend = BlendOption.Zero;
+                bs.RenderTargets[i].BlendOperation = BlendOperation.Minimum;
+                bs.RenderTargets[i].SourceBlendAlpha = BlendOption.Zero;
+                bs.RenderTargets[i].DestinationBlendAlpha = BlendOption.One;
+                bs.RenderTargets[i].BlendOperationAlpha = BlendOperation.Minimum;
+                bs.RenderTargets[i].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+            }
+            //bs.RenderTargets[0].SourceBlend = BlendOption.SourceAlpha;
+            //bs.RenderTargets[0].DestinationBlend = BlendOption.Zero;
+            //bs.RenderTargets[0].BlendOperation = BlendOperation.Add;
+            //bs.RenderTargets[0].SourceBlendAlpha = BlendOption.One;
+            //bs.RenderTargets[0].DestinationBlendAlpha = BlendOption.Zero;
+            //bs.RenderTargets[0].BlendOperationAlpha = BlendOperation.Add;
+            //bs.RenderTargets[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+            BlendState = BlendState.FromDescription(Device, bs);
+        }
+
 
         /// <summary>
         /// Initialize graphics properties and create the main window.
@@ -127,6 +170,7 @@ namespace Client
 
             InitializeRasterizer();
             InitializeDepthBuffer();
+            InitializeBlending();
 
             Viewport = new Viewport(0.0f, 0.0f, Form.ClientSize.Width, Form.ClientSize.Height);
             //DeviceContext.OutputMerger.SetTargets(RenderTarget);

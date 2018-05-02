@@ -39,17 +39,13 @@ namespace Client
 
         #region Depth Buffer and Rasterizer
         private static Texture2DDescription depthBufferDesc;
-        private static Texture2D DepthBuffer;
+        private static Texture2D depthBuffer;
         public static DepthStencilView DepthView;
         public static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
-
-
-        private static Texture2DDescription depthBufferDesc_off;
-        private static Texture2D DepthBuffer_off;
-        public static DepthStencilView DepthView_off;
-        public static DepthStencilState DepthState_off;
-        private static DepthStencilStateDescription dsStateDesc_off;
+        
+        public static DepthStencilState DepthStateOff;
+        private static DepthStencilStateDescription dsStateDescOff;
 
         public static RasterizerStateDescription Rasterizer;
 
@@ -87,8 +83,8 @@ namespace Client
                 Usage = ResourceUsage.Default
             };
 
-            DepthBuffer = new Texture2D(Device, depthBufferDesc);
-            DepthView = new DepthStencilView(Device, DepthBuffer);
+            depthBuffer = new Texture2D(Device, depthBufferDesc);
+            DepthView = new DepthStencilView(Device, depthBuffer);
 
             dsStateDesc = new DepthStencilStateDescription()
             {
@@ -97,14 +93,14 @@ namespace Client
                 DepthWriteMask = DepthWriteMask.All,
                 DepthComparison = Comparison.Less,
             };
-            dsStateDesc_off = new DepthStencilStateDescription()
+            dsStateDescOff = new DepthStencilStateDescription()
             {
                 IsDepthEnabled = true,
                 IsStencilEnabled = false,
                 DepthWriteMask = DepthWriteMask.All,
                 DepthComparison = Comparison.Less,
             };
-            DepthState_off = DepthStencilState.FromDescription(Device, dsStateDesc);
+            DepthStateOff = DepthStencilState.FromDescription(Device, dsStateDescOff);
             DepthState = DepthStencilState.FromDescription(Device, dsStateDesc);
 
             DeviceContext.OutputMerger.DepthStencilState = DepthState;

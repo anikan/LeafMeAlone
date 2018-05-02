@@ -16,35 +16,53 @@ namespace Client
 {
     public class ParticleSystem : GameObject
     {
-
+        //list of particles in the system.
         public List<Particle> Particles = new List<Particle>();
 
-        private Buffer VBO_Verts, VBO_Colors, VBO_Tex;
-        private Buffer EBO;
-        private DataStream Verts, Colors, Tex,Faces;
 
+        //create buffers
+        private Buffer VBO_Verts, VBO_Tex;
+        private Buffer EBO;
+        private DataStream Verts, Tex,Faces;
         private InputElement[] Elements;
 
+
+        //create shader effects
         private InputLayout InputLayout;
         private Effect Effects;
         private EffectPass Pass;
 
+
+        //create texture
         private ShaderResourceView TexSRV;
 
-
-        //number of particles emitted per 100 frames.
+        
+        //how fast particles are emitted
         public int emissionRate = 1;
+
+        //max number of particles.
         public int maxParticles = 1000;
 
-        public int size = Vector3.SizeInBytes * 4;
+        private readonly int size = Vector3.SizeInBytes * 4;
 
+        //size of particles.
+        private float delta;
 
-
-        float delta = .15f;
-
+        //random for use in forces.
         private Random r;
-        public ParticleSystem()
+
+        /// <summary>
+        /// Make a new particle system.
+        /// </summary>
+        /// <param name="sizedelta"></param>
+        /// <param name="emissionrate"></param>
+        /// <param name="maxparticles"></param>
+        public ParticleSystem(float sizedelta = .15f, int emissionrate = 1, int maxparticles = 1000)
         {
+            delta = sizedelta;
+            emissionRate = emissionrate;
+            maxParticles = maxparticles;
+
             r = new Random();
 
             for (int i = 0; i < maxParticles; i++)
@@ -53,14 +71,16 @@ namespace Client
             }
 
             Verts = new DataStream(Particles.Count * size, true, true);
-            Colors = new DataStream(Particles.Count * size, true, true);
             Faces = new DataStream(Particles.Count * sizeof(int) * 6,true,true);
             Tex = new DataStream(Particles.Count * size,true,true);
 
+            //calculate for quad
             for (var index = 0; index < Particles.Count; index++)
             {
                 var pt = Particles[index];
                 var initPos = pt.Position;
+
+                delta = (float)r.NextDouble() - .7f;
 
                 Vector3 topLeft_Both = new Vector3(initPos.X - delta,initPos.Y + delta, initPos.Z);
                 Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z); 
@@ -77,14 +97,7 @@ namespace Client
                 Tex.Write(new Vector3(1f, 1f, 0f));
                 Tex.Write(new Vector3(0f, 1f, 0f));
                 Tex.Write(new Vector3(1f, 0f, 0f));
-
-                Vector3 color = new Vector3((float) r.NextDouble(), (float) r.NextDouble(), (float) r.NextDouble());
-                Colors.Write(color);
-                Colors.Write(color);
-                Colors.Write(color);
-                Colors.Write(color);
-
-
+                
                 Faces.Write(index * 4);
                 Faces.Write((index * 4) + 2);
                 Faces.Write((index * 4) + 1);
@@ -94,12 +107,10 @@ namespace Client
 
             }
             Verts.Position = 0;
-            Colors.Position = 0;
             Faces.Position = 0;
             Tex.Position = 0;
 
             VBO_Verts = new Buffer(GraphicsRenderer.Device, Verts, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            VBO_Colors = new Buffer(GraphicsRenderer.Device, Colors, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(int), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             var btcode = ShaderBytecode.CompileFromFile(@"../../Shaders/particle.fx", "VS", "vs_4_0", ShaderFlags.None,
@@ -115,15 +126,17 @@ namespace Client
             Elements = new[]
             {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
-               // new InputElement("COLOR", 0, Format.R32G32B32_Float, 1),
                 new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 1)
             };
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
 
-            TexSRV = CreateTexture(@"../../fire3.png");
+            TexSRV = CreateTexture(@"../../Particles/fire3.png");
         }
 
+        /// <summary>
+        /// Update the buffers.
+        /// </summary>
         public void UpdateBuffer()
         {
             Verts.Position = 0;
@@ -151,13 +164,14 @@ namespace Client
 
         }
 
-
+        /// <summary>
+        /// Draw to the screen.
+        /// </summary>
         public override void Draw()
         {
             GraphicsRenderer.DeviceContext.InputAssembler.InputLayout = InputLayout;
             GraphicsRenderer.DeviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO_Verts, Vector3.SizeInBytes, 0));
-            //GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBO_Colors, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBO_Tex, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO,Format.R32_UInt,0);
 
@@ -173,12 +187,16 @@ namespace Client
             GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
             GraphicsRenderer.DeviceContext.OutputMerger.BlendSampleMask = ~0;
 
-            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState_off;
+            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthStateOff;
              Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
             GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6,0,0);
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
+            GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
         }
 
+        /// <summary>
+        /// Update the particles.
+        /// </summary>
         public override void Update()
         {
             int emissionThisFrame = 0;
@@ -202,6 +220,12 @@ namespace Client
             UpdateBuffer();
         }
 
+
+        /// <summary>
+        /// Create new texture.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         private ShaderResourceView CreateTexture(string fileName)
         {
             return File.Exists(fileName) ? ShaderResourceView.FromFile(GraphicsRenderer.Device, fileName) : null;

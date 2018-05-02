@@ -200,17 +200,28 @@ namespace Server
         }
 
         /// <summary>
-        /// Given a player, generate a PlayerPacket and send it.
+        /// Given an object, generate a player or object packet and send it.
         /// </summary>
-        /// <param name="player">Player to send.</param>
-        /* public void SendPlayer(PlayerServer player)
+        /// <param name="gameObject">Object to send.</param>
+        public void SendObject(GameObject gameObject)
         {
-            PlayerPacket packet = ServerPacketFactory.CreatePacket(player);
+            byte[] data = null;
+            if (gameObject is PlayerServer)
+            {
+                PlayerPacket packet = ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
 
-            //Console.WriteLine("Sending packet {0}.", packet.ToString());
+                data = PlayerPacket.Serialize(packet);
+            }
 
-            Send(clientSocket, PlayerPacket.Serialize(packet));
-        } */
+            else
+            {
+                //packet = ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
+
+                //data = PlayerPacket.Serialize(packet);
+            }
+
+            SendAll(data);
+        } 
 
         /// <summary>
         /// Send the byteData to the socket.

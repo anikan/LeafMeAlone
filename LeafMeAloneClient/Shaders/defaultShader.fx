@@ -49,6 +49,7 @@ SamplerState MeshTextureSampler
 	AddressV = Wrap;
 };
 
+// Vertex shader, handles the positioning of the vertices
 void VS(float4 iPosL  : POSITION,
 		float4 iNormL : NORMAL,
 		float3 iTex : TEXTURE,
@@ -65,6 +66,7 @@ void VS(float4 iPosL  : POSITION,
 	oTex = float2(iTex.x, iTex.y);
 }
 
+// Pixel shader, handles coloring each pixel
 float4 PS(float4 iPosHProj  : SV_POSITION, 
 
 		float4 PositionObj : W_POSITION,

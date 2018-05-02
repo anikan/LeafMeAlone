@@ -57,6 +57,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="LeafClient.cs" />
+    <Compile Include="MapClient.cs" />
     <Compile Include="NetworkClient.cs" />
     <Compile Include="GameObjectClient.cs" />
     <Compile Include="Geometry.cs" />

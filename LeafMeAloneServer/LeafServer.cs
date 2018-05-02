@@ -55,7 +55,8 @@ namespace Server
             {
 
                 // Get the forward vector of the player.
-                Vector3 PlayerForward = player.Transform.Forward;
+                // TODO: Have an actual Transform.Forward
+                Vector3 PlayerForward = Vector3.Zero;// player.Transform.Forward;
                 PlayerForward.Y = 0.0f;
 
                 // Get the vector from the player to the leaf.

@@ -31,17 +31,6 @@ namespace Shared
         public Vector3 Rotation; // euler coordinate that represents the direction the object is facing
         public Vector3 Scale;     // scale of the model
 
-        public Vector3 Forward
-        {
-            get
-            {
-                float X = (float)Math.Cos(Rotation.Y) * (float)Math.Cos(Rotation.X);
-                float Y = (float)Math.Sin(Rotation.Y) * (float)Math.Cos(Rotation.X);
-                float Z = (float)Math.Sin(Rotation.X);
-                return new Vector3(X, Y, Z);
-            }
-        }
-
         // check if the objects are logically equivalent to each other
         public override bool Equals(object other)
         {

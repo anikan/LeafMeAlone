@@ -7,7 +7,7 @@ using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
-
+using AntTweakBar;
 
 namespace Client
 {
@@ -77,6 +77,8 @@ namespace Client
 
         public static Shader ActiveShader;
 
+        public static Bar bar;
+
         public static Light ActiveLightSystem;
 
         // the offset of the camera from the player. Can be changed anytime to update the camera
@@ -120,6 +122,7 @@ namespace Client
             }
 
             LoadAllShaders();
+            
         }
 
         /// <summary>

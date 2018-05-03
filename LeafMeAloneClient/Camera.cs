@@ -85,21 +85,23 @@ namespace Client
         /// move the camera by delta (by default)
         /// can also specify the camera absolute position
         /// </summary>
-        /// <param name="delta"> move the camera by delta. If it is isRelative, the change is additve; otherwise it is absolute </param>
-        /// <param name="isRelative"> set whether or not the move is relative; true by default </param>
-        public void MoveCamera( Vector3 delta, bool isRelative=true )
+        /// <param name="delta"> move the camera by delta without changing the angle </param>
+        public void MoveCameraRelative ( Vector3 delta )
         {
-            if (isRelative)
-            {
-                m_CameraPosition += delta;
-                m_CameraLookAt += delta;
-            }
-            else
-            {
-                Vector3 diff = delta - m_CameraPosition;
-                m_CameraPosition = delta;
-                m_CameraLookAt = m_CameraLookAt + diff;
-            }
+            m_CameraPosition += delta;
+            m_CameraLookAt += delta;
+            UpdateCameraView();
+        }
+
+        /// <summary>
+        /// Move the camera to an absolute position, looking at another absolute position
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="lookat"></param>
+        public void MoveCameraAbsolute(Vector3 pos, Vector3 lookat)
+        {
+            m_CameraPosition = pos;
+            m_CameraLookAt = lookat;
             UpdateCameraView();
         }
 

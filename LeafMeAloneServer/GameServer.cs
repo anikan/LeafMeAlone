@@ -101,9 +101,7 @@ namespace Server
             {
                 gameObjectList[i].Update(deltaTime);
             }
-
         }
-
 
         public PlayerServer CreateNewPlayer()
         {

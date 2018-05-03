@@ -46,13 +46,12 @@ namespace Shared
         /// <returns>the serialized packet</returns>
         public static byte[] Serialize(CreateObjectPacket packet)
         {
+            byte[] header = Packet.GetHeader(packet, PacketType.CreateObjectPacket);
+
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
             byte[] serializedObject = ms.ToArray();
-
-            // Add packetType as first byte, send over
-            return (new byte[] { (byte)PacketType.CreateObjectPacket })
-                            .Concat(serializedObject).ToArray();
+            return (header.Concat(serializedObject).ToArray());
         }
 
         /// <summary>
@@ -62,10 +61,8 @@ namespace Shared
         /// <returns>The deserialized playerpacket</returns>
         public static CreateObjectPacket Deserialize(byte[] data)
         {
-            // Remove packet type
-            data = data.Skip(1).ToArray();
             return Serializer.Deserialize<CreateObjectPacket>(
-                new MemoryStream(data)
+                new MemoryStream(RemoveHeader(data))
                 );
         }
     }

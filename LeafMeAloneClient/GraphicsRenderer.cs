@@ -111,26 +111,24 @@ namespace Client
             BlendStateDescription bs = new BlendStateDescription()
             {
                 AlphaToCoverageEnable = false,
-                IndependentBlendEnable = false
+                IndependentBlendEnable = false,
             };
             for (int i = 0; i < bs.RenderTargets.Length; i++)
             {
                 bs.RenderTargets[i].BlendEnable = true;
-                bs.RenderTargets[i].SourceBlend = BlendOption.One;
-                bs.RenderTargets[i].DestinationBlend = BlendOption.Zero;
-                bs.RenderTargets[i].BlendOperation = BlendOperation.Minimum;
+                bs.RenderTargets[i].BlendOperation = BlendOperation.Add;
+                bs.RenderTargets[i].SourceBlend = BlendOption.SourceAlpha;
+                bs.RenderTargets[i].DestinationBlend = BlendOption.InverseSourceAlpha;
+
+
+                bs.RenderTargets[i].BlendOperationAlpha = BlendOperation.Add;
                 bs.RenderTargets[i].SourceBlendAlpha = BlendOption.Zero;
-                bs.RenderTargets[i].DestinationBlendAlpha = BlendOption.One;
-                bs.RenderTargets[i].BlendOperationAlpha = BlendOperation.Minimum;
+                bs.RenderTargets[i].DestinationBlendAlpha = BlendOption.Zero;
+
+
+
                 bs.RenderTargets[i].RenderTargetWriteMask = ColorWriteMaskFlags.All;
             }
-            //bs.RenderTargets[0].SourceBlend = BlendOption.SourceAlpha;
-            //bs.RenderTargets[0].DestinationBlend = BlendOption.Zero;
-            //bs.RenderTargets[0].BlendOperation = BlendOperation.Add;
-            //bs.RenderTargets[0].SourceBlendAlpha = BlendOption.One;
-            //bs.RenderTargets[0].DestinationBlendAlpha = BlendOption.Zero;
-            //bs.RenderTargets[0].BlendOperationAlpha = BlendOperation.Add;
-            //bs.RenderTargets[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
             BlendState = BlendState.FromDescription(Device, bs);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ namespace Client
 
         private static void Main()
         {
+            //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
             GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
@@ -56,7 +58,7 @@ namespace Client
 
 
             
-            Client.p =new ParticleSystem();
+            Client.p =new ParticleSystem(ParticleSystemType.FIRE);
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 

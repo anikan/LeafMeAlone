@@ -4,28 +4,13 @@ float4x4 gProj;
 
 uniform extern Texture2D tex_diffuse;
 
+//texture sampling
 SamplerState MeshTextureSampler
 {
 	Filter = MIN_MAG_MIP_LINEAR;
 	AddressU = Wrap;
 	AddressV = Wrap;
 };
-
-//void VS(float4 iPosL  : POSITION,
-//	float4 iColor : COLOR0,
-//	out float4 oPosH : SV_POSITION,
-//	out float4 oColor : COLOR0)
-//{
-//	float4x4 worldViewProj = mul(mul(gWorld, gView), gProj);
-//	oPosH = mul(iPosL, worldViewProj);
-//	oColor = iColor;
-//}
-//
-//
-//float4 PS(float4 iPosH  : SV_POSITION, float4 iColor : COLOR0) : SV_TARGET
-//{
-//	return iColor;
-//}
 
 
 void VS(float4 iPosL : POSITION,
@@ -44,7 +29,13 @@ float4 PS(float4 iPosH  : SV_POSITION,
 {
 	float4 ret = tex_diffuse.Sample(MeshTextureSampler, iTex);
 
-	//return float4(0,ret.y,ret.z,1.0f);
+	//need to enforce the branch is not taken before evaluation
+	[branch]
+	if (ret.a < .2f)
+	{
+		//clip all pixels getting here (dont render them)
+		clip(-1);
+	}
 	return ret;
 }
 

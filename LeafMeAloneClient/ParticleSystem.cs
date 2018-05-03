@@ -14,10 +14,19 @@ using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace Client
 {
+    public enum ParticleSystemType
+    {
+        FIRE,
+        WIND
+    }
+
     public class ParticleSystem : GameObject
     {
+        public bool Enabled = true;
+
+
         //list of particles in the system.
-        public List<Particle> Particles = new List<Particle>();
+        private List<Particle> Particles = new List<Particle>();
 
 
         //create buffers
@@ -54,10 +63,11 @@ namespace Client
         /// <summary>
         /// Make a new particle system.
         /// </summary>
+        /// <param name="type"></param>
         /// <param name="sizedelta"></param>
         /// <param name="emissionrate"></param>
         /// <param name="maxparticles"></param>
-        public ParticleSystem(float sizedelta = .15f, int emissionrate = 1, int maxparticles = 1000)
+        public ParticleSystem(ParticleSystemType type, float sizedelta = 1.0f, int emissionrate = 1, int maxparticles = 1000)
         {
             delta = sizedelta;
             emissionRate = emissionrate;
@@ -80,7 +90,7 @@ namespace Client
                 var pt = Particles[index];
                 var initPos = pt.Position;
 
-                delta = (float)r.NextDouble() - .7f;
+                //delta = (float)r.NextDouble() - .7f;
 
                 Vector3 topLeft_Both = new Vector3(initPos.X - delta,initPos.Y + delta, initPos.Z);
                 Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z); 
@@ -131,7 +141,18 @@ namespace Client
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
 
-            TexSRV = CreateTexture(@"../../Particles/fire3.png");
+            switch (type)
+            {
+                case ParticleSystemType.FIRE:
+                    TexSRV = CreateTexture(@"../../Particles/fire2.png");
+                    break;
+                case ParticleSystemType.WIND:
+                    TexSRV = CreateTexture(@"../../Particles/wind.png");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+            
         }
 
         /// <summary>
@@ -169,6 +190,8 @@ namespace Client
         /// </summary>
         public override void Draw()
         {
+            if (!Enabled) return;
+
             GraphicsRenderer.DeviceContext.InputAssembler.InputLayout = InputLayout;
             GraphicsRenderer.DeviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO_Verts, Vector3.SizeInBytes, 0));
@@ -177,19 +200,24 @@ namespace Client
 
 
             Effects.GetVariableByName("gWorld").AsMatrix().SetMatrix(Matrix.Identity);
-            Effects.GetVariableByName("gView").AsMatrix()
-                .SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
+            Effects.GetVariableByName("gView").AsMatrix().SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
             Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
             Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(TexSRV);
 
-            var blendFactor = new Color4(1,1,1,1);
+            //var blendFactor = new Color4(1,1,1,1);
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = GraphicsRenderer.BlendState;
-            GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
-            GraphicsRenderer.DeviceContext.OutputMerger.BlendSampleMask = ~0;
+            //GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
+            //GraphicsRenderer.DeviceContext.OutputMerger.BlendSampleMask = ~0;
 
+
+            //turn off depth for now
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthStateOff;
-             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
+
+            //apply pass
+            Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
             GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6,0,0);
+
+            //turn back on depth 
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
         }
@@ -199,6 +227,9 @@ namespace Client
         /// </summary>
         public override void Update()
         {
+            if (!Enabled)
+                return;
+
             int emissionThisFrame = 0;
             foreach (Particle particle in Particles)
             {

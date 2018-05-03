@@ -19,11 +19,13 @@ namespace Shared
 
         public float ConeAngle;
         public float Range;
+        public float Force;
 
-        public ToolInfo(float angle, float range)
+        public ToolInfo(float angle, float range, float force)
         {
             this.ConeAngle = angle;
             this.Range = range;
+            this.Force = force;
         }
     }
 
@@ -32,12 +34,14 @@ namespace Shared
 
         private const float ThrowerAngle = 20.0f;
         private const float ThrowerRange = 2.0f;
+        private const float ThrowerForce = 0.0f;
 
         private const float BlowerAngle = 45.0f;
         private const float BlowerRange = 3.0f;
+        private const float BlowerForce = 0.5f;
 
-        public static ToolInfo Thrower = new ToolInfo(ThrowerAngle, ThrowerRange);
-        public static ToolInfo Blower = new ToolInfo(BlowerAngle, BlowerRange);
+        public static ToolInfo Thrower = new ToolInfo(ThrowerAngle, ThrowerRange, ThrowerForce);
+        public static ToolInfo Blower = new ToolInfo(BlowerAngle, BlowerRange, BlowerForce);
 
         private static Dictionary<ToolType, ToolInfo> ToolMap = new Dictionary<ToolType, ToolInfo>
         {

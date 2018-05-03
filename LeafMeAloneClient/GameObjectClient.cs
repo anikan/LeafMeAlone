@@ -7,7 +7,7 @@ using Shared;
 
 namespace Client
 {
-    public class GameObjectClient : GameObject
+    public abstract class GameObjectClient : GameObject
     {
         private Model model;
 
@@ -35,7 +35,7 @@ namespace Client
             model.Update();
         }
 
-        public override void Draw()
+        public virtual void Draw()
         {
             model?.Draw();
         }

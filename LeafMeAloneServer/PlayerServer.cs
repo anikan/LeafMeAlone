@@ -36,24 +36,6 @@ namespace Server
         public override void Update(float deltaTime)
         {
 
-            if (UsingToolPrimary)
-            {
-
-                List<LeafServer> LeafList = GameServer.instance.LeafList;
-                for (int i = 0; i < LeafList.Count; i++)
-                {
-                    if (LeafList[i].IsInPlayerToolRange(this))
-                    {
-
-                    }
-                }
-            }
-
-            else if (UsingToolSecondary)
-            {
-
-            }
-
         }
 
         public void UpdateFromPacket(PlayerPacket packet)

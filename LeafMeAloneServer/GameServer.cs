@@ -15,7 +15,7 @@ namespace Server
 
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
 
-        public List<GameObject> gameObjectList = new List<GameObject>();
+        public List<GameObjectServer> gameObjectList = new List<GameObjectServer>();
         public List<LeafServer> LeafList = new List<LeafServer>();
 
         private NetworkServer networkServer = new NetworkServer();
@@ -110,6 +110,7 @@ namespace Server
 
             TestPhysics();
 
+
             for (int i = 0; i < gameObjectList.Count; i++)
             {
                 gameObjectList[i].Update(deltaTime);
@@ -193,6 +194,32 @@ namespace Server
         public void AddUniversalPhysics()
         {
 
+        }
+
+        public void AddPlayerToolEffects()
+        {
+
+            for (int i = 0; i < playerServerList.Count; i++)
+            {
+
+                PlayerServer player = playerServerList[i];
+
+                if (player.UsingToolPrimary || player.UsingToolSecondary)
+                {
+
+                    for (int j = 0; j < gameObjectList.Count; j++)
+                    {
+
+                        GameObjectServer gameObject = gameObjectList[j];
+                        if (gameObject.IsInPlayerToolRange(player))
+                        {
+
+                            gameObject.HitByTool(player.ToolEquipped);
+
+                        }
+                    }
+                }
+            }
         }
     }
 }

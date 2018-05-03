@@ -161,6 +161,7 @@ namespace Server
                 new CreateObjectPacket(player);
             // Create createObjectPacket, send to client
             byte[] data = CreateObjectPacket.Serialize(setPlayerPacket);
+            Packet.Deserialize(data, out int bytes);
             Send(clientSocket, data);
         }
 
@@ -186,15 +187,13 @@ namespace Server
                 state.sb.Append(Encoding.ASCII.GetString(
                     state.buffer, 0, bytesRead));
 
-                byte[] resizedBuffer = new byte[bytesRead];
-
-                Buffer.BlockCopy(
-                    state.buffer, 0, resizedBuffer, 0, bytesRead
-                    );
-
-                PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
-
-                PlayerPackets.Add(packet);
+                while (state.buffer.Length > 0)
+                {
+                    Packet objectPacket = 
+                        Packet.Deserialize(state.buffer, out int packetSize);
+                    PlayerPackets.Add((PlayerPacket) objectPacket);
+                    state.buffer = state.buffer.Skip(bytesRead).ToArray();
+                }
 
                 //Console.WriteLine("Read new player packet: Data : {0}",
                 //    packet.ToString());
@@ -219,7 +218,8 @@ namespace Server
             byte[] data = null;
             if (gameObject is PlayerServer)
             {
-                PlayerPacket packet = ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
+                PlayerPacket packet = 
+                    ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
 
                 data = PlayerPacket.Serialize(packet);
             }

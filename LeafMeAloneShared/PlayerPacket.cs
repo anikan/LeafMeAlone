@@ -78,21 +78,11 @@ namespace Shared
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
             byte[] serializedObject = ms.ToArray();
-        
-            serializedObject = Packet.PrependHeader(serializedObject, PacketType.PlayerPacket);
-            
-            return serializedObject;
-        }
 
-        /// <summary>
-        /// Deserializes a byte array into a player packet object.
-        /// </summary>
-        /// <param name="data">The byte array of the player packet</param>
-        /// <returns>The deserialized playerpacket</returns>
-        public static PlayerPacket Deserialize(byte[] data)
-        {
-            return Serializer.Deserialize<PlayerPacket>(
-                new MemoryStream(RemoveHeader(data)));
+            serializedObject =
+                PrependHeader(serializedObject, PacketType.PlayerPacket);
+
+            return serializedObject;
         }
 
         public override string ToString()

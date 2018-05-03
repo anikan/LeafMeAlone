@@ -106,34 +106,14 @@ namespace Client
             byte[] buffer = new byte[StateObject.BufferSize];
             if (client.Available > 0)
             {
-                int bytesRead =
-                    client.Receive(buffer, 0, StateObject.BufferSize, 0);
-
-                // Read everything but the first byte, which gives the packet
-                // Type
-                byte[] resizedBuffer = new byte[bytesRead];
-                Buffer.BlockCopy(buffer, 0, resizedBuffer, 0, bytesRead);
-
-                ProcessPacket((PacketType) buffer[0], resizedBuffer);
-            }
-        }
-
-        private void ProcessPacket(PacketType packetType, byte[] resizedBuffer)
-        {
-            switch (packetType)
-            {
-                case PacketType.CreateObjectPacket:
-                    PacketQueue.Add(
-                        CreateObjectPacket.Deserialize(resizedBuffer)
-                        );
-                    break;
-                case PacketType.PlayerPacket:
-                    PacketQueue.Add(
-                        PlayerPacket.Deserialize(resizedBuffer)
-                        );
-                    break;
-                case PacketType.LeafPacket:
-                    break;
+                client.Receive(buffer, 0, StateObject.BufferSize, 0);
+                while (buffer.Length > 0)
+                {
+                    Packet objectPacket = 
+                        Packet.Deserialize(buffer, out int bytesRead);
+                    PacketQueue.Add(objectPacket);
+                    buffer = buffer.Skip(bytesRead).ToArray();
+                }
             }
         }
 

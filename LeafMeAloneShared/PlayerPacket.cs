@@ -24,7 +24,7 @@ namespace Shared
 
             BLOWER,
             THROWER
-      
+
         }
 
         // Movement info in the packet. 
@@ -91,7 +91,8 @@ namespace Shared
         /// <returns>The deserialized playerpacket</returns>
         public static PlayerPacket Deserialize(byte[] data)
         {
-            return Serializer.Deserialize<PlayerPacket>(new MemoryStream(RemoveHeader(data)));
+            return Serializer.Deserialize<PlayerPacket>(
+                new MemoryStream(RemoveHeader(data)));
         }
 
         public override string ToString()

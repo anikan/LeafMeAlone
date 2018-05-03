@@ -143,6 +143,7 @@ namespace Client
         /// <param name="data">Byte array of data</param>
         public void Send(byte[] data)
         {
+            Console.WriteLine(BitConverter.ToString(data));
             // Begin sending the data to the remote device.  
             client.BeginSend(data, 0, data.Length, 0,
                 new AsyncCallback(SendCallback), client);

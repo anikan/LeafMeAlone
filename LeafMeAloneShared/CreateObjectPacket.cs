@@ -46,12 +46,13 @@ namespace Shared
         /// <returns>the serialized packet</returns>
         public static byte[] Serialize(CreateObjectPacket packet)
         {
-            byte[] header = Packet.GetHeader(packet, PacketType.CreateObjectPacket);
-
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
             byte[] serializedObject = ms.ToArray();
-            return (header.Concat(serializedObject).ToArray());
+
+            serializedObject = Packet.PrependHeader(serializedObject, PacketType.CreateObjectPacket);
+
+            return serializedObject;
         }
 
         /// <summary>

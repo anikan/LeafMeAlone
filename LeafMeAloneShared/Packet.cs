@@ -40,12 +40,17 @@ namespace Shared
         /// Returns the header of the packet.
         /// </summary>
         /// <returns>The packet header</returns>
-        public static byte[] GetHeader(Packet packet, PacketType type)
+        public static byte[] PrependHeader(byte[] data, PacketType type)
         {
             byte[] header;
-            header = new byte[] {(byte) type};
+            header = new byte[]{ (byte) type};
+            byte[] packetSize = BitConverter.GetBytes(data.Length);
 
-            return header;
+            header = header.Concat(packetSize).ToArray();
+
+            data = data.Concat(header).ToArray();
+
+            return data;
         }
 
         /// <summary>

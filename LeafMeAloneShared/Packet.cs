@@ -43,7 +43,7 @@ namespace Shared
         public static byte[] GetHeader(Packet packet, PacketType type)
         {
             byte[] header;
-            header = new byte[] {(byte) PacketType.PlayerPacket};
+            header = new byte[] {(byte) type};
 
             return header;
         }

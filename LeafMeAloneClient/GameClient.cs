@@ -181,6 +181,11 @@ namespace Client
                 {
                     gameObjects.TryGetValue(
                         packet.ObjectID, out GameObjectClient toUpdate);
+
+                    if (toUpdate == null)
+                    {
+                        Console.WriteLine("Warning: Packet references object whose ID not created yet");
+                    }
                     toUpdate.UpdateFromPacket(packet);
                 }
             }

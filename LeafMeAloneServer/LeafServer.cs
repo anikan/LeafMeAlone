@@ -8,6 +8,9 @@ using SlimDX;
 
 namespace Server
 {
+    /// <summary>
+    /// Leaf class on the game server. Is a physics object.
+    /// </summary>
     public class LeafServer : PhysicsObject, ILeaf
     {
         public bool Burning { get; set; }
@@ -20,6 +23,12 @@ namespace Server
 
         public LeafServer(Transform startTransform) : base (ObjectType.LEAF, startTransform)
         {
+
+        }
+
+        public LeafServer(Transform startTransform, float mass) : base(ObjectType.LEAF, startTransform, mass)
+        {
+
 
         }
 

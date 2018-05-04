@@ -14,11 +14,8 @@ namespace Server
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
 
-        // If the user is using the primary function of their tool.
-        public bool UsingToolPrimary { get; set; }
-
-        // If the user is using the secondary function of their tool.
-        public bool UsingToolSecondary { get; set; }
+        // If the user is using the primary function of their tool or secondary
+        public ToolMode ActiveToolMode { get; set; }
 
         public PlayerServer() : base(ObjectType.PLAYER)
         { }
@@ -38,6 +35,22 @@ namespace Server
 
         }
 
+        public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
+        {
+
+            for (int j = 0; j < allObjects.Count; j++)
+            {
+
+                GameObjectServer gameObject = allObjects[j];
+                if (gameObject.IsInPlayerToolRange(this))
+                {
+
+                    gameObject.HitByTool(ToolEquipped, ActiveToolMode);
+
+                }
+            }
+        }
+
         public void UpdateFromPacket(PlayerPacket packet)
         {
             Transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f) * GameServer.TICK_TIME_S;
@@ -45,7 +58,7 @@ namespace Server
             Transform.Rotation.Y = packet.Rotation;
         }
 
-        public override void HitByTool(ToolType toolType)
+        public override void HitByTool(ToolType toolType, ToolMode ActiveToolMode)
         {
             // TODO
         }

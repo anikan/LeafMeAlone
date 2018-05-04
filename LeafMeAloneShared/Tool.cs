@@ -10,8 +10,16 @@ namespace Shared
     // Type of tool the player is using.
     public enum ToolType
     {
+        NONE,
         BLOWER,
         THROWER
+    }
+
+    public enum ToolMode
+    {
+        NONE,
+        PRIMARY,
+        SECONDARY
     }
 
     public struct ToolInfo

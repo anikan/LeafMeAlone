@@ -34,7 +34,7 @@ namespace Server
 
 
 
-        public override void HitByTool(ToolType toolType)
+        public override void HitByTool(ToolType toolType, ToolMode toolMode)
         {
             // TODO
         }

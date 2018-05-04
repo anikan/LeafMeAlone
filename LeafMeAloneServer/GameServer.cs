@@ -204,21 +204,8 @@ namespace Server
 
                 PlayerServer player = playerServerList[i];
 
-                if (player.UsingToolPrimary || player.UsingToolSecondary)
-                {
+                player.AffectObjectsInToolRange(gameObjectList);
 
-                    for (int j = 0; j < gameObjectList.Count; j++)
-                    {
-
-                        GameObjectServer gameObject = gameObjectList[j];
-                        if (gameObject.IsInPlayerToolRange(player))
-                        {
-
-                            gameObject.HitByTool(player.ToolEquipped);
-
-                        }
-                    }
-                }
             }
         }
     }

@@ -21,7 +21,7 @@ namespace Server
             ObjectType = objectType;
         }
 
-        public abstract void HitByTool(ToolType toolType);
+        public abstract void HitByTool(ToolType toolType, ToolMode toolMode);
 
         /// <summary>
         /// Gets the distance of this object to the player.

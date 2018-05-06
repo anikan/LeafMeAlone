@@ -12,7 +12,6 @@ namespace Server
     public abstract class GameObjectServer : GameObject
     {
 
-
         // How long this object can burn before being destroying.
         private float BurnTimeBeforeDestroy;
 

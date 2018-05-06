@@ -125,37 +125,59 @@ namespace Server
             return vector;
         }
 
+        /// <summary>
+        /// Function called when this object is hit by a player's tool.
+        /// </summary>
+        /// <param name="playerPosition">Position of the player that hit this object.</param>
+        /// <param name="toolType">Type of tool equipped.</param>
+        /// <param name="toolMode">Mode (primary or secondary) of tool equipped.</param>
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
-
+            // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
 
+            // If this is a leafblower.
             if (toolType == ToolType.BLOWER)
             {
 
+                // If this is the leafblower's primary tool.
                 if (toolMode == ToolMode.PRIMARY)
                 {
+                    // Extinguish any objects that get blowed by the leaf blower.
+                    Extinguish();
 
+                    // Get the force of this tool.
                     float toolForce = toolInfo.Force;
+
+                    // Get the vector from the player to the object.
                     Vector3 playerToObj = Transform.Position - playerPosition;
+                    float distance = playerToObj.Length();
+
+                    // Divide the vector by the range of the tool to normalize it.
+                    playerToObj /= toolInfo.Range;
+
+                    // Multiply tool force by distance so that it's stronger on objects that are closer.
+                    // Also make sure denominator can't be zero.
+                    toolForce /= Math.Max(0.001f, distance);
+
+                    // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
-
-
                     ApplyForce(force);
-
-
                 }
             }
+
+            // If this is a flamethrower
             else if (toolType == ToolType.THROWER)
             {
 
+                // If it's the primary flamethrower function
                 if (toolMode == ToolMode.PRIMARY)
                 {
 
-
+                    // Set the object on fire.
+                    CatchFire();
 
                 }
-
             }
         }
     }

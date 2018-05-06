@@ -14,6 +14,7 @@ namespace Server
         public GameObjectServer(ObjectType objectType) : base()
         {
             ObjectType = objectType;
+
         }
 
         public GameObjectServer(ObjectType objectType, Transform startPosition) : base(startPosition)
@@ -27,6 +28,16 @@ namespace Server
 
         public override void Update(float deltaTime)
         {
+        }
+
+        /// <summary>
+        /// Add this GameObject to the server's list of GameObjects and set the id.
+        /// </summary>
+        public void Register()
+        {
+            Id = GameServer.instance.gameObjectDict.Count();
+
+            GameServer.instance.gameObjectDict.Add(Id, this);
         }
     }
 }

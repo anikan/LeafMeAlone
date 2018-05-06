@@ -136,12 +136,10 @@ namespace Server
         /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
-            List<GameObject> currentGameObjects =
-                GameServer.instance.gameObjectList;
-            foreach (GameObject objToSend in currentGameObjects)
+            foreach (KeyValuePair<int, GameObject> pair in GameServer.instance.gameObjectDict)
             {
                 CreateObjectPacket packetToSend =
-                    new CreateObjectPacket(objToSend);
+                    new CreateObjectPacket(pair.Value);
                 clientSocket.Send(CreateObjectPacket.Serialize(packetToSend));
             }
         }

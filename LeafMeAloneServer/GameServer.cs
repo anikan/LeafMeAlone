@@ -15,7 +15,7 @@ namespace Server
 
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
 
-        public List<GameObject> gameObjectList = new List<GameObject>();
+        public Dictionary<int, GameObject> gameObjectDict = new Dictionary<int, GameObject>();
 
         private NetworkServer networkServer = new NetworkServer();
 
@@ -50,7 +50,6 @@ namespace Server
             
             gameServer.networkServer.StartListening();
 
-
             gameServer.DoGameLoop();
 
             return 0;
@@ -71,18 +70,26 @@ namespace Server
                 //Update the server players based on received packets.
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {
-                    //playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
+                    PlayerPacket packet = networkServer.PlayerPackets[i];
+
+                    if (gameObjectDict.TryGetValue(packet.ObjectID, out GameObject playerGameObject))
+                    {
+                        PlayerServer player = (PlayerServer) playerGameObject;
+
+                        player.UpdateFromPacket(networkServer.PlayerPackets[i]);
+
+                        Console.WriteLine("Player {0} is at {1}", player.Id, player.GetTransform().Position);
+                    }
                 }
 
                 UpdateObjects(timer.ElapsedMilliseconds);
 
-                //Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
 
-                //Send player data to all clients.
-                //networkServer.SendPlayer(playerServer);
+                //Send object data to all clients.
+                networkServer.SendPlayer(playerServer);
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
@@ -96,24 +103,28 @@ namespace Server
 
         public void UpdateObjects(float deltaTime)
         {
-
-            for (int i = 0; i < gameObjectList.Count; i++)
+            //This foreach loop hurts my soul. May consider making it normal for loop.
+            foreach (KeyValuePair<int, GameObject> pair in gameObjectDict )
             {
-                gameObjectList[i].Update(deltaTime);
+                pair.Value.Update(deltaTime);
             }
         }
 
         public PlayerServer CreateNewPlayer()
         {
-            //Assign id based on the next spot in the gameObjectList.
-            int id = gameObjectList.Count();
+            //Assign id based on the next spot in the gameObjectDict.
+            int id = gameObjectDict.Count();
 
+            //Create two players, one to send as an active player to client. Other to keep track of on server.
+            PlayerServer newPlayer = new PlayerServer();
+            newPlayer.Register();
+
+            //Create the active player with the same id as the newPlayer.
             PlayerServer newActivePlayer = new PlayerServer();
             newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
-            PlayerServer newPlayer = new PlayerServer();
+            newActivePlayer.Id = newPlayer.Id;
             
             playerServerList.Add(newPlayer);
-            gameObjectList.Add(newPlayer);
 
             //Note currently assuming players get ids 0-3
             newActivePlayer.Transform.Position = spawnPoints[0];
@@ -145,7 +156,7 @@ namespace Server
 
                 LeafServer newLeaf = new LeafServer();
                 newLeaf.Transform.Position = pos;
-                gameObjectList.Add(newLeaf);
+                newLeaf.Register();
 
                 Console.WriteLine("Creating leaf at position " + pos);
             }

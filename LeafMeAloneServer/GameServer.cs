@@ -47,7 +47,7 @@ namespace Server
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            //CreateLeaves(100, -10, 10, -10, 10);
+            CreateLeaves(1, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)
@@ -75,7 +75,7 @@ namespace Server
                 //Update the server players based on received packets.
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {
-                    //playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
+                    // playerServerList.UpdateFromPacket( networkServer.PlayerPackets[i] );
                 }
 
                 UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
@@ -158,7 +158,7 @@ namespace Server
                 new CreateObjectPacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-             networkServer.SendAll(CreateObjectPacket.Serialize(objPacket));
+             networkServer.SendAll(objPacket.Serialize());
                
             return newActivePlayer;
         }

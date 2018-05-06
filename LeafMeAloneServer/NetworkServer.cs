@@ -142,7 +142,7 @@ namespace Server
             {
                 CreateObjectPacket packetToSend =
                     new CreateObjectPacket(objToSend);
-                clientSocket.Send(CreateObjectPacket.Serialize(packetToSend));
+                clientSocket.Send(packetToSend.Serialize());
             }
         }
 
@@ -160,7 +160,7 @@ namespace Server
             CreateObjectPacket setPlayerPacket =
                 new CreateObjectPacket(player);
             // Create createObjectPacket, send to client
-            byte[] data = CreateObjectPacket.Serialize(setPlayerPacket);
+            byte[] data = setPlayerPacket.Serialize();
             Packet.Deserialize(data, out int bytes);
             Send(clientSocket, data);
         }
@@ -222,7 +222,7 @@ namespace Server
                 PlayerPacket packet = 
                     ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
 
-                data = PlayerPacket.Serialize(packet);
+                data = packet.Serialize();
             }
 
             else

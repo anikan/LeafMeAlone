@@ -7,7 +7,6 @@ using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
-using AntTweakBar;
 
 namespace Client
 {
@@ -76,8 +75,6 @@ namespace Client
         }
 
         public static Shader ActiveShader;
-
-        public static Bar bar;
 
         public static Light ActiveLightSystem;
 

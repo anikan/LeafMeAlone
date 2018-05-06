@@ -50,10 +50,8 @@ namespace Shared
             Serializer.Serialize(ms, packet);
             byte[] serializedObject = ms.ToArray();
 
-            serializedObject = Packet.PrependHeader(
+            return PrependHeader( 
                 serializedObject, PacketType.CreateObjectPacket);
-
-            return serializedObject;
         }
     }
 }

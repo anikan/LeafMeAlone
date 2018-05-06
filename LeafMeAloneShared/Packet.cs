@@ -43,15 +43,9 @@ namespace Shared
         /// <returns>The packet header</returns>
         public static byte[] PrependHeader(byte[] data, PacketType type)
         {
-            byte[] header;
-            header = new byte[]{ (byte) type};
+            byte[] header = new byte[]{ (byte) type };
             byte[] packetSize = BitConverter.GetBytes(data.Length);
-
-            header = header.Concat(packetSize).ToArray();
-
-            data = data.Concat(header).ToArray();
-
-            return data;
+            return header.Concat(packetSize).Concat(data).ToArray();
         }
 
         public static Packet Deserialize(byte[] data, out int bytesRead)
@@ -80,12 +74,14 @@ namespace Shared
         /// </summary>
         /// <param name="data">The byte array of the packet</param>
         /// <returns>The byte[] without the header.</returns>
-        public static byte[] RemoveHeader( byte[] data )
+        public static byte[] RemoveHeader( byte[] data)
         {
-            int packetSize = BitConverter.ToInt32(data, 1);
+            byte[] sizePortion = new byte[4];
+            Buffer.BlockCopy(data, 1, sizePortion, 0, 4);
+            int packetSize = BitConverter.ToInt32(sizePortion, 0);
             byte[] resizedBuffer = new byte[packetSize];
             Buffer.BlockCopy(data, 5, resizedBuffer, 0, packetSize);
-            return data.Skip(5 + packetSize).ToArray();
+            return resizedBuffer;
         }
     }
 }

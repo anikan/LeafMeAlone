@@ -179,20 +179,21 @@ namespace Server
             Socket handler = state.workSocket;
 
             // Read data from the client socket.   
-            int bytesRead = handler.EndReceive(ar);
+            int bytesToRead = handler.EndReceive(ar);
 
-            if (bytesRead > 0)
+            if (bytesToRead > 0)
             {
                 // There  might be more data, so store the data received so far.  
                 state.sb.Append(Encoding.ASCII.GetString(
-                    state.buffer, 0, bytesRead));
+                    state.buffer, 0, bytesToRead));
 
-                while (state.buffer.Length > 0)
+                while (bytesToRead > 0)
                 {
                     Packet objectPacket = 
-                        Packet.Deserialize(state.buffer, out int packetSize);
+                        Packet.Deserialize(state.buffer, out int bytesRead);
                     PlayerPackets.Add((PlayerPacket) objectPacket);
                     state.buffer = state.buffer.Skip(bytesRead).ToArray();
+                    bytesToRead -= bytesRead;
                 }
 
                 //Console.WriteLine("Read new player packet: Data : {0}",

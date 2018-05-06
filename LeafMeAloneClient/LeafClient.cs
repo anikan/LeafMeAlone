@@ -12,19 +12,21 @@ namespace Client
 
         public const string LeafModelPath = @"../../Models/Leaf_V1.fbx";
 
-        public LeafClient() : base(LeafModelPath)
+        public LeafClient(CreateObjectPacket createPacket) : 
+            base(createPacket, LeafModelPath)
         {
-
         }
 
-        public LeafClient(Transform startTransform) : base(LeafModelPath, startTransform)
+        public void UpdateFromPacket(LeafPacket packet)
         {
-
+            Transform.Position.X = packet.MovementX;
+            Transform.Position.Y = packet.MovementY;
+            Transform.Rotation.Y = packet.Rotation;
         }
 
         public override void UpdateFromPacket(Packet packet)
         {
-            throw new NotImplementedException();
+            UpdateFromPacket(packet as LeafPacket);
         }
     }
 }

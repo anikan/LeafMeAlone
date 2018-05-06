@@ -47,7 +47,7 @@ namespace Server
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            CreateLeaves(1, -10, 10, -10, 10);
+            //CreateLeaves(1, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)

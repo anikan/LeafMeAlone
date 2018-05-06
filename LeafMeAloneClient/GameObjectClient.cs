@@ -16,9 +16,14 @@ namespace Client
             SetModel(modelPath);
         }
 
-        protected GameObjectClient(string modelPath, Transform startTransform) : base(startTransform)
+        public GameObjectClient(
+            CreateObjectPacket createPacket, string modelPath
+            ) 
         {
             SetModel(modelPath);
+            Id = createPacket.Id;
+            Transform.Position.X = createPacket.InitialX;
+            Transform.Position.Y = createPacket.InitialY;
         }
 
         public void SetModel(string filePath)
@@ -39,6 +44,7 @@ namespace Client
         {
             model?.Draw();
         }
+
 
         public abstract void UpdateFromPacket(Packet packet);
     }

@@ -11,14 +11,18 @@ namespace Server
     public class PlayerServer : GameObjectServer, IPlayer
     {
 
+        public const float PLAYER_BURN_TIME = 10000.0f;
+
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
 
         // If the user is using the primary function of their tool or secondary
         public ToolMode ActiveToolMode { get; set; }
 
-        public PlayerServer() : base(ObjectType.PLAYER)
-        { }
+        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_BURN_TIME)
+        {
+
+        }
 
         public Transform GetTransform()
         {
@@ -42,10 +46,10 @@ namespace Server
             {
 
                 GameObjectServer gameObject = allObjects[j];
-                if (gameObject.IsInPlayerToolRange(this))
+                if (gameObject != this && gameObject.IsInPlayerToolRange(this))
                 {
 
-                    gameObject.HitByTool(ToolEquipped, ActiveToolMode);
+                    gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
 
                 }
             }
@@ -58,7 +62,7 @@ namespace Server
             Transform.Rotation.Y = packet.Rotation;
         }
 
-        public override void HitByTool(ToolType toolType, ToolMode ActiveToolMode)
+        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
             // TODO
         }

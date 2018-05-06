@@ -17,6 +17,8 @@ namespace Shared
     public abstract class GameObject : INetworked
     {
 
+        public bool Burning;
+
         public ObjectType ObjectType;
 
         /// <summary>

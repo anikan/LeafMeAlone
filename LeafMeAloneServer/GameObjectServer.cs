@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using System.Diagnostics;
 using SlimDX;
 
 namespace Server
@@ -11,17 +12,86 @@ namespace Server
     public abstract class GameObjectServer : GameObject
     {
 
-        public GameObjectServer(ObjectType objectType) : base()
+
+        // How long this object can burn before being destroying.
+        private float BurnTimeBeforeDestroy;
+
+        // Timer for how long this object has been burning.
+        private Stopwatch BurnTimer;
+
+        /// <summary>
+        /// Constructor for a GameObject that's on the server, with default instantiation position.
+        /// </summary>
+        /// <param name="objectType">Type of this object.</param>
+        /// <param name="burnTime">Amount of time this object can burn before destroy.</param>
+        public GameObjectServer(ObjectType objectType, float burnTime) : base()
         {
-            ObjectType = objectType;
+            // Call the initialize function with correct arguments.
+            Initialize(objectType, burnTime);
         }
 
-        public GameObjectServer(ObjectType objectType, Transform startPosition) : base(startPosition)
+        /// <summary>
+        /// Constructor for a GameObject that's on the server, with a specified position.
+        /// </summary>
+        /// <param name="objectType">Type of the object.</param>
+        /// <param name="startPosition">Location the object should be created.</param>
+        /// <param name="burnTime">Time this object can burn before destroy.</param>
+        public GameObjectServer(ObjectType objectType, Transform startPosition, float burnTime) : base(startPosition)
         {
-            ObjectType = objectType;
+            Initialize(objectType, burnTime);
         }
 
-        public abstract void HitByTool(ToolType toolType, ToolMode toolMode);
+        /// <summary>
+        /// Initializes this object's values and data structures.
+        /// </summary>
+        /// <param name="objectType">Type of this object.</param>
+        /// <param name="burnTime">Time this object can burn before destroy.</param>
+        public void Initialize(ObjectType objectType, float burnTime)
+        {
+            ObjectType = objectType;
+            BurnTimeBeforeDestroy = burnTime;
+            BurnTimer = new Stopwatch();
+        }
+
+        /// <summary>
+        /// Update step for this game object. Runs every tick.
+        /// </summary>
+        /// <param name="deltaTime">Time since last frame.</param>
+        public override void Update(float deltaTime)
+        {
+            // Destroy the object after it's done burning.
+            if (BurnTimer.ElapsedMilliseconds / 1000.0f > BurnTimeBeforeDestroy)
+            {
+                // Omg how are we going to do destroy asdf?
+            }
+        }
+
+        /// <summary>
+        /// Catch this object on fire.
+        /// </summary>
+        public void CatchFire()
+        {
+            Burning = true;
+            BurnTimer.Restart();
+        }
+
+        /// <summary>
+        /// Extinguish this object.
+        /// </summary>
+        public void Extinguish()
+        {
+            Burning = false;
+            BurnTimer.Stop();
+            BurnTimer.Reset();
+        }
+
+        /// <summary>
+        /// Function called when this object is hit by the player's active tool (in range)
+        /// </summary>
+        /// <param name="playerPosition">Position of the player. </param>
+        /// <param name="toolType">Type of the tool hit by.</param>
+        /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
+        public abstract void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode);
 
         /// <summary>
         /// Gets the distance of this object to the player.

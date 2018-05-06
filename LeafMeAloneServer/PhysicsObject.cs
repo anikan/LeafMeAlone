@@ -43,7 +43,7 @@ namespace Server
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
         /// <param name="mass">Optional mass of the object, default 1</param>
-        public PhysicsObject(ObjectType objectType, float mass = 1.0f) : base(objectType)
+        public PhysicsObject(ObjectType objectType, float burnTime, float mass = 1.0f) : base(objectType, burnTime)
         {
             Mass = mass;
         }
@@ -54,7 +54,7 @@ namespace Server
         /// <param name="objectType">Type of this object.</param>
         /// <param name="startTransform">Starting position.</param>
         /// <param name="mass">Optional mass of the object, default 1.</param>
-        public PhysicsObject(ObjectType objectType, Transform startTransform, float mass = 1.0f) : base(objectType, startTransform)
+        public PhysicsObject(ObjectType objectType, Transform startTransform, float burnTime, float mass = 1.0f) : base(objectType, startTransform, burnTime)
         {
             Mass = mass;
         }
@@ -123,6 +123,40 @@ namespace Server
             if (vector.Z < minBeforeZero) vector.Z = 0.0f;
 
             return vector;
+        }
+
+        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        {
+
+            ToolInfo toolInfo = Tool.GetToolInfo(toolType);
+
+            if (toolType == ToolType.BLOWER)
+            {
+
+                if (toolMode == ToolMode.PRIMARY)
+                {
+
+                    float toolForce = toolInfo.Force;
+                    Vector3 playerToObj = Transform.Position - playerPosition;
+                    Vector3 force = playerToObj * toolForce;
+
+
+                    ApplyForce(force);
+
+
+                }
+            }
+            else if (toolType == ToolType.THROWER)
+            {
+
+                if (toolMode == ToolMode.PRIMARY)
+                {
+
+
+
+                }
+
+            }
         }
     }
 }

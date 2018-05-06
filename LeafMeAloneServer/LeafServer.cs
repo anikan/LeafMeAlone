@@ -11,17 +11,17 @@ namespace Server
     /// <summary>
     /// Leaf class on the game server. Is a physics object.
     /// </summary>
-    public class LeafServer : PhysicsObject, ILeaf
+    public class LeafServer : PhysicsObject
     {
-        public bool Burning { get; set; }
-        public float TimeBurning { get; set; }
 
-        public LeafServer() : base(ObjectType.LEAF)
+        public const float LEAF_BURN_TIME = 3.0f;
+
+        public LeafServer() : base(ObjectType.LEAF, LEAF_BURN_TIME)
         {
 
         }
 
-        public LeafServer(Transform startTransform) : base (ObjectType.LEAF, startTransform)
+        public LeafServer(Transform startTransform) : base (ObjectType.LEAF, startTransform, LEAF_BURN_TIME)
         {
 
         }
@@ -30,13 +30,6 @@ namespace Server
         {
 
 
-        }
-
-
-
-        public override void HitByTool(ToolType toolType, ToolMode toolMode)
-        {
-            // TODO
         }
     }
 }

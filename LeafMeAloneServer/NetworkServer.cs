@@ -162,6 +162,12 @@ namespace Server
             }
         }
 
+        public void SendNewObjectToAll(GameObjectServer newObject)
+        {
+            Packet packetToSend = new CreateObjectPacket(newObject);
+            SendAll(packetToSend.Serialize());
+        }
+
         /// <summary>
         /// Creates a new player in the game, sends it out to all the clients,
         /// and then sends that active player to the clientSocket that is 

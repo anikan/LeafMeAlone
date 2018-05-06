@@ -14,7 +14,6 @@ using Device = SlimDX.DXGI.Device;
 using System.Diagnostics;
 using System.Net;
 
-
 namespace Client
 {
     class GameClient
@@ -48,11 +47,11 @@ namespace Client
             {
                 address = IPAddress.Loopback;
             }
-
-            GameClient Client = new GameClient(address);
-            Client.Timer = new Stopwatch();
-
-            Client.gameObjects = new Dictionary<int, GameObjectClient>();
+            GameClient Client = new GameClient(new NetworkClient(address))
+            {
+                Timer = new Stopwatch(),
+                gameObjects = new Dictionary<int, GameObjectClient>()
+            };
 
             GraphicsRenderer.Init();
 
@@ -134,9 +133,9 @@ namespace Client
 
         }
 
-        public GameClient(IPAddress address)
+        public GameClient(NetworkClient networkClient)
         {
-            networkClient = new NetworkClient(address);
+            this.networkClient = networkClient;
             networkClient.StartClient();
 
             // Receive the response from the remote device.  
@@ -186,6 +185,10 @@ namespace Client
 
             foreach (Packet packet in networkClient.PacketQueue)
             {
+                if (packet == null)
+                {
+                    continue;
+                }
                 if (packet is CreateObjectPacket)
                 {
                     CreateObjectFromPacket(packet as CreateObjectPacket);

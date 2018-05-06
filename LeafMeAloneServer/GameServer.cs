@@ -50,7 +50,7 @@ namespace Server
 
             networkServer = new NetworkServer(address);
 
-            //CreateLeaves(1, -10, 10, -10, 10);
+            CreateLeaves(1, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)
@@ -124,7 +124,7 @@ namespace Server
         public void UpdateObjects(float deltaTime)
         {
 
-            TestPhysics();
+            //TestPhysics();
             
             //This foreach loop hurts my soul. May consider making it normal for loop.
             foreach (KeyValuePair<int, GameObjectServer> pair in gameObjectDict )
@@ -203,6 +203,7 @@ namespace Server
 
                 LeafServer newLeaf = new LeafServer();
                 newLeaf.Transform.Position = pos;
+                networkServer.SendNewObjectToAll(newLeaf);
                 LeafList.Add(newLeaf);
                 newLeaf.Register();
 

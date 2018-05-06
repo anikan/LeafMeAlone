@@ -21,7 +21,7 @@ namespace Client
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public static int BufferSize = 256;
+        public static int BufferSize = 1024;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -114,11 +114,11 @@ namespace Client
             byte[] buffer = new byte[StateObject.BufferSize];
             if (client.Available > 0)
             {
-                int bytesToRead = 
+                int bytesToRead =
                     client.Receive(buffer, 0, StateObject.BufferSize, 0);
                 while (bytesToRead > 0)
                 {
-                    Packet objectPacket = 
+                    Packet objectPacket =
                         Packet.Deserialize(buffer, out int bytesRead);
                     PacketQueue.Add(objectPacket);
                     buffer = buffer.Skip(bytesRead).ToArray();

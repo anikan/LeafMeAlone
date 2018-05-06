@@ -94,7 +94,7 @@ namespace Server
                 networkServer.PlayerPackets.Clear();
 
                 //Send object data to all clients.
-                //networkServer.SendPlayer(playerServer);
+                networkServer.SendWorldUpdateToAllClients();
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {

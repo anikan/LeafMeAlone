@@ -144,6 +144,15 @@ namespace Server
             }
         }
 
+        public void SendWorldUpdateToAllClients()
+        {
+            foreach (KeyValuePair<int, GameObject> pair in GameServer.instance.gameObjectDict)
+            {
+                Packet packetToSend = ServerPacketFactory.CreatePacket(pair.Value);
+                SendAll(packetToSend.Serialize());
+            }
+        }
+
         /// <summary>
         /// Creates a new player in the game, sends it out to all the clients,
         /// and then sends that active player to the clientSocket that is 
@@ -207,31 +216,6 @@ namespace Server
             handler.BeginReceive(newState.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), newState);
         }
-
-        /// <summary>
-        /// Given an object, generate a player or object packet and send it.
-        /// </summary>
-        /// <param name="gameObject">Object to send.</param>
-        public void SendObject(GameObject gameObject)
-        {
-            byte[] data = null;
-            if (gameObject is PlayerServer)
-            {
-                PlayerPacket packet = 
-                    ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
-
-                data = packet.Serialize();
-            }
-
-            else
-            {
-                //packet = ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
-
-                //data = PlayerPacket.Serialize(packet);
-            }
-
-            SendAll(data);
-        } 
 
         /// <summary>
         /// Send the byteData to the socket.

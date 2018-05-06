@@ -1,6 +1,8 @@
-float4x4 gWorld;
-float4x4 gView;
-float4x4 gProj;
+uniform extern float4x4 gWorldViewProj;
+uniform extern float3 gOrigin;
+uniform extern float CutoffSpeed;
+uniform extern float CutoffDist;
+uniform extern float StopDist;
 
 uniform extern Texture2D tex_diffuse;
 
@@ -16,27 +18,38 @@ SamplerState MeshTextureSampler
 void VS(float4 iPosL : POSITION,
 	float4 iTex : TEXTURE,
 	out float4 oPosH : SV_POSITION,
+	out float4 oPosObj : POSITION_OBJ,
 	out float2 oTex : UV_TEX)
 {
-	float4x4 worldViewProj = mul(mul(gWorld, gView), gProj);
-	oPosH = mul(iPosL, worldViewProj);
+	oPosH = mul(iPosL, gWorldViewProj);
+	oPosObj = iPosL;
 	oTex = float2(iTex.x, iTex.y);
 }
 
 float4 PS(float4 iPosH  : SV_POSITION,
+	float4 iPosObj : POSITION_OBJ,
 	float2 iTex : UV_TEX)
 	: SV_TARGET
 {
 	float4 ret = tex_diffuse.Sample(MeshTextureSampler, iTex);
 
+	float dist = length(iPosObj.xyz - gOrigin);
+	float factor = 1.0f;
+	if (dist > CutoffDist)
+	{
+		factor = 1.0f / (1.0f + CutoffSpeed * (dist-CutoffDist));
+	}
+	
+	//ret = factor * ret;
+
 	//need to enforce the branch is not taken before evaluation
 	[branch]
-	if (ret.a < .2f)
+	if (ret.a < .09f)
 	{
 		//clip all pixels getting here (dont render them)
 		clip(-1);
 	}
-	return ret;
+	return factor*ret;
 }
 
 

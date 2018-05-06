@@ -41,7 +41,6 @@ namespace Client
         private Effect Effects;
         private EffectPass Pass;
 
-
         //create texture
         private ShaderResourceView TexSRV;
 
@@ -60,24 +59,58 @@ namespace Client
         //random for use in forces.
         private Random r;
 
+        // where the particle is being spit out
+        private Vector3 Origin;
+        private Vector3 Velocity;
+        private float ConeSize;
+        private float CutoffDist;
+        private float CutOffSpeed;
+        private float EnlargeSpeed;
+        private float StopDist;
+
         /// <summary>
-        /// Make a new particle system.
+        /// Create a new particle system
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="sizedelta"></param>
-        /// <param name="emissionrate"></param>
-        /// <param name="maxparticles"></param>
-        public ParticleSystem(ParticleSystemType type, float sizedelta = 1.0f, int emissionrate = 1, int maxparticles = 1000)
+        /// <param name="type"> Specify the type of the particle system needed (WIND or FIRE) </param>
+        /// <param name="init_pos"> Specify the generation origin of the particles </param>
+        /// <param name="velocity"> Specify the velocity of the particles as a vector </param>
+        /// <param name="cone_radius"> Specify the cone radius of the overall cone of the particles </param>
+        /// <param name="initial_size"> Specify the size of the particle initially </param>
+        /// <param name="cutoff_dist"> Specify the cutoff distance, where the particle starts getting larger and darker </param>
+        /// <param name="cutoff_speed"> Specify the cutoff speed, the rate at which particles get darker </param>
+        /// <param name="enlarge_speed"> Specify the enlarge speed, the rate at which particles get larger </param>
+        /// <param name="stop_dist"> Specify the distance, where the particles stop showing up </param>
+        /// <param name="emissionrate"> Specify the emission rate of the particle system </param>
+        /// <param name="maxparticles"> Specify the max number of particles emitted at a time </param>
+        public ParticleSystem(ParticleSystemType type, 
+            Vector3 init_pos,  
+            Vector3 velocity, 
+            float cone_radius = 2.0f,
+            float initial_size = 1.0f,
+            float cutoff_dist = 10.0f,
+            float cutoff_speed = 0.2f,
+            float enlarge_speed = 0.075f,
+            float stop_dist = 50.0f,
+            int emissionrate = 2, 
+            int maxparticles = 1000)
         {
-            delta = sizedelta;
+            delta = initial_size;
             emissionRate = emissionrate;
             maxParticles = maxparticles;
+
+            Origin = init_pos;
+            Velocity = velocity;
+            ConeSize = cone_radius;
+            CutOffSpeed = cutoff_speed;
+            CutoffDist = cutoff_dist;
+            EnlargeSpeed = enlarge_speed;
+            StopDist = stop_dist;
 
             r = new Random();
 
             for (int i = 0; i < maxParticles; i++)
             {
-                Particles.Add(new Particle(Vector3.Zero, Vector3.Zero, 1.0f, 0f));
+                Particles.Add(new Particle(Origin, Vector3.UnitY, 1.0f, 0f));
             }
 
             Verts = new DataStream(Particles.Count * size, true, true);
@@ -144,7 +177,7 @@ namespace Client
             switch (type)
             {
                 case ParticleSystemType.FIRE:
-                    TexSRV = CreateTexture(@"../../Particles/fire2.png");
+                    TexSRV = CreateTexture(@"../../Particles/fire_red.png");
                     break;
                 case ParticleSystemType.WIND:
                     TexSRV = CreateTexture(@"../../Particles/wind.png");
@@ -161,15 +194,32 @@ namespace Client
         public void UpdateBuffer()
         {
             Verts.Position = 0;
+            
             for (var index = 0; index < Particles.Count; index++)
             {
                 var pt = Particles[index];
                 var initPos = pt.Position;
 
-                Vector3 topLeft_Both = new Vector3(initPos.X - delta, initPos.Y + delta, initPos.Z);
-                Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z);
-                Vector3 topRight = new Vector3(initPos.X + delta, initPos.Y + delta, initPos.Z);
-                Vector3 bottomLeft = new Vector3(initPos.X - delta, initPos.Y - delta, initPos.Z);
+                // change the size of the particle after the cutoff
+                float delta_factor = 1.0f;
+                float distance = Vector3.Distance(initPos, Origin);
+
+                if (distance > StopDist)
+                {
+                    delta_factor = 0.0f;
+                }
+                else if (distance > CutoffDist)
+                {
+                    delta_factor = delta_factor * (1f + (distance-CutoffDist) * EnlargeSpeed);
+                }
+                
+
+                // find the positions of the particles
+                float resized_delta = delta * delta_factor;
+                Vector3 topLeft_Both = new Vector3(initPos.X - resized_delta, initPos.Y + resized_delta, initPos.Z);
+                Vector3 bottomRight_Both = new Vector3(initPos.X + resized_delta, initPos.Y - resized_delta, initPos.Z);
+                Vector3 topRight = new Vector3(initPos.X + resized_delta, initPos.Y + resized_delta, initPos.Z);
+                Vector3 bottomLeft = new Vector3(initPos.X - resized_delta, initPos.Y - resized_delta, initPos.Z);
 
  
                 Verts.Write(topLeft_Both);
@@ -199,9 +249,10 @@ namespace Client
             GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO,Format.R32_UInt,0);
 
 
-            Effects.GetVariableByName("gWorld").AsMatrix().SetMatrix(Matrix.Identity);
-            Effects.GetVariableByName("gView").AsMatrix().SetMatrix(GraphicsManager.ActiveCamera.m_ViewMatrix);
-            Effects.GetVariableByName("gProj").AsMatrix().SetMatrix(GraphicsRenderer.ProjectionMatrix);
+            Effects.GetVariableByName("CutoffSpeed").AsScalar().Set(CutOffSpeed);
+            Effects.GetVariableByName("CutoffDist").AsScalar().Set(CutoffDist);
+            Effects.GetVariableByName("gOrigin").AsVector().Set(Origin);
+            Effects.GetVariableByName("gWorldViewProj").AsMatrix().SetMatrix(Matrix.Identity * GraphicsManager.ActiveCamera.m_ViewMatrix * GraphicsRenderer.ProjectionMatrix);
             Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(TexSRV);
 
             //var blendFactor = new Color4(1,1,1,1);
@@ -237,15 +288,20 @@ namespace Client
                 {
                     if (particle.LifeRemaining <= 0)
                     {
-                        particle.Position = Vector3.Zero;
+                        particle.Position = Origin;
                         particle.Acceleration = Vector3.Zero;
                         particle.Velocity = Vector3.Zero;
-                        particle.LifeRemaining = r.Range(20f);
+                        particle.LifeRemaining = r.Range(10f);
                         emissionThisFrame++;
                     }
                 }
 
-                particle.Force = new Vector3(r.NextFloat(), particle.LifeRemaining - r.Range(10) , r.NextFloat());
+                Vector3 prevForce = particle.Force;
+                particle.Force = new Vector3(
+                    10* ConeSize * (r.NextFloat()-0.5f) + Velocity.X + prevForce.X, 
+                    10* ConeSize * (r.NextFloat()-0.5f) + Velocity.Y + prevForce.Y, 
+                    10* ConeSize * (r.NextFloat()-0.5f) + Velocity.Z + prevForce.Z);
+
                 particle.Update(.001f);
             }
             UpdateBuffer();

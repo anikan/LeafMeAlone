@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.AccessControl;
 using System.Threading;
 using Shared;
 
@@ -52,6 +53,13 @@ namespace Client
         //List of received packets. Populated by ReadCallback
         public List<Packet> PacketQueue = new List<Packet>();
 
+        private IPAddress address;
+
+        public NetworkClient(IPAddress address)
+        {
+            this.address = address;
+        }
+
         /// <summary>
         /// Try to connect to the host.
         /// </summary>
@@ -61,11 +69,11 @@ namespace Client
             try
             {
                 //For testing purposes, connect to Loopback. 
-                IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
+                //IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
+                IPEndPoint remoteEP = new IPEndPoint(address, port);
 
                 // Create a TCP/IP socket.  
-                client = new Socket(ipAddress.AddressFamily,
+                client = new Socket(address.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
 
                 // Connect to the remote endpoint.  

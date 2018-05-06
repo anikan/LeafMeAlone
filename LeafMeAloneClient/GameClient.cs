@@ -12,6 +12,7 @@ using SlimDX.DXGI;
 using SlimDX.Windows;
 using Device = SlimDX.DXGI.Device;
 using System.Diagnostics;
+using System.Net;
 
 
 namespace Client
@@ -33,11 +34,22 @@ namespace Client
         /// The main entry point for the application.
         /// </summary>
         /// 
-        private NetworkClient networkClient = new NetworkClient();
+        private NetworkClient networkClient;
 
-        private static void Main()
+        private static void Main(String[] args)
         {
-            GameClient Client = new GameClient();
+            IPAddress address;
+            if (args.Length > 1)
+            {
+                address = IPAddress.Parse(args[1]);
+            }
+
+            else
+            {
+                address = IPAddress.Loopback;
+            }
+
+            GameClient Client = new GameClient(address);
             Client.Timer = new Stopwatch();
 
             Client.gameObjects = new Dictionary<int, GameObjectClient>();
@@ -122,8 +134,9 @@ namespace Client
 
         }
 
-        public GameClient()
+        public GameClient(IPAddress address)
         {
+            networkClient = new NetworkClient(address);
             networkClient.StartClient();
 
             // Receive the response from the remote device.  
@@ -206,13 +219,13 @@ namespace Client
                     InitializeUserPlayerAndMovement(createPacket);
                     break;
                 case (ObjectType.PLAYER):
-                    gameObjects.Add( 
-                        createPacket.ObjectId, new PlayerClient( createPacket )
+                    gameObjects.Add(
+                        createPacket.ObjectId, new PlayerClient(createPacket)
                         );
                     break;
                 case (ObjectType.LEAF):
                     gameObjects.Add(
-                        createPacket.ObjectId, new LeafClient( createPacket )
+                        createPacket.ObjectId, new LeafClient(createPacket)
                         );
                     break;
             }
@@ -228,7 +241,7 @@ namespace Client
             CreateObjectPacket createPacket
             )
         {
-            ActivePlayer = new PlayerClient( createPacket );
+            ActivePlayer = new PlayerClient(createPacket);
             GraphicsManager.ActivePlayer = ActivePlayer;
             gameObjects.Add(ActivePlayer.Id, ActivePlayer);
             // Set up the input manager.

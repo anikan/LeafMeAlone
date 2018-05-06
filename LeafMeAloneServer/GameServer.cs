@@ -16,7 +16,7 @@ namespace Server
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
 
         public List<LeafServer> LeafList = new List<LeafServer>();
-        public Dictionary<int, GameObject> gameObjectDict = new Dictionary<int, GameObject>();
+        public Dictionary<int, GameObjectServer> gameObjectDict = new Dictionary<int, GameObjectServer>();
 
         private NetworkServer networkServer = new NetworkServer();
 
@@ -77,13 +77,13 @@ namespace Server
                 {
                     PlayerPacket packet = networkServer.PlayerPackets[i];
 
-                    if (gameObjectDict.TryGetValue(packet.ObjectID, out GameObject playerGameObject))
+                    if (gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject))
                     {
                         PlayerServer player = (PlayerServer) playerGameObject;
 
                         player.UpdateFromPacket(networkServer.PlayerPackets[i]);
 
-                        Console.WriteLine("Player {0} is at {1}", player.Id, player.GetTransform().Position);
+                        Console.WriteLine("Player {0} is at {1}", player.Id, player.Transform.Position);
                     }
                 }
 
@@ -94,7 +94,7 @@ namespace Server
                 networkServer.PlayerPackets.Clear();
 
                 //Send object data to all clients.
-                //networkServer.SendPlayer(playerServer);
+                networkServer.SendWorldUpdateToAllClients();
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
@@ -114,7 +114,7 @@ namespace Server
             TestPhysics();
             
             //This foreach loop hurts my soul. May consider making it normal for loop.
-            foreach (KeyValuePair<int, GameObject> pair in gameObjectDict )
+            foreach (KeyValuePair<int, GameObjectServer> pair in gameObjectDict )
             {
                 pair.Value.Update(deltaTime);
             }

@@ -33,6 +33,11 @@ namespace Client
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
+        public PlayerClient(CreateObjectPacket createPacket) : 
+            base(createPacket, PlayerModelPath)
+        {
+        }
+
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
@@ -40,12 +45,6 @@ namespace Client
         public bool UsingToolSecondary { get; set; }
         public ToolMode ActiveToolMode { get; set; }
 
-        public PlayerClient(CreateObjectPacket createPacket) : base(PlayerModelPath)
-        {
-            Id = createPacket.Id;
-            Transform.Position.X = createPacket.InitialX;
-            Transform.Position.Y = createPacket.InitialY;
-        }
 
         /// <summary>
         /// Moves the player in a specified direction (NESW)

@@ -125,6 +125,12 @@ namespace Server
             state.workSocket = clientSocket;
             clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
+
+            //Start listening for the next connection
+            listener.BeginAccept(
+                new AsyncCallback(AcceptCallback),
+                listener);
+
         }
 
         /// <summary>
@@ -136,11 +142,20 @@ namespace Server
         /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
-            foreach (KeyValuePair<int, GameObject> pair in GameServer.instance.gameObjectDict)
+            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
             {
                 CreateObjectPacket packetToSend =
                     new CreateObjectPacket(pair.Value);
                 clientSocket.Send(packetToSend.Serialize());
+            }
+        }
+
+        public void SendWorldUpdateToAllClients()
+        {
+            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
+            {
+                Packet packetToSend = ServerPacketFactory.CreatePacket(pair.Value);
+                SendAll(packetToSend.Serialize());
             }
         }
 
@@ -207,31 +222,6 @@ namespace Server
             handler.BeginReceive(newState.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), newState);
         }
-
-        /// <summary>
-        /// Given an object, generate a player or object packet and send it.
-        /// </summary>
-        /// <param name="gameObject">Object to send.</param>
-        public void SendObject(GameObject gameObject)
-        {
-            byte[] data = null;
-            if (gameObject is PlayerServer)
-            {
-                PlayerPacket packet = 
-                    ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
-
-                data = packet.Serialize();
-            }
-
-            else
-            {
-                //packet = ServerPacketFactory.CreatePacket((PlayerServer)gameObject);
-
-                //data = PlayerPacket.Serialize(packet);
-            }
-
-            SendAll(data);
-        } 
 
         /// <summary>
         /// Send the byteData to the socket.

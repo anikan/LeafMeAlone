@@ -8,15 +8,22 @@ using System.Threading.Tasks;
 namespace Shared
 {
     [ProtoContract]
-    class LeafPacket : Packet
+    public class LeafPacket : Packet
     {
         [ProtoMember(1)]
-        public float MovementX;
+        public int _ProtoObjId
+        {
+            get { return ObjectId; }
+            set { ObjectId = value; }
+        }
 
         [ProtoMember(2)]
-        public float MovementY;
+        public float MovementX;
 
         [ProtoMember(3)]
+        public float MovementY;
+
+        [ProtoMember(4)]
         public float Rotation;
 
         /// <summary>
@@ -24,6 +31,5 @@ namespace Shared
         /// </summary>
         public LeafPacket()  : base(PacketType.LeafPacket)
         { }
-
     }
 }

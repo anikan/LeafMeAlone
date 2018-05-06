@@ -57,6 +57,7 @@
     <Compile Include="ILeaf.cs" />
     <Compile Include="INetworked.cs" />
     <Compile Include="CreateObjectPacket.cs" />
+    <Compile Include="LeafPacket.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="PlayerPacket.cs" />
     <Compile Include="Packet.cs" />

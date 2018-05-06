@@ -16,22 +16,16 @@ namespace Client
         private Model model;
 
         /// <summary>
-        /// Constructs a new local GameObject with a model at the specified path.
-        /// </summary>
-        /// <param name="modelPath">Path to this gameobject's model.</param>
-        protected GameObjectClient(string modelPath) : base()
-        {
-            SetModel(modelPath);
-        }
-
-        /// <summary>
         /// Constructs a new local GameObject with a model at the specified path and a specified position.
         /// </summary>
-        /// <param name="modelPath">Paht to this gameobject's model.</param>
-        /// <param name="startTransform">Starting transform of this object.</param>
-        protected GameObjectClient(string modelPath, Transform startTransform) : base(startTransform)
+        /// <param name="createPacket">Initial packet for this object.</param>
+        /// <param name="modelPath">Path to this gameobject's model.</param>
+        public GameObjectClient(CreateObjectPacket createPacket, string modelPath) : base()
         {
             SetModel(modelPath);
+            Id = createPacket.ObjectId;
+            Transform.Position.X = createPacket.InitialX;
+            Transform.Position.Y = createPacket.InitialY;
         }
 
         /// <summary>

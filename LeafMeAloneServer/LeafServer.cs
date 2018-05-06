@@ -21,12 +21,14 @@ namespace Server
 
         }
 
-        public LeafServer(Transform startTransform) : base (ObjectType.LEAF, startTransform, LEAF_BURN_TIME)
+        public LeafServer(Transform startTransform) : 
+            base (ObjectType.LEAF, startTransform, LEAF_BURN_TIME)
         {
 
         }
 
-        public LeafServer(Transform startTransform, float mass) : base(ObjectType.LEAF, startTransform, mass)
+        public LeafServer(Transform startTransform, float mass) : 
+            base(ObjectType.LEAF, startTransform, mass)
         {
 
 

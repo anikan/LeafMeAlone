@@ -24,7 +24,7 @@ namespace Client
                 Dead = player.Dead,
                 MovementX = player.PlayerRequests.MovementRequested.X,
                 MovementY = player.PlayerRequests.MovementRequested.Y,
-                ObjectID = player.Id,
+                _ProtoObjId = player.Id,
                 Rotation = player.Transform.Rotation.Y,
                 ToolEquipped = player.ToolEquipped,
                 UsingToolPrimary = player.PlayerRequests.UseToolPrimaryRequest,

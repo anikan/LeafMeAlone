@@ -138,7 +138,7 @@ namespace Client
                 else
                 {
                     gameObjects.TryGetValue(
-                        packet.ObjectID, out GameObjectClient toUpdate);
+                        packet.ObjectId, out GameObjectClient toUpdate);
 
                     if (toUpdate == null)
                     {
@@ -164,11 +164,14 @@ namespace Client
                     InitializeUserPlayerAndMovement(createPacket);
                     break;
                 case (ObjectType.PLAYER):
-                    gameObjects.Add(
-                        createPacket.Id, new PlayerClient(createPacket)
+                    gameObjects.Add( 
+                        createPacket.ObjectId, new PlayerClient( createPacket )
                         );
                     break;
                 case (ObjectType.LEAF):
+                    gameObjects.Add(
+                        createPacket.ObjectId, new LeafClient( createPacket )
+                        );
                     break;
             }
         }
@@ -183,7 +186,7 @@ namespace Client
             CreateObjectPacket createPacket
             )
         {
-            ActivePlayer = new PlayerClient(createPacket);
+            ActivePlayer = new PlayerClient( createPacket );
             GraphicsManager.ActivePlayer = ActivePlayer;
             gameObjects.Add(ActivePlayer.Id, ActivePlayer);
             // Set up the input manager.

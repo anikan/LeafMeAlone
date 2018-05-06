@@ -125,6 +125,12 @@ namespace Server
             state.workSocket = clientSocket;
             clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
+
+            //Start listening for the next connection
+            listener.BeginAccept(
+                new AsyncCallback(AcceptCallback),
+                listener);
+
         }
 
         /// <summary>

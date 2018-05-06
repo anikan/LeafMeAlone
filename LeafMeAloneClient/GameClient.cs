@@ -38,34 +38,12 @@ namespace Client
         private static void Main()
         {
             GameClient Client = new GameClient();
-            Client.Timer = new Stopwatch();
-
-            Client.gameObjects = new Dictionary<int, GameObjectClient>();
 
             GraphicsRenderer.Init();
 
-            GraphicsManager.ActiveCamera =
-                new Camera(
+            GraphicsManager.ActiveCamera = new Camera(
                     new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY
                     );
-
-            /*
-            Client.leaves = new List<LeafClient>();
-
-            for (int x = -5; x < 5; x++)
-            {
-                for (int y = -5; y < 5; y++)
-                {
-
-                    LeafClient newLeaf = new LeafClient();
-                    newLeaf.Transform.Position = new Vector3(x * 5, 0.0f, y * 5);
-                    Client.GameObjects.Add(newLeaf.Id, newLeaf);
-                }
-            }
-            */
-
-            //TODO FOR TESTING ONLY
-            //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -73,32 +51,6 @@ namespace Client
 
         }
 
-
-        public static void TestPlayerMovementWithoutNetworking(object ignore, KeyEventArgs keyArg)
-        {
-            if (keyArg.KeyCode == Keys.Up)
-            {
-                GraphicsManager.ActivePlayer.Transform.Position += Vector3.UnitY;
-            }
-            if (keyArg.KeyCode == Keys.Down)
-            {
-                GraphicsManager.ActivePlayer.Transform.Position -= Vector3.UnitY;
-            }
-            if (keyArg.KeyCode == Keys.Left)
-            {
-                GraphicsManager.ActivePlayer.Transform.Position += Vector3.UnitX;
-            }
-            if (keyArg.KeyCode == Keys.Right)
-            {
-                GraphicsManager.ActivePlayer.Transform.Position -= Vector3.UnitX;
-            }
-            if (keyArg.KeyCode == Keys.Space)
-            {
-                GraphicsManager.ActivePlayer.Transform.Rotation += Vector3.UnitY * 20;
-            }
-
-
-        }
         private void DoGameLoop()
         {
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
@@ -125,6 +77,9 @@ namespace Client
         public GameClient()
         {
             networkClient.StartClient();
+            Timer = new Stopwatch();
+            Timer.Start();
+            gameObjects = new Dictionary<int, GameObjectClient>();
 
             // Receive the response from the remote device.  
             //networkClient.Receive();
@@ -135,13 +90,16 @@ namespace Client
         /// </summary>
         private void Update()
         {
+            // Get the time since the last frame.
             float delta = Timer.ElapsedMilliseconds;
 
             foreach (KeyValuePair<int, GameObjectClient> kv in
                 gameObjects.AsEnumerable())
             {
                 GameObjectClient gameObject = kv.Value;
-                gameObject.Update(delta);
+
+                // Update with delta in seconds
+                gameObject.Update(delta / 1000.0f);
             }
 
             Timer.Restart();

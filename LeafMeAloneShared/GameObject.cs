@@ -18,6 +18,7 @@ namespace Shared
     {
 
         public bool Burning;
+        public float Health;
 
         public ObjectType ObjectType;
 
@@ -30,6 +31,7 @@ namespace Shared
         public int Id { get; set; }
 
         public abstract void Update(float deltaTime);
+        public abstract void Destroy();
           
         protected GameObject()
         {

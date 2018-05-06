@@ -102,8 +102,10 @@ namespace Server
         public void ApplyFakeFriction()
         {
 
+            // Get the current velocity (or round it to zero if it's really small).
             Velocity = RoundVectorToZero(Velocity, MIN_VELOCITY);
 
+            // Decrease the velocity slightly and apply it back
             Vector3 FakeFriction = -Velocity * FAKE_FRICTION_FACTOR;
             Velocity += FakeFriction;
 
@@ -133,6 +135,9 @@ namespace Server
         /// <param name="toolMode">Mode (primary or secondary) of tool equipped.</param>
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
+            // Call the base's HitByTool function (burns the object)
+            base.HitByTool(playerPosition, toolType, toolMode);
+
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
 
@@ -163,20 +168,6 @@ namespace Server
                     // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
                     ApplyForce(force);
-                }
-            }
-
-            // If this is a flamethrower
-            else if (toolType == ToolType.THROWER)
-            {
-
-                // If it's the primary flamethrower function
-                if (toolMode == ToolMode.PRIMARY)
-                {
-
-                    // Set the object on fire.
-                    CatchFire();
-
                 }
             }
         }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Shared
 {
     [ProtoContract]
-    class LeafPacket : Packet
+    public class LeafPacket : Packet
     {
         [ProtoMember(1)]
         public float MovementX;
@@ -24,6 +24,5 @@ namespace Shared
         /// </summary>
         public LeafPacket()  : base(PacketType.LeafPacket)
         { }
-
     }
 }

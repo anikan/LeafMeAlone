@@ -206,11 +206,14 @@ namespace Client
                     InitializeUserPlayerAndMovement(createPacket);
                     break;
                 case (ObjectType.PLAYER):
-                    gameObjects.Add(
-                        createPacket.Id, new PlayerClient(createPacket)
+                    gameObjects.Add( 
+                        createPacket.Id, new PlayerClient( createPacket )
                         );
                     break;
                 case (ObjectType.LEAF):
+                    gameObjects.Add(
+                        createPacket.Id, new LeafClient( createPacket )
+                        );
                     break;
             }
         }
@@ -225,7 +228,7 @@ namespace Client
             CreateObjectPacket createPacket
             )
         {
-            ActivePlayer = new PlayerClient(createPacket);
+            ActivePlayer = new PlayerClient( createPacket );
             GraphicsManager.ActivePlayer = ActivePlayer;
             gameObjects.Add(ActivePlayer.Id, ActivePlayer);
             // Set up the input manager.

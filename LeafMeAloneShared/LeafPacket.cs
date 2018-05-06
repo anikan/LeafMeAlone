@@ -18,5 +18,12 @@ namespace Shared
 
         [ProtoMember(3)]
         public float Rotation;
+
+        /// <summary>
+        /// Creates a new packet for a leaf
+        /// </summary>
+        public LeafPacket()  : base(PacketType.LeafPacket)
+        { }
+
     }
 }

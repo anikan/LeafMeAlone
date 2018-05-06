@@ -146,5 +146,15 @@ namespace Server
 
             return false;
         }
+
+        /// <summary>
+        /// Add this GameObject to the server's list of GameObjects and set the id.
+        /// </summary>
+        public void Register()
+        {
+            Id = GameServer.instance.gameObjectDict.Count();
+
+            GameServer.instance.gameObjectDict.Add(Id, this);
+        }
     }
 }

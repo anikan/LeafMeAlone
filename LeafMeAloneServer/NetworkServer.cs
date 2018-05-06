@@ -136,7 +136,7 @@ namespace Server
         /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
-            foreach (KeyValuePair<int, GameObject> pair in GameServer.instance.gameObjectDict)
+            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
             {
                 CreateObjectPacket packetToSend =
                     new CreateObjectPacket(pair.Value);
@@ -146,7 +146,7 @@ namespace Server
 
         public void SendWorldUpdateToAllClients()
         {
-            foreach (KeyValuePair<int, GameObject> pair in GameServer.instance.gameObjectDict)
+            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
             {
                 Packet packetToSend = ServerPacketFactory.CreatePacket(pair.Value);
                 SendAll(packetToSend.Serialize());

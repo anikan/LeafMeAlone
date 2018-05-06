@@ -37,6 +37,9 @@ namespace Client
         // Current player.
         public static PlayerClient ActivePlayer;
 
+        // The list of particle systems
+        private static List<ParticleSystem> p_systems;
+
         // Converts a screen point to a world position.
         // Converts a screen point to a world position.
         public static Vector3 ScreenToWorldPoint(Vector2 screenPos)
@@ -82,10 +85,48 @@ namespace Client
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
 
+        // the offset of the framethrower from the player
+        public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f,3.85f,3.0f);
+        public static float FlameInitSpeed = 40.0f, FlameAcceleration = 15.0f;
+        private static int counter = 0;
+
         public static void Update()
         {
             // update the camera position based on the player position
             ActiveCamera.MoveCameraAbsolute( ActivePlayer.Transform.Position + PlayerToCamOffset, ActivePlayer.Transform.Position );
+
+            // set the rotation based on the three directions
+            Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
+                                   Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
+                                   Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
+            
+            // if all rendering is stopped, reset and enable
+            if (!p_systems[0].IsRendering())
+            {
+                p_systems[0].ResetSystem();
+                p_systems[0].EnableGeneration(true);
+            }
+            // manually toggle off after 6000 frames
+            else if ((counter = ++counter % 6000) == 0)
+            {
+                p_systems[0].EnableGeneration(false);
+            }
+
+            // flame throwing particle system update
+            p_systems[0].SetOrigin(ActivePlayer.Transform.Position + Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat) );
+            p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
+            p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
+            p_systems[0].Update();
+            
+            p_systems[1].Update();
+
+        }
+
+        public static void Draw()
+        {
+            p_systems[0].Draw();
+            p_systems[1].Draw();
+
         }
 
         /// <summary>
@@ -120,6 +161,36 @@ namespace Client
             }
 
             LoadAllShaders();
+
+            p_systems = new List<ParticleSystem>();
+            
+            // set the rotation based on the three directions
+            Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
+                         Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
+                         Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
+
+            p_systems.Add(new ParticleSystem(ParticleSystemType.FIRE,
+                    ActivePlayer.Transform.Position + Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat),   // origin
+                    ActivePlayer.Transform.Forward * FlameInitSpeed,  // acceleration
+                    ActivePlayer.Transform.Forward * FlameAcceleration,   // initial speed
+                    120.0f,   // cone radius, may need to adjust whenever acceleration changes
+                    1.0f,    // initial delta size
+                    10f,     // cutoff distance
+                    0.2f,     // cutoff speed
+                    0.075f      // enlarge speed
+                )
+            );
+            p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
+                    new Vector3(-10, -10, 0),   // origin
+                    new Vector3(2.0f, 0f, 0f),  // acceleration
+                    new Vector3(1f, 0f, 0f),    // initial speed
+                    20.0f,   // cone radius
+                    1.0f,    // initial delta size
+                    10f,     // cutoff distance
+                    0,     // cutoff speed
+                    0      // enlarge speed
+                )
+            );
         }
 
         /// <summary>

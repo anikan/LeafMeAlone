@@ -17,23 +17,27 @@ SamplerState MeshTextureSampler
 
 void VS(float4 iPosL : POSITION,
 	float4 iTex : TEXTURE,
+	float4 iOrigin : ORIGIN,
 	out float4 oPosH : SV_POSITION,
 	out float4 oPosObj : POSITION_OBJ,
+	out float4 oOrigin : ORIGIN_OBJ,
 	out float2 oTex : UV_TEX)
 {
 	oPosH = mul(iPosL, gWorldViewProj);
 	oPosObj = iPosL;
 	oTex = float2(iTex.x, iTex.y);
+	oOrigin = iOrigin;
 }
 
 float4 PS(float4 iPosH  : SV_POSITION,
 	float4 iPosObj : POSITION_OBJ,
+	float4 iOrigin : ORIGIN_OBJ,
 	float2 iTex : UV_TEX)
 	: SV_TARGET
 {
 	float4 ret = tex_diffuse.Sample(MeshTextureSampler, iTex);
 
-	float dist = length(iPosObj.xyz - gOrigin);
+	float dist = length(iPosObj - iOrigin);
 	float factor = 1.0f;
 	if (dist > CutoffDist)
 	{

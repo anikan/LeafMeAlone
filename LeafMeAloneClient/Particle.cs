@@ -11,6 +11,17 @@ namespace Client
 
     public class Particle
     {
+        //create buffers
+        public Buffer VBO_Verts, VBO_Tex;
+        public Buffer EBO;
+        public DataStream Verts, Tex, Faces;
+        //public InputElement[] Elements;
+
+        /// <summary>
+        /// Creation origin of the particle in world space.
+        /// </summary>
+        public Vector3 Origin;
+
         /// <summary>
         /// Current position of the particle in world space.
         /// </summary>
@@ -32,6 +43,11 @@ namespace Client
         public Vector3 Acceleration;
 
         /// <summary>
+        /// Initial Acceleration (Derivative of Velocity)
+        /// </summary>
+        public Vector3 InitAcceleration;
+
+        /// <summary>
         /// Normal for object
         /// </summary>
         public Vector3 Normal;
@@ -46,13 +62,17 @@ namespace Client
         /// </summary>
         public float LifeRemaining;
 
-        public Particle(Vector3 position, Vector3 velocity, float mass, float lifeRemaining)
+        public Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, float mass, float lifeRemaining)
         {
+            InitAcceleration = acceleration;
+            Origin = position;
             Position = position;
             Velocity = Vector3.Zero;
             LifeRemaining = lifeRemaining;
             Mass = mass;
             Force = Vector3.Zero;
+
+
         }
 
 

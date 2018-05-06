@@ -26,7 +26,6 @@ namespace Client
 
         private Camera Camera => GraphicsManager.ActiveCamera;
 
-        private ParticleSystem p;
 
         /// <summary>
         /// The main entry point for the application.
@@ -40,12 +39,13 @@ namespace Client
             GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
-            GraphicsManager.Init();
 
             Client.ActivePlayer = new PlayerClient();
 
             //GraphicsManager.ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
             GraphicsManager.ActivePlayer = Client.ActivePlayer;
+
+            GraphicsManager.Init();
 
             // Set up the input manager.
             Client.SetupInputManager();
@@ -55,16 +55,6 @@ namespace Client
 
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
-
-            Client.p =new ParticleSystem(ParticleSystemType.FIRE, 
-                new Vector3(-10,0,0),   // origin
-                new Vector3(2.0f, 0f, 0f),  // velocity
-                2.0f,   // cone radius
-                1.0f,    // initial delta size
-                10f,     // cutoff distance
-                0.2f,     // cutoff speed
-                0.075f      // enlarge speed
-                );
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -111,6 +101,7 @@ namespace Client
 
             //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
             GraphicsManager.Update();
+            GraphicsManager.Draw();
             Render();
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
@@ -129,9 +120,6 @@ namespace Client
         {
             ActivePlayer.Update();
             ActivePlayer.Draw();
-
-            p.Update();
-            p.Draw();
         }
 
         /// <summary>

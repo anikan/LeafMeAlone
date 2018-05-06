@@ -24,16 +24,6 @@ namespace Server
 
         }
 
-        public Transform GetTransform()
-        {
-            return Transform;
-        }
-
-        public void SetTransform(Transform value)
-        {
-            Transform = value;
-        }
-
         public override void Update(float deltaTime)
         {
 

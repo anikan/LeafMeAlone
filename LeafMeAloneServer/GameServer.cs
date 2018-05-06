@@ -77,7 +77,7 @@ namespace Server
                 {
                     PlayerPacket packet = networkServer.PlayerPackets[i];
 
-                    if (gameObjectDict.TryGetValue(packet.ObjectID, out GameObjectServer playerGameObject))
+                    if (gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject))
                     {
                         PlayerServer player = (PlayerServer) playerGameObject;
 

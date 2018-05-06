@@ -19,7 +19,11 @@ namespace Shared
     {
 
         [ProtoMember(1)]
-        public int Id;
+        public int _ProtoObjId
+        {
+            get { return ObjectId; }
+            set { ObjectId = value; }
+        }
 
         [ProtoMember(2)]
         public float InitialX;
@@ -36,7 +40,7 @@ namespace Shared
         public CreateObjectPacket(GameObject gameObject) :
             base(PacketType.CreateObjectPacket)
         {
-            Id = gameObject.Id;
+            ObjectId = gameObject.Id;
             InitialX = gameObject.Transform.Position.X;
             InitialY = gameObject.Transform.Position.Y;
             objectType = gameObject.ObjectType;

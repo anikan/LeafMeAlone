@@ -26,7 +26,7 @@ namespace Shared
         public bool Modified;
 
         // ID of the object this packet is associated with.
-        public int ObjectID;
+        public int ObjectId;
 
         public PacketType packetType;
 

@@ -26,7 +26,7 @@ namespace Server
                     Dead = player.Dead,
                     MovementX = player.Transform.Get2dPosition().X,
                     MovementY = player.Transform.Get2dPosition().Y,
-                    ObjectID = player.Id,
+                    _ProtoObjId = player.Id,
                     Rotation = player.Transform.Rotation.Y,
                     ToolEquipped = player.ToolEquipped,
                     UsingToolPrimary =
@@ -41,7 +41,7 @@ namespace Server
                 {
                     MovementX = leaf.Transform.Get2dPosition().X,
                     MovementY = leaf.Transform.Get2dPosition().Y,
-                    ObjectID = leaf.Id,
+                    ObjectId = leaf.Id,
                     Rotation = leaf.Transform.Rotation.Y,
                 };
             }

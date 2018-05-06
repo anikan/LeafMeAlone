@@ -180,7 +180,7 @@ namespace Client
                 else
                 {
                     gameObjects.TryGetValue(
-                        packet.ObjectID, out GameObjectClient toUpdate);
+                        packet.ObjectId, out GameObjectClient toUpdate);
 
                     if (toUpdate == null)
                     {
@@ -207,12 +207,12 @@ namespace Client
                     break;
                 case (ObjectType.PLAYER):
                     gameObjects.Add( 
-                        createPacket.Id, new PlayerClient( createPacket )
+                        createPacket.ObjectId, new PlayerClient( createPacket )
                         );
                     break;
                 case (ObjectType.LEAF):
                     gameObjects.Add(
-                        createPacket.Id, new LeafClient( createPacket )
+                        createPacket.ObjectId, new LeafClient( createPacket )
                         );
                     break;
             }

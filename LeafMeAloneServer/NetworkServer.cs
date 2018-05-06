@@ -136,7 +136,7 @@ namespace Server
         /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
-            List<GameObject> currentGameObjects =
+            List<GameObjectServer> currentGameObjects =
                 GameServer.instance.gameObjectList;
             foreach (GameObject objToSend in currentGameObjects)
             {

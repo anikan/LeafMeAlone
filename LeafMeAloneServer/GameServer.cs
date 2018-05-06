@@ -15,7 +15,8 @@ namespace Server
 
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
 
-        public List<GameObject> gameObjectList = new List<GameObject>();
+        public List<GameObjectServer> gameObjectList = new List<GameObjectServer>();
+        public List<LeafServer> LeafList = new List<LeafServer>();
 
         private NetworkServer networkServer = new NetworkServer();
 
@@ -29,11 +30,17 @@ namespace Server
 
         private List<Vector3> spawnPoints = new List<Vector3>();
 
+        private Stopwatch testTimer;
+
         public GameServer()
         {
             instance = this; 
 
             timer = new Stopwatch();
+            testTimer = new Stopwatch();
+
+            timer.Start();
+            testTimer.Start();
 
             spawnPoints.Add(new Vector3(-10, -10, 0));
             spawnPoints.Add(new Vector3(-10, 10, 0));
@@ -41,7 +48,6 @@ namespace Server
             spawnPoints.Add(new Vector3(10, 10, 0));
 
             //CreateLeaves(100, -10, 10, -10, 10);
-
         }
 
         public static int Main(String[] args)
@@ -49,7 +55,6 @@ namespace Server
             GameServer gameServer = new GameServer();
             
             gameServer.networkServer.StartListening();
-
 
             gameServer.DoGameLoop();
 
@@ -63,7 +68,6 @@ namespace Server
         {
             while (true)
             {
-                timer.Restart();
 
                 //Check if a client wants to connect.
                 networkServer.CheckForConnections();
@@ -74,7 +78,7 @@ namespace Server
                     //playerServerList.UpdateFromPacket(networkServer.PlayerPackets[i]);
                 }
 
-                UpdateObjects(timer.ElapsedMilliseconds);
+                UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
 
                 //Console.WriteLine("Player is at {0}", playerServer.GetTransform().Position);
 
@@ -86,20 +90,51 @@ namespace Server
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
-                    Console.WriteLine("Warning: Server is falling behind.");
+               //     Console.WriteLine("Warning: Server is falling behind.");
                 }
+
+                timer.Restart();
 
                 //Sleep for the rest of this tick.
                 System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
+
+
             }
         }
 
         public void UpdateObjects(float deltaTime)
         {
 
+            TestPhysics();
+
+
             for (int i = 0; i < gameObjectList.Count; i++)
             {
                 gameObjectList[i].Update(deltaTime);
+            }
+        }
+
+        public void TestPhysics()
+        {
+
+            if (testTimer.Elapsed.Seconds > 3)
+            {
+
+                for (int i = 0; i < LeafList.Count; i++)
+                {
+                    Console.WriteLine("APPLYING FORCE");
+                    Vector3 testForce = new Vector3(100.0f, 0.0f, 0.0f);
+                    LeafList[i].ApplyForce(testForce);
+                    testTimer.Restart();
+
+                }
+            }
+
+            for (int i = 0; i < LeafList.Count; i++)
+            {
+                string printString = string.Format("Leaf {0}: {1}", i, LeafList[i].Transform.Position);
+                Console.WriteLine(printString);
+
             }
         }
 
@@ -146,8 +181,27 @@ namespace Server
                 LeafServer newLeaf = new LeafServer();
                 newLeaf.Transform.Position = pos;
                 gameObjectList.Add(newLeaf);
+                LeafList.Add(newLeaf);
 
                 Console.WriteLine("Creating leaf at position " + pos);
+            }
+        }
+
+        public void AddUniversalPhysics()
+        {
+
+        }
+
+        public void AddPlayerToolEffects()
+        {
+
+            for (int i = 0; i < playerServerList.Count; i++)
+            {
+
+                PlayerServer player = playerServerList[i];
+
+                player.AffectObjectsInToolRange(gameObjectList);
+
             }
         }
     }

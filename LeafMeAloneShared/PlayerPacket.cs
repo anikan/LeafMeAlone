@@ -18,15 +18,6 @@ namespace Shared
     public class PlayerPacket : Packet
     {
 
-        // Type of tool the player is using.
-        public enum ToolType
-        {
-
-            BLOWER,
-            THROWER
-
-        }
-
         // Movement info in the packet. 
         // Note: When sending the packet, this is just a direction.
         // When receiving, this will be an absolute position.

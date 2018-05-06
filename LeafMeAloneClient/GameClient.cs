@@ -56,9 +56,15 @@ namespace Client
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
 
-
-            
-            Client.p =new ParticleSystem(ParticleSystemType.FIRE);
+            Client.p =new ParticleSystem(ParticleSystemType.FIRE, 
+                new Vector3(-10,0,0),   // origin
+                new Vector3(2.0f, 0f, 0f),  // velocity
+                2.0f,   // cone radius
+                1.0f,    // initial delta size
+                10f,     // cutoff distance
+                0.2f,     // cutoff speed
+                0.075f      // enlarge speed
+                );
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 

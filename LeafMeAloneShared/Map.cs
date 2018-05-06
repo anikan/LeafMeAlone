@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
+    public class Map
+    {
 
+
+
+    }
 }
-

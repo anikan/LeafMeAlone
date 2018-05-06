@@ -7,10 +7,8 @@ using Shared;
 
 namespace Client
 {
-    class LeafClient : GameObjectClient, ILeaf
+    class LeafClient : GameObjectClient
     {
-        public bool Burning { get; set; }
-        public float TimeBurning { get; set; }
 
         public const string LeafModelPath = @"../../Models/Leaf_V1.fbx";
 

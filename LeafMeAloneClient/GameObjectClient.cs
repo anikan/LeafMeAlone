@@ -35,7 +35,7 @@ namespace Client
             model.Update();
         }
 
-        public override void Draw()
+        public virtual void Draw()
         {
             model?.Draw();
         }

@@ -242,7 +242,7 @@ namespace Client
         {
             // Create a new player packet, and fill it with player's relevant info.
             PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
-            byte[] data = PlayerPacket.Serialize(toSend);
+            byte[] data = toSend.Serialize();
             networkClient.Send(data);
 
             // COMMENT OUT WHEN SERVER IS INTEGRATED

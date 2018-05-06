@@ -15,6 +15,7 @@ namespace Server
 
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
 
+        public List<LeafServer> LeafList = new List<LeafServer>();
         public Dictionary<int, GameObject> gameObjectDict = new Dictionary<int, GameObject>();
 
         private NetworkServer networkServer = new NetworkServer();
@@ -29,19 +30,24 @@ namespace Server
 
         private List<Vector3> spawnPoints = new List<Vector3>();
 
+        private Stopwatch testTimer;
+
         public GameServer()
         {
             instance = this; 
 
             timer = new Stopwatch();
+            testTimer = new Stopwatch();
+
+            timer.Start();
+            testTimer.Start();
 
             spawnPoints.Add(new Vector3(-10, -10, 0));
             spawnPoints.Add(new Vector3(-10, 10, 0));
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            //CreateLeaves(100, -10, 10, -10, 10);
-
+            //CreateLeaves(1, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)
@@ -62,7 +68,6 @@ namespace Server
         {
             while (true)
             {
-                timer.Restart();
 
                 //Check if a client wants to connect.
                 networkServer.CheckForConnections();
@@ -82,19 +87,21 @@ namespace Server
                     }
                 }
 
-                UpdateObjects(timer.ElapsedMilliseconds);
+                UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
 
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
 
                 //Send object data to all clients.
-                networkServer.SendPlayer(playerServer);
+                //networkServer.SendPlayer(playerServer);
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
-                    Console.WriteLine("Warning: Server is falling behind.");
+               //     Console.WriteLine("Warning: Server is falling behind.");
                 }
+
+                timer.Restart();
 
                 //Sleep for the rest of this tick.
                 System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
@@ -103,10 +110,37 @@ namespace Server
 
         public void UpdateObjects(float deltaTime)
         {
+
+            TestPhysics();
+            
             //This foreach loop hurts my soul. May consider making it normal for loop.
             foreach (KeyValuePair<int, GameObject> pair in gameObjectDict )
             {
                 pair.Value.Update(deltaTime);
+            }
+        }
+
+        public void TestPhysics()
+        {
+
+            if (testTimer.Elapsed.Seconds > 3)
+            {
+
+                for (int i = 0; i < LeafList.Count; i++)
+                {
+                    Console.WriteLine("APPLYING FORCE");
+                    Vector3 testForce = new Vector3(100.0f, 0.0f, 0.0f);
+                    LeafList[i].ApplyForce(testForce);
+                    testTimer.Restart();
+
+                }
+            }
+
+            for (int i = 0; i < LeafList.Count; i++)
+            {
+                string printString = string.Format("Leaf {0}: {1}", i, LeafList[i].Transform.Position);
+                Console.WriteLine(printString);
+
             }
         }
 
@@ -134,7 +168,7 @@ namespace Server
                 new CreateObjectPacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-             networkServer.SendAll(CreateObjectPacket.Serialize(objPacket));
+             networkServer.SendAll(objPacket.Serialize());
                
             return newActivePlayer;
         }
@@ -156,9 +190,28 @@ namespace Server
 
                 LeafServer newLeaf = new LeafServer();
                 newLeaf.Transform.Position = pos;
+                LeafList.Add(newLeaf);
                 newLeaf.Register();
 
                 Console.WriteLine("Creating leaf at position " + pos);
+            }
+        }
+
+        public void AddUniversalPhysics()
+        {
+
+        }
+
+        public void AddPlayerToolEffects()
+        {
+
+            for (int i = 0; i < playerServerList.Count; i++)
+            {
+
+                PlayerServer player = playerServerList[i];
+
+                //player.AffectObjectsInToolRange(gameObjectList);
+
             }
         }
     }

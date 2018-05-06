@@ -30,28 +30,16 @@ namespace Shared
         [ProtoMember(4)]
         public ObjectType objectType;
 
-        public CreateObjectPacket() { }
+        public CreateObjectPacket() : base(PacketType.CreateObjectPacket)
+        { }
 
-        public CreateObjectPacket(GameObject gameObject)
+        public CreateObjectPacket(GameObject gameObject) :
+            base(PacketType.CreateObjectPacket)
         {
             Id = gameObject.Id;
             InitialX = gameObject.Transform.Position.X;
             InitialY = gameObject.Transform.Position.Y;
             objectType = gameObject.ObjectType;
-        }
-
-        /// <summary>
-        /// Serializes the packet object into an array of bytes
-        /// </summary>
-        /// <returns>the serialized packet</returns>
-        public static byte[] Serialize(CreateObjectPacket packet)
-        {
-            MemoryStream ms = new MemoryStream();
-            Serializer.Serialize(ms, packet);
-            byte[] serializedObject = ms.ToArray();
-
-            return PrependHeader( 
-                serializedObject, PacketType.CreateObjectPacket);
         }
     }
 }

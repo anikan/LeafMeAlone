@@ -18,15 +18,6 @@ namespace Shared
     public class PlayerPacket : Packet
     {
 
-        // Type of tool the player is using.
-        public enum ToolType
-        {
-
-            BLOWER,
-            THROWER
-
-        }
-
         // Movement info in the packet. 
         // Note: When sending the packet, this is just a direction.
         // When receiving, this will be an absolute position.
@@ -65,24 +56,8 @@ namespace Shared
         /// Initializes a player packet, calls base constructor.
         /// </summary>
         /// <param name="id"></param>
-        public PlayerPacket()
+        public PlayerPacket() : base(PacketType.PlayerPacket)
         {
-        }
-
-        /// <summary>
-        /// Serializes the packet object into an array of bytes
-        /// </summary>
-        /// <returns>the serialized packet</returns>
-        public static byte[] Serialize(PlayerPacket packet)
-        {
-            MemoryStream ms = new MemoryStream();
-            Serializer.Serialize(ms, packet);
-            byte[] serializedObject = ms.ToArray();
-
-            serializedObject =
-                PrependHeader(serializedObject, PacketType.PlayerPacket);
-
-            return serializedObject;
         }
 
         public override string ToString()

@@ -28,13 +28,15 @@ namespace Shared
         // ID of the object this packet is associated with.
         public int ObjectID;
 
+        public PacketType packetType;
+
         /// <summary>
         /// Creates the packet
         /// </summary>
         /// <param name="id"></param>
-        public Packet()
+        public Packet(PacketType packetType)
         {
-
+            this.packetType = packetType;
         }
 
         /// <summary>
@@ -48,6 +50,14 @@ namespace Shared
             return header.Concat(packetSize).Concat(data).ToArray();
         }
 
+        /// <summary>
+        /// Deserializes the packet type from the given data and outputs the 
+        /// size of the packet
+        /// </summary>
+        /// <param name="data">the input buffer that begins with the 
+        /// packet info</param>
+        /// <param name="bytesRead">the number of bytes read in total</param>
+        /// <returns>the packet deserialized</returns>
         public static Packet Deserialize(byte[] data, out int bytesRead)
         {
             Byte[] objectData =
@@ -82,6 +92,20 @@ namespace Shared
             byte[] resizedBuffer = new byte[packetSize];
             Buffer.BlockCopy(data, 5, resizedBuffer, 0, packetSize);
             return resizedBuffer;
+        }
+
+        /// <summary>
+        /// Serializes the packet to a byte array
+        /// </summary>
+        /// <returns>the serialized object</returns>
+        public byte[] Serialize()
+        {
+            MemoryStream ms = new MemoryStream();
+            Serializer.Serialize(ms, this);
+            byte[] serializedObject = ms.ToArray();
+
+            return PrependHeader( 
+                serializedObject, packetType);
         }
     }
 }

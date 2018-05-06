@@ -17,6 +17,8 @@ namespace Shared
     public abstract class GameObject : INetworked
     {
 
+        public bool Burning;
+
         public ObjectType ObjectType;
 
         /// <summary>
@@ -28,7 +30,6 @@ namespace Shared
         public int Id { get; set; }
 
         public abstract void Update(float deltaTime);
-        public abstract void Draw();
           
         protected GameObject()
         {

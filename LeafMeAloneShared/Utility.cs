@@ -31,6 +31,23 @@ namespace Shared
         public Vector3 Rotation; // euler coordinate that represents the direction the object is facing
         public Vector3 Scale;     // scale of the model
 
+        public Vector3 Forward  // getter returns the unit direction vector, based on the Rotation vector
+        {
+            get
+            {
+                Vector3 retVec = new Vector3(0, -1, 0);
+
+                // set the rotation based on the three directions
+                Matrix m_ModelMatrix = Matrix.RotationX(Rotation.X) *
+                                Matrix.RotationY(Rotation.Y) *
+                                Matrix.RotationZ(Rotation.Z);
+
+                retVec = Vector3.Normalize(Vector3.TransformCoordinate(retVec, m_ModelMatrix));
+
+                return retVec;
+            }
+        }
+
         // check if the objects are logically equivalent to each other
         public override bool Equals(object other)
         {

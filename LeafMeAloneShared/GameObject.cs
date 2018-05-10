@@ -7,13 +7,18 @@ using SlimDX;
 
 namespace Shared
 {
+    // Type of an object in the game.
     public enum ObjectType
     {
+        OTHER,
         ACTIVE_PLAYER,
         PLAYER,
         LEAF
     };
 
+    /// <summary>
+    /// Abstract GameObject class, for both GameObjectClient and GameObjectServer to extend
+    /// </summary>
     public abstract class GameObject : INetworked
     {
 

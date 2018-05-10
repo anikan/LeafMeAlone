@@ -43,7 +43,7 @@ namespace Server
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
         /// <param name="mass">Optional mass of the object, default 1</param>
-        public PhysicsObject(ObjectType objectType, float burnTime, float mass = 1.0f) : base(objectType, burnTime)
+        public PhysicsObject(ObjectType objectType, float health, float mass = 1.0f) : base(objectType, health)
         {
             Mass = mass;
         }
@@ -54,7 +54,7 @@ namespace Server
         /// <param name="objectType">Type of this object.</param>
         /// <param name="startTransform">Starting position.</param>
         /// <param name="mass">Optional mass of the object, default 1.</param>
-        public PhysicsObject(ObjectType objectType, Transform startTransform, float burnTime, float mass = 1.0f) : base(objectType, startTransform, burnTime)
+        public PhysicsObject(ObjectType objectType, Transform startTransform, float health, float mass = 1.0f) : base(objectType, startTransform, health)
         {
             Mass = mass;
         }

@@ -12,8 +12,14 @@ namespace Server
     public abstract class GameObjectServer : GameObject
     {
 
+        // Rate (in seconds) that health decrements if an object is on fire.
+        public const float HEALTH_DECREMENT_RATE = 1.0f;
+
         // Timer for how long this object has been burning.
         private Stopwatch BurnTimer;
+
+        // Timer to keep track of when health should decrement.
+        private Stopwatch HealthDecrementTimer;
 
         /// <summary>
         /// Constructor for a GameObject that's on the server, with default instantiation position.
@@ -47,6 +53,7 @@ namespace Server
             ObjectType = objectType;
             Health = health;
             BurnTimer = new Stopwatch();
+            HealthDecrementTimer = new Stopwatch();
         }
 
         /// <summary>
@@ -59,11 +66,20 @@ namespace Server
             // If this object is burning.
             if (Burning)
             {
-                // Get fire damage from the flamethrower.
-                float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
 
-                // Decrease health by burn damage.
-                Health -= fireDamage;
+                // Check if the health decrement rate has been passed and if so, decrement health.
+                if (HealthDecrementTimer.ElapsedMilliseconds / 1000.0f >= HEALTH_DECREMENT_RATE)
+                {
+                    // Get fire damage from the flamethrower.
+                    float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
+
+                    // Decrease health by burn damage.
+                    Health -= fireDamage;
+
+                    // Restart the decrement timer.
+                    HealthDecrementTimer.Restart();
+
+                }
 
                 // If health goes negative, destroy the object.
                 if (Health <= 0)
@@ -81,6 +97,7 @@ namespace Server
         {
             Burning = true;
             BurnTimer.Restart();
+            HealthDecrementTimer.Restart();
         }
 
         /// <summary>

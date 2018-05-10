@@ -21,7 +21,7 @@ namespace Client
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public static int BufferSize = 1024;
+        public static int BufferSize = 4096;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -111,15 +111,38 @@ namespace Client
         /// </summary>
         public void Receive()
         {
-            byte[] buffer = new byte[StateObject.BufferSize];
-            if (client.Available > 0)
+            Console.WriteLine(client.Available);
+
+            byte[] savedBuffer = new byte[0];
+
+            while (client.Available > 0)
             {
-                int bytesToRead =
-                    client.Receive(buffer, 0, StateObject.BufferSize, 0);
-                while (bytesToRead > 0)
+                if (savedBuffer.Length != 0)
                 {
+                    Console.WriteLine("hi there");
+                }
+
+                byte[] buffer = new byte[StateObject.BufferSize];
+
+                Buffer.BlockCopy(savedBuffer, 0, buffer, 0, savedBuffer.Length);
+
+                int bytesToRead =
+                    client.Receive(buffer, savedBuffer.Length, StateObject.BufferSize - savedBuffer.Length, 0);
+
+                savedBuffer = new byte[0];
+
+                while (bytesToRead > 0)
+                { 
                     Packet objectPacket =
                         Packet.Deserialize(buffer, out int bytesRead);
+
+                    //If we need more bytes to continue, break.
+                    if (objectPacket == null)
+                    {
+                        savedBuffer = buffer;
+                        break;
+                    }
+
                     PacketQueue.Add(objectPacket);
                     buffer = buffer.Skip(bytesRead).ToArray();
                     bytesToRead -= bytesRead;

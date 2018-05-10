@@ -50,7 +50,7 @@ namespace Server
 
             networkServer = new NetworkServer(address);
 
-            CreateLeaves(1, -10, 10, -10, 10);
+            CreateLeaves(100, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)

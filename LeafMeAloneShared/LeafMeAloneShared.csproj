@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AntTweakBar.NET">
+      <HintPath>..\AntTweakBar.NET.dll</HintPath>
+    </Reference>
     <Reference Include="AssimpNet, Version=3.3.2.0, Culture=neutral, PublicKeyToken=3edc10cb77b1bca2, processorArchitecture=MSIL">
       <HintPath>..\packages\AssimpNet.3.3.2\lib\net45\AssimpNet.dll</HintPath>
     </Reference>
@@ -54,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FPSTracker.cs" />
     <Compile Include="INetworked.cs" />
     <Compile Include="PlayerPacket.cs" />
     <Compile Include="Packet.cs" />

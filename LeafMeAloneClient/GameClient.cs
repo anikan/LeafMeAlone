@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AntTweakBar;
 using Client;
 using LeafMeAloneClient;
 using Shared;
@@ -26,16 +27,17 @@ namespace Client
 
         private Camera Camera => GraphicsManager.ActiveCamera;
 
+        private FPSTracker fps;
+
 
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         /// 
         private NetworkClient networkClient = new NetworkClient();
-
         private static void Main()
         {
-            //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
+            Process.Start("..\\..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
             GameClient Client = new GameClient();
 
             GraphicsRenderer.Init();
@@ -55,6 +57,12 @@ namespace Client
 
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
+            var b = new Bar(GraphicsRenderer.BarContext) { Label = "FPS", Contained = true };
+            b.Size = new Size(5, 30);
+            b.Position = new Point(GraphicsRenderer.Form.ClientSize.Width - b.Size.Width, 0);
+            b.SetDefinition("refresh=.1");
+            Client.fps = new FPSTracker(b);
+            Client.fps.Start();
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -104,6 +112,8 @@ namespace Client
             GraphicsManager.Draw();
             Render();
 
+            GraphicsRenderer.BarContext.Draw();
+            fps.Next();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 
         }
@@ -111,7 +121,7 @@ namespace Client
         public GameClient()
         {
             networkClient.StartClient();
-            
+
             // Receive the response from the remote device.  
             //networkClient.Receive();
         }
@@ -149,12 +159,12 @@ namespace Client
             PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
             byte[] data = PlayerPacket.Serialize(toSend);
             networkClient.Send(data);
-            
+
             // COMMENT OUT WHEN SERVER IS INTEGRATED
             /*ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,
                                                           ActivePlayer.Transform.Position.Y,
                                                           ActivePlayer.Transform.Position.Z - playerPack.Movement.Y * 0.01f );*/
-        
+
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
             ActivePlayer.ResetRequests();
@@ -165,7 +175,7 @@ namespace Client
         /// Sets up the input manager and relevant input events.
         /// </summary>
         private void SetupInputManager()
-        { 
+        {
             // Create an input manager for player events.
             InputManager = new InputManager(ActivePlayer);
 

@@ -201,7 +201,7 @@ namespace Client
             // add more argument to each list as needed
             List <string> allShaderPaths = new List<string>( new string[]
             {
-                @"../../Shaders/defaultShader.fx"
+                @"../../../Shaders/defaultShader.fx"
             } );
 
             List <string> allShaderVSName = new List<string>(new string[]

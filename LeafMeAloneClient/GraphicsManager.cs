@@ -88,6 +88,8 @@ namespace Client
         // the offset of the framethrower from the player
         public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f,3.85f,3.0f);
         public static float FlameInitSpeed = 40.0f, FlameAcceleration = 15.0f;
+        public static float WindInitSpeed = 60.0f, WindAcceleration = -30.0f, WindStopDistance = 60.0f;
+        public static Vector3 WindDirection = Vector3.UnitX;
         private static int counter = 0;
 
         public static void Update()
@@ -117,7 +119,14 @@ namespace Client
             p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
             p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
             p_systems[0].Update();
-            
+
+            if (counter % 1000 == 0)
+            {
+                WindDirection = Vector3.TransformCoordinate(WindDirection, Matrix.RotationY(0.1f));
+            }
+
+            p_systems[1].SetVelocity(WindDirection * WindInitSpeed);
+            p_systems[1].SetAcceleration(WindDirection * WindAcceleration);
             p_systems[1].Update();
 
         }
@@ -143,6 +152,7 @@ namespace Client
                 light0.UseDirectionalPreset();
                 light0.intensities = new Vector4(1.3f,1.2f,1.0f,0);
                 light0.status = LightParameters.STATUS_ON;
+                light0.position = Vector4.Normalize(new Vector4(-1, 0, 0, 0));
             }
             LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
             {
@@ -169,26 +179,50 @@ namespace Client
                          Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
                          Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
 
+            // Flame thrower settings
             p_systems.Add(new ParticleSystem(ParticleSystemType.FIRE,
-                    ActivePlayer.Transform.Position + Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat),   // origin
-                    ActivePlayer.Transform.Forward * FlameInitSpeed,  // acceleration
-                    ActivePlayer.Transform.Forward * FlameAcceleration,   // initial speed
-                    120.0f,   // cone radius, may need to adjust whenever acceleration changes
+                ActivePlayer.Transform.Position +
+                Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat), // origin
+                ActivePlayer.Transform.Forward * FlameInitSpeed, // acceleration
+                ActivePlayer.Transform.Forward * FlameAcceleration, // initial speed
+                    false,          // cutoff all colors
+                    false,          // no backward particle prevention
+                    320.0f,   // cone radius, may need to adjust whenever acceleration changes
                     1.0f,    // initial delta size
                     10f,     // cutoff distance
                     0.2f,     // cutoff speed
                     0.075f      // enlarge speed
                 )
             );
+
+            // Wind blower settings
             p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
                     new Vector3(-10, -10, 0),   // origin
-                    new Vector3(2.0f, 0f, 0f),  // acceleration
-                    new Vector3(1f, 0f, 0f),    // initial speed
-                    20.0f,   // cone radius
+                    WindDirection * WindAcceleration,  // acceleration
+                    WindDirection * WindInitSpeed,    // initial speed
+                    true,          // cutoff alpha only
+                    true,          // prevent backward flow 
+                    800.0f,   // cone radius
                     1.0f,    // initial delta size
-                    10f,     // cutoff distance
-                    0,     // cutoff speed
-                    0      // enlarge speed
+                    0f,     // cutoff distance
+                    0.5f,     // cutoff speed
+                    0.1f,      // enlarge speed
+                    WindStopDistance      // stop dist
+                )
+            );
+
+            // camera effect...?
+            p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
+                    new Vector3(-10, -10, 0),   // origin
+                    new Vector3(-30.0f, 0f, 0f),  // acceleration
+                    new Vector3(100f, 0f, 0f),    // initial speed
+                    true,          // cutoff alpha only
+                    false,           // dont prevent backward flow
+                    10000.0f,   // cone radius
+                    1.0f,    // initial delta size
+                    2f,     // cutoff distance
+                    0.5f,     // cutoff speed
+                    0.2f      // enlarge speed
                 )
             );
         }

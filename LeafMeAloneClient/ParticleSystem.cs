@@ -69,6 +69,9 @@ namespace Client
         private float CutOffSpeed;
         private float EnlargeSpeed;
         private float StopDist;
+        private int AlphaCutoffOnly;
+        private bool DisableRewind;
+        private ParticleSystemType Type;
 
         private bool ShouldGenerate;
         private bool ShouldRender;
@@ -91,6 +94,8 @@ namespace Client
             Vector3 init_pos,  
             Vector3 acceleration, 
             Vector3 init_velocity,
+            bool alpha_cutoff_only = false,
+            bool disable_rewind = true,
             float cone_radius = 20.0f,
             float initial_size = 1.0f,
             float cutoff_dist = 10.0f,
@@ -112,7 +117,11 @@ namespace Client
             CutoffDist = cutoff_dist;
             EnlargeSpeed = enlarge_speed;
             StopDist = stop_dist;
+            AlphaCutoffOnly = alpha_cutoff_only? 1:0;
+            DisableRewind = disable_rewind;
             ShouldGenerate = true;
+            ShouldRender = true;
+            Type = type;
 
             r = new Random();
 
@@ -197,12 +206,13 @@ namespace Client
                     TexSRV = CreateTexture(@"../../Particles/fire_red.png");
                     break;
                 case ParticleSystemType.WIND:
-                    TexSRV = CreateTexture(@"../../Particles/Wind_Transparent.png");
+                    TexSRV = CreateTexture(@"../../Particles/Wind_Transparent2.png");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
             
+            ResetSystem();
         }
 
         /// <summary>
@@ -275,7 +285,7 @@ namespace Client
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(2, new VertexBufferBinding(VBO_Origin, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO,Format.R32_UInt,0);
 
-
+            Effects.GetVariableByName("AlphaCutoffOnly").AsScalar().Set(AlphaCutoffOnly);
             Effects.GetVariableByName("CutoffSpeed").AsScalar().Set(CutOffSpeed);
             Effects.GetVariableByName("CutoffDist").AsScalar().Set(CutoffDist);
             Effects.GetVariableByName("gOrigin").AsVector().Set(GenerationOrigin);
@@ -323,6 +333,7 @@ namespace Client
                         particle.Position = GenerationOrigin;
                         particle.Acceleration = Vector3.Zero;
                         particle.Velocity = InitVelocity;
+                        particle.InitVelocity = InitVelocity;
                         particle.LifeRemaining = r.Range(10f);
                         emissionThisFrame++;
                         activeParticles++;
@@ -335,10 +346,20 @@ namespace Client
 
                 Vector3 prevForce = particle.Force;
                 particle.Force = new Vector3(
-                    ConeSize * (r.NextFloat()-0.5f) + particle.InitAcceleration.X + prevForce.X, 
-                    ConeSize * (r.NextFloat()-0.5f) + particle.InitAcceleration.Y + prevForce.Y, 
-                    ConeSize * (r.NextFloat()-0.5f) + particle.InitAcceleration.Z + prevForce.Z);
+                    ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.X + prevForce.X,
+                    ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.Y + prevForce.Y,
+                    ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.Z + prevForce.Z);
 
+                if (DisableRewind)
+                {
+                    float cosAngle = Vector3.Dot(Vector3.Normalize(particle.InitVelocity), Vector3.Normalize(particle.Velocity));
+                    if (cosAngle < 0f)
+                    {
+                        particle.Force = Vector3.Zero;
+                        particle.Velocity = Vector3.Zero;
+                        particle.LifeRemaining = 0;
+                    }
+                }
                 particle.Update(.001f);
             }
 

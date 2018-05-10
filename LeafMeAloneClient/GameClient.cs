@@ -101,8 +101,8 @@ namespace Client
 
             //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
             GraphicsManager.Update();
-            GraphicsManager.Draw();
             Render();
+            GraphicsManager.Draw();
 
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 

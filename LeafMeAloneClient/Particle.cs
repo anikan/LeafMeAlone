@@ -11,11 +11,6 @@ namespace Client
 
     public class Particle
     {
-        //create buffers
-        public Buffer VBO_Verts, VBO_Tex;
-        public Buffer EBO;
-        public DataStream Verts, Tex, Faces;
-        //public InputElement[] Elements;
 
         /// <summary>
         /// Creation origin of the particle in world space.
@@ -31,6 +26,7 @@ namespace Client
         /// Current Velocity (Derivative of Position)
         /// </summary>
         public Vector3 Velocity;
+        public Vector3 InitVelocity;
 
         /// <summary>
         /// Current force exerted on particle. Note: Gets reset after every update loop.
@@ -67,7 +63,8 @@ namespace Client
             InitAcceleration = acceleration;
             Origin = position;
             Position = position;
-            Velocity = Vector3.Zero;
+            Velocity = velocity;
+            InitVelocity = velocity;
             LifeRemaining = lifeRemaining;
             Mass = mass;
             Force = Vector3.Zero;

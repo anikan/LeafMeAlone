@@ -65,14 +65,14 @@ namespace Client
                 address = IPAddress.Loopback;
             }
 
-            GameClient Client = new GameClient(new NetworkClient(address));
-
             // Create a new camera with a specified offset.
             Camera activeCamera = new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
 
             // Initialize graphics classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
+
+            GameClient Client = new GameClient(new NetworkClient(address));
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 

@@ -129,10 +129,12 @@ namespace Client
                 int bytesToRead =
                     client.Receive(buffer, savedBuffer.Length, StateObject.BufferSize - savedBuffer.Length, 0);
 
+                bytesToRead += savedBuffer.Length;
+
                 savedBuffer = new byte[0];
 
-                while (bytesToRead > 0)
-                { 
+                while (buffer.Length > 0)
+                {
                     Packet objectPacket =
                         Packet.Deserialize(buffer, out int bytesRead);
 

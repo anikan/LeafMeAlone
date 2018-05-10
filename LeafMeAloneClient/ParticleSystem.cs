@@ -82,6 +82,9 @@ namespace Client
         /// <param name="type"> Specify the type of the particle system needed (WIND or FIRE) </param>
         /// <param name="init_pos"> Specify the generation origin of the particles </param>
         /// <param name="acceleration"> Specify the acceleration of the particles as a vector </param>
+        /// <param name="init_velocity"> Specify the initial velocity of the particles </param>
+        /// <param name="alpha_cutoff_only"> Disable cutting off color other than alpha </param>
+        /// <param name="disable_rewind"> Disable particles from moving backwards from the direction of initial velocity </param>
         /// <param name="cone_radius"> Specify the cone radius of the overall cone of the particles </param>
         /// <param name="initial_size"> Specify the size of the particle initially </param>
         /// <param name="cutoff_dist"> Specify the cutoff distance, where the particle starts getting larger and darker </param>

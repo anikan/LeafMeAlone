@@ -56,14 +56,18 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="GameClient.cs" />
+    <Compile Include="GraphicGameObject.cs" />
     <Compile Include="LeafClient.cs" />
     <Compile Include="NetworkClient.cs" />
-    <Compile Include="GameObjectClient.cs" />
+    <Compile Include="NetworkedGameObjectClient.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="GraphicsManager.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="InputManager.cs" />
+    <Compile Include="NonNetworkedGameObjectClient.cs" />
+    <Compile Include="Particle.cs" />
+    <Compile Include="ParticleSystem.cs" />
     <Compile Include="PlayerClient.cs" />
     <Compile Include="GraphicsRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -97,6 +101,10 @@
       <Project>{3fc1602c-d2f3-4f71-b433-92c241503bcf}</Project>
       <Name>LeafMeAloneShared</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Shaders\defaultShader.fx" />
+    <Content Include="Shaders\particle.fx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.3.3.2\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.3.3.2\build\AssimpNet.targets')" />

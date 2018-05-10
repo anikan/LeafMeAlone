@@ -8,7 +8,7 @@ using Shared;
 
 namespace Client
 {
-    public class PlayerClient : GameObjectClient, IPlayer
+    public class PlayerClient : NetworkedGameObjectClient, IPlayer
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
@@ -203,6 +203,14 @@ namespace Client
         public override void UpdateFromPacket(Packet packet)
         {
             UpdateFromPacket(packet as PlayerPacket);
+        }
+
+        /// <summary>
+        /// "Kills" the player and forces a respawn.
+        /// </summary>
+        public override void Destroy()
+        {
+            // You can't destroy a player silly. Do something else here instead.
         }
     }
 }

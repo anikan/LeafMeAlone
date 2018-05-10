@@ -7,7 +7,7 @@ using Shared;
 
 namespace Client
 {
-    class LeafClient : GameObjectClient
+    class LeafClient : NetworkedGameObjectClient
     {
 
         public const string LeafModelPath = @"../../Models/Leaf_V1.fbx";

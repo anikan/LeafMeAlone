@@ -14,15 +14,15 @@ namespace Server
     public class LeafServer : PhysicsObject
     {
 
-        public const float LEAF_BURN_TIME = 3.0f;
+        public const float LEAF_HEALTH = 5.0f;
 
-        public LeafServer() : base(ObjectType.LEAF, LEAF_BURN_TIME)
+        public LeafServer() : base(ObjectType.LEAF, LEAF_HEALTH)
         {
 
         }
 
         public LeafServer(Transform startTransform) : 
-            base (ObjectType.LEAF, startTransform, LEAF_BURN_TIME)
+            base (ObjectType.LEAF, startTransform, LEAF_HEALTH)
         {
 
         }

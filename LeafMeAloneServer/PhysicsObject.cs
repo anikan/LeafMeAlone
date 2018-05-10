@@ -43,7 +43,7 @@ namespace Server
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
         /// <param name="mass">Optional mass of the object, default 1</param>
-        public PhysicsObject(ObjectType objectType, float burnTime, float mass = 1.0f) : base(objectType, burnTime)
+        public PhysicsObject(ObjectType objectType, float health, float mass = 1.0f) : base(objectType, health)
         {
             Mass = mass;
         }
@@ -54,7 +54,7 @@ namespace Server
         /// <param name="objectType">Type of this object.</param>
         /// <param name="startTransform">Starting position.</param>
         /// <param name="mass">Optional mass of the object, default 1.</param>
-        public PhysicsObject(ObjectType objectType, Transform startTransform, float burnTime, float mass = 1.0f) : base(objectType, startTransform, burnTime)
+        public PhysicsObject(ObjectType objectType, Transform startTransform, float health, float mass = 1.0f) : base(objectType, startTransform, health)
         {
             Mass = mass;
         }
@@ -102,8 +102,10 @@ namespace Server
         public void ApplyFakeFriction()
         {
 
+            // Get the current velocity (or round it to zero if it's really small).
             Velocity = RoundVectorToZero(Velocity, MIN_VELOCITY);
 
+            // Decrease the velocity slightly and apply it back
             Vector3 FakeFriction = -Velocity * FAKE_FRICTION_FACTOR;
             Velocity += FakeFriction;
 
@@ -125,37 +127,48 @@ namespace Server
             return vector;
         }
 
+        /// <summary>
+        /// Function called when this object is hit by a player's tool.
+        /// </summary>
+        /// <param name="playerPosition">Position of the player that hit this object.</param>
+        /// <param name="toolType">Type of tool equipped.</param>
+        /// <param name="toolMode">Mode (primary or secondary) of tool equipped.</param>
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
+            // Call the base's HitByTool function (burns the object)
+            base.HitByTool(playerPosition, toolType, toolMode);
 
+            // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
 
+            // If this is a leafblower.
             if (toolType == ToolType.BLOWER)
             {
 
+                // If this is the leafblower's primary tool.
                 if (toolMode == ToolMode.PRIMARY)
                 {
+                    // Extinguish any objects that get blowed by the leaf blower.
+                    Extinguish();
 
+                    // Get the force of this tool.
                     float toolForce = toolInfo.Force;
+
+                    // Get the vector from the player to the object.
                     Vector3 playerToObj = Transform.Position - playerPosition;
+                    float distance = playerToObj.Length();
+
+                    // Divide the vector by the range of the tool to normalize it.
+                    playerToObj /= toolInfo.Range;
+
+                    // Multiply tool force by distance so that it's stronger on objects that are closer.
+                    // Also make sure denominator can't be zero.
+                    toolForce /= Math.Max(0.001f, distance);
+
+                    // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
-
-
                     ApplyForce(force);
-
-
                 }
-            }
-            else if (toolType == ToolType.THROWER)
-            {
-
-                if (toolMode == ToolMode.PRIMARY)
-                {
-
-
-
-                }
-
             }
         }
     }

@@ -9,25 +9,30 @@ using SlimDX;
 
 namespace Server
 {
+    /// <summary>
+    /// GameObject that exists on the server.
+    /// </summary>
     public abstract class GameObjectServer : GameObject
     {
 
-
-        // How long this object can burn before being destroying.
-        private float BurnTimeBeforeDestroy;
+        // Rate (in seconds) that health decrements if an object is on fire.
+        public const float HEALTH_DECREMENT_RATE = 1.0f;
 
         // Timer for how long this object has been burning.
         private Stopwatch BurnTimer;
+
+        // Timer to keep track of when health should decrement.
+        private Stopwatch HealthDecrementTimer;
 
         /// <summary>
         /// Constructor for a GameObject that's on the server, with default instantiation position.
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
-        /// <param name="burnTime">Amount of time this object can burn before destroy.</param>
-        public GameObjectServer(ObjectType objectType, float burnTime) : base()
+        /// <param name="health">Health this object has.</param>
+        public GameObjectServer(ObjectType objectType, float health) : base()
         {
             // Call the initialize function with correct arguments.
-            Initialize(objectType, burnTime);
+            Initialize(objectType, health);
         }
 
         /// <summary>
@@ -35,22 +40,23 @@ namespace Server
         /// </summary>
         /// <param name="objectType">Type of the object.</param>
         /// <param name="startPosition">Location the object should be created.</param>
-        /// <param name="burnTime">Time this object can burn before destroy.</param>
-        public GameObjectServer(ObjectType objectType, Transform startPosition, float burnTime) : base(startPosition)
+        /// <param name="health">Health this object has.</param>
+        public GameObjectServer(ObjectType objectType, Transform startPosition, float health) : base(startPosition)
         {
-            Initialize(objectType, burnTime);
+            Initialize(objectType, health);
         }
 
         /// <summary>
         /// Initializes this object's values and data structures.
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
-        /// <param name="burnTime">Time this object can burn before destroy.</param>
-        public void Initialize(ObjectType objectType, float burnTime)
+        /// <param name="health">Amount of health this object has.</param>
+        public void Initialize(ObjectType objectType, float health)
         {
             ObjectType = objectType;
-            BurnTimeBeforeDestroy = burnTime;
+            Health = health;
             BurnTimer = new Stopwatch();
+            HealthDecrementTimer = new Stopwatch();
         }
 
         /// <summary>
@@ -59,10 +65,31 @@ namespace Server
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
-            // Destroy the object after it's done burning.
-            if (BurnTimer.ElapsedMilliseconds / 1000.0f > BurnTimeBeforeDestroy)
+
+            // If this object is burning.
+            if (Burning)
             {
-                // Omg how are we going to do destroy asdf?
+
+                // Check if the health decrement rate has been passed and if so, decrement health.
+                if (HealthDecrementTimer.ElapsedMilliseconds / 1000.0f >= HEALTH_DECREMENT_RATE)
+                {
+                    // Get fire damage from the flamethrower.
+                    float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
+
+                    // Decrease health by burn damage.
+                    Health -= fireDamage;
+
+                    // Restart the decrement timer.
+                    HealthDecrementTimer.Restart();
+
+                }
+
+                // If health goes negative, destroy the object.
+                if (Health <= 0)
+                {
+                    // Destroy.
+                    Destroy();
+                }
             }
         }
 
@@ -73,6 +100,7 @@ namespace Server
         {
             Burning = true;
             BurnTimer.Restart();
+            HealthDecrementTimer.Restart();
         }
 
         /// <summary>
@@ -91,7 +119,24 @@ namespace Server
         /// <param name="playerPosition">Position of the player. </param>
         /// <param name="toolType">Type of the tool hit by.</param>
         /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
-        public abstract void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode);
+        public virtual void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        {
+            // Get information about the tool that was used on this object.
+            ToolInfo toolInfo = Tool.GetToolInfo(toolType);
+
+            if (toolType == ToolType.THROWER)
+            {
+
+                // If it's the primary flamethrower function
+                if (toolMode == ToolMode.PRIMARY)
+                {
+
+                    // Set the object on fire.
+                    CatchFire();
+
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the distance of this object to the player.
@@ -156,6 +201,14 @@ namespace Server
             Id = GameServer.instance.gameObjectDict.Count();
 
             GameServer.instance.gameObjectDict.Add(Id, this);
+        }
+
+        /// <summary>
+        /// Destroys this object and removes references.
+        /// </summary>
+        public override void Destroy()
+        {
+            // What to do?!
         }
     }
 }

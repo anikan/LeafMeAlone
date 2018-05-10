@@ -13,6 +13,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using Device = SlimDX.DXGI.Device;
+using System.Net;
 
 namespace Client
 {
@@ -47,15 +48,24 @@ namespace Client
         // Initial particle system.
         private ParticleSystem p;
 
-        // Network client, to handle networking from the client-side
-        private NetworkClient networkClient = new NetworkClient();
+        private NetworkClient networkClient;
 
-        private static void Main()
+        private static void Main(String[] args)
         {
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
 
-            // Create a new GameClient
-            GameClient Client = new GameClient();
+            IPAddress address;
+            if (args.Length > 1)
+            {
+                address = IPAddress.Parse(args[1]);
+            }
+
+            else
+            {
+                address = IPAddress.Loopback;
+            }
+
+            GameClient Client = new GameClient(new NetworkClient(address));
 
             // Create a new camera with a specified offset.
             Camera activeCamera = new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
@@ -101,12 +111,10 @@ namespace Client
 
         }
 
-        /// <summary>
-        /// Creates a new GameClient
-        /// </summary>
-        public GameClient()
+        // Start the networked client (connect to server).
+        public GameClient(NetworkClient networkClient)
         {
-            // Start the networked client (connect to server).
+            this.networkClient = networkClient;
             networkClient.StartClient();
 
             // Initialize frame timer
@@ -205,6 +213,11 @@ namespace Client
             foreach (Packet packet in networkClient.PacketQueue)
             {
                 // If this is a packet to create a new object, create the object.
+                if (packet == null)
+                {
+                    continue;
+                }
+
                 if (packet is CreateObjectPacket)
                 {
                     // Create the new object.
@@ -260,6 +273,7 @@ namespace Client
                 case (ObjectType.LEAF):
                     NetworkedGameObjects.Add(
                         createPacket.ObjectId, new LeafClient( createPacket )
+
                         );
                     break;
             }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.AccessControl;
 using System.Threading;
 using Shared;
 
@@ -20,7 +21,7 @@ namespace Client
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public static int BufferSize = 256;
+        public static int BufferSize = 1024;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -52,6 +53,13 @@ namespace Client
         //List of received packets. Populated by ReadCallback
         public List<Packet> PacketQueue = new List<Packet>();
 
+        private IPAddress address;
+
+        public NetworkClient(IPAddress address)
+        {
+            this.address = address;
+        }
+
         /// <summary>
         /// Try to connect to the host.
         /// </summary>
@@ -61,11 +69,11 @@ namespace Client
             try
             {
                 //For testing purposes, connect to Loopback. 
-                IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
+                //IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
+                IPEndPoint remoteEP = new IPEndPoint(address, port);
 
                 // Create a TCP/IP socket.  
-                client = new Socket(ipAddress.AddressFamily,
+                client = new Socket(address.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
 
                 // Connect to the remote endpoint.  
@@ -106,11 +114,11 @@ namespace Client
             byte[] buffer = new byte[StateObject.BufferSize];
             if (client.Available > 0)
             {
-                int bytesToRead = 
+                int bytesToRead =
                     client.Receive(buffer, 0, StateObject.BufferSize, 0);
                 while (bytesToRead > 0)
                 {
-                    Packet objectPacket = 
+                    Packet objectPacket =
                         Packet.Deserialize(buffer, out int bytesRead);
                     PacketQueue.Add(objectPacket);
                     buffer = buffer.Skip(bytesRead).ToArray();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
@@ -18,7 +19,7 @@ namespace Server
         public List<LeafServer> LeafList = new List<LeafServer>();
         public Dictionary<int, GameObjectServer> gameObjectDict = new Dictionary<int, GameObjectServer>();
 
-        private NetworkServer networkServer = new NetworkServer();
+        private NetworkServer networkServer;
 
         //Time in ms for each tick.
         public const long TICK_TIME= 33;
@@ -32,7 +33,7 @@ namespace Server
 
         private Stopwatch testTimer;
 
-        public GameServer()
+        public GameServer(IPAddress address)
         {
             instance = this; 
 
@@ -47,12 +48,25 @@ namespace Server
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            //CreateLeaves(1, -10, 10, -10, 10);
+            networkServer = new NetworkServer(address);
+
+            CreateLeaves(1, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)
         {
-            GameServer gameServer = new GameServer();
+            IPAddress address;
+            if (args.Length > 1)
+            {
+                address = IPAddress.Parse(args[1]);
+            }
+
+            else
+            {
+                address = IPAddress.Loopback;
+            }
+
+            GameServer gameServer = new GameServer(address);
             
             gameServer.networkServer.StartListening();
 
@@ -87,11 +101,10 @@ namespace Server
                     }
                 }
 
-                UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
-
-
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
+
+                UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
@@ -111,7 +124,7 @@ namespace Server
         public void UpdateObjects(float deltaTime)
         {
 
-            TestPhysics();
+            //TestPhysics();
             
             //This foreach loop hurts my soul. May consider making it normal for loop.
             foreach (KeyValuePair<int, GameObjectServer> pair in gameObjectDict )
@@ -190,6 +203,7 @@ namespace Server
 
                 LeafServer newLeaf = new LeafServer();
                 newLeaf.Transform.Position = pos;
+                networkServer.SendNewObjectToAll(newLeaf);
                 LeafList.Add(newLeaf);
                 newLeaf.Register();
 

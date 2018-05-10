@@ -8,7 +8,7 @@ using Shared;
 
 namespace Client
 {
-    public class PlayerClient : GameObjectClient, IPlayer
+    public class PlayerClient : NetworkedGameObjectClient, IPlayer
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;

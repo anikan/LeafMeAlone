@@ -9,6 +9,9 @@ using SlimDX;
 
 namespace Server
 {
+    /// <summary>
+    /// GameObject that exists on the server.
+    /// </summary>
     public abstract class GameObjectServer : GameObject
     {
 

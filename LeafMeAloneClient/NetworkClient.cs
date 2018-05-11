@@ -117,17 +117,19 @@ namespace Client
 
             while (client.Available > 0)
             {
-                if (savedBuffer.Length != 0)
-                {
-                    Console.WriteLine("hi there");
-                }
+                //Saving amount available as it may change while waiting. 
+                int amountAvailable = client.Available;
 
-                byte[] buffer = new byte[StateObject.BufferSize];
+                //Initialize buffer size to be num bytes available or the full buffer size.
+                byte[] buffer = new byte[Math.Min(amountAvailable + savedBuffer.Length, StateObject.BufferSize)];
 
                 Buffer.BlockCopy(savedBuffer, 0, buffer, 0, savedBuffer.Length);
 
+                //Set how many bytes to read this iteration.
+                int bytesToReceive = Math.Min(amountAvailable, StateObject.BufferSize - savedBuffer.Length);
+
                 int bytesToRead =
-                    client.Receive(buffer, savedBuffer.Length, StateObject.BufferSize - savedBuffer.Length, 0);
+                    client.Receive(buffer, savedBuffer.Length, bytesToReceive, 0);
 
                 bytesToRead += savedBuffer.Length;
 
@@ -146,6 +148,7 @@ namespace Client
                     }
 
                     PacketQueue.Add(objectPacket);
+
                     buffer = buffer.Skip(bytesRead).ToArray();
                     bytesToRead -= bytesRead;
                 }

@@ -140,7 +140,7 @@ namespace Client
             );
 
             // TEMPORARY: Add the particle system to non-networked game objects.
-            NonNetworkedGameObjects.Add(p);
+            //NonNetworkedGameObjects.Add(p);
 
             // Receive the response from the remote device.  
             //networkClient.Receive();

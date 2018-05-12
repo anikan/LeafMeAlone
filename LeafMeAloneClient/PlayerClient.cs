@@ -159,7 +159,7 @@ namespace Client
 
             // TEMPORARY FOR TESTING
             // Set rotation of player
-            //Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
+            Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
 
         }
 
@@ -186,6 +186,7 @@ namespace Client
             // Reset the player requests struct to clear all info.
             PlayerRequests = new PlayerRequestInfo();
             // Set rotation initially to the rotation of the player
+
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
 
             PlayerRequests.EquipToolRequest = equippedTool;

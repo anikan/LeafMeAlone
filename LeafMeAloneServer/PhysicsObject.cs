@@ -120,9 +120,9 @@ namespace Server
         private Vector3 RoundVectorToZero(Vector3 vector, float minBeforeZero)
         {
             // Checks each value and sets to zero if less than minimum.
-            if (vector.X < minBeforeZero) vector.X = 0.0f;
-            if (vector.Y < minBeforeZero) vector.Y = 0.0f;
-            if (vector.Z < minBeforeZero) vector.Z = 0.0f;
+            if (Math.Abs(vector.X) < minBeforeZero) vector.X = 0.0f;
+            if (Math.Abs(vector.Y) < minBeforeZero) vector.Y = 0.0f;
+            if (Math.Abs(vector.Z) < minBeforeZero) vector.Z = 0.0f;
 
             return vector;
         }
@@ -171,7 +171,7 @@ namespace Server
                     // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
 
-                    Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
+                   // Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
 
 
                     ApplyForce(force);

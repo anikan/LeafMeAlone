@@ -187,7 +187,7 @@ namespace Server
                 float angleBetween = (float)Math.Acos(dot / mag);
                 angleBetween *= (180.0f / (float)Math.PI);
 
-                Console.WriteLine(string.Format("{0} {1}: Angle between is {2}, must be {3} before hit", this.GetType().ToString(), Id, angleBetween, equippedToolInfo.ConeAngle / 2.0f));
+              //  Console.WriteLine(string.Format("{0} {1}: Angle between is {2}, must be {3} before hit", this.GetType().ToString(), Id, angleBetween, equippedToolInfo.ConeAngle / 2.0f));
 
                 // Return true if the leaf is within the cone angle, false otherwise. 
                 return (angleBetween <= (equippedToolInfo.ConeAngle / 2.0f));

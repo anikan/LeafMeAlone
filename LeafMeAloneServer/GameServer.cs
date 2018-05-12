@@ -55,7 +55,7 @@ namespace Server
 
             networkServer = new NetworkServer(address);
 
-            CreateLeaves(100, -10, 10, -10, 10);
+            CreateLeaves(200, -10, 10, -10, 10);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -98,7 +98,7 @@ namespace Server
                 {
                     PlayerPacket packet = networkServer.PlayerPackets[i];
 
-                    if (gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject))
+                    if (packet != null && gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject))
                     {
                         PlayerServer player = (PlayerServer) playerGameObject;
 

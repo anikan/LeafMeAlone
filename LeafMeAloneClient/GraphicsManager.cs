@@ -95,32 +95,40 @@ namespace Client
         public static void Update()
         {
             // update the camera position based on the player position
-            if (ActivePlayer == null) return;
-            
-            ActiveCamera.MoveCameraAbsolute( ActivePlayer.Transform.Position + PlayerToCamOffset, ActivePlayer.Transform.Position );
+            if (ActivePlayer != null)
+            {
+                ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
+                    ActivePlayer.Transform.Position);
 
-            // set the rotation based on the three directions
-            Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
-                                   Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
-                                   Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
-            
-            // if all rendering is stopped, reset and enable
-            if (!p_systems[0].IsRendering())
+                // set the rotation based on the three directions
+                Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
+                             Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
+                             Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
+
+                // if all rendering is stopped, reset and enable
+                if (!p_systems[0].IsRendering())
+                {
+                    p_systems[0].ResetSystem();
+                    p_systems[0].EnableGeneration(true);
+                }
+                // manually toggle off after 6000 frames
+                else if ((counter = ++counter % 6000) == 0)
+                {
+                    p_systems[0].EnableGeneration(false);
+                }
+
+                // flame throwing particle system update
+                p_systems[0].SetOrigin(ActivePlayer.Transform.Position +
+                                       Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat));
+                p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
+                p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
+                p_systems[0].Update(0.001f);
+            }
+            else
             {
                 p_systems[0].ResetSystem();
-                p_systems[0].EnableGeneration(true);
-            }
-            // manually toggle off after 6000 frames
-            else if ((counter = ++counter % 6000) == 0)
-            {
                 p_systems[0].EnableGeneration(false);
             }
-
-            // flame throwing particle system update
-            p_systems[0].SetOrigin(ActivePlayer.Transform.Position + Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat) );
-            p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
-            p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
-            p_systems[0].Update(0.001f);
 
             if (counter % 1000 == 0)
             {

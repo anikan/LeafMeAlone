@@ -121,6 +121,10 @@ namespace Client
 
         }
 
+        /// <summary>
+        /// Requests the player to look at a specified position, using mouse on screen space calculations.
+        /// </summary>
+        /// <param name="position">Screenspace position to look at.</param>
         public void RequestLookAtScreenSpace(Vector2 position)
         {
             // Screen sizes

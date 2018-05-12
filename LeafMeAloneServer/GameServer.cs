@@ -55,7 +55,7 @@ namespace Server
 
             networkServer = new NetworkServer(address);
 
-            CreateLeaves(200, -10, 10, -10, 10);
+            CreateRandomLeaves(200, -10, 10, -10, 10);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -128,6 +128,10 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Call Update() on all objects in the object dict.
+        /// </summary>
+        /// <param name="deltaTime"></param>
         public void UpdateObjects(float deltaTime)
         {
 
@@ -139,32 +143,9 @@ namespace Server
                 pair.Value.Update(deltaTime);
             }
 
+            // Add the effects of the player tools.
             AddPlayerToolEffects();
 
-        }
-
-        public void TestPhysics()
-        {
-
-            if (testTimer.Elapsed.Seconds > 3)
-            {
-
-                for (int i = 0; i < LeafList.Count; i++)
-                {
-                    Console.WriteLine("APPLYING FORCE");
-                    Vector3 testForce = new Vector3(100.0f, 0.0f, 0.0f);
-                    LeafList[i].ApplyForce(testForce);
-                    testTimer.Restart();
-
-                }
-            }
-
-            for (int i = 0; i < LeafList.Count; i++)
-            {
-                string printString = string.Format("Leaf {0}: {1}", i, LeafList[i].Transform.Position);
-                Console.WriteLine(printString);
-
-            }
         }
 
         public PlayerServer CreateNewPlayer()
@@ -196,28 +177,46 @@ namespace Server
             return newActivePlayer;
         }
 
-        public void CreateLeaves(int num, float minX, float maxX, float minY, float maxY)
+        /// <summary>
+        /// Creates all leaves in the scene, placing them randomly.
+        /// </summary>
+        /// <param name="num">Number of leaves to create.</param>
+        /// <param name="minX">Min x position to spawn leaves.</param>
+        /// <param name="maxX">Max x position to spawn leaves.</param>
+        /// <param name="minY">Min y position to spawn leaves.</param>
+        /// <param name="maxY">Max y position to spawn leaves.</param>
+        public void CreateRandomLeaves(int num, float minX, float maxX, float minY, float maxY)
         {
+            // Create a new random number generator.
             Random rnd = new Random();
 
+            // Itereate through number of leaves we want to create.
             for (int i = 0; i < num; i++)
             {
 
+                // Get random doubles for position.
                 double randX = rnd.NextDouble();
                 double randY = rnd.NextDouble();
 
+                // Bind random doubles to our range.
                 randX = (randX * (maxX - minX)) + minX;
                 randY = (randY * (maxY - minY)) + maxY;
 
+                // Get the new position
                 Vector3 pos = new Vector3((float)randX, 0.0f, (float)randY);
 
+                // Create a new leaf
                 LeafServer newLeaf = new LeafServer();
+
+                // Set the leaf's initial position.
                 newLeaf.Transform.Position = pos;
+
+                // Send this object to the other object's.
                 networkServer.SendNewObjectToAll(newLeaf);
+
+                // Add this leaf to the leaf list and object dictionary.
                 LeafList.Add(newLeaf);
                 newLeaf.Register();
-
-                Console.WriteLine("Creating leaf at position " + pos);
             }
         }
 
@@ -226,14 +225,20 @@ namespace Server
 
         }
 
+        /// <summary>
+        /// Add the tool effects of all the players.
+        /// </summary>
         public void AddPlayerToolEffects()
         {
 
+            // Iterate through all players.
             for (int i = 0; i < playerServerList.Count; i++)
             {
 
+                // Get this player.
                 PlayerServer player = playerServerList[i];
 
+                // Affect all objects within range of the player.
                 player.AffectObjectsInToolRange(gameObjectDict.Values.ToList<GameObjectServer>());
 
             }

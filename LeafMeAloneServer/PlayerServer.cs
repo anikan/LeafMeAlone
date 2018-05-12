@@ -24,6 +24,10 @@ namespace Server
 
         }
 
+        /// <summary>
+        /// Updates the object, runs every frame.
+        /// </summary>
+        /// <param name="deltaTime">Time since lsat frame, in seconds.</param>
         public override void Update(float deltaTime)
         {
 
@@ -33,16 +37,27 @@ namespace Server
 
         }
 
+        /// <summary>
+        /// Affects any object's within range of the player's tool.
+        /// </summary>
+        /// <param name="allObjects">A list of all objects in the game.</param>
         public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
         {
+            // If there is a tool equipped.
             if (ToolEquipped != ToolType.NONE)
             {
+
+                // Itereate through all objects.
                 for (int j = 0; j < allObjects.Count; j++)
                 {
 
+                    //Get the current object.
                     GameObjectServer gameObject = allObjects[j];
+
+                    // Check if it's within tool range, and that it's not the current player.
                     if (gameObject != this && gameObject.IsInPlayerToolRange(this))
                     {
+                        // Hit the object.
                         gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
 
                     }
@@ -50,6 +65,10 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Update the player based on a packet sent from the client.
+        /// </summary>
+        /// <param name="packet">Packet from client.</param>
         public void UpdateFromPacket(PlayerPacket packet)
         {
             Transform.Position += new Vector3(packet.MovementX, 0.0f, packet.MovementZ) * GameServer.TICK_TIME_S;
@@ -72,6 +91,12 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Function that determines what happens when the player is hit by another player's tool.
+        /// </summary>
+        /// <param name="playerPosition">Position of the other player.</param>
+        /// <param name="toolType">Type of tool hit by.</param>
+        /// <param name="toolMode">Tool mode hit by.</param>
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
             // TODO

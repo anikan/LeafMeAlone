@@ -13,7 +13,7 @@ namespace Server
     /// </summary>
     public class LeafServer : PhysicsObject
     {
-
+        // Constants for leafs. 
         public const float LEAF_HEALTH = 5.0f;
         public const float LEAF_MASS = 0.1f;
 

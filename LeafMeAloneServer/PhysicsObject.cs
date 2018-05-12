@@ -170,11 +170,11 @@ namespace Server
 
                     // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
-
-                   // Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
-
-
                     ApplyForce(force);
+
+                    // Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
+
+
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AntTweakBar;
@@ -27,7 +28,8 @@ namespace Client
 
         private Camera Camera => GraphicsManager.ActiveCamera;
 
-        private FPSTracker fps;
+        private UIFramesPersecond fps;
+        private UITimer gameTimer;
 
 
         /// <summary>
@@ -57,12 +59,10 @@ namespace Client
 
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
-            var b = new Bar(GraphicsRenderer.BarContext) { Label = "FPS", Contained = true };
-            b.Size = new Size(5, 30);
-            b.Position = new Point(GraphicsRenderer.Form.ClientSize.Width - b.Size.Width, 0);
-            b.SetDefinition("refresh=.1");
-            Client.fps = new FPSTracker(b);
+            Client.fps = new UIFramesPersecond(new Size(5, 30), new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
             Client.fps.Start();
+            Client.gameTimer = new UITimer(60,new Size(225,3),new Point(0,0) );
+
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -95,10 +95,13 @@ namespace Client
 
 
         }
+
         private void DoGameLoop()
         {
+            fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
+
             ReceivePackets();
 
             // Update input events.
@@ -108,14 +111,13 @@ namespace Client
             SendPackets();
 
             //GraphicsManager.ActiveCamera.RotateCamera(new Vector3(0, 0, 0), new Vector3(1, 0, 0), 0.0001f);
-            GraphicsManager.Update();
-            GraphicsManager.Draw();
+
             Render();
 
-            GraphicsRenderer.BarContext.Draw();
-            fps.Next();
-            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 
+            GraphicsRenderer.BarContext.Draw();
+            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+            fps.StopAndCalculateFps();
         }
 
         public GameClient()
@@ -128,6 +130,9 @@ namespace Client
 
         private void Render()
         {
+            GraphicsManager.Update();
+            GraphicsManager.Draw();
+
             ActivePlayer.Update();
             ActivePlayer.Draw();
         }

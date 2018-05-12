@@ -162,7 +162,7 @@ namespace Client
         /// <param name="pos"></param>
         public void SetPosition(Vector2 pos)
         {
-            // Set the position of the player directly.
+            // Set the position of the player directly
 
             // Update Transform on GameObject
 
@@ -190,7 +190,7 @@ namespace Client
             UsingToolPrimary = packet.UsingToolPrimary;
             UsingToolSecondary = packet.UsingToolSecondary;
             Transform.Position.X = packet.MovementX;
-            Transform.Position.Y = packet.MovementY;
+            Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
         }
 

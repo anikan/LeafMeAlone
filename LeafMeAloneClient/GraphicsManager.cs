@@ -79,21 +79,21 @@ namespace Client
 
         public static Light ActiveLightSystem;
 
-        // the offset of the camera from the player. Can be changed anytime to update the camera
-        public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
-
         public static void Update()
         {
-            // update the camera position based on the player position
-            ActiveCamera.MoveCameraAbsolute( ActivePlayer.Transform.Position + PlayerToCamOffset, ActivePlayer.Transform.Position );
+            if (ActivePlayer != null)
+            {
+                // update the camera position based on the player position
+                ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + GameClient.CAMERA_OFFSET, ActivePlayer.Transform.Position);
+            }
         }
 
         /// <summary>
         /// Initialize the graphics manager
         /// </summary>
-        public static void Init()
+        public static void Init(Camera activeCamera)
         {
-            ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
+            ActiveCamera = activeCamera;
 
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  

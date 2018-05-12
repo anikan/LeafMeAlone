@@ -7,8 +7,25 @@ using SlimDX;
 
 namespace Shared
 {
+    // Type of an object in the game.
+    public enum ObjectType
+    {
+        OTHER,
+        ACTIVE_PLAYER,
+        PLAYER,
+        LEAF
+    };
+
+    /// <summary>
+    /// Abstract GameObject class, for both GameObjectClient and GameObjectServer to extend
+    /// </summary>
     public abstract class GameObject : INetworked
     {
+
+        public bool Burning;
+        public float Health;
+
+        public ObjectType ObjectType;
 
         /// <summary>
         /// Name can be given to gameobjects for debugging purposes.
@@ -18,14 +35,23 @@ namespace Shared
         public Transform Transform;
         public int Id { get; set; }
 
-        public abstract void Update();
-        public abstract void Draw();
-        
+        public abstract void Update(float deltaTime);
+        public abstract void Destroy();
+          
         protected GameObject()
         {
-            Transform.Rotation = new Vector3(0, 0, 0);
-            Transform.Position = new Vector3(0, 0, 0);
-            Transform.Scale = new Vector3(1, 1, 1);
+            Transform EmptyTransform = new Transform();
+
+            EmptyTransform.Rotation = new Vector3(0, 0, 0);
+            EmptyTransform.Position = new Vector3(0, 0, 0);
+            EmptyTransform.Scale = new Vector3(1, 1, 1);
+
+            Transform = EmptyTransform;
+        }
+
+        protected GameObject(Transform startTransform)
+        {
+            Transform = startTransform;
         }
     }
 }

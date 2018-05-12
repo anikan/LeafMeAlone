@@ -11,26 +11,50 @@ namespace Server
     public class PlayerServer : GameObjectServer, IPlayer
     {
 
-        public bool Dead { get; set; }
-        public PlayerPacket.ToolType ToolEquipped { get; set; }
-        public bool UsingToolPrimary { get; set; }
-        public bool UsingToolSecondary { get; set; }
+        public const float PLAYER_BURN_TIME = 10000.0f;
 
-        public Transform GetTransform()
+        public bool Dead { get; set; }
+        public ToolType ToolEquipped { get; set; }
+
+        // If the user is using the primary function of their tool or secondary
+        public ToolMode ActiveToolMode { get; set; }
+
+        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_BURN_TIME)
         {
-            return Transform;
+
         }
 
-        public void SetTransform(Transform value)
+        public override void Update(float deltaTime)
         {
-            Transform = value;
+
+        }
+
+        public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
+        {
+
+            for (int j = 0; j < allObjects.Count; j++)
+            {
+
+                GameObjectServer gameObject = allObjects[j];
+                if (gameObject != this && gameObject.IsInPlayerToolRange(this))
+                {
+
+                    gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
+
+                }
+            }
         }
 
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            Transform.Position += new Vector3(packet.MovementX, packet.MovementY, 0.0f) * GameServer.TICK_TIME_S;
+            Transform.Position += new Vector3(packet.MovementX, 0.0f, packet.MovementY) * GameServer.TICK_TIME_S;
 
             Transform.Rotation.Y = packet.Rotation;
+        }
+
+        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        {
+            // TODO
         }
     }
 }

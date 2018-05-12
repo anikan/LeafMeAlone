@@ -56,13 +56,16 @@
   <ItemGroup>
     <Compile Include="Camera.cs" />
     <Compile Include="GameClient.cs" />
+    <Compile Include="GraphicGameObject.cs" />
+    <Compile Include="LeafClient.cs" />
     <Compile Include="NetworkClient.cs" />
-    <Compile Include="GameObjectClient.cs" />
+    <Compile Include="NetworkedGameObjectClient.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="GraphicsManager.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="InputManager.cs" />
+    <Compile Include="NonNetworkedGameObjectClient.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="PlayerClient.cs" />

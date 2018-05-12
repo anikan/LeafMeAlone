@@ -20,21 +20,21 @@ namespace Client
         WIND
     }
 
-    public class ParticleSystem : GameObject
+    /// <summary>
+    /// Particle system object, only exists client-side.
+    /// </summary>
+    public class ParticleSystem : NonNetworkedGameObjectClient
     {
         public bool Enabled = true;
 
-
         //list of particles in the system.
         private List<Particle> Particles = new List<Particle>();
-
 
         //create buffers
         private Buffer VBO_Verts, VBO_Tex;
         private Buffer EBO;
         private DataStream Verts, Tex,Faces;
         private InputElement[] Elements;
-
 
         //create shader effects
         private InputLayout InputLayout;
@@ -276,7 +276,7 @@ namespace Client
         /// <summary>
         /// Update the particles.
         /// </summary>
-        public override void Update()
+        public override void Update(float deltaTime)
         {
             if (!Enabled)
                 return;
@@ -318,5 +318,9 @@ namespace Client
             return File.Exists(fileName) ? ShaderResourceView.FromFile(GraphicsRenderer.Device, fileName) : null;
         }
 
+        public override void Destroy()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

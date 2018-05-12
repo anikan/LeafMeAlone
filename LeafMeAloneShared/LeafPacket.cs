@@ -21,7 +21,7 @@ namespace Shared
         public float MovementX;
 
         [ProtoMember(3)]
-        public float MovementY;
+        public float MovementZ;
 
         [ProtoMember(4)]
         public float Rotation;

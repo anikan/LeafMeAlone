@@ -52,7 +52,7 @@ namespace Server
 
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            Transform.Position += new Vector3(packet.MovementX, 0.0f, packet.MovementY) * GameServer.TICK_TIME_S;
+            Transform.Position += new Vector3(packet.MovementX, 0.0f, packet.MovementZ) * GameServer.TICK_TIME_S;
 
             Transform.Rotation.Y = packet.Rotation;
 

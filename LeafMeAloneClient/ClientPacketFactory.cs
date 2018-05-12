@@ -23,7 +23,7 @@ namespace Client
             {
                 Dead = player.Dead,
                 MovementX = player.PlayerRequests.MovementRequested.X,
-                MovementY = player.PlayerRequests.MovementRequested.Y,
+                MovementZ = player.PlayerRequests.MovementRequested.Y,
                 _ProtoObjId = player.Id,
                 Rotation = player.Transform.Rotation.Y,
                 ToolEquipped = player.PlayerRequests.EquipToolRequest,

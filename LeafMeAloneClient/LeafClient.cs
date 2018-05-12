@@ -20,7 +20,7 @@ namespace Client
         public void UpdateFromPacket(LeafPacket packet)
         {
             Transform.Position.X = packet.MovementX;
-            Transform.Position.Y = packet.MovementY;
+            Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
         }
 

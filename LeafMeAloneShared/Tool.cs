@@ -62,8 +62,8 @@ namespace Shared
         private const float ThrowerDamage = 1.0f;
 
         // Leafblower tool information.
-        private const float BlowerAngle = 10.0f;
-        private const float BlowerRange = 15.0f;
+        private const float BlowerAngle = 45.0f;
+        private const float BlowerRange = 20.0f;
         private const float BlowerForce = 200.0f;
         private const float BlowerDamage = 0.0f;
 

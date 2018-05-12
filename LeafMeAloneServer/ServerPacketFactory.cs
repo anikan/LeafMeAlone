@@ -24,8 +24,8 @@ namespace Server
                 return new PlayerPacket()
                 {
                     Dead = player.Dead,
-                    MovementX = player.Transform.Get2dPosition().X,
-                    MovementY = player.Transform.Get2dPosition().Y,
+                    MovementX = player.Transform.Position.X,
+                    MovementZ = player.Transform.Position.Z,
                     _ProtoObjId = player.Id,
                     Rotation = player.Transform.Rotation.Y,
                     ToolEquipped = player.ToolEquipped,
@@ -39,8 +39,8 @@ namespace Server
             {
                 return new LeafPacket()
                 {
-                    MovementX = leaf.Transform.Get2dPosition().X,
-                    MovementY = leaf.Transform.Get2dPosition().Y,
+                    MovementX = leaf.Transform.Position.X,
+                    MovementZ = leaf.Transform.Position.Z,
                     ObjectId = leaf.Id,
                     Rotation = leaf.Transform.Rotation.Y,
                 };

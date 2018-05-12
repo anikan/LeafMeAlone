@@ -35,7 +35,7 @@ namespace Shared
         /// delta
         /// </summary>
         [ProtoMember(3)]
-        public float MovementY;
+        public float MovementZ;
 
         // Rotation of the player.
         [ProtoMember(4)]
@@ -71,7 +71,7 @@ namespace Shared
 
             string printString = string.Format(
                 "Player packet info: Movement=({0}, {1}), Rotation={2}, UseToolPrimary={3}, UseToolSecondary={4}",
-                MovementX, MovementY, Rotation, UsingToolPrimary, UsingToolSecondary);
+                MovementX, MovementZ, Rotation, UsingToolPrimary, UsingToolSecondary);
 
             return printString;
 

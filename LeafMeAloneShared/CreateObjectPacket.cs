@@ -29,7 +29,7 @@ namespace Shared
         public float InitialX;
 
         [ProtoMember(3)]
-        public float InitialY;
+        public float InitialZ;
 
         [ProtoMember(4)]
         public ObjectType objectType;
@@ -42,7 +42,7 @@ namespace Shared
         {
             ObjectId = gameObject.Id;
             InitialX = gameObject.Transform.Position.X;
-            InitialY = gameObject.Transform.Position.Y;
+            InitialZ = gameObject.Transform.Position.Z;
             objectType = gameObject.ObjectType;
         }
     }

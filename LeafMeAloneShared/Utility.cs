@@ -120,7 +120,7 @@ namespace Shared
 
         public Vector2 Get2dPosition()
         {
-            return new Vector2(Position.X, Position.Y);
+            return new Vector2(Position.X, Position.Z);
         }
     }
 }

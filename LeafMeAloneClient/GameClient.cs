@@ -96,7 +96,6 @@ namespace Client
 
                 // Send any packets to the server.
                 SendPackets();
-
             }
 
             // Update all objects.

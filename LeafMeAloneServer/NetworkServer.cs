@@ -60,7 +60,7 @@ namespace Server
             // The DNS name of the computer  
 
             //IPAddress ipAddress = IPAddress.Loopback;//ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(address, 11000);
+            IPEndPoint localEndPoint = new IPEndPoint(address, 2302);
 
             // Create a TCP/IP socket.  
             listener = new Socket(address.AddressFamily,

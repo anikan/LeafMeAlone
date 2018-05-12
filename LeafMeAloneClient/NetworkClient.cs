@@ -34,7 +34,7 @@ namespace Client
     public class NetworkClient
     {
         // The port number for the remote device.  
-        private const int port = 11000;
+        private const int port = 2302;
 
         // ManualResetEvent instances signal completion.  
         private static ManualResetEvent connectDone =

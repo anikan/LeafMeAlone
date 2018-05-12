@@ -175,6 +175,8 @@ namespace Client
         {
             // Reset the player requests struct to clear all info.
             PlayerRequests = new PlayerRequestInfo();
+            // Set rotation initially to the rotation of the player
+            PlayerRequests.RotationRequested = Transform.Rotation.Y;
 
         }
 

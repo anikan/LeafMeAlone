@@ -114,11 +114,6 @@ namespace Client
                 p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
                 p_systems[0].Update(delta_t);
             }
-            else
-            {
-                p_systems[0].ResetSystem();
-                p_systems[0].EnableGeneration(false);
-            }
 
             p_systems[1].SetVelocity(WindDirection * WindInitSpeed);
             p_systems[1].SetAcceleration(WindDirection * WindAcceleration);

@@ -84,15 +84,16 @@ namespace Client
 
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
-
-        // the offset of the framethrower from the player
+        
+        // TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
         public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f,3.85f,3.0f);
         public static float FlameInitSpeed = 40.0f, FlameAcceleration = 15.0f;
+
+        // TODO: MOVE TO WIND BLOWER OR PLAYER CLASS
         public static float WindInitSpeed = 60.0f, WindAcceleration = -30.0f, WindStopDistance = 60.0f;
         public static Vector3 WindDirection = Vector3.UnitX;
-        private static int counter = 0;
-
-        public static void Update()
+        
+        public static void Update(float delta_t)
         {
             // update the camera position based on the player position
             if (ActivePlayer != null)
@@ -100,29 +101,18 @@ namespace Client
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
 
+                // TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
                 // set the rotation based on the three directions
                 Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
                              Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
                              Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
-
-                // if all rendering is stopped, reset and enable
-                if (!p_systems[0].IsRendering())
-                {
-                    p_systems[0].ResetSystem();
-                    p_systems[0].EnableGeneration(true);
-                }
-                // manually toggle off after 6000 frames
-                else if ((counter = ++counter % 6000) == 0)
-                {
-                    p_systems[0].EnableGeneration(false);
-                }
 
                 // flame throwing particle system update
                 p_systems[0].SetOrigin(ActivePlayer.Transform.Position +
                                        Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat));
                 p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
                 p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
-                p_systems[0].Update(0.001f);
+                p_systems[0].Update(delta_t);
             }
             else
             {
@@ -130,14 +120,9 @@ namespace Client
                 p_systems[0].EnableGeneration(false);
             }
 
-            if (counter % 1000 == 0)
-            {
-                WindDirection = Vector3.TransformCoordinate(WindDirection, Matrix.RotationY(0.1f));
-            }
-
             p_systems[1].SetVelocity(WindDirection * WindInitSpeed);
             p_systems[1].SetAcceleration(WindDirection * WindAcceleration);
-            p_systems[1].Update(0.001f);
+            p_systems[1].Update(delta_t);
 
         }
 
@@ -157,23 +142,23 @@ namespace Client
 
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  
-            LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
+            
             {
+                LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
                 light0.UseDirectionalPreset();
                 light0.intensities = new Vector4(1.3f,1.2f,1.0f,0);
                 light0.status = LightParameters.STATUS_ON;
                 light0.position = Vector4.Normalize(new Vector4(-1, 0, 0, 0));
             }
-            LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
             {
+                LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
                 light1.UseDirectionalPreset();
                 light1.status = LightParameters.STATUS_ON;
                 light1.intensities = new Vector4(0.8f,0.8f,0.8f,0);
                 light1.position = Vector4.Normalize(new Vector4(0,-1,0,0));
             }
-
-            LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
             {
+                LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
                 light2.UseDirectionalPreset();
                 light2.status = LightParameters.STATUS_ON;
                 light2.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
@@ -221,7 +206,7 @@ namespace Client
                 )
             );
 
-            // TODO: MOVE THIS TO SOMEWHERE NECESSARY?
+            // TODO: MOVE THIS TO SOMEWHERE NECESSARY FOR SCREEN EFFECTS?
             // camera effect...?
             p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
                     new Vector3(-10, -10, 0),   // origin

@@ -156,7 +156,7 @@ namespace Client
             }
 
             // Update the graphics manager.
-            GraphicsManager.Update();
+            GraphicsManager.Update(delta);
 
             // Restart the frame timer.
             FrameTimer.Restart();

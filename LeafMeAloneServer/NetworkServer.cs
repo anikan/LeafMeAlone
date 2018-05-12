@@ -40,12 +40,10 @@ namespace Server
         //List of packets for Game to process.
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
-        public IPAddress address;
 
-        public NetworkServer(IPAddress address)
+        public NetworkServer()
         {
             clientSockets = new List<Socket>();
-            this.address = address;
         }
 
         /// <summary>
@@ -66,7 +64,7 @@ namespace Server
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);
 
             // Create a TCP/IP socket.  
-            listener = new Socket(address.AddressFamily,
+            listener = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.  

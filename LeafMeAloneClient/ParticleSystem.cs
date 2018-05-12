@@ -21,21 +21,21 @@ namespace Client
         WIND
     }
 
-    public class ParticleSystem : GameObject
+    /// <summary>
+    /// Particle system object, only exists client-side.
+    /// </summary>
+    public class ParticleSystem : NonNetworkedGameObjectClient
     {
         public bool Enabled = true;
 
-
         //list of particles in the system.
         private List<Particle> Particles = new List<Particle>();
-
 
         //create buffers
         private Buffer VBO_Verts, VBO_Tex, VBO_Origin;
         private Buffer EBO;
         private DataStream Verts, Tex, Faces, StartingLocations;
         private InputElement[] Elements;
-
 
         //create shader effects
         private InputLayout InputLayout;
@@ -316,7 +316,7 @@ namespace Client
         /// <summary>
         /// Update the particles.
         /// </summary>
-        public override void Update()
+        public override void Update(float deltaTime)
         {
             if (!Enabled)
                 return;
@@ -363,7 +363,7 @@ namespace Client
                         particle.LifeRemaining = 0;
                     }
                 }
-                particle.Update(.001f);
+                particle.Update(deltaTime);
             }
 
             ShouldRender = (activeParticles != 0);

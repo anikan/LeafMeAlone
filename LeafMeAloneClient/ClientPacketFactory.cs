@@ -25,8 +25,8 @@ namespace Client
                 MovementX = player.PlayerRequests.MovementRequested.X,
                 MovementZ = player.PlayerRequests.MovementRequested.Y,
                 _ProtoObjId = player.Id,
-                Rotation = player.Transform.Rotation.Y,
                 ToolEquipped = player.PlayerRequests.EquipToolRequest,
+                Rotation = player.PlayerRequests.RotationRequested,
                 UsingToolPrimary = player.PlayerRequests.UseToolPrimaryRequest,
                 UsingToolSecondary = player.PlayerRequests.UseToolSecondaryRequest
             };

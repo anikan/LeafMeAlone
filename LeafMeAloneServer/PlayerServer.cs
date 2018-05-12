@@ -27,20 +27,25 @@ namespace Server
         public override void Update(float deltaTime)
         {
 
+            base.Update(deltaTime);
+
+           //  Console.WriteLine("Tool equipped is " + ToolEquipped.ToString() + " and mode is " + ActiveToolMode.ToString());
+
         }
 
         public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
         {
-
-            for (int j = 0; j < allObjects.Count; j++)
+            if (ToolEquipped != ToolType.NONE)
             {
-
-                GameObjectServer gameObject = allObjects[j];
-                if (gameObject != this && gameObject.IsInPlayerToolRange(this))
+                for (int j = 0; j < allObjects.Count; j++)
                 {
 
-                    gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
+                    GameObjectServer gameObject = allObjects[j];
+                    if (gameObject != this && gameObject.IsInPlayerToolRange(this))
+                    {
+                        gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
 
+                    }
                 }
             }
         }
@@ -50,6 +55,21 @@ namespace Server
             Transform.Position += new Vector3(packet.MovementX, 0.0f, packet.MovementY) * GameServer.TICK_TIME_S;
 
             Transform.Rotation.Y = packet.Rotation;
+
+            ToolEquipped = packet.ToolEquipped;
+
+            if (packet.UsingToolPrimary)
+            {
+                ActiveToolMode = ToolMode.PRIMARY;
+            }
+            else if (packet.UsingToolSecondary)
+            {
+                ActiveToolMode = ToolMode.SECONDARY;
+            }
+            else
+            {
+                ActiveToolMode = ToolMode.NONE;
+            }
         }
 
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)

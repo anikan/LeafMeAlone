@@ -148,6 +148,8 @@ namespace Server
                 // If this is the leafblower's primary tool.
                 if (toolMode == ToolMode.PRIMARY)
                 {
+
+
                     // Extinguish any objects that get blowed by the leaf blower.
                     Extinguish();
 
@@ -156,6 +158,7 @@ namespace Server
 
                     // Get the vector from the player to the object.
                     Vector3 playerToObj = Transform.Position - playerPosition;
+                    playerToObj.Y = 0.0f;
                     float distance = playerToObj.Length();
 
                     // Divide the vector by the range of the tool to normalize it.
@@ -167,6 +170,10 @@ namespace Server
 
                     // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
+
+                    Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
+
+
                     ApplyForce(force);
                 }
             }

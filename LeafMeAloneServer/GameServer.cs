@@ -35,6 +35,11 @@ namespace Server
 
         public GameServer(IPAddress address)
         {
+            if (instance != null)
+            {
+                Console.WriteLine("ERROR: Singleton pattern violated on GameServer.cs. There are multiple instances!");
+            }
+
             instance = this; 
 
             timer = new Stopwatch();
@@ -97,7 +102,7 @@ namespace Server
 
                         player.UpdateFromPacket(networkServer.PlayerPackets[i]);
 
-                        Console.WriteLine("Player {0} is at {1}", player.Id, player.Transform.Position);
+                   //     Console.WriteLine("Player {0} is at {1}", player.Id, player.Transform.Position);
                     }
                 }
 
@@ -131,6 +136,9 @@ namespace Server
             {
                 pair.Value.Update(deltaTime);
             }
+
+            AddPlayerToolEffects();
+
         }
 
         public void TestPhysics()
@@ -224,7 +232,7 @@ namespace Server
 
                 PlayerServer player = playerServerList[i];
 
-                //player.AffectObjectsInToolRange(gameObjectList);
+                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList<GameObjectServer>());
 
             }
         }

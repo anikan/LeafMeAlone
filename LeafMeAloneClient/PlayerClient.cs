@@ -28,6 +28,8 @@ namespace Client
             // Requests for the use of primary/secondary features of tools.
             public bool UseToolPrimaryRequest;
             public bool UseToolSecondaryRequest;
+
+            public ToolType EquipToolRequest;
         };
         
         // All of the requests from the player that will go into a packet.
@@ -87,6 +89,11 @@ namespace Client
         {
             // Set request bool to true.
             PlayerRequests.UseToolSecondaryRequest = true;
+        }
+
+        public void RequestToolEquip(ToolType type)
+        {
+            PlayerRequests.EquipToolRequest = type;
         }
 
         // Note: Causes weird behaviour sometimes. Needs to be fixed if want to use.
@@ -173,8 +180,13 @@ namespace Client
         /// </summary>
         public void ResetRequests()
         {
+
+            ToolType equippedTool = PlayerRequests.EquipToolRequest;
+
             // Reset the player requests struct to clear all info.
             PlayerRequests = new PlayerRequestInfo();
+
+            PlayerRequests.EquipToolRequest = equippedTool;
 
         }
 

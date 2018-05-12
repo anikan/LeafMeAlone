@@ -62,9 +62,9 @@ namespace Shared
         private const float ThrowerDamage = 1.0f;
 
         // Leafblower tool information.
-        private const float BlowerAngle = 45.0f;
-        private const float BlowerRange = 3.0f;
-        private const float BlowerForce = 0.5f;
+        private const float BlowerAngle = 10.0f;
+        private const float BlowerRange = 15.0f;
+        private const float BlowerForce = 200.0f;
         private const float BlowerDamage = 0.0f;
 
         // Create a flamethrower struct to store flamethrower info.
@@ -78,14 +78,25 @@ namespace Shared
         {
 
             {ToolType.BLOWER, Blower},
-            {ToolType.THROWER, Thrower}
+            {ToolType.THROWER, Thrower},
+            {ToolType.NONE, new ToolInfo() }
 
         };
         
         // Gets tool information from a tool type.
         public static ToolInfo GetToolInfo(ToolType type)
         {
-            return ToolMap[type];
+            
+            if (ToolMap.TryGetValue(type, out ToolInfo info))
+            {
+                return ToolMap[type];
+
+            }
+            else
+            {
+                Console.WriteLine("Error: Could not get tool type " + type.ToString() + " from tool info map.");
+                return new ToolInfo();
+            }
         }
     }
 }

@@ -1,3 +1,3 @@
-cd D:/Classes/CSE125/LeafMeAlone/LeafMeAloneServer/bin/Debug
+cd ./LeafMeAloneServer/bin/x64/Debug
 LeafMeAloneServer.exe
 pause

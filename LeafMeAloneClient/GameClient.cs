@@ -44,7 +44,7 @@ namespace Client
 
         // Timer to calculate time between frames.
         public Stopwatch FrameTimer;
-        
+
         // Initial particle system.
         private ParticleSystem p;
 
@@ -54,15 +54,14 @@ namespace Client
         {
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
 
-            IPAddress address;
-            if (args.Length > 1)
+            String address;
+            if (args.Length > 0)
             {
-                address = IPAddress.Parse(args[1]);
+                address = args[0];
             }
-
             else
             {
-                address = IPAddress.Loopback;
+                address = "localhost";
             }
 
             // Create a new camera with a specified offset.
@@ -119,14 +118,14 @@ namespace Client
             // Initialize frame timer
             FrameTimer = new Stopwatch();
             FrameTimer.Start();
-            
+
             // Initialize game object lists.
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
 
             // TEMPORARY: Create a new test particle system.
             // TODO: Move this to better place.
-            p = new ParticleSystem 
+            p = new ParticleSystem
             (
                 ParticleSystemType.FIRE,
                 new Vector3(-10, 0, 0),   // origin
@@ -263,15 +262,15 @@ namespace Client
 
                 // Create an other player
                 case (ObjectType.PLAYER):
-                    NetworkedGameObjects.Add( 
-                        createPacket.ObjectId, new PlayerClient( createPacket )
+                    NetworkedGameObjects.Add(
+                        createPacket.ObjectId, new PlayerClient(createPacket)
                         );
                     break;
 
                 // Create a leaf.
                 case (ObjectType.LEAF):
                     NetworkedGameObjects.Add(
-                        createPacket.ObjectId, new LeafClient( createPacket )
+                        createPacket.ObjectId, new LeafClient(createPacket)
 
                         );
                     break;
@@ -287,7 +286,7 @@ namespace Client
         private void InitializeUserPlayerAndMovement(CreateObjectPacket createPacket)
         {
             // Create a new player with the specified packet info.
-            ActivePlayer = new PlayerClient( createPacket );
+            ActivePlayer = new PlayerClient(createPacket);
 
             // Set the active plyer in the graphics manager.
             GraphicsManager.ActivePlayer = ActivePlayer;

@@ -40,9 +40,11 @@ namespace Server
         //List of packets for Game to process.
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
+        private bool networked;
 
-        public NetworkServer()
+        public NetworkServer(bool networked)
         {
+            this.networked = networked;
             clientSockets = new List<Socket>();
         }
 
@@ -53,14 +55,16 @@ namespace Server
         {
             // Data buffer for incoming data.  
             byte[] bytes = new Byte[1024];
-
+            IPAddress ipAddress = IPAddress.Loopback;
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+            if (networked)
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                ipAddress = ipHostInfo.AddressList[0];
+            }
 
-            //IPAddress ipAddress = IPAddress.Loopback;//ipHostInfo.AddressList[0];
+
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);
 
             // Create a TCP/IP socket.  
@@ -212,9 +216,9 @@ namespace Server
 
                 while (bytesToRead > 0)
                 {
-                    Packet objectPacket = 
+                    Packet objectPacket =
                         Packet.Deserialize(state.buffer, out int bytesRead);
-                    PlayerPackets.Add((PlayerPacket) objectPacket);
+                    PlayerPackets.Add((PlayerPacket)objectPacket);
                     state.buffer = state.buffer.Skip(bytesRead).ToArray();
                     bytesToRead -= bytesRead;
                 }

@@ -54,14 +54,11 @@ namespace Client
         {
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
 
-            String address;
+            IPAddress ipAddress = IPAddress.Loopback;
             if (args.Length > 0)
-            {
-                address = args[0];
-            }
-            else
-            {
-                address = "localhost";
+            { 
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+                ipAddress = ipHostInfo.AddressList[0];
             }
 
             // Create a new camera with a specified offset.
@@ -71,7 +68,7 @@ namespace Client
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
 
-            GameClient Client = new GameClient(new NetworkClient(address));
+            GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 

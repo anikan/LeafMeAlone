@@ -33,7 +33,7 @@ namespace Server
 
         private Stopwatch testTimer;
 
-        public GameServer()
+        public GameServer(bool networked)
         {
             instance = this; 
 
@@ -48,15 +48,21 @@ namespace Server
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            networkServer = new NetworkServer();
+            networkServer = new NetworkServer(networked);
 
             CreateLeaves(100, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)
         {
+            bool networked = false;
 
-            GameServer gameServer = new GameServer();
+            if (args.Length > 0)
+            {
+                networked = true;
+            }
+
+            GameServer gameServer = new GameServer(networked);
             
             gameServer.networkServer.StartListening();
 

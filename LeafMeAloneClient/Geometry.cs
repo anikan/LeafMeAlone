@@ -290,6 +290,11 @@ namespace Client
             }
         }
 
+        public void LoadBoneAnimation()
+        {
+
+        }
+
         /// <summary>
         /// Create a texture resource using the complete filepath to the texture file
         /// </summary>

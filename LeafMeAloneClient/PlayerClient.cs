@@ -13,7 +13,7 @@ namespace Client
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
 
-        public const string PlayerModelPath = @"../../../Models/Player_V2.fbx";
+        public const string PlayerModelPath = @"../../../Models/05.03.18_Version2.fbx";
 
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo

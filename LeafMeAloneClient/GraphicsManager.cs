@@ -84,41 +84,45 @@ namespace Client
 
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
-
-        // the offset of the framethrower from the player
+        
+        // TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
         public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f,3.85f,3.0f);
         public static float FlameInitSpeed = 40.0f, FlameAcceleration = 15.0f;
-        private static int counter = 0;
 
-        public static void Update()
+        // TODO: MOVE TO WIND BLOWER OR PLAYER CLASS
+        public static float WindInitSpeed = 60.0f, WindAcceleration = -30.0f, WindStopDistance = 60.0f;
+        public static Vector3 WindDirection = Vector3.UnitX;
+        
+        public static void Update(float delta_t)
         {
             // update the camera position based on the player position
-            ActiveCamera.MoveCameraAbsolute( ActivePlayer.Transform.Position + PlayerToCamOffset, ActivePlayer.Transform.Position );
+            if (ActivePlayer != null)
+            {
+                ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
+                    ActivePlayer.Transform.Position);
 
-            // set the rotation based on the three directions
-            Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
-                                   Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
-                                   Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
-            
-            // if all rendering is stopped, reset and enable
-            if (!p_systems[0].IsRendering())
+                // TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
+                // set the rotation based on the three directions
+                Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
+                             Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
+                             Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
+
+                // flame throwing particle system update
+                p_systems[0].SetOrigin(ActivePlayer.Transform.Position +
+                                       Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat));
+                p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
+                p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
+                p_systems[0].Update(delta_t);
+            }
+            else
             {
                 p_systems[0].ResetSystem();
-                p_systems[0].EnableGeneration(true);
-            }
-            // manually toggle off after 6000 frames
-            else if ((counter = ++counter % 6000) == 0)
-            {
                 p_systems[0].EnableGeneration(false);
             }
 
-            // flame throwing particle system update
-            p_systems[0].SetOrigin(ActivePlayer.Transform.Position + Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat) );
-            p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
-            p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
-            p_systems[0].Update();
-            
-            p_systems[1].Update();
+            p_systems[1].SetVelocity(WindDirection * WindInitSpeed);
+            p_systems[1].SetAcceleration(WindDirection * WindAcceleration);
+            p_systems[1].Update(delta_t);
 
         }
 
@@ -132,28 +136,29 @@ namespace Client
         /// <summary>
         /// Initialize the graphics manager
         /// </summary>
-        public static void Init()
+        public static void Init(Camera activeCamera)
         {
-            ActiveCamera = new Camera(new Vector3(0, 50, -30), Vector3.Zero, Vector3.UnitY);
+            ActiveCamera = activeCamera;
 
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  
-            LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
+            
             {
+                LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
                 light0.UseDirectionalPreset();
                 light0.intensities = new Vector4(1.3f,1.2f,1.0f,0);
                 light0.status = LightParameters.STATUS_ON;
+                light0.position = Vector4.Normalize(new Vector4(-1, 0, 0, 0));
             }
-            LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
             {
+                LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
                 light1.UseDirectionalPreset();
                 light1.status = LightParameters.STATUS_ON;
                 light1.intensities = new Vector4(0.8f,0.8f,0.8f,0);
                 light1.position = Vector4.Normalize(new Vector4(0,-1,0,0));
             }
-
-            LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
             {
+                LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
                 light2.UseDirectionalPreset();
                 light2.status = LightParameters.STATUS_ON;
                 light2.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
@@ -163,32 +168,57 @@ namespace Client
             LoadAllShaders();
 
             p_systems = new List<ParticleSystem>();
-            
+           
             // set the rotation based on the three directions
-            Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
-                         Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
-                         Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
+            Matrix mat = Matrix.Identity;
 
+            // TODO: MOVE THIS TO EITHER PLAYER OR FLAMETHROWER CLASS
+            // Flame thrower settings
             p_systems.Add(new ParticleSystem(ParticleSystemType.FIRE,
-                    ActivePlayer.Transform.Position + Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat),   // origin
-                    ActivePlayer.Transform.Forward * FlameInitSpeed,  // acceleration
-                    ActivePlayer.Transform.Forward * FlameAcceleration,   // initial speed
-                    120.0f,   // cone radius, may need to adjust whenever acceleration changes
+                    Vector3.Zero +
+                    Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat), // origin
+                    Vector3.UnitZ * FlameInitSpeed, // acceleration
+                    Vector3.UnitZ * FlameAcceleration, // initial speed
+                    false,          // cutoff all colors
+                    false,          // no backward particle prevention
+                    320.0f,   // cone radius, may need to adjust whenever acceleration changes
                     1.0f,    // initial delta size
                     10f,     // cutoff distance
                     0.2f,     // cutoff speed
                     0.075f      // enlarge speed
                 )
             );
+
+            // TODO: MOVE THIS TO EITHER WIND BLOWER CLASS OR PLAYER CLASS
+            // Wind blower settings
             p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
                     new Vector3(-10, -10, 0),   // origin
-                    new Vector3(2.0f, 0f, 0f),  // acceleration
-                    new Vector3(1f, 0f, 0f),    // initial speed
-                    20.0f,   // cone radius
+                    WindDirection * WindAcceleration,  // acceleration
+                    WindDirection * WindInitSpeed,    // initial speed
+                    true,          // cutoff alpha only
+                    true,          // prevent backward flow 
+                    800.0f,   // cone radius
                     1.0f,    // initial delta size
-                    10f,     // cutoff distance
-                    0,     // cutoff speed
-                    0      // enlarge speed
+                    0f,     // cutoff distance
+                    0.5f,     // cutoff speed
+                    0.1f,      // enlarge speed
+                    WindStopDistance      // stop dist
+                )
+            );
+
+            // TODO: MOVE THIS TO SOMEWHERE NECESSARY FOR SCREEN EFFECTS?
+            // camera effect...?
+            p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
+                    new Vector3(-10, -10, 0),   // origin
+                    new Vector3(-30.0f, 0f, 0f),  // acceleration
+                    new Vector3(100f, 0f, 0f),    // initial speed
+                    true,          // cutoff alpha only
+                    false,           // dont prevent backward flow
+                    10000.0f,   // cone radius
+                    1.0f,    // initial delta size
+                    2f,     // cutoff distance
+                    0.5f,     // cutoff speed
+                    0.2f      // enlarge speed
                 )
             );
         }

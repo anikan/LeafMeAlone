@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.AccessControl;
 using System.Threading;
 using Shared;
 
-namespace LeafMeAloneClient
+namespace Client
 {
 
 
@@ -20,7 +21,7 @@ namespace LeafMeAloneClient
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public static int BufferSize = 256;
+        public static int BufferSize = 4096;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -50,7 +51,14 @@ namespace LeafMeAloneClient
         private Socket client;
 
         //List of received packets. Populated by ReadCallback
-        public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
+        public List<Packet> PacketQueue = new List<Packet>();
+
+        private IPAddress address;
+
+        public NetworkClient(IPAddress address)
+        {
+            this.address = address;
+        }
 
         /// <summary>
         /// Try to connect to the host.
@@ -61,11 +69,11 @@ namespace LeafMeAloneClient
             try
             {
                 //For testing purposes, connect to Loopback. 
-                IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
+                //IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
+                IPEndPoint remoteEP = new IPEndPoint(address, port);
 
                 // Create a TCP/IP socket.  
-                client = new Socket(ipAddress.AddressFamily,
+                client = new Socket(address.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
 
                 // Connect to the remote endpoint.  
@@ -74,7 +82,7 @@ namespace LeafMeAloneClient
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                //Console.WriteLine(e.ToString());
             }
         }
 
@@ -103,19 +111,47 @@ namespace LeafMeAloneClient
         /// </summary>
         public void Receive()
         {
-            byte[] buffer = new byte[StateObject.BufferSize];
-            if (client.Available > 0)
+            Console.WriteLine(client.Available);
+
+            byte[] savedBuffer = new byte[0];
+
+            while (client.Available > 0)
             {
-                int bytesRead = client.Receive(buffer, 0, StateObject.BufferSize, 0);
+                //Saving amount available as it may change while waiting. 
+                int amountAvailable = client.Available;
 
-                byte[] resizedBuffer = new byte[bytesRead];
-                Buffer.BlockCopy(buffer, 0, resizedBuffer, 0, bytesRead);
+                //Initialize buffer size to be num bytes available or the full buffer size.
+                byte[] buffer = new byte[Math.Min(amountAvailable + savedBuffer.Length, StateObject.BufferSize)];
 
-                PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
+                Buffer.BlockCopy(savedBuffer, 0, buffer, 0, savedBuffer.Length);
 
-                //Console.WriteLine("Received packet {0}.", packet.ToString());
+                //Set how many bytes to read this iteration.
+                int bytesToReceive = Math.Min(amountAvailable, StateObject.BufferSize - savedBuffer.Length);
 
-                PlayerPackets.Add(packet);
+                int bytesToRead =
+                    client.Receive(buffer, savedBuffer.Length, bytesToReceive, 0);
+
+                bytesToRead += savedBuffer.Length;
+
+                savedBuffer = new byte[0];
+
+                while (buffer.Length > 0)
+                {
+                    Packet objectPacket =
+                        Packet.Deserialize(buffer, out int bytesRead);
+
+                    //If we need more bytes to continue, break.
+                    if (objectPacket == null)
+                    {
+                        savedBuffer = buffer;
+                        break;
+                    }
+
+                    PacketQueue.Add(objectPacket);
+
+                    buffer = buffer.Skip(bytesRead).ToArray();
+                    bytesToRead -= bytesRead;
+                }
             }
         }
 
@@ -125,6 +161,7 @@ namespace LeafMeAloneClient
         /// <param name="data">Byte array of data</param>
         public void Send(byte[] data)
         {
+            //Console.WriteLine(BitConverter.ToString(data));
             // Begin sending the data to the remote device.  
             client.BeginSend(data, 0, data.Length, 0,
                 new AsyncCallback(SendCallback), client);

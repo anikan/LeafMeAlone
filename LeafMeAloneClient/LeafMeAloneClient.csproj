@@ -34,26 +34,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
@@ -101,13 +81,16 @@
     <Compile Include="Camera.cs" />
     <Compile Include="UIFramesPersecond.cs" />
     <Compile Include="GameClient.cs" />
+    <Compile Include="GraphicGameObject.cs" />
+    <Compile Include="LeafClient.cs" />
     <Compile Include="NetworkClient.cs" />
-    <Compile Include="GameObjectClient.cs" />
+    <Compile Include="NetworkedGameObjectClient.cs" />
     <Compile Include="Geometry.cs" />
     <Compile Include="GraphicsManager.cs" />
     <Compile Include="Light.cs" />
     <Compile Include="Model.cs" />
     <Compile Include="InputManager.cs" />
+    <Compile Include="NonNetworkedGameObjectClient.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleSystem.cs" />
     <Compile Include="PlayerClient.cs" />

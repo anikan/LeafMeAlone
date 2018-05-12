@@ -3,6 +3,7 @@ uniform extern float3 gOrigin;
 uniform extern float CutoffSpeed;
 uniform extern float CutoffDist;
 uniform extern float StopDist;
+uniform extern int AlphaCutoffOnly;
 
 uniform extern Texture2D tex_diffuse;
 
@@ -53,7 +54,15 @@ float4 PS(float4 iPosH  : SV_POSITION,
 		//clip all pixels getting here (dont render them)
 		clip(-1);
 	}
-	return factor*ret;
+
+	if (AlphaCutoffOnly == 1)
+	{
+		return float4(ret.xyz, ret.w * factor);
+	}
+	else
+	{
+		return factor * ret;
+	}
 }
 
 

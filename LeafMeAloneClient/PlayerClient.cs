@@ -8,15 +8,18 @@ using Shared;
 
 namespace Client
 {
-    public class PlayerClient : GameObjectClient, IPlayer
+    public class PlayerClient : NetworkedGameObjectClient, IPlayer
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
-        
+
+        public const string PlayerModelPath = @"../../../Models/Player_V2.fbx";
+
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {
-            // Direction of movement the player is requesting. Should be between -1 and 1 each axis.
+            // Direction of movement the player is requesting. Should be 
+            // between -1 and 1 each axis.
             public Vector2 MovementRequested;
 
             // Amount of rotation the player is requested.
@@ -30,17 +33,18 @@ namespace Client
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
+        public PlayerClient(CreateObjectPacket createPacket) : 
+            base(createPacket, PlayerModelPath)
+        {
+        }
+
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
-        public PlayerPacket.ToolType ToolEquipped { get; set; }
+        public ToolType ToolEquipped { get; set; }
         public bool UsingToolPrimary { get; set; }
         public bool UsingToolSecondary { get; set; }
+        public ToolMode ActiveToolMode { get; set; }
 
-        public PlayerClient() : base()
-        {
-            SetModel(@"../../../Models/05.01.18_Version2.fbx");
-            Transform.Rotation.Y += 180f.ToRadians();
-        }
 
         /// <summary>
         /// Moves the player in a specified direction (NESW)
@@ -49,14 +53,16 @@ namespace Client
         public void RequestMove(Vector2 dir)
         {
 
-            // If the direction requested is non-zero in the X axis (account for floating point error).
+            // If the direction requested is non-zero in the X axis 
+            // (account for floating point error).
             if (dir.X < 0.0f - FLOAT_RANGE || dir.X > 0.0f + FLOAT_RANGE)
             {
                 // Request in the x direction.
                 PlayerRequests.MovementRequested.X = dir.X;
             }
 
-            // If the direction requested is non-zero in the Y axis (account for floating point error).
+            // If the direction requested is non-zero in the Y axis (account 
+            // for floating point error).
             if (dir.Y < 0.0f - FLOAT_RANGE || dir.Y > 0.0f + FLOAT_RANGE)
             {
                 //// Request in the y direction.
@@ -146,7 +152,7 @@ namespace Client
 
             // TEMPORARY FOR TESTING
             // Set rotation of player
-            Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
+            //Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
 
         }
 
@@ -156,7 +162,7 @@ namespace Client
         /// <param name="pos"></param>
         public void SetPosition(Vector2 pos)
         {
-            // Set the position of the player directly.
+            // Set the position of the player directly
 
             // Update Transform on GameObject
 
@@ -169,8 +175,11 @@ namespace Client
         {
             // Reset the player requests struct to clear all info.
             PlayerRequests = new PlayerRequestInfo();
+            // Set rotation initially to the rotation of the player
+            PlayerRequests.RotationRequested = Transform.Rotation.Y;
 
         }
+
 
         /// <summary>
         /// Updates the player's values based on a received packet.
@@ -183,8 +192,27 @@ namespace Client
             UsingToolPrimary = packet.UsingToolPrimary;
             UsingToolSecondary = packet.UsingToolSecondary;
             Transform.Position.X = packet.MovementX;
-            Transform.Position.Y = packet.MovementY;
+            Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
+        }
+
+        /// <summary>
+        /// Facade method which calls to the actual packet processor after 
+        /// casting
+        /// </summary>
+        /// <param name="packet">Abstract packet which gets casted to an actual 
+        /// object type</param>
+        public override void UpdateFromPacket(Packet packet)
+        {
+            UpdateFromPacket(packet as PlayerPacket);
+        }
+
+        /// <summary>
+        /// "Kills" the player and forces a respawn.
+        /// </summary>
+        public override void Destroy()
+        {
+            // You can't destroy a player silly. Do something else here instead.
         }
     }
 }

@@ -70,8 +70,10 @@ namespace Client
             {
                 //For testing purposes, connect to Loopback. 
                 //IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(address, port);
-
+                //IPEndPoint remoteEP = new IPEndPoint(address, port);
+                IPHostEntry ipHostInfo = Dns.Resolve("its-cseb220-25.ucsd.edu");
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
                 // Create a TCP/IP socket.  
                 client = new Socket(address.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);

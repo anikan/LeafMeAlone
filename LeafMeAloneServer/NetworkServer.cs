@@ -58,9 +58,12 @@ namespace Server
 
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            //IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
 
             //IPAddress ipAddress = IPAddress.Loopback;//ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(address, 2302);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);
 
             // Create a TCP/IP socket.  
             listener = new Socket(address.AddressFamily,

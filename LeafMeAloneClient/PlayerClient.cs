@@ -13,8 +13,6 @@ namespace Client
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
 
-        public const string PlayerModelPath = @"../../../Models/05.03.18_Version2.fbx";
-
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {
@@ -34,7 +32,7 @@ namespace Client
         public PlayerRequestInfo PlayerRequests;
 
         public PlayerClient(CreateObjectPacket createPacket) : 
-            base(createPacket, PlayerModelPath)
+            base(createPacket, FileManager.PlayerModel)
         {
         }
 

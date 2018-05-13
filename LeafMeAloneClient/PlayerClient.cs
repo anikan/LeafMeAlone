@@ -32,9 +32,15 @@ namespace Client
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
+        private ParticleSystem FlameThrower,LeafBlower;
+
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, FileManager.PlayerModel)
         {
+            FlameThrower = new FlameThrowerParticleSystem();
+            LeafBlower = new LeafBlowerParticleSystem();
+            GraphicsManager.ParticleSystems.Add(FlameThrower);
+            GraphicsManager.ParticleSystems.Add(LeafBlower);
         }
 
         //Implementations of IPlayer fields
@@ -214,6 +220,53 @@ namespace Client
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
+
+            switch (ActiveToolMode)
+            {
+                case ToolMode.NONE:
+                    FlameThrower.EnableGeneration(false);
+                    LeafBlower.EnableGeneration(false);
+                    break;
+                case ToolMode.PRIMARY:
+                    switch (ToolEquipped)
+                    {
+                        case ToolType.BLOWER:
+                            FlameThrower.EnableGeneration(false);
+                            LeafBlower.EnableGeneration(true);
+                            break;
+                        case ToolType.THROWER:
+                            FlameThrower.EnableGeneration(true);
+                            LeafBlower.EnableGeneration(false);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case ToolMode.SECONDARY:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+        }
+
+        public override void Update(float deltaTime)
+        {
+            base.Update(deltaTime);
+            Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
+                         Matrix.RotationY(Transform.Rotation.Y) *
+                         Matrix.RotationZ(Transform.Rotation.Z);
+
+            // flame throwing particle system update
+            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            FlameThrower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
+            FlameThrower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
+            FlameThrower.Update(deltaTime);
+
+            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            LeafBlower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
+            LeafBlower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
+            LeafBlower.Update(deltaTime);
         }
 
         /// <summary>

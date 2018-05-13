@@ -378,6 +378,8 @@ namespace Client
                     scene.Meshes[idx].TextureCoordinateChannels[0].ForEach(texture => {
                         mesh.TexCoords.Write(texture);
                     });
+
+                    mesh.TexCoords.Position = 0;
                 }
 
                 // Parse material properties
@@ -393,7 +395,6 @@ namespace Client
                 mesh.Vertices.Position = 0;
                 mesh.Normals.Position = 0;
                 mesh.Faces.Position = 0;
-                mesh.TexCoords.Position = 0;
 
                 //create vertex vbo and faces ebo.
                 mesh.VBOPositions = new Buffer(GraphicsRenderer.Device, mesh.Vertices, mesh.vertSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);

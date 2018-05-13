@@ -158,7 +158,7 @@ namespace Client
 
             //TODO: REMOVE AFTER TESTING
             animatedModel = new Model(@"../../Models/crankshaft.dae", true);
-            animatedModel.m_Properties.Scale = new Vector3(.015f, .015f, .015f);
+            animatedModel.m_Properties.Scale = new Vector3(.15f, .15f, .15f);
             //animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
             animatedModel.StartAnimationSequenceByIndex(0, true);
         }

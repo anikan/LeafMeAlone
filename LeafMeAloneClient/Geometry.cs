@@ -482,7 +482,7 @@ namespace Client
             String nodeName = node.Name;
             Matrix nodeTransform = node.Transform.ToMatrix();
             MyAnimationNode currAnimationNode = animationNodes[AnimationIndex].ContainsKey(nodeName) ? animationNodes[AnimationIndex][nodeName] : null;
-
+            
             if (currAnimationNode != null)
             {
                 Vector3 Scaling = CalcInterpolateScaling(animationTime, currAnimationNode);

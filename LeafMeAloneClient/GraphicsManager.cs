@@ -157,8 +157,8 @@ namespace Client
             ParticleSystems = new List<ParticleSystem>();
 
             //TODO: REMOVE AFTER TESTING
-            animatedModel = new Model(@"../../Models/crankshaft.dae", true);
-            animatedModel.m_Properties.Scale = new Vector3(.15f, .15f, .15f);
+            animatedModel = new Model(@"../../Models/Low-Poly Spider/Only_Spider_with_Animations_Export.dae", true);
+            animatedModel.m_Properties.Scale = new Vector3(10.15f, 10.15f, 10.15f);
             //animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
             animatedModel.StartAnimationSequenceByIndex(0, true);
         }

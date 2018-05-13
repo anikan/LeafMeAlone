@@ -66,13 +66,14 @@ namespace Server
         public override void Update(float deltaTime)
         {
 
+
             // If this object is burning.
             if (Burning)
             {
-
                 // Check if the health decrement rate has been passed and if so, decrement health.
                 if (HealthDecrementTimer.ElapsedMilliseconds / 1000.0f >= HEALTH_DECREMENT_RATE)
                 {
+
                     // Get fire damage from the flamethrower.
                     float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
 
@@ -98,6 +99,7 @@ namespace Server
         /// </summary>
         public void CatchFire()
         {
+
             Burning = true;
             BurnTimer.Restart();
             HealthDecrementTimer.Restart();
@@ -132,9 +134,12 @@ namespace Server
                 if (toolMode == ToolMode.PRIMARY)
                 {
 
-                    // Set the object on fire.
-                    CatchFire();
-
+                    // If it's not already burning.
+                    if (!Burning)
+                    {
+                        // Set the object on fire.
+                        CatchFire();
+                    }
                 }
             }
         }

@@ -511,7 +511,7 @@ namespace Client
             // recursively read child nodes
             for (int i = 0; i < node.ChildCount; i++)
             {
-                ReadNodeHierarchy(AnimationIndex, animationTime, node.Children[i], GlobalTransform);
+                ReadNodeHierarchy(AnimationIndex, animationTime, node.Children[i], node.Transform.ToMatrix() * parentTransform);
             }
         }
 

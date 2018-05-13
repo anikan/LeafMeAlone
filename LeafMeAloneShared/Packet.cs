@@ -12,7 +12,8 @@ namespace Shared
     {
         CreateObjectPacket,
         PlayerPacket,
-        LeafPacket
+        LeafPacket,
+        DestroyObjectPacket
     }
 
     /// <summary>
@@ -85,6 +86,10 @@ namespace Shared
                     );
                 case PacketType.LeafPacket:
                     return Serializer.Deserialize<LeafPacket>(
+                        new MemoryStream(objectData)
+                    );
+                case PacketType.DestroyObjectPacket:
+                    return Serializer.Deserialize<DestroyObjectPacket>(
                         new MemoryStream(objectData)
                     );
             }

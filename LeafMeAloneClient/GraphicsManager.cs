@@ -38,7 +38,7 @@ namespace Client
         public static PlayerClient ActivePlayer;
 
         // The list of particle systems
-        private static List<ParticleSystem> p_systems;
+        public static List<ParticleSystem> ParticleSystems;
 
         // Converts a screen point to a world position.
         // Converts a screen point to a world position.
@@ -84,57 +84,34 @@ namespace Client
 
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
-        
-        // TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
-        public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f,3.85f,3.0f);
-        public static float FlameInitSpeed = 40.0f, FlameAcceleration = 15.0f;
 
-        // TODO: MOVE TO WIND BLOWER OR PLAYER CLASS
-        public static float WindInitSpeed = 60.0f, WindAcceleration = -30.0f, WindStopDistance = 60.0f;
-        public static Vector3 WindDirection = Vector3.UnitX;
-
-        // Test model
-        private static Model animatedModel;
-        
         public static void Update(float delta_t)
         {
+            // TODO:REMOVE AFTER TESTING
+            animatedModel.Update(delta_t);
+
             // update the camera position based on the player position
             if (ActivePlayer != null)
             {
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
-
-                // TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
-                // set the rotation based on the three directions
-                Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
-                             Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
-                             Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
-
-                // flame throwing particle system update
-                p_systems[0].SetOrigin(ActivePlayer.Transform.Position +
-                                       Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat));
-                p_systems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
-                p_systems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
-                p_systems[0].Update(delta_t);
             }
-
-            p_systems[1].SetVelocity(WindDirection * WindInitSpeed);
-            p_systems[1].SetAcceleration(WindDirection * WindAcceleration);
-            p_systems[1].Update(delta_t);
-
-            animatedModel.Update(delta_t);
         }
 
         public static void Draw()
         {
-            // Always draw solid objects first
+            // TODO: REMOVE AFTER TESTING
             animatedModel.Draw();
 
-            // Draw Transparent objects later
-            p_systems[0].Draw();
-            p_systems[1].Draw();
+            foreach (ParticleSystem particleSystem in ParticleSystems)
+            {
+                particleSystem.Draw();
+            }
 
         }
+
+        // TODO: REMOVE AFTER TESTING
+        private static Model animatedModel;
 
         /// <summary>
         /// Initialize the graphics manager
@@ -177,67 +154,13 @@ namespace Client
 
             LoadAllShaders();
 
-            p_systems = new List<ParticleSystem>();
-           
-            // set the rotation based on the three directions
-            Matrix mat = Matrix.Identity;
+            ParticleSystems = new List<ParticleSystem>();
 
-            // TODO: MOVE THIS TO EITHER PLAYER OR FLAMETHROWER CLASS
-            // Flame thrower settings
-            p_systems.Add(new ParticleSystem(ParticleSystemType.FIRE,
-                    Vector3.Zero +
-                    Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat), // origin
-                    Vector3.UnitZ * FlameInitSpeed, // acceleration
-                    Vector3.UnitZ * FlameAcceleration, // initial speed
-                    false,          // cutoff all colors
-                    false,          // no backward particle prevention
-                    320.0f,   // cone radius, may need to adjust whenever acceleration changes
-                    1.0f,    // initial delta size
-                    10f,     // cutoff distance
-                    0.2f,     // cutoff speed
-                    0.075f      // enlarge speed
-                )
-            );
-
-            // TODO: MOVE THIS TO EITHER WIND BLOWER CLASS OR PLAYER CLASS
-            // Wind blower settings
-            p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
-                    new Vector3(-10, -10, 0),   // origin
-                    WindDirection * WindAcceleration,  // acceleration
-                    WindDirection * WindInitSpeed,    // initial speed
-                    true,          // cutoff alpha only
-                    true,          // prevent backward flow 
-                    800.0f,   // cone radius
-                    1.0f,    // initial delta size
-                    0f,     // cutoff distance
-                    0.5f,     // cutoff speed
-                    0.1f,      // enlarge speed
-                    WindStopDistance      // stop dist
-                )
-            );
-
-            // TODO: MOVE THIS TO SOMEWHERE NECESSARY FOR SCREEN EFFECTS?
-            // camera effect...?
-            p_systems.Add(new ParticleSystem(ParticleSystemType.WIND,
-                    new Vector3(-10, -10, 0),   // origin
-                    new Vector3(-30.0f, 0f, 0f),  // acceleration
-                    new Vector3(100f, 0f, 0f),    // initial speed
-                    true,          // cutoff alpha only
-                    false,           // dont prevent backward flow
-                    10000.0f,   // cone radius
-                    1.0f,    // initial delta size
-                    2f,     // cutoff distance
-                    0.5f,     // cutoff speed
-                    0.2f      // enlarge speed
-                )
-            );
-
-            //TODO: REMOVE THIS AFTER TESTING
-            animatedModel = new Model(@"../../../Models/Low-Poly Spider/Only_Spider_with_Animations_Export.dae", true);
-            animatedModel.m_Properties.Scale = new Vector3(15f, 15f, 15f);
+            //TODO: REMOVE AFTER TESTING
+            animatedModel = new Model(@"../../Models/crankshaft.dae", true);
+            animatedModel.m_Properties.Scale = new Vector3(.015f, .015f, .015f);
             //animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
             animatedModel.StartAnimationSequenceByIndex(0, true);
-            
         }
 
         /// <summary>

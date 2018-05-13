@@ -23,6 +23,7 @@ namespace Client
         {
             Id = createPacket.ObjectId;
             Transform.Position.X = createPacket.InitialX;
+            Transform.Position.Y = createPacket.InitialY;
             Transform.Position.Z = createPacket.InitialZ;
         }
 

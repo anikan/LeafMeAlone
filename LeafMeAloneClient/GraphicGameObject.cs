@@ -69,7 +69,7 @@ namespace Client
         /// </summary>
         public override void Destroy()
         {
-            throw new NotImplementedException();
+            GameClient.instance.Destroy(this);
         }
     }
 }

@@ -315,7 +315,8 @@ namespace Client
             scene = importer.ImportFile(fileName,
                 PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate |
                 PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.SortByPrimitiveType |
-                PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs);
+                PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs | 
+                PostProcessSteps.LimitBoneWeights | PostProcessSteps.Debone );
 
             //make sure scene not null
             if (scene == null)
@@ -540,7 +541,6 @@ namespace Client
 
             return Vector3.Lerp(animationNode.Translations[translationIndex],
                 animationNode.Translations[nextTranslationIndex], (float) factor);
-
         }
 
         private Quaternion CalcInterpolateRotation(double animationTime, MyAnimationNode animationNode)
@@ -655,6 +655,8 @@ namespace Client
 
         public void StartAnimationSequenceByIndex(int index, bool repeatAnimation = false)
         {
+            if (index < -1 || index > scene.AnimationCount - 1) return;
+
             CurrentAnimationTime = 0;
             CurrentAnimationIndex = index;
             CurrentAnimationName = scene.Animations[index].Name;

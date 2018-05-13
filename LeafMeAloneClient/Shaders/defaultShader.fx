@@ -74,6 +74,8 @@ void VS(float4 iPosL  : POSITION,
 			+ boneTransforms[iBoneID.y] * iBoneWeight.y
 			+ boneTransforms[iBoneID.z] * iBoneWeight.z
 			+ boneTransforms[iBoneID.w] * iBoneWeight.w;
+
+		//objToBone = boneTransforms[iBoneID.x];
 		
 		worldViewProj = mul(objToBone, worldViewProj);
 	}

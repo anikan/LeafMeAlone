@@ -201,8 +201,8 @@ namespace Client
             {
                 if (i >= Bones.Count) break;
 
-                //boneTransformStream.Write(Bones[i].BoneFrameTransformation);
-                boneTransformStream.Write(Bones[i].BoneOffset);
+                boneTransformStream.Write(Bones[i].BoneFrameTransformation);
+                //boneTransformStream.Write(Bones[i].BoneOffset);
             }
 
             boneTransformStream.Position = 0;
@@ -712,8 +712,9 @@ namespace Client
                 TextureSlot tex;
                 if (mat.GetMaterialTexture(TextureType.Diffuse, 0, out tex))
                 {
-                    myMat.setDiffuseTexture( CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)) );
-                    myMat.setTexCount(1);
+                    ShaderResourceView temp;
+                    myMat.setDiffuseTexture( temp = CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)) );
+                    myMat.setTexCount( temp == null ? 0 : 1);
                 }
                 else
                 {
@@ -724,7 +725,7 @@ namespace Client
 
             // copies over all the material properties to the struct
             // sets the diffuse color
-            Color4 color = new Color4(.8f, .8f, .8f, 1.0f); // default is light grey
+            Color4 color = new Color4(.4f, .4f, .4f, 1.0f); // default is light grey
             if (mat.HasColorDiffuse)
             {
                 myMat.setDiffuse( mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);
@@ -735,7 +736,7 @@ namespace Client
             }
 
             // sets the specular color
-            color = new Color4(0, 0, 0, 1.0f);  // default is non-specular 
+            color = new Color4(0.1f, 0.1f, 0.1f, 1.0f);  // default is non-specular 
             if (mat.HasColorSpecular)
             {
                 myMat.setSpecular(mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);

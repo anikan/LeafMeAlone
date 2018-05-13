@@ -42,7 +42,7 @@ namespace Client
             if (model == null)
                 return;
             model.m_Properties = Transform;
-            model.Update();
+            model.Update(deltaTime);
         }
 
         /// <summary>

@@ -92,6 +92,9 @@ namespace Client
         // TODO: MOVE TO WIND BLOWER OR PLAYER CLASS
         public static float WindInitSpeed = 60.0f, WindAcceleration = -30.0f, WindStopDistance = 60.0f;
         public static Vector3 WindDirection = Vector3.UnitX;
+
+        // Test model
+        private static Model animatedModel;
         
         public static void Update(float delta_t)
         {
@@ -119,10 +122,15 @@ namespace Client
             p_systems[1].SetAcceleration(WindDirection * WindAcceleration);
             p_systems[1].Update(delta_t);
 
+            animatedModel.Update(delta_t);
         }
 
         public static void Draw()
         {
+            // Always draw solid objects first
+            animatedModel.Draw();
+
+            // Draw Transparent objects later
             p_systems[0].Draw();
             p_systems[1].Draw();
 
@@ -158,6 +166,13 @@ namespace Client
                 light2.status = LightParameters.STATUS_ON;
                 light2.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
                 light2.position = Vector4.Normalize(new Vector4(0, 1, 0, 0));
+            }
+            {
+                LightParameters light3 = ActiveLightSystem.GetLightParameters(3);
+                light3.UseDirectionalPreset();
+                light3.status = LightParameters.STATUS_ON;
+                light3.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
+                light3.position = Vector4.Normalize(new Vector4(0, 0, -1, 0));
             }
 
             LoadAllShaders();
@@ -216,6 +231,13 @@ namespace Client
                     0.2f      // enlarge speed
                 )
             );
+
+            //TODO: REMOVE THIS AFTER TESTING
+            animatedModel = new Model(@"../../../Models/Example_Running_Anim.fbx", true);
+            animatedModel.m_Properties.Scale = new Vector3(0.1f, .1f, .1f);
+            animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
+            animatedModel.StartAnimationSequenceByIndex(0, true);
+            
         }
 
         /// <summary>

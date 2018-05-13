@@ -36,12 +36,12 @@ namespace Client
         /// </summary>
         /// <param name="filePath"></param>
 
-        public Model(string filePath)
+        public Model(string filePath, bool enableRigging = false)
         {
             //confirm the file exists
             System.Diagnostics.Debug.Assert(File.Exists(filePath));
 
-            Load(filePath);
+            Load(filePath, enableRigging);
             m_ModelMatrix = Matrix.Identity;
             // set the properties and update the model matrix
             //m_ActiveShader = shader;
@@ -52,7 +52,7 @@ namespace Client
             m_PrevProperties.Rotation = new Vector3(0, 0, 0);
             m_PrevProperties.Position = new Vector3(0, 0, 0);
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
-            Update();
+            Update(0);
 
             setShader(@"../../../Shaders/defaultShader.fx");
         }
@@ -62,7 +62,7 @@ namespace Client
         /// </summary>
         /// <param name="filepath"></param>
         /// <param name="shaderPath"></param>
-        public Model(string filepath, string shaderPath) : this(filepath)
+        public Model(string filepath, string shaderPath, bool enableRigging = false) : this(filepath, enableRigging)
         {
             setShader(shaderPath);
         }
@@ -97,7 +97,7 @@ namespace Client
 
         // load the geometry if it is not available, or find
         // reference to the existing geometry if it is found
-        public void Load(string filePath)
+        public void Load(string filePath, bool enableRigging)
         {
             if (GraphicsManager.DictGeometry.ContainsKey(filePath))
             {
@@ -105,7 +105,7 @@ namespace Client
             }
             else
             {
-                m_ActiveGeo = new Geometry(filePath);
+                m_ActiveGeo = new Geometry(filePath, enableRigging);
                 GraphicsManager.DictGeometry[filePath] = m_ActiveGeo;
             }
         }
@@ -117,17 +117,9 @@ namespace Client
             m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
         }
 
-        // the public interface of the Update function
-        // takes in a 'properties', which is used to generate the model matrix
-        //public void Update(Transform properties)
-        //{
-        //    m_Properties = properties;
-        //    Update();
-        //}
-
         // update the model matrix based on the properties
         // assume by default the model is facing (0, 0, -1)
-        public void Update()
+        public void Update(float delta_time)
         {
             // update the matrix only if the properties has changes
             if (!m_Properties.Equals(m_PrevProperties))
@@ -145,6 +137,33 @@ namespace Client
                 // set the translation based on the position
                 m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);
             }
+
+            m_ActiveGeo.Update(delta_time);
+        }
+
+        public void StartAnimationSequenceByName(string animationName, bool repeatAnimation)
+        {
+            m_ActiveGeo.StartAnimationSequenceByName(animationName, repeatAnimation);
+        }
+
+        public void StartAnimationSequenceByIndex(int index, bool repeatAnimation)
+        {
+            m_ActiveGeo.StartAnimationSequenceByIndex(index, repeatAnimation);
+        }
+
+        public void StopCurrentAnimation()
+        {
+            m_ActiveGeo.StopCurrentAnimation();
+        }
+
+        public void GetCurrentAnimationIndex()
+        {
+            m_ActiveGeo.GetCurrentAnimationIndex();
+        }
+
+        public void GetCurrentAnimationName()
+        {
+            m_ActiveGeo.GetCurrentAnimationName();
         }
     }
 }

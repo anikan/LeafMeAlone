@@ -11,7 +11,13 @@ uniform extern int texCount;
 uniform extern float4 Diffuse, Specular, Ambient, Emissive;
 uniform extern float Shininess, Opacity;
 
+// Camera Position in object coordinates
 uniform extern float4 CamPosObj;
+
+// Bone Transformation Matrices
+static const int MAX_BONES_PER_MESH = 50;
+uniform extern float4x4 boneTransforms[MAX_BONES_PER_MESH];
+uniform extern int animationIndex;
 
 // light parameters
 static const int NUM_LIGHTS = 20;
@@ -60,7 +66,18 @@ void VS(float4 iPosL  : POSITION,
 	out float4 oNormal: NORMALS, 
 	out float2 oTex : UV_TEX )
 {
-	float4x4 worldViewProj = mul(mul(gWorld, gView), gProj);
+	float4x4 worldViewProj = mul(gWorld, mul(gView, gProj));
+
+	if (animationIndex != -1)
+	{
+		float4x4 objToBone = boneTransforms[iBoneID.x] * iBoneWeight.x
+			+ boneTransforms[iBoneID.y] * iBoneWeight.y
+			+ boneTransforms[iBoneID.z] * iBoneWeight.z
+			+ boneTransforms[iBoneID.w] * iBoneWeight.w;
+		
+		worldViewProj = mul(objToBone, worldViewProj);
+	}
+
 	oPosH = mul(iPosL, worldViewProj);
 
 	oPosObj = iPosL;

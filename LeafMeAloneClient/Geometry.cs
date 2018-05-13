@@ -116,7 +116,7 @@ namespace Client
     /// </summary>
     public class VertexBoneData
     {
-        public const int MAX_BONES = 4;
+        public const int MAX_BONES_PER_VERTEX = 4;
 
         public int[] BoneIndices;
         public float[] BoneWeights;
@@ -132,7 +132,7 @@ namespace Client
 
         public void AddBoneData(int boneIndex, float boneWeight)
         {
-            if (count < MAX_BONES)
+            if (count < MAX_BONES_PER_VERTEX)
             {
                 BoneIndices[count] = boneIndex;
                 BoneWeights[count] = boneWeight;
@@ -143,7 +143,7 @@ namespace Client
                 // find the bone with the smallest weight
                 int minIndex = 0;
                 float minWeight = BoneWeights[0];
-                for (int i = 1; i < MAX_BONES; i++)
+                for (int i = 1; i < MAX_BONES_PER_VERTEX; i++)
                 {
                     if (BoneWeights[i] < minWeight)
                     {
@@ -165,8 +165,8 @@ namespace Client
         public void NormalizeBoneData()
         {
             float totalWeight = 0;
-            for (int i = 0; i < MAX_BONES; i++) totalWeight += BoneWeights[i];
-            for (int i = 0; i < MAX_BONES; i++) BoneWeights[i] /= totalWeight;
+            for (int i = 0; i < MAX_BONES_PER_VERTEX; i++) totalWeight += BoneWeights[i];
+            for (int i = 0; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] /= totalWeight;
         }
     }
 
@@ -175,16 +175,38 @@ namespace Client
     /// </summary>
     public class MyMesh
     {
+        public const int MAX_BONES_PER_MESH = 50;
+        public const int BONE_TRANSFORM_STREAM_SIZE = MAX_BONES_PER_MESH * sizeof(float) * 16;
+
         public int CountVertices;
 
         public Buffer EBO, VBOPositions, VBONormals, VBOTexCoords, VBOBoneIDs, VBOBoneWeights;
         public int vertSize, normSize, faceSize, texSize, boneIDSize, boneWeightSize;
-        public DataStream Vertices, Normals, Faces, TexCoords, DSBoneIDs, DSBoneWeights;
+        public DataStream Vertices, Normals, Faces, TexCoords, DSBoneIDs, DSBoneWeights, boneTransformStream;
         public MyMaterial Materials;
 
         public List<MyBone> Bones;
         public Dictionary<string, int> BoneMappings;
         public List<VertexBoneData> VertexBoneDatas;  // this is per vertex
+
+        public MyMesh()
+        {
+            boneTransformStream = new DataStream(BONE_TRANSFORM_STREAM_SIZE, true, true);
+        }
+
+        public void UpdateBoneTransformStream()
+        {
+            boneTransformStream.Position = 0;
+            for (int i = 0; i < MAX_BONES_PER_MESH; i++)
+            {
+                if (i >= Bones.Count) break;
+
+                //boneTransformStream.Write(Bones[i].BoneFrameTransformation);
+                boneTransformStream.Write(Bones[i].BoneOffset);
+            }
+
+            boneTransformStream.Position = 0;
+        }
     }
 
     /// <summary>
@@ -271,6 +293,11 @@ namespace Client
         /// The animations are all indiced the same way as stored in AnimationIndices
         /// </summary>
         private List< Dictionary<String, MyAnimationNode> > animationNodes;
+
+        /// <summary>
+        /// For inverting from the root node
+        /// </summary>
+        private Matrix InverseGlobalTransform;
 
         /// <summary>
         /// Create a new geometry given filename
@@ -389,6 +416,7 @@ namespace Client
 
             // set the animation related lookup tables
             AnimationIndices = new Dictionary<string, int>();
+            animationNodes = new List<Dictionary<string, MyAnimationNode>>(scene.AnimationCount);
             for (int i = 0; i < scene.AnimationCount; i++)
             {
                 AnimationIndices[scene.Animations[i].Name] = i;
@@ -427,6 +455,8 @@ namespace Client
                     }
                 }
             }
+
+            InverseGlobalTransform = Matrix.Invert( scene.RootNode.Transform.ToMatrix());
         }
 
         protected void SetBoneTransform(int AnimationIndex, double TimeInSeconds)
@@ -448,7 +478,7 @@ namespace Client
         protected void ReadNodeHierarchy(int AnimationIndex, double animationTime, Node node, Matrix parentTransform)
         {
             String nodeName = node.Name;
-            Matrix nodeTransformation = node.Transform.ToMatrix();
+            Matrix nodeTransform = node.Transform.ToMatrix();
             MyAnimationNode currAnimationNode = animationNodes[AnimationIndex].ContainsKey(nodeName) ? animationNodes[AnimationIndex][nodeName] : null;
 
             if (currAnimationNode != null)
@@ -460,41 +490,130 @@ namespace Client
                 Vector3 Translation = CalcInterpolateTranslation(animationTime, currAnimationNode);
                 Matrix TranslationMatrix = Matrix.Translation(Translation);
 
-                nodeTransformation = ScalingMatrix * RotationMatrix * TranslationMatrix;
+                nodeTransform = ScalingMatrix * RotationMatrix * TranslationMatrix;
+            }
+            
+            Matrix GlobalTransform = nodeTransform * parentTransform;
+            
+            // for each mesh, set the bones 
+            foreach (MyMesh mesh in allMeshes)
+            {
+                if (mesh.BoneMappings.ContainsKey(nodeName))
+                {
+                    int boneIndex = mesh.BoneMappings[nodeName];
+                    mesh.Bones[boneIndex].BoneFrameTransformation = mesh.Bones[boneIndex].BoneOffset * GlobalTransform * InverseGlobalTransform;
+                }
             }
 
+            // recursively read child nodes
+            for (int i = 0; i < node.ChildCount; i++)
+            {
+                ReadNodeHierarchy(AnimationIndex, animationTime, node.Children[i], GlobalTransform);
+            }
+        }
+
+        private Vector3 CalcInterpolateTranslation(double animationTime, MyAnimationNode animationNode)
+        {
+            if (animationNode.Translations.Count == 1) return animationNode.Translations[0];
+            if (animationNode.TranslationTime[0] > animationTime) return animationNode.Translations[0];
+
+            // find the key frame before or at the current frame
+            int translationIndex = 0;
+            for (int i = 0; i < animationNode.Translations.Count; i++)
+            {
+                if (animationNode.TranslationTime[i] > animationTime)
+                {
+                    translationIndex = i - 1;
+                    break;
+                }
+            }
+
+            if (translationIndex == -1) return animationNode.Translations[animationNode.Translations.Count - 1];
+            int nextTranslationIndex = translationIndex + 1;
+
+            double frameDuration = animationNode.TranslationTime[nextTranslationIndex] -
+                                   animationNode.TranslationTime[translationIndex];
+            double factor = (animationTime - animationNode.TranslationTime[translationIndex]) / frameDuration;
+
+            if (factor <= 0.0) return animationNode.Translations[translationIndex];
+            if (factor >= 1.0) return animationNode.Translations[nextTranslationIndex];
+
+            return Vector3.Lerp(animationNode.Translations[translationIndex],
+                animationNode.Translations[nextTranslationIndex], (float) factor);
 
         }
 
-        private Vector3 CalcInterpolateTranslation(double animationTime, MyAnimationNode currAnimationNode)
+        private Quaternion CalcInterpolateRotation(double animationTime, MyAnimationNode animationNode)
         {
-            Vector3 ret = new Vector3();
+            if (animationNode.Rotations.Count == 1) return animationNode.Rotations[0];
+            if (animationNode.RotationTime[0] > animationTime) return animationNode.Rotations[0];
 
-            return ret;
+            // find the key frame before or at the current frame
+            int rotationIndex = -1;
+            for (int i = 0; i < animationNode.Rotations.Count; i++)
+            {
+                if (animationNode.RotationTime[i] > animationTime)
+                {
+                    rotationIndex = i - 1;
+                    break;
+                }
+            }
+
+            if (rotationIndex == -1) return animationNode.Rotations[animationNode.Rotations.Count-1];
+
+            int nextRotationIndex = rotationIndex + 1;
+
+            double frameDuration = animationNode.RotationTime[nextRotationIndex] -
+                                   animationNode.RotationTime[rotationIndex];
+            double factor = (animationTime - animationNode.RotationTime[rotationIndex]) / frameDuration;
+
+            if (factor <= 0.0) return animationNode.Rotations[rotationIndex];
+            if (factor >= 1.0) return animationNode.Rotations[nextRotationIndex];
+
+            return Quaternion.Lerp(animationNode.Rotations[rotationIndex],
+                animationNode.Rotations[nextRotationIndex], (float)factor);
         }
 
-        private Quaternion CalcInterpolateRotation(double animationTime, MyAnimationNode currAnimationNode)
+        private Vector3 CalcInterpolateScaling(double animationTime, MyAnimationNode animationNode)
         {
-            Quaternion ret = new Quaternion();
+            if (animationNode.Scalings.Count == 1) return animationNode.Scalings[0];
+            if (animationNode.ScalingTime[0] > animationTime) return animationNode.Scalings[0];
 
-            return ret;
-        }
+            // find the key frame before or at the current frame
+            int scalingIndex = -1;
+            for (int i = 0; i < animationNode.Scalings.Count; i++)
+            {
+                if (animationNode.ScalingTime[i] > animationTime)
+                {
+                    scalingIndex = i - 1;
+                    break;
+                }
+            }
 
-        private Vector3 CalcInterpolateScaling(double animationTime, MyAnimationNode currAnimationNode)
-        {
-            Vector3 ret = new Vector3();
+            if (scalingIndex == -1) return animationNode.Scalings[animationNode.Scalings.Count - 1];
 
-            return ret;
+            int nextScalingIndex = scalingIndex + 1;
+
+            double frameDuration = animationNode.ScalingTime[nextScalingIndex] -
+                                   animationNode.ScalingTime[scalingIndex];
+            double factor = (animationTime - animationNode.ScalingTime[scalingIndex]) / frameDuration;
+
+            if (factor <= 0.0) return animationNode.Scalings[scalingIndex];
+            if (factor >= 1.0) return animationNode.Scalings[nextScalingIndex];
+
+            return Vector3.Lerp(animationNode.Scalings[scalingIndex],
+                animationNode.Scalings[nextScalingIndex], (float)factor);
         }
 
         private double CurrentAnimationTime = 0;
         private int CurrentAnimationIndex = -1;
+        private string CurrentAnimationName = null;
         private bool RepeatAnimation = false;
 
         // need to be called in order to use the skeletal animation
         public void Update(float delta_time)
         {
-            if (CurrentAnimationIndex != -1)
+            if (CurrentAnimationIndex != -1 && RiggingEnabled)
             {
                 // number of ticks per second
                 double TicksPerSecond = scene.Animations[CurrentAnimationIndex].TicksPerSecond;
@@ -516,14 +635,29 @@ namespace Client
 
                 // advance the animation
                 CurrentAnimationTime += delta_time;
+
+                foreach (MyMesh mesh in allMeshes)
+                {
+                    mesh.UpdateBoneTransformStream();
+                }
             }
+            else CurrentAnimationIndex = -1;
         }
 
         // need to be called FIRST before an update, so that the skeletal animation can be drawn
-        public void StartAnimationSequence(string animationName, bool repeatAnimation)
+        public void StartAnimationSequenceByName(string animationName, bool repeatAnimation = false)
         {
             CurrentAnimationTime = 0;
             CurrentAnimationIndex = AnimationIndices.ContainsKey(animationName) ? AnimationIndices[animationName] : -1 ;
+            RepeatAnimation = repeatAnimation;
+            CurrentAnimationName = animationName;
+        }
+
+        public void StartAnimationSequenceByIndex(int index, bool repeatAnimation = false)
+        {
+            CurrentAnimationTime = 0;
+            CurrentAnimationIndex = index;
+            CurrentAnimationName = scene.Animations[index].Name;
             RepeatAnimation = repeatAnimation;
         }
 
@@ -531,6 +665,18 @@ namespace Client
         public void StopCurrentAnimation()
         {
             CurrentAnimationIndex = -1;
+            CurrentAnimationName = null;
+        }
+
+        // find which animation is being set now
+        public int GetCurrentAnimationIndex()
+        {
+            return CurrentAnimationIndex;
+        }
+
+        public string GetCurrentAnimationName()
+        {
+            return CurrentAnimationName;
         }
 
         /// <summary>
@@ -675,8 +821,8 @@ namespace Client
             }
 
             // create new datastream so that we can stream them to the VBOs
-            mesh.boneIDSize = sizeof(int) * VertexBoneData.MAX_BONES * mesh.CountVertices;
-            mesh.boneWeightSize = sizeof(float) * VertexBoneData.MAX_BONES * mesh.CountVertices;
+            mesh.boneIDSize = sizeof(int) * VertexBoneData.MAX_BONES_PER_VERTEX * mesh.CountVertices;
+            mesh.boneWeightSize = sizeof(float) * VertexBoneData.MAX_BONES_PER_VERTEX * mesh.CountVertices;
             mesh.DSBoneIDs = new DataStream(mesh.boneIDSize, true, true);
             mesh.DSBoneWeights = new DataStream(mesh.boneWeightSize, true, true);
 
@@ -687,7 +833,7 @@ namespace Client
                 mesh.VertexBoneDatas[i].NormalizeBoneData();
 
                 // write the data into datastreams
-                for (int bonei = 0; bonei < VertexBoneData.MAX_BONES; bonei++)
+                for (int bonei = 0; bonei < VertexBoneData.MAX_BONES_PER_VERTEX; bonei++)
                 {
                     mesh.DSBoneIDs.Write(mesh.VertexBoneDatas[i].BoneIndices[bonei]);
                     mesh.DSBoneWeights.Write(mesh.VertexBoneDatas[i].BoneWeights[bonei]);
@@ -740,13 +886,16 @@ namespace Client
                 }
 
                 // pass bone IDs and weights if applicable
-                if (RiggingEnabled)
+                shader.ShaderEffect.GetVariableByName("animationIndex").AsScalar().Set(CurrentAnimationIndex);
+                if (CurrentAnimationIndex != -1)
                 {
                     GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(BoneIdLoc,
-                        new VertexBufferBinding(mesh.VBOBoneIDs, sizeof(float) * VertexBoneData.MAX_BONES, 0));
+                        new VertexBufferBinding(mesh.VBOBoneIDs, sizeof(int) * VertexBoneData.MAX_BONES_PER_VERTEX, 0));
 
                     GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(BoneWeightLoc,
-                        new VertexBufferBinding(mesh.VBOBoneWeights, sizeof(int) * VertexBoneData.MAX_BONES, 0));
+                        new VertexBufferBinding(mesh.VBOBoneWeights, sizeof(float) * VertexBoneData.MAX_BONES_PER_VERTEX, 0));
+                    
+                    shader.ShaderEffect.GetVariableByName("boneTransforms").SetRawValue(mesh.boneTransformStream, MyMesh.BONE_TRANSFORM_STREAM_SIZE);
                 }
 
                 // pass texture resource into the shader if applicable

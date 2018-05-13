@@ -12,7 +12,8 @@ namespace Shared
     {
         CreateObjectPacket,
         PlayerPacket,
-        LeafPacket
+        LeafPacket,
+        DestroyObjectPacket
     }
 
     /// <summary>

@@ -208,7 +208,7 @@ namespace Server
         /// </summary>
         public override void Destroy()
         {
-            // What to do?!
+            GameServer.instance.Destroy(this);
         }
     }
 }

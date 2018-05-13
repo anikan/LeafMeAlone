@@ -14,15 +14,16 @@ namespace Server
     {
         public static GameServer instance;
 
+        public List<GameObject> toDestroyQueue = new List<GameObject>();
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
-
         public List<LeafServer> LeafList = new List<LeafServer>();
-        public Dictionary<int, GameObjectServer> gameObjectDict = new Dictionary<int, GameObjectServer>();
+        public Dictionary<int, GameObjectServer> gameObjectDict =
+            new Dictionary<int, GameObjectServer>();
 
         private NetworkServer networkServer;
 
         //Time in ms for each tick.
-        public const long TICK_TIME= 33;
+        public const long TICK_TIME = 33;
 
         //Time per second for each tick.
         public const float TICK_TIME_S = .033f;
@@ -35,7 +36,7 @@ namespace Server
 
         public GameServer(bool networked)
         {
-            instance = this; 
+            instance = this;
 
             timer = new Stopwatch();
             testTimer = new Stopwatch();
@@ -63,7 +64,7 @@ namespace Server
             }
 
             GameServer gameServer = new GameServer(networked);
-            
+
             gameServer.networkServer.StartListening();
 
             gameServer.DoGameLoop();
@@ -87,13 +88,15 @@ namespace Server
                 {
                     PlayerPacket packet = networkServer.PlayerPackets[i];
 
-                    if (gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject))
+                    if (gameObjectDict.TryGetValue(packet._ProtoObjId,
+                        out GameObjectServer playerGameObject))
                     {
-                        PlayerServer player = (PlayerServer) playerGameObject;
+                        PlayerServer player = (PlayerServer)playerGameObject;
 
                         player.UpdateFromPacket(networkServer.PlayerPackets[i]);
 
-                        Console.WriteLine("Player {0} is at {1}", player.Id, player.Transform.Position);
+                        Console.WriteLine("Player {0} is at {1}", player.Id,
+                            player.Transform.Position);
                     }
                 }
 
@@ -107,7 +110,7 @@ namespace Server
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
-               //     Console.WriteLine("Warning: Server is falling behind.");
+                    //     Console.WriteLine("Warning: Server is falling behind.");
                 }
 
                 timer.Restart();
@@ -119,11 +122,10 @@ namespace Server
 
         public void UpdateObjects(float deltaTime)
         {
-
             //TestPhysics();
-            
+
             //This foreach loop hurts my soul. May consider making it normal for loop.
-            foreach (KeyValuePair<int, GameObjectServer> pair in gameObjectDict )
+            foreach (KeyValuePair<int, GameObjectServer> pair in gameObjectDict)
             {
                 pair.Value.Update(deltaTime);
             }
@@ -166,19 +168,19 @@ namespace Server
             PlayerServer newActivePlayer = new PlayerServer();
             newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
             newActivePlayer.Id = newPlayer.Id;
-            
+
             playerServerList.Add(newPlayer);
 
             //Note currently assuming players get ids 0-3
             newActivePlayer.Transform.Position = spawnPoints[0];
             newPlayer.Transform.Position = spawnPoints[0];
-            
-            CreateObjectPacket objPacket = 
+
+            CreateObjectPacket objPacket =
                 new CreateObjectPacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-             networkServer.SendAll(objPacket.Serialize());
-               
+            networkServer.SendAll(objPacket.Serialize());
+
             return newActivePlayer;
         }
 
@@ -203,6 +205,8 @@ namespace Server
                 LeafList.Add(newLeaf);
                 newLeaf.Register();
 
+                newLeaf.Health = 0;
+
                 Console.WriteLine("Creating leaf at position " + pos);
             }
         }
@@ -223,6 +227,26 @@ namespace Server
                 //player.AffectObjectsInToolRange(gameObjectList);
 
             }
+        }
+
+        /// <summary>
+        /// Destroys the given game object; removes it from the dictionary of 
+        /// objects to send update packets for, and adds the destory packet to 
+        /// the toDestroy Queue
+        /// </summary>
+        /// <param name="gameObj">The game object to destroy</param>
+        public void Destroy(GameObject gameObj)
+        {
+            gameObjectDict.Remove(gameObj.Id);
+            if (gameObj is LeafServer leaf)
+            {
+                LeafList.Remove(leaf);
+            } else if (gameObj is PlayerServer player)
+            {
+                playerServerList.Remove(player);
+            }
+
+            toDestroyQueue.Add(gameObj);
         }
     }
 }

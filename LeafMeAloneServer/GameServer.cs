@@ -113,6 +113,7 @@ namespace Server
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
+                toDestroyQueue.Clear();
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
@@ -134,10 +135,11 @@ namespace Server
         {
             //TestPhysics();
 
+            List<GameObjectServer> toUpdateList = gameObjectDict.Values.ToList();
             //This foreach loop hurts my soul. May consider making it normal for loop.
-            foreach (KeyValuePair<int, GameObjectServer> pair in gameObjectDict)
+            foreach (GameObjectServer toUpdate in toUpdateList)
             {
-                pair.Value.Update(deltaTime);
+                toUpdate.Update(deltaTime);
             }
 
             // Add the effects of the player tools.
@@ -214,8 +216,6 @@ namespace Server
                 // Add this leaf to the leaf list and object dictionary.
                 LeafList.Add(newLeaf);
                 newLeaf.Register();
-                newLeaf.Burning = true;
-                newLeaf.Health = -1000;
             }
         }
 

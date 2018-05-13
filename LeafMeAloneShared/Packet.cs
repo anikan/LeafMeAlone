@@ -88,6 +88,10 @@ namespace Shared
                     return Serializer.Deserialize<LeafPacket>(
                         new MemoryStream(objectData)
                     );
+                case PacketType.DestroyObjectPacket:
+                    return Serializer.Deserialize<DestroyObjectPacket>(
+                        new MemoryStream(objectData)
+                    );
             }
 
             //We don't have all the bytes to deserialize, return null.

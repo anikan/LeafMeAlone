@@ -20,17 +20,13 @@ namespace Shared
             set { ObjectId = value; }
         }
 
-        [ProtoMember(2)]
-        public ObjectType objectType;
-
         public DestroyObjectPacket() : base(PacketType.DestroyObjectPacket)
         { }
 
         public DestroyObjectPacket(GameObject gameObject) :
-            base(PacketType.CreateObjectPacket)
+            base(PacketType.DestroyObjectPacket)
         {
             ObjectId = gameObject.Id;
-            objectType = gameObject.ObjectType;
         }
     }
 }

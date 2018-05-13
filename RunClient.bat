@@ -1,2 +1,3 @@
-cd ./LeafMeAloneClient/bin/x64/Debug
-LeafMeAloneClient.exe
+cd ./LeafMeAloneClient/bin/Debug
+start LeafMeAloneClient.exe
+exit

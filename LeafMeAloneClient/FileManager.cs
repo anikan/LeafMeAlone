@@ -5,20 +5,20 @@
         /// <summary>
         /// Shaders
         /// </summary>
-        public static string DefaultShader = @"../../../Shaders/defaultShader.fx";
-        public static string ParticleShader = @"../../../Shaders/particle.fx";
+        public static string DefaultShader = @"../../Shaders/defaultShader.fx";
+        public static string ParticleShader = @"../../Shaders/particle.fx";
 
         /// <summary>
         /// Textures
         /// </summary>
-        public static string FireTexture = @"../../../Particles/fire_red.png";
-        public static string WindTexture = @"../../../Particles/Wind_Transparent2.png";
+        public static string FireTexture = @"../../Particles/fire_red.png";
+        public static string WindTexture = @"../../Particles/Wind_Transparent2.png";
 
 
         /// <summary>
         /// Models
         /// </summary>
-        public static string LeafModel = @"../../../Models/05.13.18_Leaf.fbx";
-        public static string PlayerModel = @"../../../Models/05.03.18_Version2.fbx";
+        public static string LeafModel = @"../../Models/05.13.18_Leaf.fbx";
+        public static string PlayerModel = @"../../Models/05.03.18_Version2.fbx";
     }
 }

@@ -55,7 +55,7 @@ namespace Server
 
             networkServer = new NetworkServer(networked);
 
-            CreateRandomLeaves(200, -10, 10, -10, 10);
+            CreateRandomLeaves(200, -10, -10, 10, -10, 10);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -177,14 +177,19 @@ namespace Server
         /// Creates all leaves in the scene, placing them randomly.
         /// </summary>
         /// <param name="num">Number of leaves to create.</param>
+        /// <param name="floorHeight">Height of the floor in the world..</param>
         /// <param name="minX">Min x position to spawn leaves.</param>
         /// <param name="maxX">Max x position to spawn leaves.</param>
-        /// <param name="minY">Min y position to spawn leaves.</param>
-        /// <param name="maxY">Max y position to spawn leaves.</param>
-        public void CreateRandomLeaves(int num, float minX, float maxX, float minY, float maxY)
+        /// <param name="minZ">Min y position to spawn leaves.</param>
+        /// <param name="maxZ">Max y position to spawn leaves.</param>
+        public void CreateRandomLeaves(int num, float floorHeight, float minX, float maxX, float minZ, float maxZ)
         {
             // Create a new random number generator.
             Random rnd = new Random();
+
+            // Very slight random offset for leaves so that there's no z-fighting.
+            double minY = floorHeight - 0.1f;
+            double maxY = floorHeight;
 
             // Itereate through number of leaves we want to create.
             for (int i = 0; i < num; i++)
@@ -193,13 +198,15 @@ namespace Server
                 // Get random doubles for position.
                 double randX = rnd.NextDouble();
                 double randY = rnd.NextDouble();
+                double randZ = rnd.NextDouble();
 
                 // Bind random doubles to our range.
                 randX = (randX * (maxX - minX)) + minX;
-                randY = (randY * (maxY - minY)) + maxY;
+                randY = (randY * (maxY - minY)) + minY;
+                randZ = (randZ * (maxZ - minZ)) + maxZ;
 
                 // Get the new position
-                Vector3 pos = new Vector3((float)randX, 0.0f, (float)randY);
+                Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
 
                 // Create a new leaf
                 LeafServer newLeaf = new LeafServer();

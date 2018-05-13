@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,7 @@ namespace Client
         /// <param name="filePath">Path of the model.</param>
         public void SetModel(string filePath)
         {
+            //Console.WriteLine(File.Exists(filePath));
             model = new Model(filePath);
             Name = filePath.Split('.')[0];
         }

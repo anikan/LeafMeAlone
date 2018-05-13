@@ -1,3 +1,2 @@
-cd D:/Classes/CSE125/LeafMeAlone/LeafMeAloneClient/bin/Debug
-start LeafMeAloneClient.exe
-exit
+cd ./LeafMeAloneClient/bin/x64/Debug
+LeafMeAloneClient.exe

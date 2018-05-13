@@ -84,15 +84,7 @@ namespace Client
 
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
-        
-        // TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
-        public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f,3.85f,3.0f);
-        public static float FlameInitSpeed = 40.0f, FlameAcceleration = 15.0f;
 
-        // TODO: MOVE TO WIND BLOWER OR PLAYER CLASS
-        public static float WindInitSpeed = 60.0f, WindAcceleration = -30.0f, WindStopDistance = 60.0f;
-        public static Vector3 WindDirection = Vector3.UnitX;
-        
         public static void Update(float delta_t)
         {
             // update the camera position based on the player position

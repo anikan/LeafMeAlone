@@ -258,14 +258,14 @@ namespace Client
                          Matrix.RotationZ(Transform.Rotation.Z);
 
             // flame throwing particle system update
-            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(GraphicsManager.PlayerToFlamethrowerOffset, mat));
-            FlameThrower.SetVelocity(Transform.Forward * GraphicsManager.FlameInitSpeed);
-            FlameThrower.SetAcceleration(Transform.Forward * GraphicsManager.FlameAcceleration);
+            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            FlameThrower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
+            FlameThrower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
             FlameThrower.Update(deltaTime);
 
-            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(GraphicsManager.PlayerToFlamethrowerOffset, mat));
-            LeafBlower.SetVelocity(Transform.Forward * GraphicsManager.FlameInitSpeed);
-            LeafBlower.SetAcceleration(Transform.Forward * GraphicsManager.FlameAcceleration);
+            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            LeafBlower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
+            LeafBlower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
             LeafBlower.Update(deltaTime);
         }
 

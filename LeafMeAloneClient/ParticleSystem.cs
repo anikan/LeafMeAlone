@@ -327,6 +327,16 @@ namespace Client
             int activeParticles = 0;
             foreach (Particle particle in Particles)
             {
+                if (DisableRewind)
+                {
+                    float cosAngle = Vector3.Dot(Vector3.Normalize(particle.InitVelocity), Vector3.Normalize(particle.Velocity));
+                    if (cosAngle < 0f)
+                    {
+                        particle.Force = Vector3.Zero;
+                        particle.Velocity = Vector3.Zero;
+                        particle.LifeRemaining = -1;
+                    }
+                }
                 if (particle.LifeRemaining <= 0 || Vector3.Distance(particle.Position, particle.Origin) > StopDist)
                 {
                     if ( emissionThisFrame < emissionRate && ShouldGenerate)
@@ -353,16 +363,7 @@ namespace Client
                     ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.Y + prevForce.Y,
                     ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.Z + prevForce.Z);
 
-                if (DisableRewind)
-                {
-                    float cosAngle = Vector3.Dot(Vector3.Normalize(particle.InitVelocity), Vector3.Normalize(particle.Velocity));
-                    if (cosAngle < 0f)
-                    {
-                        particle.Force = Vector3.Zero;
-                        particle.Velocity = Vector3.Zero;
-                        particle.LifeRemaining = 0;
-                    }
-                }
+                
                 particle.Update(deltaTime);
             }
 

@@ -15,7 +15,7 @@ uniform extern float Shininess, Opacity;
 uniform extern float4 CamPosObj;
 
 // Bone Transformation Matrices
-static const int MAX_BONES_PER_MESH = 50;
+static const int MAX_BONES_PER_MESH = 100;
 uniform extern float4x4 boneTransforms[MAX_BONES_PER_MESH];
 uniform extern int animationIndex;
 

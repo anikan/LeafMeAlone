@@ -175,7 +175,7 @@ namespace Client
     /// </summary>
     public class MyMesh
     {
-        public const int MAX_BONES_PER_MESH = 50;
+        public const int MAX_BONES_PER_MESH = 100;
         public const int BONE_TRANSFORM_STREAM_SIZE = MAX_BONES_PER_MESH * sizeof(float) * 16;
 
         public int CountVertices;

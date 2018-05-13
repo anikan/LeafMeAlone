@@ -234,7 +234,7 @@ namespace Client
 
             //TODO: REMOVE THIS AFTER TESTING
             animatedModel = new Model(@"../../../Models/Low-Poly Spider/Only_Spider_with_Animations_Export.dae", true);
-            //animatedModel.m_Properties.Scale = new Vector3(1.5f, 1.5f, 1.5f);
+            animatedModel.m_Properties.Scale = new Vector3(15f, 15f, 15f);
             //animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
             animatedModel.StartAnimationSequenceByIndex(0, true);
             

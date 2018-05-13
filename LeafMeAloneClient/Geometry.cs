@@ -486,8 +486,10 @@ namespace Client
             {
                 Vector3 Scaling = CalcInterpolateScaling(animationTime, currAnimationNode);
                 Matrix ScalingMatrix = Matrix.Scaling(Scaling);
+
                 Quaternion Rotation = CalcInterpolateRotation(animationTime, currAnimationNode);
                 Matrix RotationMatrix = Matrix.RotationQuaternion(Rotation);
+
                 Vector3 Translation = CalcInterpolateTranslation(animationTime, currAnimationNode);
                 Matrix TranslationMatrix = Matrix.Translation(Translation);
 

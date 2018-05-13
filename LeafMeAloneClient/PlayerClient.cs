@@ -31,9 +31,38 @@ namespace Client
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
+        private ParticleSystem FlameThrower,LeafBlower;
+
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, FileManager.PlayerModel)
         {
+            FlameThrower = new ParticleSystem(ParticleSystemType.FIRE,
+                Vector3.Zero +
+                Vector3.TransformCoordinate(GraphicsManager.PlayerToFlamethrowerOffset, Matrix.Identity), // origin
+                Vector3.UnitZ * GraphicsManager.FlameInitSpeed, // acceleration
+                Vector3.UnitZ * GraphicsManager.FlameAcceleration, // initial speed
+                false, // cutoff all colors
+                false, // no backward particle prevention
+                320.0f, // cone radius, may need to adjust whenever acceleration changes
+                1.0f, // initial delta size
+                10f, // cutoff distance
+                0.2f, // cutoff speed
+                0.075f // enlarge speed
+            );
+            LeafBlower = new ParticleSystem(ParticleSystemType.WIND,
+                new Vector3(-10, -10, 0), // origin
+                new Vector3(-30.0f, 0f, 0f), // acceleration
+                new Vector3(100f, 0f, 0f), // initial speed
+                true, // cutoff alpha only
+                false, // dont prevent backward flow
+                10000.0f, // cone radius
+                1.0f, // initial delta size
+                2f, // cutoff distance
+                0.5f, // cutoff speed
+                0.2f // enlarge speed
+            );
+            GraphicsManager.ParticleSystems.Add(FlameThrower);
+            GraphicsManager.ParticleSystems.Add(LeafBlower);
         }
 
         //Implementations of IPlayer fields
@@ -192,6 +221,53 @@ namespace Client
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
+
+            switch (ActiveToolMode)
+            {
+                case ToolMode.NONE:
+                    FlameThrower.Enabled = false;
+                    LeafBlower.Enabled = false;
+                    break;
+                case ToolMode.PRIMARY:
+                    switch (ToolEquipped)
+                    {
+                        case ToolType.BLOWER:
+                            FlameThrower.Enabled = false;
+                            LeafBlower.Enabled = true;
+                            break;
+                        case ToolType.THROWER:
+                            LeafBlower.Enabled = false;
+                            FlameThrower.Enabled = true;
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case ToolMode.SECONDARY:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+        }
+
+        public override void Update(float deltaTime)
+        {
+            base.Update(deltaTime);
+            Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
+                         Matrix.RotationY(Transform.Rotation.Y) *
+                         Matrix.RotationZ(Transform.Rotation.Z);
+
+            // flame throwing particle system update
+            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(GraphicsManager.PlayerToFlamethrowerOffset, mat));
+            FlameThrower.SetVelocity(Transform.Forward * GraphicsManager.FlameInitSpeed);
+            FlameThrower.SetAcceleration(Transform.Forward * GraphicsManager.FlameAcceleration);
+            FlameThrower.Update(deltaTime);
+
+            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(GraphicsManager.PlayerToFlamethrowerOffset, mat));
+            LeafBlower.SetVelocity(Transform.Forward * GraphicsManager.FlameInitSpeed);
+            LeafBlower.SetAcceleration(Transform.Forward * GraphicsManager.FlameAcceleration);
+            LeafBlower.Update(deltaTime);
         }
 
         /// <summary>

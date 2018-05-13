@@ -31,10 +31,7 @@ namespace Server
                     _ProtoObjId = player.Id,
                     Rotation = player.Transform.Rotation.Y,
                     ToolEquipped = player.ToolEquipped,
-                    UsingToolPrimary =
-                    player.ActiveToolMode == ToolMode.PRIMARY,
-                    UsingToolSecondary =
-                    player.ActiveToolMode == ToolMode.SECONDARY
+                    ActiveToolMode = player.ActiveToolMode
                 };
             }
             else if (gameObj is LeafServer leaf)

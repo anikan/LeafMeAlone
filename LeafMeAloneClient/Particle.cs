@@ -11,6 +11,12 @@ namespace Client
 
     public class Particle
     {
+
+        /// <summary>
+        /// Creation origin of the particle in world space.
+        /// </summary>
+        public Vector3 Origin;
+
         /// <summary>
         /// Current position of the particle in world space.
         /// </summary>
@@ -20,6 +26,7 @@ namespace Client
         /// Current Velocity (Derivative of Position)
         /// </summary>
         public Vector3 Velocity;
+        public Vector3 InitVelocity;
 
         /// <summary>
         /// Current force exerted on particle. Note: Gets reset after every update loop.
@@ -30,6 +37,11 @@ namespace Client
         /// Current Acceleration (Derivative of Velocity)
         /// </summary>
         public Vector3 Acceleration;
+
+        /// <summary>
+        /// Initial Acceleration (Derivative of Velocity)
+        /// </summary>
+        public Vector3 InitAcceleration;
 
         /// <summary>
         /// Normal for object
@@ -46,13 +58,18 @@ namespace Client
         /// </summary>
         public float LifeRemaining;
 
-        public Particle(Vector3 position, Vector3 velocity, float mass, float lifeRemaining)
+        public Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, float mass, float lifeRemaining)
         {
+            InitAcceleration = acceleration;
+            Origin = position;
             Position = position;
-            Velocity = Vector3.Zero;
+            Velocity = velocity;
+            InitVelocity = velocity;
             LifeRemaining = lifeRemaining;
             Mass = mass;
             Force = Vector3.Zero;
+
+
         }
 
 

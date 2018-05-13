@@ -76,7 +76,7 @@ namespace Shared
         {
             get
             {
-                Vector3 retVec = new Vector3(0, -1, 0);
+                Vector3 retVec = new Vector3(0, 0, 1);
 
                 // set the rotation based on the three directions
                 Matrix m_ModelMatrix = Matrix.RotationX(Rotation.X) *

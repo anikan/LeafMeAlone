@@ -1,2 +1,2 @@
-cd D:/Classes/CSE125/LeafMeAlone/LeafMeAloneClient/bin/Debug
+cd ./LeafMeAloneClient/bin/x64/Debug
 LeafMeAloneClient.exe

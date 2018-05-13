@@ -183,6 +183,9 @@ namespace Client
         /// <param name="stream"></param>
         public void WriteDataToStream(DataStream stream, Matrix toWorld)
         {
+            // make sure that transformations don't get mistaken
+            if (type == TYPE_DIRECTIONAL) position.W = 0;
+            
             Matrix toObj = Matrix.Invert(toWorld);
             Vector4 pos_obj = Vector4.Transform(position, toObj) ;
 

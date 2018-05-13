@@ -10,7 +10,7 @@ namespace Client
     class LeafClient : NetworkedGameObjectClient
     {
 
-        public const string LeafModelPath = @"../../Models/Leaf_V1.fbx";
+        public const string LeafModelPath = @"../../../Models/Leaf_V1.fbx";
 
         public LeafClient(CreateObjectPacket createPacket) : 
             base(createPacket, LeafModelPath)

@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Client;
 using Shared;
 using SlimDX;
-using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
-using Device = SlimDX.DXGI.Device;
 using System.Net;
 
 namespace Client
@@ -44,9 +39,8 @@ namespace Client
 
         // Timer to calculate time between frames.
         public Stopwatch FrameTimer;
-
-        // Initial particle system.
-        private ParticleSystem p;
+        private UIFramesPersecond fps;
+        private UITimer gameTimer;
 
         private NetworkClient networkClient;
 
@@ -70,16 +64,22 @@ namespace Client
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
+
+            //TODO FOR TESTING ONLY
+            //GraphicsRenderer.Form.KeyDown += TestPlayerMovementWithoutNetworking;
+            Client.fps = new UIFramesPersecond(new Size(5, 30), new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
+            Client.gameTimer = new UITimer(60,new Size(225,3),new Point(0,0) );
+
+
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
 
-        /// <summary>
-        /// Main game loop code.
-        /// </summary>
+        
         private void DoGameLoop()
         {
+            fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
 
@@ -102,8 +102,10 @@ namespace Client
             // Draw everythhing.
             Render();
 
-            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 
+            GraphicsRenderer.BarContext.Draw();
+            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+            fps.StopAndCalculateFps();
         }
 
         // Start the networked client (connect to server).
@@ -119,20 +121,6 @@ namespace Client
             // Initialize game object lists.
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
-
-            // TEMPORARY: Create a new test particle system.
-            // TODO: Move this to better place.
-            p = new ParticleSystem
-            (
-                ParticleSystemType.FIRE,
-                new Vector3(-10, 0, 0),   // origin
-                new Vector3(2.0f, 0f, 0f),  // velocity
-                2.0f,   // cone radius
-                1.0f,    // initial delta size
-                10f,     // cutoff distance
-                0.2f,     // cutoff speed
-                0.075f      // enlarge speed
-            );
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -167,7 +155,7 @@ namespace Client
             }
 
             // Update the graphics manager.
-            GraphicsManager.Update();
+            GraphicsManager.Update(delta);
 
             // Restart the frame timer.
             FrameTimer.Restart();
@@ -192,6 +180,7 @@ namespace Client
             {
                 obj.Draw();
             }
+            GraphicsManager.Draw();
         }
 
 

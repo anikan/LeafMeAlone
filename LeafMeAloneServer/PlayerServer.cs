@@ -22,6 +22,8 @@ namespace Server
         public PlayerServer() : base(ObjectType.PLAYER, PLAYER_BURN_TIME)
         {
 
+            ToolEquipped = ToolType.BLOWER;
+
         }
 
         /// <summary>
@@ -43,24 +45,20 @@ namespace Server
         /// <param name="allObjects">A list of all objects in the game.</param>
         public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
         {
-            // If there is a tool equipped.
-            if (ToolEquipped != ToolType.NONE)
+
+            // Itereate through all objects.
+            for (int j = 0; j < allObjects.Count; j++)
             {
 
-                // Itereate through all objects.
-                for (int j = 0; j < allObjects.Count; j++)
+                //Get the current object.
+                GameObjectServer gameObject = allObjects[j];
+
+                // Check if it's within tool range, and that it's not the current player.
+                if (gameObject != this && gameObject.IsInPlayerToolRange(this))
                 {
+                    // Hit the object.
+                    gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
 
-                    //Get the current object.
-                    GameObjectServer gameObject = allObjects[j];
-
-                    // Check if it's within tool range, and that it's not the current player.
-                    if (gameObject != this && gameObject.IsInPlayerToolRange(this))
-                    {
-                        // Hit the object.
-                        gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
-
-                    }
                 }
             }
         }
@@ -75,7 +73,11 @@ namespace Server
 
             Transform.Rotation.Y = packet.Rotation;
 
-            ToolEquipped = packet.ToolEquipped;
+            if (packet.ToolEquipped != ToolType.SAME)
+            {
+                ToolEquipped = packet.ToolEquipped;
+                Console.WriteLine(string.Format("Player {0} switching to {1}", Id, ToolEquipped.ToString()));
+            }
 
             if (packet.UsingToolPrimary)
             {

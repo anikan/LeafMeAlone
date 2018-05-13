@@ -10,9 +10,9 @@ namespace Shared
     // Type of tool the player is using.
     public enum ToolType
     {
-        NONE,
+        SAME,
         BLOWER,
-        THROWER
+        THROWER,
     }
 
     // Mode for left/right tool clicks, or maybe any special (power-up) modes.
@@ -79,8 +79,6 @@ namespace Shared
 
             {ToolType.BLOWER, Blower},
             {ToolType.THROWER, Thrower},
-            {ToolType.NONE, new ToolInfo() }
-
         };
         
         // Gets tool information from a tool type.

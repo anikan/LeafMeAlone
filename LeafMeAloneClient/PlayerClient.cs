@@ -93,7 +93,15 @@ namespace Client
 
         public void RequestToolEquip(ToolType type)
         {
-            PlayerRequests.EquipToolRequest = type;
+            if (type != ToolEquipped)
+            {
+                Console.WriteLine("Requesting new tool! " + type.ToString());
+                PlayerRequests.EquipToolRequest = type;
+            }
+            else
+            {
+                PlayerRequests.EquipToolRequest = ToolType.SAME;
+            }
         }
 
         // Note: Causes weird behaviour sometimes. Needs to be fixed if want to use.
@@ -161,8 +169,7 @@ namespace Client
 
             PlayerRequests.RotationRequested = angleMouse;
 
-            // TEMPORARY FOR TESTING
-            // Set rotation of player
+            // Set rotation of player locally, but still set to the rotation of server later.
             Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
 
         }
@@ -185,15 +192,15 @@ namespace Client
         public void ResetRequests()
         {
 
-            ToolType equippedTool = PlayerRequests.EquipToolRequest;
+            //  ToolType equippedTool = PlayerRequests.EquipToolRequest;
 
             // Reset the player requests struct to clear all info.
             PlayerRequests = new PlayerRequestInfo();
             // Set rotation initially to the rotation of the player
 
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
-
-            PlayerRequests.EquipToolRequest = equippedTool;
+  
+            // PlayerRequests.EquipToolRequest = equippedTool;
 
         }
 
@@ -205,7 +212,9 @@ namespace Client
         public void UpdateFromPacket(PlayerPacket packet)
         {
             Dead = packet.Dead;
+
             ToolEquipped = packet.ToolEquipped;
+
             UsingToolPrimary = packet.UsingToolPrimary;
             UsingToolSecondary = packet.UsingToolSecondary;
             Transform.Position.X = packet.MovementX;

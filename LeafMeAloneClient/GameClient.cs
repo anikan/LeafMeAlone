@@ -60,7 +60,7 @@ namespace Client
             }
 
             // Create a new camera with a specified offset.
-            Camera activeCamera = 
+            Camera activeCamera =
                 new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
 
             // Initialize graphics classes
@@ -68,15 +68,14 @@ namespace Client
             GraphicsManager.Init(activeCamera);
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
-            instance = Client;
 
 
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += 
             // TestPlayerMovementWithoutNetworking;
-            Client.fps = new UIFramesPersecond(new Size(5, 30), 
+            Client.fps = new UIFramesPersecond(new Size(5, 30),
                 new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
-            Client.gameTimer = 
+            Client.gameTimer =
                 new UITimer(60, new Size(225, 3), new Point(0, 0));
 
 
@@ -123,6 +122,12 @@ namespace Client
         // Start the networked client (connect to server).
         public GameClient(NetworkClient networkClient)
         {
+            if (instance != null)
+            {
+                Console.WriteLine("WARNING: Attempting to double instantiate GameClient!");
+            }
+            instance = this;
+
             this.networkClient = networkClient;
             networkClient.StartClient();
 
@@ -228,11 +233,11 @@ namespace Client
                     // Get the object ID so we can update the object.
                     NetworkedGameObjects.TryGetValue(
                         packet.ObjectId,
-                        out NetworkedGameObjectClient toUpdate);
+                        out NetworkedGameObjectClient packetObject);
 
                     // If we didn't get an object, object doesn't exist 
                     // and something is wrong.
-                    if (toUpdate == null)
+                    if (packetObject == null)
                     {
                         Console.WriteLine(
                             BAD_PACKET_REF);
@@ -241,11 +246,11 @@ namespace Client
                     if (packet is LeafPacket || packet is PlayerPacket)
                     {
                         // Update the packet we found.
-                        toUpdate.UpdateFromPacket(packet);
+                        packetObject.UpdateFromPacket(packet);
                     }
                     else if (packet is DestroyObjectPacket)
                     {
-                        toUpdate.Destroy();
+                        packetObject.Destroy();
                     }
                 }
             }

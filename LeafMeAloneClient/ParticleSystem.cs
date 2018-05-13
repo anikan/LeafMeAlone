@@ -24,7 +24,7 @@ namespace Client
     /// <summary>
     /// Particle system object, only exists client-side.
     /// </summary>
-    public class ParticleSystem : NonNetworkedGameObjectClient
+    public abstract class ParticleSystem : NonNetworkedGameObjectClient
     {
         public bool Enabled = true;
 

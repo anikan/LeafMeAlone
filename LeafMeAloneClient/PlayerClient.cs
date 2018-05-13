@@ -37,32 +37,8 @@ namespace Client
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, FileManager.PlayerModel)
         {
-            FlameThrower = new ParticleSystem(ParticleSystemType.FIRE,
-                Vector3.Zero +
-                Vector3.TransformCoordinate(GraphicsManager.PlayerToFlamethrowerOffset, Matrix.Identity), // origin
-                Vector3.UnitZ * GraphicsManager.FlameInitSpeed, // acceleration
-                Vector3.UnitZ * GraphicsManager.FlameAcceleration, // initial speed
-                false, // cutoff all colors
-                false, // no backward particle prevention
-                320.0f, // cone radius, may need to adjust whenever acceleration changes
-                1.0f, // initial delta size
-                10f, // cutoff distance
-                0.2f, // cutoff speed
-                0.075f // enlarge speed
-            );
-            LeafBlower = new ParticleSystem(ParticleSystemType.WIND,
-                new Vector3(-10, -10, 0), // origin
-                GraphicsManager.WindDirection * GraphicsManager.WindAcceleration, // acceleration
-                GraphicsManager.WindDirection * GraphicsManager.WindInitSpeed, // initial speed
-                true, // cutoff alpha only
-                true, // prevent backward flow 
-                800.0f, // cone radius
-                1.0f, // initial delta size
-                0f, // cutoff distance
-                0.5f, // cutoff speed
-                0.1f, // enlarge speed
-                GraphicsManager.WindStopDistance // stop dist
-            );
+            FlameThrower = new FlameThrowerParticleSystem();
+            LeafBlower = new LeafBlowerParticleSystem();
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
         }

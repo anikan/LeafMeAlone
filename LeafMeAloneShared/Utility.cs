@@ -85,6 +85,8 @@ namespace Shared
 
                 retVec = Vector3.Normalize(Vector3.TransformCoordinate(retVec, m_ModelMatrix));
 
+             //   Console.WriteLine("Forward is: " + retVec);
+
                 return retVec;
             }
         }

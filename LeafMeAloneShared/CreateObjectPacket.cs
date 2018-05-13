@@ -29,9 +29,12 @@ namespace Shared
         public float InitialX;
 
         [ProtoMember(3)]
-        public float InitialZ;
+        public float InitialY;
 
         [ProtoMember(4)]
+        public float InitialZ;
+
+        [ProtoMember(5)]
         public ObjectType objectType;
 
         public CreateObjectPacket() : base(PacketType.CreateObjectPacket)
@@ -42,6 +45,7 @@ namespace Shared
         {
             ObjectId = gameObject.Id;
             InitialX = gameObject.Transform.Position.X;
+            InitialY = gameObject.Transform.Position.Y;
             InitialZ = gameObject.Transform.Position.Z;
             objectType = gameObject.ObjectType;
         }

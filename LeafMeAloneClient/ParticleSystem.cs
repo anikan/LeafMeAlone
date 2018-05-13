@@ -45,7 +45,7 @@ namespace Client
         //create texture
         private ShaderResourceView TexSRV;
 
-
+        
         //how fast particles are emitted
         public int emissionRate = 1;
 
@@ -93,9 +93,9 @@ namespace Client
         /// <param name="stop_dist"> Specify the distance, where the particles stop showing up </param>
         /// <param name="emissionrate"> Specify the emission rate of the particle system </param>
         /// <param name="maxparticles"> Specify the max number of particles emitted at a time </param>
-        public ParticleSystem(ParticleSystemType type,
-            Vector3 init_pos,
-            Vector3 acceleration,
+        public ParticleSystem(ParticleSystemType type, 
+            Vector3 init_pos,  
+            Vector3 acceleration, 
             Vector3 init_velocity,
             bool alpha_cutoff_only = false,
             bool disable_rewind = true,
@@ -105,7 +105,7 @@ namespace Client
             float cutoff_speed = 0.2f,
             float enlarge_speed = 0.075f,
             float stop_dist = 50.0f,
-            int emissionrate = 2,
+            int emissionrate = 2, 
             int maxparticles = 1000)
         {
             delta = initial_size;
@@ -120,7 +120,7 @@ namespace Client
             CutoffDist = cutoff_dist;
             EnlargeSpeed = enlarge_speed;
             StopDist = stop_dist;
-            AlphaCutoffOnly = alpha_cutoff_only ? 1 : 0;
+            AlphaCutoffOnly = alpha_cutoff_only? 1:0;
             DisableRewind = disable_rewind;
             ShouldGenerate = true;
             ShouldRender = true;
@@ -135,8 +135,8 @@ namespace Client
 
             Verts = new DataStream(Particles.Count * size, true, true);
             StartingLocations = new DataStream(Particles.Count * size, true, true);
-            Faces = new DataStream(Particles.Count * sizeof(uint) * 6, true, true);
-            Tex = new DataStream(Particles.Count * size, true, true);
+            Faces = new DataStream(Particles.Count * sizeof(int) * 6,true,true);
+            Tex = new DataStream(Particles.Count * size,true,true);
 
             //calculate for quad
             for (var index = 0; index < Particles.Count; index++)
@@ -146,11 +146,11 @@ namespace Client
 
                 //delta = (float)r.NextDouble() - .7f;
 
-                Vector3 topLeft_Both = new Vector3(initPos.X - delta, initPos.Y + delta, initPos.Z);
-                Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z);
+                Vector3 topLeft_Both = new Vector3(initPos.X - delta,initPos.Y + delta, initPos.Z);
+                Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z); 
                 Vector3 topRight = new Vector3(initPos.X + delta, initPos.Y + delta, initPos.Z);
                 Vector3 bottomLeft = new Vector3(initPos.X - delta, initPos.Y - delta, initPos.Z);
-
+                
 
                 Verts.Write(topLeft_Both);
                 Verts.Write(bottomRight_Both);
@@ -166,13 +166,13 @@ namespace Client
                 Tex.Write(new Vector3(1f, 1f, 0f));
                 Tex.Write(new Vector3(0f, 1f, 0f));
                 Tex.Write(new Vector3(1f, 0f, 0f));
-
-                Faces.Write((uint)(index * 4));
-                Faces.Write((uint)((index * 4) + 2));
-                Faces.Write((uint)((index * 4) + 1));
-                Faces.Write((uint)((index * 4)));
-                Faces.Write((uint)((index * 4) + 1));
-                Faces.Write((uint)((index * 4) + 3));
+                
+                Faces.Write(index * 4);
+                Faces.Write((index * 4) + 2);
+                Faces.Write((index * 4) + 1);
+                Faces.Write((index * 4));
+                Faces.Write((index * 4) + 1);
+                Faces.Write((index * 4) + 3);
 
             }
             Verts.Position = 0;
@@ -183,7 +183,7 @@ namespace Client
             VBO_Verts = new Buffer(GraphicsRenderer.Device, Verts, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             VBO_Origin = new Buffer(GraphicsRenderer.Device, StartingLocations, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(int), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             var btcode = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "VS", "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);
             var btcode1 = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "PS", "fx_5_0", ShaderFlags.None,
@@ -214,7 +214,7 @@ namespace Client
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
-
+            
             ResetSystem();
         }
 
@@ -225,7 +225,7 @@ namespace Client
         {
             Verts.Position = 0;
             StartingLocations.Position = 0;
-
+            
             for (var index = 0; index < Particles.Count; index++)
             {
                 var pt = Particles[index];
@@ -244,9 +244,9 @@ namespace Client
                 // if the distance is greater than cutoff, increase the size for a puff-up effect
                 else if (distance > CutoffDist)
                 {
-                    delta_factor = delta_factor * (1f + (distance - CutoffDist) * EnlargeSpeed);
+                    delta_factor = delta_factor * (1f + (distance-CutoffDist) * EnlargeSpeed);
                 }
-
+                
                 // find the positions of the particles
                 float resized_delta = delta * delta_factor;
                 Vector3 topLeft_Both = new Vector3(initPos.X - resized_delta, initPos.Y + resized_delta, initPos.Z);
@@ -286,7 +286,7 @@ namespace Client
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO_Verts, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBO_Tex, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(2, new VertexBufferBinding(VBO_Origin, Vector3.SizeInBytes, 0));
-            GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO, Format.R32_UInt, 0);
+            // GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO,Format.R32_SInt,0);
 
             Effects.GetVariableByName("AlphaCutoffOnly").AsScalar().Set(AlphaCutoffOnly);
             Effects.GetVariableByName("CutoffSpeed").AsScalar().Set(CutOffSpeed);
@@ -306,7 +306,7 @@ namespace Client
 
             //apply pass
             Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
-            GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6, 0, 0);
+            GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6,0,0);
 
             //turn back on depth 
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
@@ -329,7 +329,7 @@ namespace Client
             {
                 if (particle.LifeRemaining <= 0 || Vector3.Distance(particle.Position, particle.Origin) > StopDist)
                 {
-                    if (emissionThisFrame < emissionRate && ShouldGenerate)
+                    if ( emissionThisFrame < emissionRate && ShouldGenerate)
                     {
                         particle.InitAcceleration = Acceleration;
                         particle.Origin = GenerationOrigin;

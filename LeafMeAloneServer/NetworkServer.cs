@@ -40,12 +40,12 @@ namespace Server
         //List of packets for Game to process.
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
-        public IPAddress address;
+        private bool networked;
 
-        public NetworkServer(IPAddress address)
+        public NetworkServer(bool networked)
         {
+            this.networked = networked;
             clientSockets = new List<Socket>();
-            this.address = address;
         }
 
         /// <summary>
@@ -55,15 +55,20 @@ namespace Server
         {
             // Data buffer for incoming data.  
             byte[] bytes = new Byte[1024];
-
+            IPAddress ipAddress = IPAddress.Loopback;
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
+            if (networked)
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                ipAddress = ipHostInfo.AddressList[0];
+            }
 
-            //IPAddress ipAddress = IPAddress.Loopback;//ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(address, 11000);
+
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);
 
             // Create a TCP/IP socket.  
-            listener = new Socket(address.AddressFamily,
+            listener = new Socket(ipAddress.AddressFamily,
                 SocketType.Stream, ProtocolType.Tcp);
 
             // Bind the socket to the local endpoint and listen for incoming connections.  
@@ -211,9 +216,9 @@ namespace Server
 
                 while (bytesToRead > 0)
                 {
-                    Packet objectPacket = 
+                    Packet objectPacket =
                         Packet.Deserialize(state.buffer, out int bytesRead);
-                    PlayerPackets.Add((PlayerPacket) objectPacket);
+                    PlayerPackets.Add((PlayerPacket)objectPacket);
                     state.buffer = state.buffer.Skip(bytesRead).ToArray();
                     bytesToRead -= bytesRead;
                 }

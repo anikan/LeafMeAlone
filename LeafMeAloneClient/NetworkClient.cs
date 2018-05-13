@@ -53,11 +53,11 @@ namespace Client
         //List of received packets. Populated by ReadCallback
         public List<Packet> PacketQueue = new List<Packet>();
 
-        private IPAddress address;
+        private IPAddress ipAddress;
 
-        public NetworkClient(IPAddress address)
+        public NetworkClient(IPAddress ipAddress)
         {
-            this.address = address;
+            this.ipAddress = ipAddress;
         }
 
         /// <summary>
@@ -70,10 +70,10 @@ namespace Client
             {
                 //For testing purposes, connect to Loopback. 
                 //IPAddress ipAddress = IPAddress.Loopback; // new IPAddress(IPAddress.Loopback);//ipHostInfo.AddressList[0];
-                IPEndPoint remoteEP = new IPEndPoint(address, port);
-
+                //IPEndPoint remoteEP = new IPEndPoint(address, port);
+                IPEndPoint remoteEP = new IPEndPoint(ipAddress, port);
                 // Create a TCP/IP socket.  
-                client = new Socket(address.AddressFamily,
+                client = new Socket(ipAddress.AddressFamily,
                     SocketType.Stream, ProtocolType.Tcp);
 
                 // Connect to the remote endpoint.  

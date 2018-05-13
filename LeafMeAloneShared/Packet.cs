@@ -113,6 +113,10 @@ namespace Shared
 
             byte[] sizePortion = new byte[4];
             Buffer.BlockCopy(data, 1, sizePortion, 0, 4);
+            if (!BitConverter.IsLittleEndian)
+            {
+                sizePortion = sizePortion.Reverse().ToArray();
+            }
             int packetSize = BitConverter.ToInt32(sizePortion, 0);
 
             //Check whether the full packet has arrived.

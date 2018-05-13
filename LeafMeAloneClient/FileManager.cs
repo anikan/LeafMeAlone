@@ -18,7 +18,7 @@
         /// <summary>
         /// Models
         /// </summary>
-        public static string LeafModel = @"../../../Models/Leaf_V1.fbx";
+        public static string LeafModel = @"../../../Models/05.13.18_Leaf.fbx";
         public static string PlayerModel = @"../../../Models/05.03.18_Version2.fbx";
     }
 }

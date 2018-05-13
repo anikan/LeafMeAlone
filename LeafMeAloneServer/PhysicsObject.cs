@@ -79,6 +79,9 @@ namespace Server
         /// <param name="deltaTime"></param>
         public override void Update(float deltaTime)
         {
+
+            base.Update(deltaTime);
+
             // Calculate accelaration from F = ma
             Acceleration = Force / Mass;
 

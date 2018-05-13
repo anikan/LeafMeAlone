@@ -37,7 +37,6 @@ namespace Server
 
         public GameServer(bool networked)
         {
-            instance = this;
             if (instance != null)
             {
                 Console.WriteLine(SINGLETON_VIOLATED);
@@ -215,6 +214,8 @@ namespace Server
                 // Add this leaf to the leaf list and object dictionary.
                 LeafList.Add(newLeaf);
                 newLeaf.Register();
+                newLeaf.Burning = true;
+                newLeaf.Health = -1000;
             }
         }
 

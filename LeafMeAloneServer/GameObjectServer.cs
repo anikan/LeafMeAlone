@@ -121,6 +121,7 @@ namespace Server
         /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
         public virtual void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
+
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
 
@@ -148,6 +149,7 @@ namespace Server
 
             // Get the vector between the two.
             Vector3 VectorBetween = Transform.Position - player.Transform.Position;
+            VectorBetween.Y = 0.0f;
 
             // Calculate the length.
             return VectorBetween.Length();
@@ -161,14 +163,13 @@ namespace Server
         /// <returns>True if within range, false if not.</returns>
         public bool IsInPlayerToolRange(PlayerServer player)
         {
-
+          //  Console.WriteLine("Checking object with ID " + Id  + " and type " + this.GetType().ToString());
             // Get the player's equipped tool.
             ToolInfo equippedToolInfo = Tool.GetToolInfo(player.ToolEquipped);
 
             // Check if the leaf is within range of the player.
             if (GetDistanceToPlayer(player) <= equippedToolInfo.Range)
             {
-
                 // Get the forward vector of the player.
                 // TODO: Have an actual Transform.Forward
                 Vector3 PlayerForward = player.Transform.Forward;
@@ -184,6 +185,9 @@ namespace Server
 
                 // Calculate the angle between the two vectors.
                 float angleBetween = (float)Math.Acos(dot / mag);
+                angleBetween *= (180.0f / (float)Math.PI);
+
+              //  Console.WriteLine(string.Format("{0} {1}: Angle between is {2}, must be {3} before hit", this.GetType().ToString(), Id, angleBetween, equippedToolInfo.ConeAngle / 2.0f));
 
                 // Return true if the leaf is within the cone angle, false otherwise. 
                 return (angleBetween <= (equippedToolInfo.ConeAngle / 2.0f));

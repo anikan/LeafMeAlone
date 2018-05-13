@@ -32,7 +32,6 @@ namespace Client
                     Precision = 2,
                     Value = timeToCountInSeconds
                 };
-            t.Start();
         }
 
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)

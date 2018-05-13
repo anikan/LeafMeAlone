@@ -155,7 +155,8 @@ namespace Client
             // Get the time since the last frame.
             float delta = FrameTimer.ElapsedMilliseconds;
             delta /= 1000.0f;
-
+            delta = Math.Max(.001f, delta);
+            delta = Math.Min(.01f, delta);
             // Iterate through all networked objects and update them.
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in NetworkedGameObjects.AsEnumerable())
             {

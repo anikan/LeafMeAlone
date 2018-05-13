@@ -175,7 +175,8 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
 			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
-			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .2f;
+
+			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .3f;
 		}
 
 		// else if there is a texture.... MAKE IT RED FOR NOW 
@@ -183,7 +184,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
 			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
-			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .2f;
+			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .3f;
 		}
 
 		retColor += max( float4(0,0,0,0),  c_l * c_mat ) ;

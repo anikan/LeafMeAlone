@@ -749,7 +749,7 @@ namespace Client
             }
 
             // sets the ambient color
-            color = new Color4(.2f, .2f, .2f, 1.0f);    // default is dark grey
+            color = new Color4(.3f, .3f, .3f, 1.0f);    // default is dark grey
             if (mat.HasColorAmbient)
             {
                 myMat.setAmbient(mat.ColorDiffuse.R, mat.ColorDiffuse.G, mat.ColorDiffuse.B, mat.ColorDiffuse.A);

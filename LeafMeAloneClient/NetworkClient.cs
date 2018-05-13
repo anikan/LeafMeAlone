@@ -111,7 +111,7 @@ namespace Client
         /// </summary>
         public void Receive()
         {
-            Console.WriteLine(client.Available);
+         //   Console.WriteLine(client.Available);
 
             byte[] savedBuffer = new byte[0];
 

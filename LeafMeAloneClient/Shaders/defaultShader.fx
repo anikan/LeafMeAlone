@@ -70,10 +70,10 @@ void VS(float4 iPosL  : POSITION,
 
 	if (animationIndex != -1)
 	{
-		float4x4 objToBone = boneTransforms[iBoneID.x] * iBoneWeight.x
-			+ boneTransforms[iBoneID.y] * iBoneWeight.y
-			+ boneTransforms[iBoneID.z] * iBoneWeight.z
-			+ boneTransforms[iBoneID.w] * iBoneWeight.w;
+		float4x4 objToBone = mul(boneTransforms[iBoneID.x],iBoneWeight.x)
+			+ mul(boneTransforms[iBoneID.y], iBoneWeight.y)
+			+ mul(boneTransforms[iBoneID.z], iBoneWeight.z)
+			+ mul(boneTransforms[iBoneID.w], iBoneWeight.w);
 
 		//objToBone = boneTransforms[iBoneID.x];
 		

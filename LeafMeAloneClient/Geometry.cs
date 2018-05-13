@@ -502,7 +502,7 @@ namespace Client
                 if (mesh.BoneMappings.ContainsKey(nodeName))
                 {
                     int boneIndex = mesh.BoneMappings[nodeName];
-                    mesh.Bones[boneIndex].BoneFrameTransformation = mesh.Bones[boneIndex].BoneOffset * GlobalTransform * InverseGlobalTransform;
+                    mesh.Bones[boneIndex].BoneFrameTransformation = mesh.Bones[boneIndex].BoneOffset * GlobalTransform /** InverseGlobalTransform*/;
                 }
             }
 

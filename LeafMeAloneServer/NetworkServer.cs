@@ -155,9 +155,10 @@ namespace Server
 
         public void SendWorldUpdateToAllClients()
         {
-            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
+            List<GameObjectServer> gameObjects = GameServer.instance.gameObjectDict.Values.ToList();
+            for (int i = 0; i < gameObjects.Count; i++)
             {
-                Packet packetToSend = ServerPacketFactory.CreatePacket(pair.Value);
+                Packet packetToSend = ServerPacketFactory.CreatePacket(gameObjects[i]);
                 SendAll(packetToSend.Serialize());
             }
         }
@@ -200,8 +201,17 @@ namespace Server
             StateObject state = (StateObject)ar.AsyncState;
             Socket handler = state.workSocket;
 
-            // Read data from the client socket.   
-            int bytesToRead = handler.EndReceive(ar);
+            int bytesToRead = 0;
+            try
+            {
+                // Read data from the client socket.   
+                bytesToRead = handler.EndReceive(ar);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return;
+            }
 
             if (bytesToRead > 0)
             {
@@ -211,9 +221,9 @@ namespace Server
 
                 while (bytesToRead > 0)
                 {
-                    Packet objectPacket = 
+                    Packet objectPacket =
                         Packet.Deserialize(state.buffer, out int bytesRead);
-                    PlayerPackets.Add((PlayerPacket) objectPacket);
+                    PlayerPackets.Add((PlayerPacket)objectPacket);
                     state.buffer = state.buffer.Skip(bytesRead).ToArray();
                     bytesToRead -= bytesRead;
                 }
@@ -258,11 +268,35 @@ namespace Server
         /// <param name="byteData">Data to send.</param>
         public void SendAll(byte[] byteData)
         {
-            foreach (Socket socket in clientSockets)
+            for (int i = 0; i < clientSockets.Count; i++)
             {
-                // Begin sending the data to the remote device.  
-                socket.BeginSend(byteData, 0, byteData.Length, 0,
-                    new AsyncCallback(SendCallback), socket);
+                Socket socket = clientSockets[i];
+
+                /*if (!socket.Connected)
+                {
+                    Console.WriteLine("Client Disconnected");
+                    //socket.Close();
+
+                    clientSockets.Remove(socket);
+                    i -= 1;
+                }*/
+
+                //If a client disconnected, close the socket and remove it from the list of sockets.
+                try
+                {
+                    // Begin sending the data to the remote device.
+                    Send(socket, byteData);
+                    //socket.BeginSend(byteData, 0, byteData.Length, 0,
+                     //   new AsyncCallback(SendCallback), socket);
+                }
+
+                catch (SocketException e)
+                {
+                    Console.WriteLine(e.Message);
+
+                    clientSockets.Remove(socket);
+                    i -= 1;
+                }
             }
         }
 

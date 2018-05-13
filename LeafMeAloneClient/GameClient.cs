@@ -112,7 +112,6 @@ namespace Client
 
             // Draw everythhing.
             Render();
-            GraphicsManager.Draw();
 
 
             GraphicsRenderer.BarContext.Draw();
@@ -192,6 +191,7 @@ namespace Client
             {
                 obj.Draw();
             }
+            GraphicsManager.Draw();
         }
 
 

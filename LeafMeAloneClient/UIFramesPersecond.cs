@@ -11,15 +11,19 @@ namespace Client
 {
     public class UIFramesPersecond
     {
-        public float CurrentFps;
+        public double CurrentFps;
         private readonly Stopwatch stopwatch;
-        private readonly FloatVariable fps;
+        private readonly DoubleVariable fps;
+
+
+        private double totalFrames = 0;
+        private double totalTime = 0.0f;
 
         public UIFramesPersecond(Size size, Point location)
         {
             CurrentFps = 0;
             stopwatch = Stopwatch.StartNew();
-            fps = new FloatVariable(UIManager.Create("FPS", size, location))
+            fps = new DoubleVariable(UIManager.Create("FPS", size, location))
             {
                 ReadOnly = true,
                 Label = "FPS",
@@ -39,7 +43,17 @@ namespace Client
             stopwatch.Stop();
 
             if (stopwatch.ElapsedMilliseconds > 1)
-                CurrentFps = 1000.0f / stopwatch.ElapsedMilliseconds;
+            {
+                totalFrames++;
+                totalTime+= stopwatch.ElapsedMilliseconds / 1000.0;
+                if (totalTime > 1.0f)
+                {
+                    CurrentFps = totalFrames;
+                    totalFrames = 0;
+                    totalTime = 0;
+                }
+
+            }
 
             fps.Value = CurrentFps;
             stopwatch.Reset();

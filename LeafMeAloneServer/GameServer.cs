@@ -33,7 +33,7 @@ namespace Server
 
         private Stopwatch testTimer;
 
-        public GameServer(IPAddress address)
+        public GameServer(bool networked)
         {
             if (instance != null)
             {
@@ -53,7 +53,7 @@ namespace Server
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            networkServer = new NetworkServer(address);
+            networkServer = new NetworkServer(networked);
 
             CreateRandomLeaves(200, -10, 10, -10, 10);
 
@@ -62,18 +62,14 @@ namespace Server
 
         public static int Main(String[] args)
         {
-            IPAddress address;
-            if (args.Length > 1)
+            bool networked = false;
+
+            if (args.Length > 0)
             {
-                address = IPAddress.Parse(args[1]);
+                networked = true;
             }
 
-            else
-            {
-                address = IPAddress.Loopback;
-            }
-
-            GameServer gameServer = new GameServer(address);
+            GameServer gameServer = new GameServer(networked);
             
             gameServer.networkServer.StartListening();
 

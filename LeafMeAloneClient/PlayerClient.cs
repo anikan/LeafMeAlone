@@ -26,8 +26,7 @@ namespace Client
             public float RotationRequested;
 
             // Requests for the use of primary/secondary features of tools.
-            public bool UseToolPrimaryRequest;
-            public bool UseToolSecondaryRequest;
+            public ToolMode ActiveToolMode;
 
             public ToolType EquipToolRequest;
         };
@@ -43,8 +42,6 @@ namespace Client
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
-        public bool UsingToolPrimary { get; set; }
-        public bool UsingToolSecondary { get; set; }
         public ToolMode ActiveToolMode { get; set; }
 
 
@@ -78,7 +75,7 @@ namespace Client
         public void RequestUsePrimary()
         {
             // Set request bool to true.
-            PlayerRequests.UseToolPrimaryRequest = true;
+            PlayerRequests.ActiveToolMode = ToolMode.PRIMARY;
 
         }
 
@@ -88,7 +85,7 @@ namespace Client
         public void RequestUseSecondary()
         {
             // Set request bool to true.
-            PlayerRequests.UseToolSecondaryRequest = true;
+            PlayerRequests.ActiveToolMode = ToolMode.SECONDARY;
         }
 
         public void RequestToolEquip(ToolType type)
@@ -215,8 +212,7 @@ namespace Client
 
             ToolEquipped = packet.ToolEquipped;
 
-            UsingToolPrimary = packet.UsingToolPrimary;
-            UsingToolSecondary = packet.UsingToolSecondary;
+            ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;

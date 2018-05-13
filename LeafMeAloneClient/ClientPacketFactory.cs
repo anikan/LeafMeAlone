@@ -27,8 +27,7 @@ namespace Client
                 _ProtoObjId = player.Id,
                 ToolEquipped = player.PlayerRequests.EquipToolRequest,
                 Rotation = player.PlayerRequests.RotationRequested,
-                UsingToolPrimary = player.PlayerRequests.UseToolPrimaryRequest,
-                UsingToolSecondary = player.PlayerRequests.UseToolSecondaryRequest
+                ActiveToolMode = player.PlayerRequests.ActiveToolMode
             };
 
             return packet;

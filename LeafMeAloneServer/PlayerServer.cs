@@ -79,18 +79,8 @@ namespace Server
                 Console.WriteLine(string.Format("Player {0} switching to {1}", Id, ToolEquipped.ToString()));
             }
 
-            if (packet.UsingToolPrimary)
-            {
-                ActiveToolMode = ToolMode.PRIMARY;
-            }
-            else if (packet.UsingToolSecondary)
-            {
-                ActiveToolMode = ToolMode.SECONDARY;
-            }
-            else
-            {
-                ActiveToolMode = ToolMode.NONE;
-            }
+            ActiveToolMode = packet.ActiveToolMode;
+
         }
 
         /// <summary>

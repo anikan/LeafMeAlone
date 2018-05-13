@@ -140,7 +140,7 @@ namespace Client
                 LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
                 light2.UseDirectionalPreset();
                 light2.status = LightParameters.STATUS_ON;
-                light2.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
+                light2.intensities = new Vector4(1.2f, 1.2f, 1.2f, 0);
                 light2.position = Vector4.Normalize(new Vector4(0, 1, 0, 0));
             }
 

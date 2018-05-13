@@ -1,3 +1,3 @@
-cd ./LeafMeAloneServer/bin/x64/Debug
-LeafMeAloneServer.exe
-pause
+cd ./LeafMeAloneServer/bin/Debug
+start LeafMeAloneServer.exe
+exit

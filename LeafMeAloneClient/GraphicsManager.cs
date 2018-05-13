@@ -100,25 +100,7 @@ namespace Client
             {
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
-
-                //// TODO: MOVE TO FLAMETHROWER OR PLAYER CLASS
-                //// set the rotation based on the three directions
-                //Matrix mat = Matrix.RotationX(ActivePlayer.Transform.Rotation.X) *
-                //             Matrix.RotationY(ActivePlayer.Transform.Rotation.Y) *
-                //             Matrix.RotationZ(ActivePlayer.Transform.Rotation.Z);
-
-                //// flame throwing particle system update
-                //ParticleSystems[0].SetOrigin(ActivePlayer.Transform.Position +
-                //                       Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat));
-                //ParticleSystems[0].SetVelocity(ActivePlayer.Transform.Forward * FlameInitSpeed);
-                //ParticleSystems[0].SetAcceleration(ActivePlayer.Transform.Forward * FlameAcceleration);
-                //ParticleSystems[0].Update(delta_t);
             }
-
-            //ParticleSystems[1].SetVelocity(WindDirection * WindInitSpeed);
-            //ParticleSystems[1].SetAcceleration(WindDirection * WindAcceleration);
-            //ParticleSystems[1].Update(delta_t);
-
         }
 
         public static void Draw()
@@ -165,59 +147,6 @@ namespace Client
             LoadAllShaders();
 
             ParticleSystems = new List<ParticleSystem>();
-           
-            //// set the rotation based on the three directions
-            //Matrix mat = Matrix.Identity;
-
-            //// TODO: MOVE THIS TO EITHER PLAYER OR FLAMETHROWER CLASS
-            //// Flame thrower settings
-            //ParticleSystems.Add(new ParticleSystem(ParticleSystemType.FIRE,
-            //        Vector3.Zero +
-            //        Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, mat), // origin
-            //        Vector3.UnitZ * FlameInitSpeed, // acceleration
-            //        Vector3.UnitZ * FlameAcceleration, // initial speed
-            //        false,          // cutoff all colors
-            //        false,          // no backward particle prevention
-            //        320.0f,   // cone radius, may need to adjust whenever acceleration changes
-            //        1.0f,    // initial delta size
-            //        10f,     // cutoff distance
-            //        0.2f,     // cutoff speed
-            //        0.075f      // enlarge speed
-            //    )
-            //);
-
-            //// TODO: MOVE THIS TO EITHER WIND BLOWER CLASS OR PLAYER CLASS
-            //// Wind blower settings
-            //ParticleSystems.Add(new ParticleSystem(ParticleSystemType.WIND,
-            //        new Vector3(-10, -10, 0),   // origin
-            //        WindDirection * WindAcceleration,  // acceleration
-            //        WindDirection * WindInitSpeed,    // initial speed
-            //        true,          // cutoff alpha only
-            //        true,          // prevent backward flow 
-            //        800.0f,   // cone radius
-            //        1.0f,    // initial delta size
-            //        0f,     // cutoff distance
-            //        0.5f,     // cutoff speed
-            //        0.1f,      // enlarge speed
-            //        WindStopDistance      // stop dist
-            //    )
-            //);
-
-            //// TODO: MOVE THIS TO SOMEWHERE NECESSARY FOR SCREEN EFFECTS?
-            //// camera effect...?
-            //ParticleSystems.Add(new ParticleSystem(ParticleSystemType.WIND,
-            //        new Vector3(-10, -10, 0),   // origin
-            //        new Vector3(-30.0f, 0f, 0f),  // acceleration
-            //        new Vector3(100f, 0f, 0f),    // initial speed
-            //        true,          // cutoff alpha only
-            //        false,           // dont prevent backward flow
-            //        10000.0f,   // cone radius
-            //        1.0f,    // initial delta size
-            //        2f,     // cutoff distance
-            //        0.5f,     // cutoff speed
-            //        0.2f      // enlarge speed
-            //    )
-            //);
         }
 
         /// <summary>

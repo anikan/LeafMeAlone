@@ -52,15 +52,16 @@ namespace Client
             );
             LeafBlower = new ParticleSystem(ParticleSystemType.WIND,
                 new Vector3(-10, -10, 0), // origin
-                new Vector3(-30.0f, 0f, 0f), // acceleration
-                new Vector3(100f, 0f, 0f), // initial speed
+                GraphicsManager.WindDirection * GraphicsManager.WindAcceleration, // acceleration
+                GraphicsManager.WindDirection * GraphicsManager.WindInitSpeed, // initial speed
                 true, // cutoff alpha only
-                false, // dont prevent backward flow
-                10000.0f, // cone radius
+                true, // prevent backward flow 
+                800.0f, // cone radius
                 1.0f, // initial delta size
-                2f, // cutoff distance
+                0f, // cutoff distance
                 0.5f, // cutoff speed
-                0.2f // enlarge speed
+                0.1f, // enlarge speed
+                GraphicsManager.WindStopDistance // stop dist
             );
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
@@ -247,19 +248,19 @@ namespace Client
             switch (ActiveToolMode)
             {
                 case ToolMode.NONE:
-                    FlameThrower.Enabled = false;
-                    LeafBlower.Enabled = false;
+                    FlameThrower.EnableGeneration(false);
+                    LeafBlower.EnableGeneration(false);
                     break;
                 case ToolMode.PRIMARY:
                     switch (ToolEquipped)
                     {
                         case ToolType.BLOWER:
-                            FlameThrower.Enabled = false;
-                            LeafBlower.Enabled = true;
+                            FlameThrower.EnableGeneration(false);
+                            LeafBlower.EnableGeneration(true);
                             break;
                         case ToolType.THROWER:
-                            LeafBlower.Enabled = false;
-                            FlameThrower.Enabled = true;
+                            FlameThrower.EnableGeneration(true);
+                            LeafBlower.EnableGeneration(false);
                             break;
                         default:
                             break;

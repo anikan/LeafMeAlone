@@ -243,7 +243,9 @@ namespace Client
             allShaderElements.Add(new[] {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
-                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2)
+                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2),
+                new InputElement("BONE_ID", 0, Format.R32G32B32A32_SInt, 3),
+                new InputElement("BONE_WEIGHT", 0, Format.R32G32B32A32_Float, 4)
             });
 
             for (int i = 0; i < allShaderPaths.Count; i++)

@@ -13,6 +13,38 @@ namespace Shared
             return new Vector3(vector.X, vector.Y, vector.Z);
         }
 
+        public static SlimDX.Quaternion ToQuaternion(this Assimp.Quaternion q)
+        {
+            return new SlimDX.Quaternion(q.X, q.Y, q.Z, q.W);
+        }
+
+        public static Matrix ToMatrix(this Matrix4x4 mat)
+        {
+            Matrix ret = new Matrix();
+
+            ret.M11 = mat.A1;
+            ret.M12 = mat.A2;
+            ret.M13 = mat.A3;
+            ret.M14 = mat.A4;
+
+            ret.M21 = mat.B1;
+            ret.M22 = mat.B2;
+            ret.M23 = mat.B3;
+            ret.M24 = mat.B4;
+
+            ret.M31 = mat.C1;
+            ret.M32 = mat.C2;
+            ret.M33 = mat.C3;
+            ret.M34 = mat.C4;
+            
+            ret.M41 = mat.D1;
+            ret.M42 = mat.D2;
+            ret.M43 = mat.D3;
+            ret.M44 = mat.D4;
+
+            return ret;
+        }
+
         public static float ToRadians(this float degrees)
         {
             return degrees * ((float) Math.PI / 180.0f);

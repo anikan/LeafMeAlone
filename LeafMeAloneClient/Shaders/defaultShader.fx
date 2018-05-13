@@ -51,12 +51,14 @@ SamplerState MeshTextureSampler
 
 // Vertex shader, handles the positioning of the vertices
 void VS(float4 iPosL  : POSITION,
-		float4 iNormL : NORMAL,
-		float3 iTex : TEXTURE,
-        out float4 oPosH  : SV_POSITION,
-		out float4 oPosObj : W_POSITION,
-		out float4 oNormal: NORMALS, 
-		out float2 oTex : UV_TEX )
+	float4 iNormL : NORMAL,
+	float3 iTex : TEXTURE,
+	int4 iBoneID : BONE_ID,
+	float4 iBoneWeight : BONE_WEIGHT,
+    out float4 oPosH  : SV_POSITION,
+	out float4 oPosObj : W_POSITION,
+	out float4 oNormal: NORMALS, 
+	out float2 oTex : UV_TEX )
 {
 	float4x4 worldViewProj = mul(mul(gWorld, gView), gProj);
 	oPosH = mul(iPosL, worldViewProj);

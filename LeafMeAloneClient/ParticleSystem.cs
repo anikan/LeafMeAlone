@@ -288,6 +288,7 @@ namespace Client
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(2, new VertexBufferBinding(VBO_Origin, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO, Format.R32_UInt, 0);
 
+
             Effects.GetVariableByName("AlphaCutoffOnly").AsScalar().Set(AlphaCutoffOnly);
             Effects.GetVariableByName("CutoffSpeed").AsScalar().Set(CutOffSpeed);
             Effects.GetVariableByName("CutoffDist").AsScalar().Set(CutoffDist);

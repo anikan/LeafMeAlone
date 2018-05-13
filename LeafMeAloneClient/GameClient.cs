@@ -3,18 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using AntTweakBar;
-using Client;
 using Shared;
 using SlimDX;
-using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
-using Device = SlimDX.DXGI.Device;
 using System.Net;
 
 namespace Client
@@ -55,15 +48,11 @@ namespace Client
         {
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
 
-            IPAddress address;
-            if (args.Length > 1)
-            {
-                address = IPAddress.Parse(args[1]);
-            }
-
-            else
-            {
-                address = IPAddress.Loopback;
+            IPAddress ipAddress = IPAddress.Loopback;
+            if (args.Length > 0)
+            { 
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+                ipAddress = ipHostInfo.AddressList[0];
             }
 
             // Create a new camera with a specified offset.
@@ -73,7 +62,7 @@ namespace Client
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
 
-            GameClient Client = new GameClient(new NetworkClient(address));
+            GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
 
             //TODO FOR TESTING ONLY
@@ -112,7 +101,6 @@ namespace Client
 
             // Draw everythhing.
             Render();
-            GraphicsManager.Draw();
 
 
             GraphicsRenderer.BarContext.Draw();
@@ -129,7 +117,7 @@ namespace Client
             // Initialize frame timer
             FrameTimer = new Stopwatch();
             FrameTimer.Start();
-            
+
             // Initialize game object lists.
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
@@ -192,6 +180,7 @@ namespace Client
             {
                 obj.Draw();
             }
+            GraphicsManager.Draw();
         }
 
 
@@ -259,15 +248,15 @@ namespace Client
 
                 // Create an other player
                 case (ObjectType.PLAYER):
-                    NetworkedGameObjects.Add( 
-                        createPacket.ObjectId, new PlayerClient( createPacket )
+                    NetworkedGameObjects.Add(
+                        createPacket.ObjectId, new PlayerClient(createPacket)
                         );
                     break;
 
                 // Create a leaf.
                 case (ObjectType.LEAF):
                     NetworkedGameObjects.Add(
-                        createPacket.ObjectId, new LeafClient( createPacket )
+                        createPacket.ObjectId, new LeafClient(createPacket)
 
                         );
                     break;
@@ -283,7 +272,7 @@ namespace Client
         private void InitializeUserPlayerAndMovement(CreateObjectPacket createPacket)
         {
             // Create a new player with the specified packet info.
-            ActivePlayer = new PlayerClient( createPacket );
+            ActivePlayer = new PlayerClient(createPacket);
 
             // Set the active plyer in the graphics manager.
             GraphicsManager.ActivePlayer = ActivePlayer;

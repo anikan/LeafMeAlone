@@ -23,8 +23,6 @@ namespace Client
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
-            t.AutoReset = true;
-            t.Enabled = true;
             TimeRemaining = timeToCountInSeconds;
             TimeRemaining_UI =
                 new FloatVariable(UIManager.Create("Timer", size, location))
@@ -34,7 +32,6 @@ namespace Client
                     Precision = 2,
                     Value = timeToCountInSeconds
                 };
-            t.Start();
         }
 
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)
@@ -54,6 +51,15 @@ namespace Client
         {
             TimeRemaining = timetoCountInSeconds;
             TimeRemaining_UI.Value = timetoCountInSeconds;
+            t.Start();
+        }
+
+        public void Start(float timeToCountInSeconds)
+        {
+            t.AutoReset = true;
+            t.Enabled = true;
+            TimeRemaining = timeToCountInSeconds;
+            TimeRemaining_UI.Value = timeToCountInSeconds;
             t.Start();
         }
 

@@ -59,7 +59,7 @@ namespace Client
         /// <param name="filePath">Path of the model.</param>
         public void SetModel(string filePath)
         {
-            Console.WriteLine(File.Exists(filePath));
+            //Console.WriteLine(File.Exists(filePath));
             model = new Model(filePath);
             Name = filePath.Split('.')[0];
         }

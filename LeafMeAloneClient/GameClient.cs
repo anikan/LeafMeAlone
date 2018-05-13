@@ -3,18 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using AntTweakBar;
-using Client;
 using Shared;
 using SlimDX;
-using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
-using Device = SlimDX.DXGI.Device;
 using System.Net;
 
 namespace Client

@@ -42,8 +42,8 @@ namespace Shared
             ret.M43 = mat.D3;
             ret.M44 = mat.D4;
 
-            //return ret;
-            return Matrix.Transpose(ret);
+            ret = Matrix.Transpose(ret);
+            return ret;
         }
 
         public static float ToRadians(this float degrees)

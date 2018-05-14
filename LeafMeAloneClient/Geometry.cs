@@ -499,9 +499,10 @@ namespace Client
                 Matrix TranslationMatrix = Matrix.Translation(Translation);
 
                 nodeTransform = ScalingMatrix * RotationMatrix * TranslationMatrix;
+                //nodeTransform = TranslationMatrix * RotationMatrix * ScalingMatrix;
             }
-            
-            Matrix GlobalTransform = nodeTransform * parentTransform;
+
+            Matrix GlobalTransform = nodeTransform* parentTransform;
             
             // for each mesh, set the bones 
             foreach (MyMesh mesh in allMeshes)

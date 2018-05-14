@@ -202,8 +202,8 @@ namespace Client
                 if (i >= Bones.Count) break;
 
                 Matrix m = Bones[i].BoneFrameTransformation;
-                m.set_Rows(3,Vector4.Zero);
-                m.M44 = 1;
+//                m.set_Rows(3,Vector4.Zero);
+//                m.M44 = 1;
 
                 boneTransformStream.Write(m);
                 //boneTransformStream.Write(Bones[i].BoneOffset);
@@ -486,11 +486,12 @@ namespace Client
             String nodeName = node.Name;
             Matrix nodeTransform = node.Transform.ToMatrix();
             MyAnimationNode currAnimationNode = animationNodes[AnimationIndex].ContainsKey(nodeName) ? animationNodes[AnimationIndex][nodeName] : null;
-            
+
             if (currAnimationNode != null)
             {
                 Vector3 Scaling = CalcInterpolateScaling(animationTime, currAnimationNode);
                 Matrix ScalingMatrix = Matrix.Scaling(Scaling);
+                //ScalingMatrix = Matrix.Identity;
 
                 Quaternion Rotation = CalcInterpolateRotation(animationTime, currAnimationNode);
                 Matrix RotationMatrix = Matrix.RotationQuaternion(Rotation);
@@ -499,21 +500,24 @@ namespace Client
                 Matrix TranslationMatrix = Matrix.Translation(Translation);
 
                 nodeTransform = ScalingMatrix * RotationMatrix * TranslationMatrix;
-                //nodeTransform = TranslationMatrix * RotationMatrix * ScalingMatrix;
             }
 
-            Matrix GlobalTransform = nodeTransform* parentTransform;
-            
+            Matrix GlobalTransform = nodeTransform * parentTransform;
+
             // for each mesh, set the bones 
+            
             foreach (MyMesh mesh in allMeshes)
             {
                 if (mesh.BoneMappings.ContainsKey(nodeName))
                 {
                     int boneIndex = mesh.BoneMappings[nodeName];
                     //= mesh.Bones[boneIndex].BoneOffset * GlobalTransform /** InverseGlobalTransform*/;
-                    Matrix m = mesh.Bones[boneIndex].BoneOffset * GlobalTransform;
+
+                    Matrix m = mesh.Bones[boneIndex].BoneOffset * GlobalTransform /*InverseGlobalTransform*/;
+
                     m.set_Rows(3, Vector4.Zero);
                     m.M44 = 1;
+
                     mesh.Bones[boneIndex].BoneFrameTransformation = m;
                 }
             }
@@ -521,7 +525,7 @@ namespace Client
             // recursively read child nodes
             for (int i = 0; i < node.ChildCount; i++)
             {
-                ReadNodeHierarchy(AnimationIndex, animationTime, node.Children[i], node.Transform.ToMatrix() * parentTransform);
+                ReadNodeHierarchy(AnimationIndex, animationTime, node.Children[i], GlobalTransform);
             }
         }
 
@@ -646,7 +650,7 @@ namespace Client
                 }
 
                 // advance the animation
-                CurrentAnimationTime += delta_time * .1f;
+                CurrentAnimationTime += delta_time;
 
                 foreach (MyMesh mesh in allMeshes)
                 {

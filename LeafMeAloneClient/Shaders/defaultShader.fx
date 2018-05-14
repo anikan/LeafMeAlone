@@ -67,22 +67,19 @@ void VS(float4 iPosL  : POSITION,
 	out float2 oTex : UV_TEX )
 {
 	float4x4 worldViewProj = mul(gWorld, mul(gView, gProj));
+	float4 posBone = iPosL;
 
 	if (animationIndex != -1)
 	{
-		float4x4 objToBone = mul(boneTransforms[iBoneID.x],iBoneWeight.x)
-			+ mul(boneTransforms[iBoneID.y], iBoneWeight.y)
-			+ mul(boneTransforms[iBoneID.z], iBoneWeight.z)
-			+ mul(boneTransforms[iBoneID.w], iBoneWeight.w);
-
-		//objToBone = boneTransforms[iBoneID.x];
-		
-		worldViewProj = mul(objToBone, worldViewProj);
+		posBone = iBoneWeight.x * mul(iPosL, boneTransforms[iBoneID.x])
+			+ iBoneWeight.y * mul(iPosL, boneTransforms[iBoneID.y] )
+			+ iBoneWeight.z * mul(iPosL, boneTransforms[iBoneID.z] )
+			+ iBoneWeight.w * mul(iPosL, boneTransforms[iBoneID.w] );
 	}
 
-	oPosH = mul(iPosL, worldViewProj);
+	oPosH = mul(posBone, worldViewProj);
 
-	oPosObj = iPosL;
+	oPosObj = posBone;
 	oNormal = iNormL;
 	oTex = float2(iTex.x, iTex.y);
 }

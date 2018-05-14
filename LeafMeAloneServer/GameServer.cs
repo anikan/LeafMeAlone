@@ -55,7 +55,7 @@ namespace Server
 
             networkServer = new NetworkServer(networked);
 
-            CreateRandomLeaves(200, -10, 10, -10, 10);
+            CreateRandomLeaves(300, -10, 10, -10, 10);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }

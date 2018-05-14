@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
-    public interface INetworked
+    public interface IObject
     {
         int Id { get; set; }
     }

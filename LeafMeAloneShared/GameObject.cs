@@ -19,7 +19,7 @@ namespace Shared
     /// <summary>
     /// Abstract GameObject class, for both GameObjectClient and GameObjectServer to extend
     /// </summary>
-    public abstract class GameObject : INetworked
+    public abstract class GameObject : IObject
     {
 
         public bool Burning;

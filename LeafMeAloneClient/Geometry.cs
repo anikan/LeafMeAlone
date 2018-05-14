@@ -201,7 +201,11 @@ namespace Client
             {
                 if (i >= Bones.Count) break;
 
-                boneTransformStream.Write(Bones[i].BoneFrameTransformation);
+                Matrix m = Bones[i].BoneFrameTransformation;
+                m.set_Rows(3,Vector4.Zero);
+                m.M44 = 1;
+
+                boneTransformStream.Write(m);
                 //boneTransformStream.Write(Bones[i].BoneOffset);
             }
 
@@ -505,7 +509,11 @@ namespace Client
                 if (mesh.BoneMappings.ContainsKey(nodeName))
                 {
                     int boneIndex = mesh.BoneMappings[nodeName];
-                    mesh.Bones[boneIndex].BoneFrameTransformation = mesh.Bones[boneIndex].BoneOffset * GlobalTransform /** InverseGlobalTransform*/;
+                    //= mesh.Bones[boneIndex].BoneOffset * GlobalTransform /** InverseGlobalTransform*/;
+                    Matrix m = mesh.Bones[boneIndex].BoneOffset * GlobalTransform;
+                    m.set_Rows(3, Vector4.Zero);
+                    m.M44 = 1;
+                    mesh.Bones[boneIndex].BoneFrameTransformation = m;
                 }
             }
 
@@ -637,7 +645,7 @@ namespace Client
                 }
 
                 // advance the animation
-                CurrentAnimationTime += delta_time;
+                CurrentAnimationTime += delta_time * .1f;
 
                 foreach (MyMesh mesh in allMeshes)
                 {

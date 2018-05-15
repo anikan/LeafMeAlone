@@ -789,6 +789,7 @@ namespace Client
                 if (scene.Animations[CurrentAnimationIndex].DurationInTicks > TimeInTicks || RepeatAnimation)
                 {
                     SetBoneTransform(CurrentAnimationIndex, CurrentAnimationTime);
+                    UpdateBoneTransformStream();
                 }
                 // stop the animation if it is done
                 else
@@ -798,8 +799,6 @@ namespace Client
 
                 // advance the animation
                 CurrentAnimationTime += delta_time;
-
-                UpdateBoneTransformStream();
             }
             else CurrentAnimationIndex = -1;
         }

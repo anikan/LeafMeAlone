@@ -161,7 +161,7 @@ namespace Client
             //animatedModel.m_Properties.Scale = new Vector3(10.25f, 10.25f, 10.25f);
             animatedModel.m_Properties.Rotation.X = (float) Math.PI/2.0f*3.0f;
             //animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
-            animatedModel.StartAnimationSequenceByIndex(2, true);
+            animatedModel.StartAnimationSequenceByIndex(0, true);
         }
 
         /// <summary>

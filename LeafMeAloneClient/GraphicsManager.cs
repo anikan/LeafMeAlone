@@ -157,12 +157,13 @@ namespace Client
             ParticleSystems = new List<ParticleSystem>();
 
             //TODO: REMOVE AFTER TESTING
-            animatedModel = new Model(@"../../Models/wolf/Wolf_dae.dae", true);
-            animatedModel.m_Properties.Scale = new Vector3(10.25f, 10.25f, 10.25f);
+            animatedModel = new Model(@"../../Models/Low-Poly Spider/Only_Spider_with_Animations_Export.dae", true);
+            float scale = 10.24f;
+            animatedModel.m_Properties.Scale = new Vector3(scale, scale, scale);
             //animatedModel.m_Properties.Rotation.X = (float) Math.PI/2.0f*3.0f;
-            //animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
+            animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
             animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
-            //animatedModel.m_Properties.Position = new Vector3(0, 10, 0);
+            animatedModel.m_Properties.Position = new Vector3(0, 10, 0);
             animatedModel.StartAnimationSequenceByIndex(0, true);
         }
 

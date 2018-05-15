@@ -6,12 +6,15 @@ using Assimp;
 using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
-using SlimDX.DXGI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using SlimDX.Direct3D9;
 using Buffer = SlimDX.Direct3D11.Buffer;
+using Format = SlimDX.DXGI.Format;
+using Material = Assimp.Material;
+using Mesh = Assimp.Mesh;
 using Quaternion = SlimDX.Quaternion;
 
 namespace Client
@@ -171,11 +174,16 @@ namespace Client
             if (totalWeight < 0.1f)
             {
                 BoneWeights[0] = 1.0f;
-                BoneIndices[0] = Geometry.MAX_BONES_PER_GEO - 1;
+                BoneIndices[0] = 0;
+
+                for (int i = 1; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] = 0f;
+
+                Console.WriteLine("No weight for this vertex");
             }
 
             else
             {
+                if (totalWeight < 0.01f) totalWeight = 1.0f;
                 for (int i = 0; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] /= totalWeight;
             }
         }
@@ -348,7 +356,7 @@ namespace Client
 
         private Matrix CalculateBoneToWorldTransform(MyBone bone)
         {
-            Matrix global = bone.OriginalLocalTranform;
+            Matrix global = bone.LocalTransform;
             MyBone parent = bone.Parent;
             while (parent != null)
             {
@@ -638,8 +646,17 @@ namespace Client
 
             // read node hierarchy
             // ReadNodeHierarchy( AnimationIndex, AnimationTime, scene.RootNode, Matrix.Identity );
+            ResetLocalTransforms();
             Evaluate(AnimationTime, CurrentAnimationIndex);
             UpdateTransforms(_rootBone);
+        }
+
+        private void ResetLocalTransforms()
+        {
+            foreach (var bone in _allBones)
+            {
+                bone.LocalTransform = bone.OriginalLocalTranform;
+            }
         }
 
         // Use this to recusively update the animation transform values
@@ -666,8 +683,7 @@ namespace Client
                 Vector3 vPosition = CalcInterpolateTranslation(animationTime, chpair.Value);
                 Quaternion vQuaternion = CalcInterpolateRotation(animationTime, chpair.Value);
                 Vector3 Scaling = CalcInterpolateScaling(animationTime, chpair.Value);
-
-                //Matrix r_mat = Matrix.RotationQuaternion(vQuaternion);
+                
                 Matrix r_mat = Matrix.RotationQuaternion(vQuaternion);
                 Matrix s_mat = Matrix.Scaling(Scaling);
                 Matrix t_mat = Matrix.Translation(vPosition);

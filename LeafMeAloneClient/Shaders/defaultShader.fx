@@ -70,7 +70,7 @@ void VS(float4 iPosL  : POSITION,
 	float4x4 worldViewProj = mul(gWorld, mul(gView, gProj));
 	float4 posBone = iPosL;
 
-	if (animationIndex != -1)
+	if (animationIndex != -1 && iBoneWeight.x + iBoneWeight.y + iBoneWeight.z + iBoneWeight.w > 0.9f)
 	{
 		posBone = iBoneWeight.x * mul(iPosL, boneTransforms[iBoneID.x])
 			+ iBoneWeight.y * mul(iPosL, boneTransforms[iBoneID.y] )

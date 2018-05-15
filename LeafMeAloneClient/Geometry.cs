@@ -668,7 +668,7 @@ namespace Client
                 Vector3 Scaling = CalcInterpolateScaling(animationTime, chpair.Value);
 
                 //Matrix r_mat = Matrix.RotationQuaternion(vQuaternion);
-                Matrix r_mat = (new Matrix4x4(vQuaternion.ToQuaternion().GetMatrix())).ToMatrix();
+                Matrix r_mat = Matrix.RotationQuaternion(vQuaternion);
                 Matrix s_mat = Matrix.Scaling(Scaling);
                 Matrix t_mat = Matrix.Translation(vPosition);
 

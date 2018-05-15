@@ -16,7 +16,8 @@ uniform extern float4 CamPosObj;
 
 // Bone Transformation Matrices
 static const int MAX_BONES_PER_MESH = 100;
-uniform extern float4x4 boneTransforms[MAX_BONES_PER_MESH];
+static const int MAX_BONES_PER_GEO = 512;
+uniform extern float4x4 boneTransforms[MAX_BONES_PER_GEO];
 uniform extern int animationIndex;
 
 // light parameters
@@ -77,6 +78,7 @@ void VS(float4 iPosL  : POSITION,
 			+ iBoneWeight.w * mul(iPosL, boneTransforms[iBoneID.w] );
 	}
 
+	posBone.w = 1.0f;
 	oPosH = mul(posBone, worldViewProj);
 
 	oPosObj = posBone;

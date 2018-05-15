@@ -2,14 +2,15 @@
  * Last updated date: 5/12/2018
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Assimp;
 using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Buffer = SlimDX.Direct3D11.Buffer;
 using Quaternion = SlimDX.Quaternion;
 
@@ -166,7 +167,17 @@ namespace Client
         {
             float totalWeight = 0;
             for (int i = 0; i < MAX_BONES_PER_VERTEX; i++) totalWeight += BoneWeights[i];
-            for (int i = 0; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] /= totalWeight;
+
+            if (totalWeight < 0.1f)
+            {
+                BoneWeights[0] = 1.0f;
+                BoneIndices[0] = Geometry.MAX_BONES_PER_GEO - 1;
+            }
+
+            else
+            {
+                for (int i = 0; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] /= totalWeight;
+            }
         }
     }
 
@@ -175,8 +186,8 @@ namespace Client
     /// </summary>
     public class MyMesh
     {
-        public const int MAX_BONES_PER_MESH = 100;
-        public const int BONE_TRANSFORM_STREAM_SIZE = MAX_BONES_PER_MESH * sizeof(float) * 16;
+        //public const int MAX_BONES_PER_MESH = 100;
+        //public const int BONE_TRANSFORM_STREAM_SIZE = MAX_BONES_PER_MESH * sizeof(float) * 16;
 
         public int CountVertices;
 
@@ -185,32 +196,10 @@ namespace Client
         public DataStream Vertices, Normals, Faces, TexCoords, DSBoneIDs, DSBoneWeights, boneTransformStream;
         public MyMaterial Materials;
 
-        public List<MyBone> Bones;
-        public Dictionary<string, int> BoneMappings;
+        //public List<MyBone> Bones;
+        //public Dictionary<string, int> BoneMappings;
         public List<VertexBoneData> VertexBoneDatas;  // this is per vertex
-
-        public MyMesh()
-        {
-            boneTransformStream = new DataStream(BONE_TRANSFORM_STREAM_SIZE, true, true);
-        }
-
-        public void UpdateBoneTransformStream()
-        {
-            boneTransformStream.Position = 0;
-            for (int i = 0; i < MAX_BONES_PER_MESH; i++)
-            {
-                if (i >= Bones.Count) break;
-
-                Matrix m = Bones[i].BoneFrameTransformation;
-//                m.set_Rows(3,Vector4.Zero);
-//                m.M44 = 1;
-
-                boneTransformStream.Write(m);
-                //boneTransformStream.Write(Bones[i].BoneOffset);
-            }
-
-            boneTransformStream.Position = 0;
-        }
+        
     }
 
     /// <summary>
@@ -223,15 +212,27 @@ namespace Client
         // applied every frame
         public Matrix BoneOffset;
 
+        public Matrix LocalTransform;
+        public Matrix GlobalBindPoseTransform;
+        public Matrix GlobalAnimatedTransform;
+        public Matrix OriginalLocalTranform;
+
+        public MyBone Parent;
+        public List<MyBone> Children;
+
         // passed into shader for transforming the bone vertices
         public Matrix BoneFrameTransformation;
 
         public MyBone(string name)
         {
             BoneName = name;
+            Children = new List<MyBone>();
         }
     }
 
+    /// <summary>
+    /// Copies over animation node information
+    /// </summary>
     public class MyAnimationNode
     {
         public String Name;
@@ -296,12 +297,137 @@ namespace Client
         /// animation may have multiple animation channels.
         /// The animations are all indiced the same way as stored in AnimationIndices
         /// </summary>
-        private List< Dictionary<String, MyAnimationNode> > animationNodes;
+        private List< Dictionary<String, MyAnimationNode> > _animationNodes;
 
         /// <summary>
         /// For inverting from the root node
         /// </summary>
-        private Matrix InverseGlobalTransform;
+        private Matrix _inverseGlobalTransform;
+
+        /// <summary>
+        /// Store information on the bones here
+        /// </summary>
+        public const int MAX_BONES_PER_GEO = 512;
+        private List<MyBone> _allBones;
+        private Dictionary<string, MyBone> _allBoneLookup;
+        private Dictionary<string, int> _allBoneMappings;
+        private MyBone _rootBone;
+        private DataStream boneTransformStream;
+
+        private int _ubindex = 0;
+        private MyBone CreateBoneTree(Node node, MyBone parent)
+        {
+            MyBone internalNode = new MyBone(node.Name)
+            {
+                Parent = parent
+            };
+
+            if (internalNode.BoneName == "")
+            {
+                internalNode.BoneName = "UnnamedBone_" + _ubindex++;
+            }
+
+            _allBoneLookup[internalNode.BoneName] = internalNode;
+
+            internalNode.LocalTransform = node.Transform.ToMatrix();
+            internalNode.OriginalLocalTranform = node.Transform.ToMatrix();
+
+            internalNode.GlobalBindPoseTransform = CalculateBoneToWorldTransform(internalNode);
+
+            for (int i = 0; i < node.ChildCount; i++)
+            {
+                MyBone child = CreateBoneTree(node.Children[i], internalNode);
+                if (child != null)
+                {
+                    internalNode.Children.Add(child);
+                }
+            }
+
+            return internalNode;
+        }
+
+        private Matrix CalculateBoneToWorldTransform(MyBone bone)
+        {
+            Matrix global = bone.OriginalLocalTranform;
+            MyBone parent = bone.Parent;
+            while (parent != null)
+            {
+                global = global * parent.LocalTransform;
+                parent = parent.Parent;
+            }
+
+            return global;
+        }
+
+        /// <summary>
+        /// Load the bone information for each vertex
+        /// </summary>
+        /// <param name="assimpMesh"></param>
+        /// <param name="mesh"></param>
+        protected void LoadBoneWeights(Mesh assimpMesh, MyMesh mesh)
+        {
+            // create a new data structures to store the bones
+            mesh.VertexBoneDatas = new List<VertexBoneData>(mesh.CountVertices);
+            for (int i = 0; i < mesh.CountVertices; i++) mesh.VertexBoneDatas.Add(new VertexBoneData());
+
+            // copy bone weights from the meshes for each vertex
+            for (int boneIndex = 0; boneIndex < assimpMesh.BoneCount; boneIndex++)
+            {
+                Bone currBone = assimpMesh.Bones[boneIndex];
+
+                for (int weighti = 0; weighti < currBone.VertexWeightCount; weighti++)
+                {
+                    VertexWeight vertexWeight = currBone.VertexWeights[weighti];
+                    mesh.VertexBoneDatas[vertexWeight.VertexID].AddBoneData(_allBoneMappings[currBone.Name], vertexWeight.Weight);
+                }
+            }
+
+            // create new datastream so that we can stream them to the VBOs
+            mesh.boneIDSize = sizeof(int) * VertexBoneData.MAX_BONES_PER_VERTEX * mesh.CountVertices;
+            mesh.boneWeightSize = sizeof(float) * VertexBoneData.MAX_BONES_PER_VERTEX * mesh.CountVertices;
+            mesh.DSBoneIDs = new DataStream(mesh.boneIDSize, true, true);
+            mesh.DSBoneWeights = new DataStream(mesh.boneWeightSize, true, true);
+
+            // for each vertex, write the vertex buffer datastreams
+            for (int i = 0; i < mesh.CountVertices; i++)
+            {
+                // normalize bone weights
+                mesh.VertexBoneDatas[i].NormalizeBoneData();
+
+                // write the data into datastreams
+                for (int bonei = 0; bonei < VertexBoneData.MAX_BONES_PER_VERTEX; bonei++)
+                {
+                    mesh.DSBoneIDs.Write(mesh.VertexBoneDatas[i].BoneIndices[bonei]);
+                    mesh.DSBoneWeights.Write(mesh.VertexBoneDatas[i].BoneWeights[bonei]);
+                }
+            }
+
+            mesh.DSBoneWeights.Position = 0;
+            mesh.DSBoneIDs.Position = 0;
+
+            // create the datastreams
+            mesh.VBOBoneIDs = new Buffer(GraphicsRenderer.Device, mesh.DSBoneIDs, mesh.boneIDSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            mesh.VBOBoneWeights = new Buffer(GraphicsRenderer.Device, mesh.DSBoneWeights, mesh.boneWeightSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+        }
+
+        protected void UpdateBoneTransformStream()
+        {
+            boneTransformStream.Position = 0;
+
+            for (int i = 0; i < MAX_BONES_PER_GEO; i++)
+            {
+                if (i >= _allBones.Count)
+                {
+                    boneTransformStream.Position = (MAX_BONES_PER_GEO - 1) * sizeof(float) * 16;
+                    boneTransformStream.Write(Matrix.Identity);
+                    break;
+                }
+
+                boneTransformStream.Write(_allBones[i].BoneOffset * _allBones[i].GlobalAnimatedTransform);
+            }
+
+            boneTransformStream.Position = 0;
+        }
 
         /// <summary>
         /// Create a new geometry given filename
@@ -348,6 +474,45 @@ namespace Client
 
             diffuseTextureSRV = new Dictionary<string, ShaderResourceView>();
 
+            if (enableRigging)
+            {
+                _allBones = new List<MyBone>();
+                _allBoneMappings = new Dictionary<string, int>();
+                _allBoneLookup = new Dictionary<string, MyBone>();
+                _rootBone = CreateBoneTree(scene.RootNode, null);
+
+                // set each bone offset
+                foreach (var sceneMesh in scene.Meshes)
+                {
+                    foreach (var rawBone in sceneMesh.Bones)
+                    {
+                        MyBone found;
+                        if (!_allBoneLookup.TryGetValue(rawBone.Name, out found)) continue;
+
+                        found.BoneOffset = rawBone.OffsetMatrix.ToMatrix();
+                        _allBones.Add(found);
+                        _allBoneMappings[found.BoneName] = _allBones.IndexOf(found);
+                    }
+                }
+
+                // for bones not inside the meshes...?
+                foreach (var boneName in _allBoneLookup.Keys.Where(b =>
+                    _allBones.All(b1 => b1.BoneName != b) && b.StartsWith("Bone")))
+                {
+                    _allBoneLookup[boneName].BoneOffset = _allBoneLookup[boneName].Parent.BoneOffset;
+                    _allBones.Add(_allBoneLookup[boneName]);
+                    _allBoneMappings[boneName] = _allBones.IndexOf(_allBoneLookup[boneName]);
+                }
+
+                // load the bone weights
+                for (int idx = 0; idx < scene.MeshCount; idx++)
+                {
+                    LoadBoneWeights(scene.Meshes[idx], allMeshes[idx]);
+                }
+
+                boneTransformStream = new DataStream(MAX_BONES_PER_GEO * sizeof(float) * 16, true, true);
+            }
+
             // main loading loop; copy cover the scene content into the datastreams and then to the buffers
             for (int idx = 0; idx < scene.MeshCount; idx++)
             {
@@ -389,12 +554,6 @@ namespace Client
                 // Parse material properties
                 ApplyMaterial(scene.Materials[scene.Meshes[idx].MaterialIndex], mesh.Materials);
 
-                // Parse Bone Animation data
-                //if (enableRigging)
-                //{
-                    LoadMeshBoneInfo(scene.Meshes[idx], mesh);
-                //}
-
                 // reset datastream positions
                 mesh.Vertices.Position = 0;
                 mesh.Normals.Position = 0;
@@ -422,18 +581,18 @@ namespace Client
 
             // set the animation related lookup tables
             AnimationIndices = new Dictionary<string, int>();
-            animationNodes = new List<Dictionary<string, MyAnimationNode>>(scene.AnimationCount);
+            _animationNodes = new List<Dictionary<string, MyAnimationNode>>(scene.AnimationCount);
             for (int i = 0; i < scene.AnimationCount; i++)
             {
                 AnimationIndices[scene.Animations[i].Name] = i;
-                animationNodes.Add( new Dictionary<string, MyAnimationNode>() );
+                _animationNodes.Add( new Dictionary<string, MyAnimationNode>() );
 
                 for (int j = 0; j < scene.Animations[i].NodeAnimationChannelCount; j++)
                 {
                     NodeAnimationChannel ch = scene.Animations[i].NodeAnimationChannels[j];
                     MyAnimationNode myNode = new MyAnimationNode(ch.NodeName);
 
-                    animationNodes[i][ch.NodeName] = myNode;
+                    _animationNodes[i][ch.NodeName] = myNode;
                     myNode.Translations = new List<Vector3>();
                     myNode.TranslationTime = new List<double>();
                     myNode.Rotations = new List<Quaternion>();
@@ -462,7 +621,7 @@ namespace Client
                 }
             }
 
-            InverseGlobalTransform = Matrix.Invert( scene.RootNode.Transform.ToMatrix());
+            _inverseGlobalTransform = Matrix.Invert( scene.RootNode.Transform.ToMatrix() );
         }
 
         protected void SetBoneTransform(int AnimationIndex, double TimeInSeconds)
@@ -478,54 +637,42 @@ namespace Client
             double AnimationTime = TimeInTicks % scene.Animations[AnimationIndex].DurationInTicks;
 
             // read node hierarchy
-            ReadNodeHierarchy( AnimationIndex, AnimationTime, scene.RootNode, Matrix.Identity );
+            // ReadNodeHierarchy( AnimationIndex, AnimationTime, scene.RootNode, Matrix.Identity );
+            Evaluate(AnimationTime, CurrentAnimationIndex);
+            UpdateTransforms(_rootBone);
         }
 
-        protected void ReadNodeHierarchy(int AnimationIndex, double animationTime, Node node, Matrix parentTransform)
+        // Use this to recusively update the animation transform values
+        private void UpdateTransforms(MyBone bone)
         {
-            String nodeName = node.Name;
-            Matrix nodeTransform = node.Transform.ToMatrix();
-            MyAnimationNode currAnimationNode = animationNodes[AnimationIndex].ContainsKey(nodeName) ? animationNodes[AnimationIndex][nodeName] : null;
-
-            if (currAnimationNode != null)
+            bone.GlobalAnimatedTransform = CalculateBoneToWorldTransform(bone);
+            foreach (var child in bone.Children)
             {
-                Vector3 Scaling = CalcInterpolateScaling(animationTime, currAnimationNode);
-                Matrix ScalingMatrix = Matrix.Scaling(Scaling);
-                //ScalingMatrix = Matrix.Identity;
-
-                Quaternion Rotation = CalcInterpolateRotation(animationTime, currAnimationNode);
-                Matrix RotationMatrix = Matrix.RotationQuaternion(Rotation);
-
-                Vector3 Translation = CalcInterpolateTranslation(animationTime, currAnimationNode);
-                Matrix TranslationMatrix = Matrix.Translation(Translation);
-
-                nodeTransform = ScalingMatrix * RotationMatrix * TranslationMatrix;
+                UpdateTransforms(child);
             }
+        }
 
-            Matrix GlobalTransform = nodeTransform * parentTransform;
-
-            // for each mesh, set the bones 
-            
-            foreach (MyMesh mesh in allMeshes)
+        private void Evaluate(double animationTime, int animationIndex)
+        {
+            Dictionary<string, MyAnimationNode> currentChannels = _animationNodes[animationIndex];
+            foreach (var chpair in currentChannels)
             {
-                if (mesh.BoneMappings.ContainsKey(nodeName))
+                if (!_allBoneLookup.ContainsKey(chpair.Key))
                 {
-                    int boneIndex = mesh.BoneMappings[nodeName];
-                    //= mesh.Bones[boneIndex].BoneOffset * GlobalTransform /** InverseGlobalTransform*/;
-
-                    Matrix m = mesh.Bones[boneIndex].BoneOffset * GlobalTransform /*InverseGlobalTransform*/;
-
-                    m.set_Rows(3, Vector4.Zero);
-                    m.M44 = 1;
-
-                    mesh.Bones[boneIndex].BoneFrameTransformation = m;
+                    Console.WriteLine("Did not find the bone node " + chpair.Key);
+                    continue;
                 }
-            }
 
-            // recursively read child nodes
-            for (int i = 0; i < node.ChildCount; i++)
-            {
-                ReadNodeHierarchy(AnimationIndex, animationTime, node.Children[i], GlobalTransform);
+                Vector3 vPosition = CalcInterpolateTranslation(animationTime, chpair.Value);
+                Quaternion vQuaternion = CalcInterpolateRotation(animationTime, chpair.Value);
+                Vector3 Scaling = CalcInterpolateScaling(animationTime, chpair.Value);
+
+                //Matrix r_mat = Matrix.RotationQuaternion(vQuaternion);
+                Matrix r_mat = (new Matrix4x4(vQuaternion.ToQuaternion().GetMatrix())).ToMatrix();
+                Matrix s_mat = Matrix.Scaling(Scaling);
+                Matrix t_mat = Matrix.Translation(vPosition);
+
+                _allBoneLookup[chpair.Key].LocalTransform = s_mat * r_mat * t_mat;
             }
         }
 
@@ -652,10 +799,7 @@ namespace Client
                 // advance the animation
                 CurrentAnimationTime += delta_time;
 
-                foreach (MyMesh mesh in allMeshes)
-                {
-                    mesh.UpdateBoneTransformStream();
-                }
+                UpdateBoneTransformStream();
             }
             else CurrentAnimationIndex = -1;
         }
@@ -810,64 +954,6 @@ namespace Client
         }
 
         /// <summary>
-        /// Load the bone information for each vertex
-        /// </summary>
-        /// <param name="assimpMesh"></param>
-        /// <param name="mesh"></param>
-        protected void LoadMeshBoneInfo(Mesh assimpMesh, MyMesh mesh)
-        {
-            // create a new data structures to store the bones
-            mesh.Bones = new List<MyBone>(assimpMesh.BoneCount);
-            mesh.BoneMappings = new Dictionary<string, int>();
-            mesh.VertexBoneDatas = new List<VertexBoneData>(mesh.vertSize);
-            for (int i = 0; i < mesh.CountVertices; i++) mesh.VertexBoneDatas.Add(new VertexBoneData());
-
-            // copy bone information from the meshes
-            for (int boneIndex = 0; boneIndex < assimpMesh.BoneCount; boneIndex++)
-            {
-                Bone currBone = assimpMesh.Bones[boneIndex];
-                MyBone myBone = new MyBone(currBone.Name);
-
-                mesh.Bones.Add(myBone);
-                mesh.BoneMappings[currBone.Name] = boneIndex;
-                myBone.BoneOffset = currBone.OffsetMatrix.ToMatrix();
-
-                for (int weighti = 0; weighti < currBone.VertexWeightCount; weighti++)
-                {
-                    VertexWeight vertexWeight = currBone.VertexWeights[weighti];
-                    mesh.VertexBoneDatas[vertexWeight.VertexID].AddBoneData(boneIndex, vertexWeight.Weight);
-                }
-            }
-
-            // create new datastream so that we can stream them to the VBOs
-            mesh.boneIDSize = sizeof(int) * VertexBoneData.MAX_BONES_PER_VERTEX * mesh.CountVertices;
-            mesh.boneWeightSize = sizeof(float) * VertexBoneData.MAX_BONES_PER_VERTEX * mesh.CountVertices;
-            mesh.DSBoneIDs = new DataStream(mesh.boneIDSize, true, true);
-            mesh.DSBoneWeights = new DataStream(mesh.boneWeightSize, true, true);
-
-            // for each vertex, write the vertex buffer datastreams
-            for (int i = 0; i < mesh.CountVertices; i++)
-            {
-                // normalize bone weights
-                mesh.VertexBoneDatas[i].NormalizeBoneData();
-
-                // write the data into datastreams
-                for (int bonei = 0; bonei < VertexBoneData.MAX_BONES_PER_VERTEX; bonei++)
-                {
-                    mesh.DSBoneIDs.Write(mesh.VertexBoneDatas[i].BoneIndices[bonei]);
-                    mesh.DSBoneWeights.Write(mesh.VertexBoneDatas[i].BoneWeights[bonei]);
-                }
-            }
-
-            mesh.DSBoneWeights.Position = 0;
-            mesh.DSBoneIDs.Position = 0;
-
-            // create the datastreams
-            mesh.VBOBoneIDs = new Buffer(GraphicsRenderer.Device, mesh.DSBoneIDs, mesh.boneIDSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            mesh.VBOBoneWeights = new Buffer(GraphicsRenderer.Device, mesh.DSBoneWeights, mesh.boneWeightSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-        }
-
-        /// <summary>
         /// Draw a model by using the modelmatrix it is assigned to
         /// </summary>
         /// <param name="modelMatrix"> describes how the object is viewed in the world space </param>
@@ -883,6 +969,13 @@ namespace Client
             GraphicsManager.ActiveLightSystem.UpdateShader(shader, modelMatrix);
             shader.ShaderEffect.GetVariableByName("CamPosObj").AsVector().Set(
                 Vector4.Transform( new Vector4(GraphicsManager.ActiveCamera.CameraPosition, 1.0f), Matrix.Invert(modelMatrix)) );
+
+            
+            if (CurrentAnimationIndex != -1)
+            {
+                shader.ShaderEffect.GetVariableByName("boneTransforms")
+                    .SetRawValue(boneTransformStream, MAX_BONES_PER_GEO * sizeof(float) * 16);
+            }
 
             for (int i = 0; i < scene.MeshCount; i++)
             {
@@ -914,7 +1007,6 @@ namespace Client
                     GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(BoneWeightLoc,
                         new VertexBufferBinding(mesh.VBOBoneWeights, sizeof(float) * VertexBoneData.MAX_BONES_PER_VERTEX, 0));
                     
-                    shader.ShaderEffect.GetVariableByName("boneTransforms").SetRawValue(mesh.boneTransformStream, MyMesh.BONE_TRANSFORM_STREAM_SIZE);
                 }
 
                 // pass texture resource into the shader if applicable

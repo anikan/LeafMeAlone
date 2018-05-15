@@ -515,8 +515,8 @@ namespace Client
 
                     Matrix m = mesh.Bones[boneIndex].BoneOffset * GlobalTransform /*InverseGlobalTransform*/;
 
-                    m.set_Rows(3, Vector4.Zero);
-                    m.M44 = 1;
+                    //m.set_Rows(3, Vector4.Zero);
+                    //m.M44 = 1;
 
                     mesh.Bones[boneIndex].BoneFrameTransformation = m;
                 }

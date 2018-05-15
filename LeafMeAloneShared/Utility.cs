@@ -15,7 +15,22 @@ namespace Shared
 
         public static SlimDX.Quaternion ToQuaternion(this Assimp.Quaternion q)
         {
-            return new SlimDX.Quaternion(q.X, q.Y, q.Z, q.W);
+            SlimDX.Quaternion ret = new SlimDX.Quaternion();
+            ret.W = q.W;
+            ret.X = q.X;
+            ret.Y = q.Y;
+            ret.Z = q.Z;
+            return ret;
+        }
+
+        public static Assimp.Quaternion ToQuaternion(this SlimDX.Quaternion q)
+        {
+            Assimp.Quaternion ret = new Assimp.Quaternion();
+            ret.W = q.W;
+            ret.X = q.W;
+            ret.Y = q.Y;
+            ret.Z = q.Z;
+            return ret;
         }
 
         public static Matrix ToMatrix(this Matrix4x4 mat)

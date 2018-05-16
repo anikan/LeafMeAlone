@@ -173,10 +173,10 @@ namespace Client
 
             if (totalWeight < 0.1f)
             {
-                BoneWeights[0] = 1.0f;
-                BoneIndices[0] = 0;
-
-                for (int i = 1; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] = 0f;
+//                BoneWeights[0] = 1.0f;
+//                BoneIndices[0] = 0;
+//
+//                for (int i = 1; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] = 0f;
 
                 Console.WriteLine("No weight for this vertex");
             }
@@ -227,6 +227,7 @@ namespace Client
 
         public MyBone Parent;
         public List<MyBone> Children;
+        public List<int> MeshIndices;
 
         // passed into shader for transforming the bone vertices
         public Matrix BoneFrameTransformation;
@@ -315,12 +316,15 @@ namespace Client
         /// <summary>
         /// Store information on the bones here
         /// </summary>
-        public const int MAX_BONES_PER_GEO = 512;
         private List<MyBone> _allBones;
         private Dictionary<string, MyBone> _allBoneLookup;
         private Dictionary<string, int> _allBoneMappings;
+
+        public const int MAX_BONES_PER_GEO = 512;
         private MyBone _rootBone;
-        private DataStream boneTransformStream;
+        private DataStream _boneTransformStream;
+        
+        private List<Matrix> _meshTransform;
 
         private int _ubindex = 0;
         private MyBone CreateBoneTree(Node node, MyBone parent)
@@ -338,9 +342,23 @@ namespace Client
             _allBoneLookup[internalNode.BoneName] = internalNode;
 
             internalNode.LocalTransform = node.Transform.ToMatrix();
+            internalNode.LocalTransform.M14 = internalNode.LocalTransform.M24 = internalNode.LocalTransform.M34 = 0;
             internalNode.OriginalLocalTranform = node.Transform.ToMatrix();
 
             internalNode.GlobalBindPoseTransform = CalculateBoneToWorldTransform(internalNode);
+
+            // check to see if any node has any meshes
+            if (node.HasMeshes)
+            {
+                String temp = "";
+                node.MeshIndices.ForEach(i =>
+                {
+                    temp = temp + i + ", ";
+                });
+                Console.WriteLine("Node " + node.Name + " has mesh index: " + temp + " and transform: " + node.Transform.ToString() + ".");
+            }
+
+            internalNode.MeshIndices = node.MeshIndices.ToList();
 
             for (int i = 0; i < node.ChildCount; i++)
             {
@@ -356,7 +374,7 @@ namespace Client
 
         private Matrix CalculateBoneToWorldTransform(MyBone bone)
         {
-            Matrix global = bone.LocalTransform;
+            Matrix global = bone.LocalTransform.Clone() ;
             MyBone parent = bone.Parent;
             while (parent != null)
             {
@@ -418,23 +436,26 @@ namespace Client
             mesh.VBOBoneWeights = new Buffer(GraphicsRenderer.Device, mesh.DSBoneWeights, mesh.boneWeightSize, ResourceUsage.Default, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
         }
 
+        /// <summary>
+        /// Update the stream of matrices to be passed into the shader
+        /// </summary>
         protected void UpdateBoneTransformStream()
         {
-            boneTransformStream.Position = 0;
+            _boneTransformStream.Position = 0;
 
             for (int i = 0; i < MAX_BONES_PER_GEO; i++)
             {
                 if (i >= _allBones.Count)
                 {
-                    boneTransformStream.Position = (MAX_BONES_PER_GEO - 1) * sizeof(float) * 16;
-                    boneTransformStream.Write(Matrix.Identity);
+                    _boneTransformStream.Position = (MAX_BONES_PER_GEO - 1) * sizeof(float) * 16;
+                    _boneTransformStream.Write(Matrix.Identity);
                     break;
                 }
 
-                boneTransformStream.Write(_allBones[i].BoneOffset * _allBones[i].GlobalAnimatedTransform);
+                _boneTransformStream.Write(_allBones[i].BoneOffset * _allBones[i].GlobalAnimatedTransform * _inverseGlobalTransform);
             }
 
-            boneTransformStream.Position = 0;
+            _boneTransformStream.Position = 0;
         }
 
         /// <summary>
@@ -452,9 +473,8 @@ namespace Client
             //import the file
             scene = importer.ImportFile(fileName,
                 PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate |
-                PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.SortByPrimitiveType |
-                PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs | 
-                PostProcessSteps.LimitBoneWeights | PostProcessSteps.Debone );
+                PostProcessSteps.SortByPrimitiveType |
+                PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs );
 
             //make sure scene not null
             if (scene == null)
@@ -462,6 +482,7 @@ namespace Client
 
             //loop through sizes and count them.
             allMeshes = new List<MyMesh>(scene.MeshCount);
+            _meshTransform = new List<Matrix>(scene.MeshCount);
 
             //loop through and store sizes 
             for (int idx = 0; idx < scene.MeshCount; idx++)
@@ -478,6 +499,8 @@ namespace Client
                 {
                     mesh.texSize = scene.Meshes[idx].TextureCoordinateChannels[0].Count * Vector3.SizeInBytes;
                 }
+
+                _meshTransform.Add(Matrix.Identity);
             }
 
             diffuseTextureSRV = new Dictionary<string, ShaderResourceView>();
@@ -488,10 +511,63 @@ namespace Client
                 _allBoneMappings = new Dictionary<string, int>();
                 _allBoneLookup = new Dictionary<string, MyBone>();
                 _rootBone = CreateBoneTree(scene.RootNode, null);
+                
+                // set the animation related lookup tables
+                AnimationIndices = new Dictionary<string, int>();
+                _animationNodes = new List<Dictionary<string, MyAnimationNode>>(scene.AnimationCount);
+                for (int i = 0; i < scene.AnimationCount; i++)
+                {
+                    AnimationIndices[scene.Animations[i].Name] = i;
+                    _animationNodes.Add(new Dictionary<string, MyAnimationNode>());
+
+                    for (int j = 0; j < scene.Animations[i].NodeAnimationChannelCount; j++)
+                    {
+                        if (scene.Animations[i].HasMeshAnimations)
+                        {
+                            Console.WriteLine("Has mesh animations!");
+                        }
+
+                        NodeAnimationChannel ch = scene.Animations[i].NodeAnimationChannels[j];
+                        MyAnimationNode myNode = new MyAnimationNode(ch.NodeName);
+
+                        _animationNodes[i][ch.NodeName] = myNode;
+                        myNode.Translations = new List<Vector3>();
+                        myNode.TranslationTime = new List<double>();
+                        myNode.Rotations = new List<Quaternion>();
+                        myNode.RotationTime = new List<double>();
+                        myNode.Scalings = new List<Vector3>();
+                        myNode.ScalingTime = new List<double>();
+
+                        // copy over all the necessary information in the animation channels
+                        for (int k = 0; k < ch.PositionKeyCount; k++)
+                        {
+                            myNode.Translations.Add(ch.PositionKeys[k].Value.ToVector3());
+                            myNode.TranslationTime.Add(ch.PositionKeys[k].Time);
+                        }
+
+                        for (int k = 0; k < ch.RotationKeyCount; k++)
+                        {
+                            myNode.Rotations.Add(ch.RotationKeys[k].Value.ToQuaternion());
+                            myNode.RotationTime.Add(ch.RotationKeys[k].Time);
+                        }
+
+                        for (int k = 0; k < ch.ScalingKeyCount; k++)
+                        {
+                            myNode.Scalings.Add(ch.ScalingKeys[k].Value.ToVector3());
+                            myNode.ScalingTime.Add(ch.ScalingKeys[k].Time);
+                        }
+                    }
+                }
 
                 // set each bone offset
                 foreach (var sceneMesh in scene.Meshes)
                 {
+                    if (sceneMesh.BoneCount <= 0)
+                    {
+                        Console.WriteLine("Mesh " + scene.Meshes.IndexOf(sceneMesh) + " does not have bones.");
+                        
+                    }
+
                     foreach (var rawBone in sceneMesh.Bones)
                     {
                         MyBone found;
@@ -518,7 +594,7 @@ namespace Client
                     LoadBoneWeights(scene.Meshes[idx], allMeshes[idx]);
                 }
 
-                boneTransformStream = new DataStream(MAX_BONES_PER_GEO * sizeof(float) * 16, true, true);
+                _boneTransformStream = new DataStream(MAX_BONES_PER_GEO * sizeof(float) * 16, true, true);
             }
 
             // main loading loop; copy cover the scene content into the datastreams and then to the buffers
@@ -587,51 +663,15 @@ namespace Client
                 mesh.EBO = new Buffer(GraphicsRenderer.Device, mesh.Faces, ibd);
             }
 
-            // set the animation related lookup tables
-            AnimationIndices = new Dictionary<string, int>();
-            _animationNodes = new List<Dictionary<string, MyAnimationNode>>(scene.AnimationCount);
-            for (int i = 0; i < scene.AnimationCount; i++)
-            {
-                AnimationIndices[scene.Animations[i].Name] = i;
-                _animationNodes.Add( new Dictionary<string, MyAnimationNode>() );
-
-                for (int j = 0; j < scene.Animations[i].NodeAnimationChannelCount; j++)
-                {
-                    NodeAnimationChannel ch = scene.Animations[i].NodeAnimationChannels[j];
-                    MyAnimationNode myNode = new MyAnimationNode(ch.NodeName);
-
-                    _animationNodes[i][ch.NodeName] = myNode;
-                    myNode.Translations = new List<Vector3>();
-                    myNode.TranslationTime = new List<double>();
-                    myNode.Rotations = new List<Quaternion>();
-                    myNode.RotationTime = new List<double>();
-                    myNode.Scalings = new List<Vector3>();
-                    myNode.ScalingTime = new List<double>();
-
-                    // copy over all the necessary information in the animation channels
-                    for (int k = 0; k < ch.PositionKeyCount; k++)
-                    {
-                        myNode.Translations.Add( ch.PositionKeys[k].Value.ToVector3() );
-                        myNode.TranslationTime.Add( ch.PositionKeys[k].Time );
-                    }
-
-                    for (int k = 0; k < ch.RotationKeyCount; k++)
-                    {
-                        myNode.Rotations.Add(ch.RotationKeys[k].Value.ToQuaternion());
-                        myNode.RotationTime.Add(ch.RotationKeys[k].Time);
-                    }
-
-                    for (int k = 0; k < ch.ScalingKeyCount; k++)
-                    {
-                        myNode.Scalings.Add(ch.ScalingKeys[k].Value.ToVector3());
-                        myNode.ScalingTime.Add(ch.ScalingKeys[k].Time);
-                    }
-                }
-            }
-
             _inverseGlobalTransform = Matrix.Invert( scene.RootNode.Transform.ToMatrix() );
         }
 
+        /// <summary>
+        /// Use this function to set the Bone Hierarchy to have the correct transformation
+        /// matrices for this frame
+        /// </summary>
+        /// <param name="AnimationIndex"></param>
+        /// <param name="TimeInSeconds"></param>
         protected void SetBoneTransform(int AnimationIndex, double TimeInSeconds)
         {
             // number of ticks per second
@@ -651,11 +691,14 @@ namespace Client
             UpdateTransforms(_rootBone);
         }
 
+        /// <summary>
+        /// Reset 
+        /// </summary>
         private void ResetLocalTransforms()
         {
             foreach (var bone in _allBones)
             {
-                bone.LocalTransform = bone.OriginalLocalTranform;
+                bone.LocalTransform = bone.OriginalLocalTranform.Clone();
             }
         }
 
@@ -663,6 +706,9 @@ namespace Client
         private void UpdateTransforms(MyBone bone)
         {
             bone.GlobalAnimatedTransform = CalculateBoneToWorldTransform(bone);
+
+            //bone.MeshIndices.ForEach(meshIndex => { _meshTransform[meshIndex] = bone.LocalTransform; });
+
             foreach (var child in bone.Children)
             {
                 UpdateTransforms(child);
@@ -989,7 +1035,7 @@ namespace Client
             if (CurrentAnimationIndex != -1)
             {
                 shader.ShaderEffect.GetVariableByName("boneTransforms")
-                    .SetRawValue(boneTransformStream, MAX_BONES_PER_GEO * sizeof(float) * 16);
+                    .SetRawValue(_boneTransformStream, MAX_BONES_PER_GEO * sizeof(float) * 16);
             }
 
             for (int i = 0; i < scene.MeshCount; i++)
@@ -1014,6 +1060,7 @@ namespace Client
 
                 // pass bone IDs and weights if applicable
                 shader.ShaderEffect.GetVariableByName("animationIndex").AsScalar().Set(CurrentAnimationIndex);
+                shader.ShaderEffect.GetVariableByName("meshTransform").AsMatrix().SetMatrix(_meshTransform[i]);
                 if (CurrentAnimationIndex != -1)
                 {
                     GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(BoneIdLoc,
@@ -1021,7 +1068,6 @@ namespace Client
 
                     GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(BoneWeightLoc,
                         new VertexBufferBinding(mesh.VBOBoneWeights, sizeof(float) * VertexBoneData.MAX_BONES_PER_VERTEX, 0));
-                    
                 }
 
                 // pass texture resource into the shader if applicable

@@ -96,6 +96,21 @@ namespace Shared
             dest.Z = src.Z;
         }
 
+        public static Matrix Clone(this Matrix mat)
+        {
+            Matrix ret = new Matrix(  );
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+
+                    ret[i, j] = mat[i, j];
+                }
+            }
+
+            return ret;
+        }
+
         public static float NextFloat(this Random r)
         {
             return (float) r.NextDouble();

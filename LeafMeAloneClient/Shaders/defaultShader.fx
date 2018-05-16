@@ -18,6 +18,7 @@ uniform extern float4 CamPosObj;
 static const int MAX_BONES_PER_MESH = 100;
 static const int MAX_BONES_PER_GEO = 512;
 uniform extern float4x4 boneTransforms[MAX_BONES_PER_GEO];
+uniform extern float4x4 meshTransform;
 uniform extern int animationIndex;
 
 // light parameters
@@ -72,10 +73,14 @@ void VS(float4 iPosL  : POSITION,
 
 	if (animationIndex != -1 && iBoneWeight.x + iBoneWeight.y + iBoneWeight.z + iBoneWeight.w > 0.9f)
 	{
-		posBone = iBoneWeight.x * mul(iPosL, boneTransforms[iBoneID.x])
-			+ iBoneWeight.y * mul(iPosL, boneTransforms[iBoneID.y] )
-			+ iBoneWeight.z * mul(iPosL, boneTransforms[iBoneID.z] )
-			+ iBoneWeight.w * mul(iPosL, boneTransforms[iBoneID.w] );
+		posBone = iBoneWeight.x * mul(posBone, boneTransforms[iBoneID.x])
+			+ iBoneWeight.y * mul(posBone, boneTransforms[iBoneID.y] )
+			+ iBoneWeight.z * mul(posBone, boneTransforms[iBoneID.z] )
+			+ iBoneWeight.w * mul(posBone, boneTransforms[iBoneID.w] );
+	}
+	else
+	{
+		posBone = mul(iPosL, meshTransform);
 	}
 
 	posBone.w = 1.0f;

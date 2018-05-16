@@ -16,10 +16,10 @@ namespace Shared
         public static SlimDX.Quaternion ToQuaternion(this Assimp.Quaternion q)
         {
             SlimDX.Quaternion ret = new SlimDX.Quaternion();
-            ret.W = q.W;
             ret.X = q.X;
             ret.Y = q.Y;
             ret.Z = q.Z;
+            ret.W = q.W;
             return ret;
         }
 
@@ -27,7 +27,7 @@ namespace Shared
         {
             Assimp.Quaternion ret= new Assimp.Quaternion();
             ret.W = q.W;
-            ret.X = q.W;
+            ret.X = q.X;
             ret.Y = q.Y;
             ret.Z = q.Z;
             return ret;

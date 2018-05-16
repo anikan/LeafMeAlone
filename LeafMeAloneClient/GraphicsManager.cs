@@ -157,12 +157,12 @@ namespace Client
             ParticleSystems = new List<ParticleSystem>();
 
             //TODO: REMOVE AFTER TESTING
-            animatedModel = new Model(@"../../Models/Low-Poly Spider/Only_Spider_with_Animations_Export.dae", true);
+            animatedModel = new Model(@"../../Models/Example_Running_Anim.fbx", true);
             float scale = 0.24f;
             animatedModel.m_Properties.Scale = new Vector3(scale, scale, scale);
-            animatedModel.m_Properties.Rotation.X = (float) Math.PI/2.0f;
+            animatedModel.m_Properties.Rotation.X = (float) Math.PI/2.0f*3.0f;
             //animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
-            //animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
+            animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
             //animatedModel.m_Properties.Position = new Vector3(0, 10, 0);
             animatedModel.StartAnimationSequenceByIndex(0, true);
         }
@@ -193,7 +193,7 @@ namespace Client
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
                 new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2),
-                new InputElement("BONE_ID", 0, Format.R32G32B32A32_SInt, 3),
+                new InputElement("BONE_ID", 0, Format.R32G32B32A32_UInt, 3),
                 new InputElement("BONE_WEIGHT", 0, Format.R32G32B32A32_Float, 4)
             });
 

@@ -73,10 +73,11 @@ void VS(float4 iPosL  : POSITION,
 
 	if (animationIndex != -1 && iBoneWeight.x + iBoneWeight.y + iBoneWeight.z + iBoneWeight.w > 0.9f)
 	{
-		posBone = iBoneWeight.x * mul(posBone, boneTransforms[iBoneID.x])
-			+ iBoneWeight.y * mul(posBone, boneTransforms[iBoneID.y] )
-			+ iBoneWeight.z * mul(posBone, boneTransforms[iBoneID.z] )
-			+ iBoneWeight.w * mul(posBone, boneTransforms[iBoneID.w] );
+		//posBone = mul(iPosL, meshTransform);
+		posBone = iBoneWeight[0] * mul(posBone, boneTransforms[iBoneID[0]])
+			+ iBoneWeight[1] * mul(posBone, boneTransforms[iBoneID[1]] )
+			+ iBoneWeight[2] * mul(posBone, boneTransforms[iBoneID[2]] )
+			+ iBoneWeight[3] * mul(posBone, boneTransforms[iBoneID[3]] );
 	}
 	else
 	{

@@ -473,8 +473,9 @@ namespace Client
             //import the file
             scene = importer.ImportFile(fileName,
                 PostProcessSteps.CalculateTangentSpace | PostProcessSteps.Triangulate |
-                PostProcessSteps.SortByPrimitiveType |
-                PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs );
+                PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.SortByPrimitiveType |
+                PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs |
+                PostProcessSteps.LimitBoneWeights );
 
             //make sure scene not null
             if (scene == null)

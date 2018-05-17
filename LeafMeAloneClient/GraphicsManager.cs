@@ -93,6 +93,10 @@ namespace Client
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
             }
+            //foreach (ParticleSystem particleSystem in ParticleSystems)
+            //{
+            //    particleSystem.Update(delta_t);
+            //}
         }
 
         public static void Draw()

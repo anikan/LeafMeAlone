@@ -13,6 +13,8 @@ namespace Client
     /// </summary>
     public abstract class GraphicGameObject : GameObject
     {
+        public delegate void On_Destroy();
+        public event On_Destroy OnDestroy;
         // Model that's associated with this object.
         private Model model;
 
@@ -70,6 +72,7 @@ namespace Client
         public override void Destroy()
         {
             GameClient.instance.Destroy(this);
+            OnDestroy?.Invoke();
         }
     }
 }

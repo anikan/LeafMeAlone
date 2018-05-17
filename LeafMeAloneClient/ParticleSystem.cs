@@ -58,7 +58,7 @@ namespace Client
         private float delta;
 
         //random for use in forces.
-        private Random r;
+        private static Random r;
 
         // where the particle is being spit out
         private Vector3 GenerationOrigin;
@@ -106,7 +106,7 @@ namespace Client
             float enlarge_speed = 0.075f,
             float stop_dist = 50.0f,
             int emissionrate = 2,
-            int maxparticles = 1000)
+            int maxparticles = 100)
         {
             delta = initial_size;
             emissionRate = emissionrate;
@@ -126,7 +126,8 @@ namespace Client
             ShouldRender = true;
             Type = type;
 
-            r = new Random();
+            if(r == null)
+                r = new Random();
 
             for (int i = 0; i < maxParticles; i++)
             {
@@ -271,6 +272,7 @@ namespace Client
             VBO_Verts = new Buffer(GraphicsRenderer.Device, Verts, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             VBO_Origin.Dispose();
             VBO_Origin = new Buffer(GraphicsRenderer.Device, StartingLocations, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            
         }
 
         /// <summary>

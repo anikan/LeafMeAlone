@@ -60,6 +60,9 @@ namespace Client
             this.ipAddress = ipAddress;
         }
 
+        //TESTING ONLY
+        public byte[] lastBuffer;
+
         /// <summary>
         /// Try to connect to the host.
         /// </summary>
@@ -115,6 +118,8 @@ namespace Client
 
             byte[] savedBuffer = new byte[0];
 
+            byte[] origBuffer;
+
             while (client.Available > 0)
             {
                 //Saving amount available as it may change while waiting. 
@@ -153,6 +158,8 @@ namespace Client
                     bytesToRead -= bytesRead;
                 }
             }
+
+            savedBuffer = origBuffer;
         }
 
         /// <summary>

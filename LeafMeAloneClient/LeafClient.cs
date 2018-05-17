@@ -16,7 +16,7 @@ namespace Client
             if (Fire == null)
             {
                 Fire = new FlameThrowerParticleSystem();
-                Fire.Transform.Rotation.Y = 90f.ToRadians();
+                //Fire.Transform.Rotation.Y = 90f.ToRadians();
             }
         }
 

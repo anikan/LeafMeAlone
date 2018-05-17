@@ -160,10 +160,19 @@ namespace Server
 
         public void SendWorldUpdateToAllClients()
         {
-            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
+            foreach ( KeyValuePair<int, GameObjectServer> pair in
+                GameServer.instance.gameObjectDict )
             {
-                Packet packetToSend = ServerPacketFactory.CreatePacket(pair.Value);
+                Packet packetToSend =
+                    ServerPacketFactory.CreatePacket(pair.Value);
                 SendAll(packetToSend.Serialize());
+            }
+
+            foreach ( var gameObj in GameServer.instance.toDestroyQueue)
+            {
+                Packet packet = 
+                    ServerPacketFactory.CreateDestroyPacket(gameObj);
+                SendAll(packet.Serialize());
             }
         }
 

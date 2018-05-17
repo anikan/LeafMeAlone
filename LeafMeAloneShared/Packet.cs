@@ -12,7 +12,8 @@ namespace Shared
     {
         CreateObjectPacket,
         PlayerPacket,
-        LeafPacket
+        LeafPacket,
+        DestroyObjectPacket
     }
 
     /// <summary>
@@ -87,6 +88,10 @@ namespace Shared
                     return Serializer.Deserialize<LeafPacket>(
                         new MemoryStream(objectData)
                     );
+                case PacketType.DestroyObjectPacket:
+                    return Serializer.Deserialize<DestroyObjectPacket>(
+                        new MemoryStream(objectData)
+                    );
             }
 
             //We don't have all the bytes to deserialize, return null.
@@ -108,6 +113,10 @@ namespace Shared
 
             byte[] sizePortion = new byte[4];
             Buffer.BlockCopy(data, 1, sizePortion, 0, 4);
+            //if (!BitConverter.IsLittleEndian)
+            //{
+            //    sizePortion = sizePortion.Reverse().ToArray();
+            //}
             int packetSize = BitConverter.ToInt32(sizePortion, 0);
 
             //Check whether the full packet has arrived.

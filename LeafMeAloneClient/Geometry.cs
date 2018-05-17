@@ -173,12 +173,10 @@ namespace Client
 
             if (totalWeight < 0.1f)
             {
-//                BoneWeights[0] = 1.0f;
-//                BoneIndices[0] = 0;
-//
-//                for (int i = 1; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] = 0f;
+                BoneWeights[0] = 1.0f;
+                BoneIndices[0] = 0;
 
-                Console.WriteLine("No weight for this vertex");
+                for (int i = 1; i < MAX_BONES_PER_VERTEX; i++) BoneWeights[i] = 0f;
             }
 
             else
@@ -194,14 +192,12 @@ namespace Client
     /// </summary>
     public class MyMesh
     {
-        //public const int MAX_BONES_PER_MESH = 100;
-        //public const int BONE_TRANSFORM_STREAM_SIZE = MAX_BONES_PER_MESH * sizeof(float) * 16;
 
         public int CountVertices;
 
         public Buffer EBO, VBOPositions, VBONormals, VBOTexCoords, VBOBoneIDs, VBOBoneWeights;
         public int vertSize, normSize, faceSize, texSize, boneIDSize, boneWeightSize;
-        public DataStream Vertices, Normals, Faces, TexCoords, DSBoneIDs, DSBoneWeights, boneTransformStream;
+        public DataStream Vertices, Normals, Faces, TexCoords, DSBoneIDs, DSBoneWeights;
         public MyMaterial Materials;
 
         //public List<MyBone> Bones;
@@ -319,12 +315,10 @@ namespace Client
         private List<MyBone> _allBones;
         private Dictionary<string, MyBone> _allBoneLookup;
         private Dictionary<string, int> _allBoneMappings;
+        private List<Matrix> _boneTransformList;
 
         public const int MAX_BONES_PER_GEO = 512;
         private MyBone _rootBone;
-        private DataStream _boneTransformStream;
-        
-        private List<Matrix> _meshTransform;
 
         private int _ubindex = 0;
         private MyBone CreateBoneTree(Node node, MyBone parent)
@@ -334,22 +328,10 @@ namespace Client
                 Parent = parent
             };
 
-            if (internalNode.BoneName == "")
-            {
-                internalNode.BoneName = "UnnamedBone_" + _ubindex++;
-            }
-
-            if (_allBoneLookup.ContainsKey(node.Name))
-            {
-                Console.WriteLine("Found same name bone: " + node.Name);
-            }
-
             _allBoneLookup[internalNode.BoneName] = internalNode;
 
             internalNode.LocalTransform = node.Transform.ToMatrix();
-            //internalNode.LocalTransform.M14 = internalNode.LocalTransform.M24 = internalNode.LocalTransform.M34 = 0;
             internalNode.OriginalLocalTranform = node.Transform.ToMatrix();
-            //internalNode.OriginalLocalTranform.M14 = internalNode.OriginalLocalTranform.M24 = internalNode.OriginalLocalTranform.M34 = 0;
 
             internalNode.GlobalBindPoseTransform = CalculateBoneToWorldTransform(internalNode);
             internalNode.MeshIndices = node.MeshIndices.ToList();
@@ -412,7 +394,7 @@ namespace Client
             for (int i = 0; i < mesh.CountVertices; i++)
             {
                 // normalize bone weights
-                mesh.VertexBoneDatas[i].NormalizeBoneData();
+                //mesh.VertexBoneDatas[i].NormalizeBoneData();
 
                 // write the data into datastreams
                 for (int bonei = 0; bonei < VertexBoneData.MAX_BONES_PER_VERTEX; bonei++)
@@ -435,21 +417,19 @@ namespace Client
         /// </summary>
         protected void UpdateBoneTransformStream()
         {
-            _boneTransformStream.Position = 0;
 
             for (int i = 0; i < MAX_BONES_PER_GEO; i++)
             {
                 if (i >= _allBones.Count)
                 {
-                    _boneTransformStream.Position = (MAX_BONES_PER_GEO - 1) * sizeof(float) * 16;
-                    _boneTransformStream.Write(Matrix.Identity);
                     break;
                 }
-
-                _boneTransformStream.Write( _allBones[i].BoneOffset * _allBones[i].GlobalAnimatedTransform * _inverseGlobalTransform);
+                
+                Matrix m = _allBones[i].BoneOffset * _allBones[i].GlobalAnimatedTransform * _inverseGlobalTransform;
+                _boneTransformList[i] = m;
+                
             }
-
-            _boneTransformStream.Position = 0;
+            
         }
 
         /// <summary>
@@ -477,7 +457,6 @@ namespace Client
 
             //loop through sizes and count them.
             allMeshes = new List<MyMesh>(scene.MeshCount);
-            _meshTransform = new List<Matrix>(scene.MeshCount);
 
             //loop through and store sizes 
             for (int idx = 0; idx < scene.MeshCount; idx++)
@@ -494,8 +473,7 @@ namespace Client
                 {
                     mesh.texSize = scene.Meshes[idx].TextureCoordinateChannels[0].Count * Vector3.SizeInBytes;
                 }
-
-                _meshTransform.Add(Matrix.Identity);
+                
             }
 
             diffuseTextureSRV = new Dictionary<string, ShaderResourceView>();
@@ -516,10 +494,6 @@ namespace Client
 
                     for (int j = 0; j < scene.Animations[i].NodeAnimationChannelCount; j++)
                     {
-                        if (scene.Animations[i].HasMeshAnimations)
-                        {
-                            Console.WriteLine("Has mesh animations!");
-                        }
 
                         NodeAnimationChannel ch = scene.Animations[i].NodeAnimationChannels[j];
                         MyAnimationNode myNode = new MyAnimationNode(ch.NodeName);
@@ -552,30 +526,19 @@ namespace Client
                         }
                     }
                 }
-
+                
                 // create and store the big scene tree
                 _rootBone = CreateBoneTree(scene.RootNode, null);
 
                 // set each bone offset
                 foreach (var sceneMesh in scene.Meshes)
                 {
-                    if (sceneMesh.BoneCount <= 0)
-                    {
-                        Console.WriteLine("Mesh " + scene.Meshes.IndexOf(sceneMesh) + " does not have bones.");
-                    }
-
                     foreach (var rawBone in sceneMesh.Bones)
                     {
                         MyBone found;
                         if (!_allBoneLookup.TryGetValue(rawBone.Name, out found))
                         {
                             Console.WriteLine("Cannot find bone: " + rawBone.Name);
-                            continue;
-                        }
-
-                        if (_allBoneMappings.ContainsKey(found.BoneName))
-                        {
-                            Console.WriteLine("Found duplicate bone name: " + rawBone.Name + " with offset matrix \n\t" + rawBone.OffsetMatrix.ToMatrix() + " vs \n\t" + found.BoneOffset);
                             continue;
                         }
 
@@ -600,7 +563,12 @@ namespace Client
                     LoadBoneWeights(scene.Meshes[idx], allMeshes[idx]);
                 }
 
-                _boneTransformStream = new DataStream(MAX_BONES_PER_GEO * sizeof(float) * 16, true, true);
+                //_boneTransformStream = new DataStream(MAX_BONES_PER_GEO * sizeof(float) * 16, true, true);
+                _boneTransformList = new List<Matrix>(MAX_BONES_PER_GEO);
+                for (int i = 0; i < MAX_BONES_PER_GEO; i++)
+                {
+                    _boneTransformList.Add(Matrix.Identity);
+                }
             }
 
             // main loading loop; copy cover the scene content into the datastreams and then to the buffers
@@ -692,8 +660,8 @@ namespace Client
 
             // read node hierarchy
             // ReadNodeHierarchy( AnimationIndex, AnimationTime, scene.RootNode, Matrix.Identity );
-            //ResetLocalTransforms();
-            Evaluate(AnimationTime, CurrentAnimationIndex);
+            ResetLocalTransforms();
+            Evaluate(AnimationTime+1, CurrentAnimationIndex);
             UpdateTransforms(_rootBone);
         }
 
@@ -712,8 +680,6 @@ namespace Client
         private void UpdateTransforms(MyBone bone)
         {
             bone.GlobalAnimatedTransform = CalculateBoneToWorldTransform(bone);
-
-            bone.MeshIndices.ForEach(meshIndex => { _meshTransform[meshIndex] = bone.GlobalAnimatedTransform; });
 
             foreach (var child in bone.Children)
             {
@@ -1040,8 +1006,9 @@ namespace Client
             
             if (CurrentAnimationIndex != -1)
             {
-                shader.ShaderEffect.GetVariableByName("boneTransforms")
-                    .SetRawValue(_boneTransformStream, MAX_BONES_PER_GEO * sizeof(float) * 16);
+                //shader.ShaderEffect.GetVariableByName("boneTransforms")
+                //    .SetRawValue(_boneTransformStream, MAX_BONES_PER_GEO * sizeof(float) * 16);
+                shader.ShaderEffect.GetVariableByName("boneTransforms").AsMatrix().SetMatrixArray(_boneTransformList.ToArray());
             }
 
             for (int i = 0; i < scene.MeshCount; i++)
@@ -1066,9 +1033,9 @@ namespace Client
 
                 // pass bone IDs and weights if applicable
                 shader.ShaderEffect.GetVariableByName("animationIndex").AsScalar().Set(CurrentAnimationIndex);
-                shader.ShaderEffect.GetVariableByName("meshTransform").AsMatrix().SetMatrix(_meshTransform[i]);
                 if (CurrentAnimationIndex != -1)
                 {
+                    shader.ShaderEffect.GetVariableByName("meshTransform").AsMatrix().SetMatrix(_allBones[0].GlobalAnimatedTransform);
                     GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(BoneIdLoc,
                         new VertexBufferBinding(mesh.VBOBoneIDs, sizeof(int) * VertexBoneData.MAX_BONES_PER_VERTEX, 0));
 

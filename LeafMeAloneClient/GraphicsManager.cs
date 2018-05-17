@@ -158,11 +158,11 @@ namespace Client
 
             //TODO: REMOVE AFTER TESTING
             animatedModel = new Model(@"../../Models/Example_Running_Anim.fbx", true);
-            float scale = 0.24f;
+            float scale = 0.124f;
             animatedModel.m_Properties.Scale = new Vector3(scale, scale, scale);
             animatedModel.m_Properties.Rotation.X = (float) Math.PI/2.0f*3.0f;
-            //animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
-            animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
+            animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
+            //animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
             //animatedModel.m_Properties.Position = new Vector3(0, 10, 0);
             animatedModel.StartAnimationSequenceByIndex(0, true);
         }

@@ -23,12 +23,11 @@ namespace Client
             {
                 Dead = player.Dead,
                 MovementX = player.PlayerRequests.MovementRequested.X,
-                MovementY = player.PlayerRequests.MovementRequested.Y,
-                ObjectID = player.Id,
-                Rotation = player.Transform.Rotation.Y,
-                ToolEquipped = player.ToolEquipped,
-                UsingToolPrimary = player.PlayerRequests.UseToolPrimaryRequest,
-                UsingToolSecondary = player.PlayerRequests.UseToolSecondaryRequest
+                MovementZ = player.PlayerRequests.MovementRequested.Y,
+                _ProtoObjId = player.Id,
+                ToolEquipped = player.PlayerRequests.EquipToolRequest,
+                Rotation = player.PlayerRequests.RotationRequested,
+                ActiveToolMode = player.PlayerRequests.ActiveToolMode
             };
 
             return packet;

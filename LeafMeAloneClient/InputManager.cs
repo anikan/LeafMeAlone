@@ -44,7 +44,9 @@ namespace Client
                 {Keys.W, () => { userPlayer.RequestMove(new Vector2(0.0f, 1.0f)); } },
                 {Keys.A, () => { userPlayer.RequestMove(new Vector2(-1.0f, 0.0f));  } },
                 {Keys.S, () => { userPlayer.RequestMove(new Vector2(0.0f, -1.0f)); } },
-                {Keys.D, () => { userPlayer.RequestMove(new Vector2(1.0f, 0.0f));  } }
+                {Keys.D, () => { userPlayer.RequestMove(new Vector2(1.0f, 0.0f));  } },
+                {Keys.D1, () => { userPlayer.RequestToolEquip(ToolType.BLOWER); } },
+                {Keys.D2, () => { userPlayer.RequestToolEquip(ToolType.THROWER);  } }
             };
 
             // Dictionary to keep track of what functions should be called by what mouse presses

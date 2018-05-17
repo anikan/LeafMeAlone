@@ -40,8 +40,12 @@ namespace Server
         //List of packets for Game to process.
         public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
 
-        public NetworkServer()
+        private bool networked;
+
+        public NetworkServer(bool networked)
         {
+            this.networked = networked;
+            clientSockets = new List<Socket>();
         }
 
         /// <summary>
@@ -51,12 +55,17 @@ namespace Server
         {
             // Data buffer for incoming data.  
             byte[] bytes = new Byte[1024];
-
+            IPAddress ipAddress = IPAddress.Loopback;
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
+            if (networked)
+            {
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                ipAddress = ipHostInfo.AddressList[0];
+            }
 
-            IPAddress ipAddress = IPAddress.Loopback;//ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 11000);
+
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);
 
             // Create a TCP/IP socket.  
             listener = new Socket(ipAddress.AddressFamily,
@@ -124,6 +133,12 @@ namespace Server
             state.workSocket = clientSocket;
             clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), state);
+
+            //Start listening for the next connection
+            listener.BeginAccept(
+                new AsyncCallback(AcceptCallback),
+                listener);
+
         }
 
         /// <summary>
@@ -135,23 +150,54 @@ namespace Server
         /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
-            List<GameObject> currentGameObjects =
-                GameServer.instance.gameObjectList;
-            foreach (GameObject objToSend in currentGameObjects)
+            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
             {
                 CreateObjectPacket packetToSend =
-                    new CreateObjectPacket(objToSend);
-                clientSocket.Send(CreateObjectPacket.Serialize(packetToSend));
+                    new CreateObjectPacket(pair.Value);
+                clientSocket.Send(packetToSend.Serialize());
             }
         }
 
+        public void SendWorldUpdateToAllClients()
+        {
+            foreach ( KeyValuePair<int, GameObjectServer> pair in
+                GameServer.instance.gameObjectDict )
+            {
+                Packet packetToSend =
+                    ServerPacketFactory.CreatePacket(pair.Value);
+                SendAll(packetToSend.Serialize());
+            }
+
+            foreach ( var gameObj in GameServer.instance.toDestroyQueue)
+            {
+                Packet packet = 
+                    ServerPacketFactory.CreateDestroyPacket(gameObj);
+                SendAll(packet.Serialize());
+            }
+        }
+
+        public void SendNewObjectToAll(GameObjectServer newObject)
+        {
+            Packet packetToSend = new CreateObjectPacket(newObject);
+            SendAll(packetToSend.Serialize());
+        }
+
+        /// <summary>
+        /// Creates a new player in the game, sends it out to all the clients,
+        /// and then sends that active player to the clientSocket that is 
+        /// specified
+        /// </summary>
+        /// <param name="clientSocket">
+        /// The socket that needs an active player
+        /// </param>
         private void ProcessNewPlayer(Socket clientSocket)
         {
             GameObject player = GameServer.instance.CreateNewPlayer();
             CreateObjectPacket setPlayerPacket =
                 new CreateObjectPacket(player);
             // Create createObjectPacket, send to client
-            byte[] data = CreateObjectPacket.Serialize(setPlayerPacket);
+            byte[] data = setPlayerPacket.Serialize();
+            Packet.Deserialize(data, out int bytes);
             Send(clientSocket, data);
         }
 
@@ -169,21 +215,22 @@ namespace Server
             Socket handler = state.workSocket;
 
             // Read data from the client socket.   
-            int bytesRead = handler.EndReceive(ar);
+            int bytesToRead = handler.EndReceive(ar);
 
-            if (bytesRead > 0)
+            if (bytesToRead > 0)
             {
                 // There  might be more data, so store the data received so far.  
                 state.sb.Append(Encoding.ASCII.GetString(
-                    state.buffer, 0, bytesRead));
+                    state.buffer, 0, bytesToRead));
 
-                byte[] resizedBuffer = new byte[bytesRead];
-
-                Buffer.BlockCopy(state.buffer, 0, resizedBuffer, 0, bytesRead);
-
-                PlayerPacket packet = PlayerPacket.Deserialize(resizedBuffer);
-
-                PlayerPackets.Add(packet);
+                while (bytesToRead > 0)
+                {
+                    Packet objectPacket =
+                        Packet.Deserialize(state.buffer, out int bytesRead);
+                    PlayerPackets.Add((PlayerPacket)objectPacket);
+                    state.buffer = state.buffer.Skip(bytesRead).ToArray();
+                    bytesToRead -= bytesRead;
+                }
 
                 //Console.WriteLine("Read new player packet: Data : {0}",
                 //    packet.ToString());
@@ -198,19 +245,6 @@ namespace Server
             handler.BeginReceive(newState.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReadCallback), newState);
         }
-
-        /// <summary>
-        /// Given a player, generate a PlayerPacket and send it.
-        /// </summary>
-        /// <param name="player">Player to send.</param>
-        /* public void SendPlayer(PlayerServer player)
-        {
-            PlayerPacket packet = ServerPacketFactory.CreatePacket(player);
-
-            //Console.WriteLine("Sending packet {0}.", packet.ToString());
-
-            Send(clientSocket, PlayerPacket.Serialize(packet));
-        } */
 
         /// <summary>
         /// Send the byteData to the socket.
@@ -229,6 +263,20 @@ namespace Server
             else
             {
                 Console.WriteLine("No socket connected.");
+            }
+        }
+
+        /// <summary>
+        /// Send given data to all connected sockets. 
+        /// </summary>
+        /// <param name="byteData">Data to send.</param>
+        public void SendAll(byte[] byteData)
+        {
+            foreach (Socket socket in clientSockets)
+            {
+                // Begin sending the data to the remote device.  
+                socket.BeginSend(byteData, 0, byteData.Length, 0,
+                    new AsyncCallback(SendCallback), socket);
             }
         }
 

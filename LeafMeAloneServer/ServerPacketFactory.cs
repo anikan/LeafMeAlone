@@ -14,25 +14,42 @@ namespace Server
     public class ServerPacketFactory
     {
         /// <summary>
-        /// Creates a network packet used to update the state of the player in the client
+        /// Creates a network packet used to update the state of the player 
+        /// in the client
         /// </summary>
-        /// <param name="player">The player object to serialize into a player</param>
-        public static PlayerPacket CreatePacket(PlayerServer player)
+        /// <param name="player">The player object to serialize into a player
+        /// </param>
+        public static Packet CreatePacket(GameObjectServer gameObj)
         {
-            PlayerPacket packet = new PlayerPacket()
+            if (gameObj is PlayerServer player)
             {
-                Dead = player.Dead,
-                MovementX = player.GetTransform().Get2dPosition().X,
-                MovementY = player.GetTransform().Get2dPosition().Y,
-                ObjectID = player.Id,
-                Rotation = player.Transform.Rotation.Y,
-                ToolEquipped = player.ToolEquipped,
-                UsingToolPrimary = player.UsingToolPrimary,
-                UsingToolSecondary = player.UsingToolSecondary
-            };
-
-            return packet;
+                return new PlayerPacket()
+                {
+                    Dead = player.Dead,
+                    MovementX = player.Transform.Position.X,
+                    MovementZ = player.Transform.Position.Z,
+                    _ProtoObjId = player.Id,
+                    Rotation = player.Transform.Rotation.Y,
+                    ToolEquipped = player.ToolEquipped,
+                    ActiveToolMode = player.ActiveToolMode
+                };
+            }
+            else if (gameObj is LeafServer leaf)
+            {
+                return new LeafPacket()
+                {
+                    MovementX = leaf.Transform.Position.X,
+                    MovementZ = leaf.Transform.Position.Z,
+                    ObjectId = leaf.Id,
+                    Rotation = leaf.Transform.Rotation.Y,
+                };
+            }
+            return null;
         }
 
+        internal static Packet CreateDestroyPacket(GameObject gameObj)
+        {
+            return new DestroyObjectPacket(gameObj);
+        }
     }
 }

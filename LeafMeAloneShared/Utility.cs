@@ -10,13 +10,54 @@ namespace Shared
     {
         public static Vector3 ToVector3(this Vector3D vector)
         {
-            return new Vector3(vector.X,vector.Y,vector.Z);
+            return new Vector3(vector.X, vector.Y, vector.Z);
         }
 
         public static float ToRadians(this float degrees)
         {
-            return degrees * ((float)Math.PI / 180.0f);
+            return degrees * ((float) Math.PI / 180.0f);
         }
+
+        public static void Copy(this Vector4 dest, Vector4 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+            dest.W = src.W;
+        }
+
+        public static void Copy(this Vector3 dest, Vector3 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+        }
+
+        public static void Copy(this Vector4 dest, Vector3 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+            dest.W = 1;
+        }
+
+        public static void Copy(this Vector3 dest, Vector4 src)
+        {
+            dest.X = src.X;
+            dest.Y = src.Y;
+            dest.Z = src.Z;
+        }
+
+        public static float NextFloat(this Random r)
+        {
+            return (float) r.NextDouble();
+        }
+
+        public static float Range(this Random r, float max)
+        {
+            return r.NextFloat() * max;
+        }
+
 
         public static Vector4 Mult(this Matrix m, Vector4 multBy)
         {
@@ -24,7 +65,7 @@ namespace Shared
         }
     }
 
-    // model properties
+// model properties
     public struct Transform
     {
         public Vector3 Position;  // location of the model in world coordinates
@@ -35,7 +76,7 @@ namespace Shared
         {
             get
             {
-                Vector3 retVec = new Vector3(0, -1, 0);
+                Vector3 retVec = new Vector3(0, 0, 1);
 
                 // set the rotation based on the three directions
                 Matrix m_ModelMatrix = Matrix.RotationX(Rotation.X) *
@@ -43,6 +84,8 @@ namespace Shared
                                 Matrix.RotationZ(Rotation.Z);
 
                 retVec = Vector3.Normalize(Vector3.TransformCoordinate(retVec, m_ModelMatrix));
+
+             //   Console.WriteLine("Forward is: " + retVec);
 
                 return retVec;
             }
@@ -79,7 +122,7 @@ namespace Shared
 
         public Vector2 Get2dPosition()
         {
-            return new Vector2(Position.X, Position.Y);
+            return new Vector2(Position.X, Position.Z);
         }
     }
 }

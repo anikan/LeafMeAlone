@@ -17,9 +17,7 @@ namespace Shared
 
         ToolType ToolEquipped { get; set; }
 
-        bool UsingToolPrimary { get; set; }
-
-        bool UsingToolSecondary { get; set; }
+        ToolMode ActiveToolMode { get; set; }
 
         void UpdateFromPacket(PlayerPacket packet);
 

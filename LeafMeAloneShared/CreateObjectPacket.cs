@@ -19,7 +19,11 @@ namespace Shared
     {
 
         [ProtoMember(1)]
-        public long Id;
+        public int _ProtoObjId
+        {
+            get { return ObjectId; }
+            set { ObjectId = value; }
+        }
 
         [ProtoMember(2)]
         public float InitialX;
@@ -28,38 +32,22 @@ namespace Shared
         public float InitialY;
 
         [ProtoMember(4)]
+        public float InitialZ;
+
+        [ProtoMember(5)]
         public ObjectType objectType;
 
-        public CreateObjectPacket(GameObject gameObject)
+        public CreateObjectPacket() : base(PacketType.CreateObjectPacket)
+        { }
+
+        public CreateObjectPacket(GameObject gameObject) :
+            base(PacketType.CreateObjectPacket)
         {
-            Id = gameObject.Id;
+            ObjectId = gameObject.Id;
             InitialX = gameObject.Transform.Position.X;
             InitialY = gameObject.Transform.Position.Y;
+            InitialZ = gameObject.Transform.Position.Z;
             objectType = gameObject.ObjectType;
-        }
-
-        /// <summary>
-        /// Serializes the packet object into an array of bytes
-        /// </summary>
-        /// <returns>the serialized packet</returns>
-        public static byte[] Serialize(CreateObjectPacket packet)
-        {
-            MemoryStream ms = new MemoryStream();
-            Serializer.Serialize(ms, packet);
-
-            // Add packetType as first byte, send over
-            return (new byte[] { (byte)PacketType.CreateObjectPacket })
-                            .Concat(ms.ToArray()).ToArray();
-        }
-
-        /// <summary>
-        /// Deserializes a byte array into a player packet object.
-        /// </summary>
-        /// <param name="data">The byte array of the player packet</param>
-        /// <returns>The deserialized playerpacket</returns>
-        public static CreateObjectPacket Deserialize(byte[] data)
-        {
-            return Serializer.Deserialize<CreateObjectPacket>(new MemoryStream(data));
         }
     }
 }

@@ -18,31 +18,33 @@ namespace Shared
     public class PlayerPacket : Packet
     {
 
+        [ProtoMember(1)]
+        public int _ProtoObjId
+        {
+            get { return ObjectId; }
+            set { ObjectId = value; }
+        }
         // Movement info in the packet. 
         // Note: When sending the packet, this is just a direction.
         // When receiving, this will be an absolute position.
-        [ProtoMember(1)]
+        [ProtoMember(2)]
         public float MovementX;
 
         /// <summary>
         /// Y movement info for the packet. Server sends absolute, client sends
         /// delta
         /// </summary>
-        [ProtoMember(2)]
-        public float MovementY;
+        [ProtoMember(3)]
+        public float MovementZ;
 
         // Rotation of the player.
-        [ProtoMember(3)]
+        [ProtoMember(4)]
         public float Rotation;
 
         // If the player is actively using their tool this frame.
 
-        [ProtoMember(4)]
-        public bool UsingToolPrimary;
-
-        // If the player is using the secondary ability of their tool this frame.
         [ProtoMember(5)]
-        public bool UsingToolSecondary;
+        public ToolMode ActiveToolMode;
 
         // Currently equipped tool.
         [ProtoMember(6)]
@@ -56,37 +58,16 @@ namespace Shared
         /// Initializes a player packet, calls base constructor.
         /// </summary>
         /// <param name="id"></param>
-        public PlayerPacket()
+        public PlayerPacket() : base(PacketType.PlayerPacket)
         {
-        }
-
-        /// <summary>
-        /// Serializes the packet object into an array of bytes
-        /// </summary>
-        /// <returns>the serialized packet</returns>
-        public static byte[] Serialize(PlayerPacket packet)
-        {
-            MemoryStream ms = new MemoryStream();
-            Serializer.Serialize(ms, packet);
-            return ms.ToArray();
-        }
-
-        /// <summary>
-        /// Deserializes a byte array into a player packet object.
-        /// </summary>
-        /// <param name="data">The byte array of the player packet</param>
-        /// <returns>The deserialized playerpacket</returns>
-        public static PlayerPacket Deserialize(byte[] data)
-        {
-            return Serializer.Deserialize<PlayerPacket>(new MemoryStream(data));
         }
 
         public override string ToString()
         {
 
             string printString = string.Format(
-                "Player packet info: Movement=({0}, {1}), Rotation={2}, UseToolPrimary={3}, UseToolSecondary={4}",
-                MovementX, MovementY, Rotation, UsingToolPrimary, UsingToolSecondary);
+                "Player packet info: Movement=({0}, {1}), Rotation={2}, ToolMode={3}",
+                MovementX, MovementZ, Rotation, ActiveToolMode.ToString());
 
             return printString;
 

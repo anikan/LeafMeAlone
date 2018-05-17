@@ -6,6 +6,7 @@ using SlimDX.Windows;
 using Device = SlimDX.Direct3D11.Device;
 using Resource = SlimDX.Direct3D11.Resource;
 using System.Windows.Forms;
+using AntTweakBar;
 
 namespace Client
 {
@@ -37,13 +38,22 @@ namespace Client
 
         public static Matrix ProjectionMatrix;
 
+        public static Context BarContext;
+
         #region Depth Buffer and Rasterizer
         private static Texture2DDescription depthBufferDesc;
-        private static Texture2D DepthBuffer;
+        private static Texture2D depthBuffer;
         public static DepthStencilView DepthView;
-        private static DepthStencilState DepthState;
+        public static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
-        private static RasterizerStateDescription Rasterizer;
+        
+        public static DepthStencilState DepthStateOff;
+        private static DepthStencilStateDescription dsStateDescOff;
+
+        public static RasterizerStateDescription Rasterizer;
+
+        public static BlendState BlendState;
+
         #endregion
 
 
@@ -52,7 +62,7 @@ namespace Client
             Rasterizer = new RasterizerStateDescription()
             {
                 FillMode = FillMode.Solid,
-                CullMode = CullMode.Back,
+                CullMode = CullMode.None,
                 IsFrontCounterclockwise = false,
                 IsDepthClipEnabled = true
             };
@@ -76,8 +86,8 @@ namespace Client
                 Usage = ResourceUsage.Default
             };
 
-            DepthBuffer = new Texture2D(Device, depthBufferDesc);
-            DepthView = new DepthStencilView(Device, DepthBuffer);
+            depthBuffer = new Texture2D(Device, depthBufferDesc);
+            DepthView = new DepthStencilView(Device, depthBuffer);
 
             dsStateDesc = new DepthStencilStateDescription()
             {
@@ -86,12 +96,46 @@ namespace Client
                 DepthWriteMask = DepthWriteMask.All,
                 DepthComparison = Comparison.Less,
             };
-
+            dsStateDescOff = new DepthStencilStateDescription()
+            {
+                IsDepthEnabled = true,
+                IsStencilEnabled = false,
+                DepthWriteMask = DepthWriteMask.All,
+                DepthComparison = Comparison.Less,
+            };
+            DepthStateOff = DepthStencilState.FromDescription(Device, dsStateDescOff);
             DepthState = DepthStencilState.FromDescription(Device, dsStateDesc);
-            DeviceContext.OutputMerger.DepthStencilState = DepthState;
 
+            DeviceContext.OutputMerger.DepthStencilState = DepthState;
         }
 
+        static void InitializeBlending()
+        {
+            BlendStateDescription bs = new BlendStateDescription()
+            {
+                AlphaToCoverageEnable = false,
+                IndependentBlendEnable = false,
+            };
+            for (int i = 0; i < bs.RenderTargets.Length; i++)
+            {
+                bs.RenderTargets[i].BlendEnable = true;
+                bs.RenderTargets[i].BlendOperation = BlendOperation.Add;
+                bs.RenderTargets[i].SourceBlend = BlendOption.SourceAlpha;
+                bs.RenderTargets[i].DestinationBlend = BlendOption.InverseSourceAlpha;
+
+
+                bs.RenderTargets[i].BlendOperationAlpha = BlendOperation.Add;
+                bs.RenderTargets[i].SourceBlendAlpha = BlendOption.Zero;
+                bs.RenderTargets[i].DestinationBlendAlpha = BlendOption.Zero;
+
+
+
+                bs.RenderTargets[i].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+            }
+            BlendState = BlendState.FromDescription(Device, bs);
+        }
+
+        
         /// <summary>
         /// Initialize graphics properties and create the main window.
         /// </summary>
@@ -127,6 +171,7 @@ namespace Client
 
             InitializeRasterizer();
             InitializeDepthBuffer();
+            InitializeBlending();
 
             Viewport = new Viewport(0.0f, 0.0f, Form.ClientSize.Width, Form.ClientSize.Height);
             //DeviceContext.OutputMerger.SetTargets(RenderTarget);
@@ -150,6 +195,9 @@ namespace Client
                 if (e.KeyCode == Keys.Escape)
                     Application.Exit();
             };
+
+           BarContext = new Context(Tw.GraphicsAPI.D3D11,Device.ComPointer);
+           BarContext.HandleResize(Form.ClientSize);
         }
 
         /// <summary>
@@ -163,6 +211,7 @@ namespace Client
             Viewport.Width = Form.ClientSize.Width;
             ProjectionMatrix = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Viewport.Width / Viewport.Height, .1f, 1000.0f);
             DeviceContext.Rasterizer.SetViewports(Viewport);
+            BarContext.HandleResize(Form.ClientSize);
         }
 
 

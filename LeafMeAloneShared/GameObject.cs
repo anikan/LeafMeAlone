@@ -7,15 +7,23 @@ using SlimDX;
 
 namespace Shared
 {
+    // Type of an object in the game.
     public enum ObjectType
     {
+        OTHER,
         ACTIVE_PLAYER,
         PLAYER,
         LEAF
     };
 
+    /// <summary>
+    /// Abstract GameObject class, for both GameObjectClient and GameObjectServer to extend
+    /// </summary>
     public abstract class GameObject : INetworked
     {
+
+        public bool Burning;
+        public float Health;
 
         public ObjectType ObjectType;
 
@@ -28,7 +36,7 @@ namespace Shared
         public int Id { get; set; }
 
         public abstract void Update(float deltaTime);
-        public abstract void Draw();
+        public abstract void Destroy();
           
         protected GameObject()
         {

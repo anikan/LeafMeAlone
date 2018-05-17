@@ -19,6 +19,7 @@ namespace Client
         // active geometry and shader in use
         private Geometry m_ActiveGeo;
         private Shader m_ActiveShader;
+        private string m_ActiveShaderPath;
 
         // model matrix used for the rendering
         private Matrix m_ModelMatrix;
@@ -29,8 +30,12 @@ namespace Client
         // This is a duplicate used to check if there is a need to update the matrix
         private Transform m_PrevProperties;
 
-        // creates a new model; duplicate filepath will be used to detect
-        // if a geometry already exists
+        /// <summary>
+        /// creates a new model; duplicate filepath will be used to detect
+        /// if a geometry already exists. A default shader will be used if not specified
+        /// </summary>
+        /// <param name="filePath"></param>
+
         public Model(string filePath)
         {
             //confirm the file exists
@@ -48,6 +53,46 @@ namespace Client
             m_PrevProperties.Position = new Vector3(0, 0, 0);
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
             Update();
+
+            setShader(FileManager.DefaultShader);
+        }
+
+        /// <summary>
+        /// Create a new model and specify some particular shader to use for this model
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="shaderPath"></param>
+        public Model(string filepath, string shaderPath) : this(filepath)
+        {
+            setShader(shaderPath);
+        }
+
+        /// <summary>
+        /// Set the shader for this model. Creates a new shader with default settings if necessary
+        /// </summary>
+        /// <param name="shaderPath"> filepath to the shader to be set to </param>
+        public void setShader(string shaderPath)
+        {
+            // initialize shader if necessary
+            if (GraphicsManager.DictShader.ContainsKey(shaderPath))
+            {
+                m_ActiveShader = GraphicsManager.DictShader[shaderPath];
+            }
+            else
+            {
+                // by default the VS_name is "VS", PS_name is "PS", and we have the position,normal,texcoord element layout
+                m_ActiveShader = new Shader(shaderPath);
+                GraphicsManager.DictShader[shaderPath] = m_ActiveShader;
+            }
+        }
+
+        /// <summary>
+        /// Can be used to set the active shader to some custom shader that does not use the default setting
+        /// </summary>
+        /// <param name="shader"> shader to be set to </param>
+        public void setShader(Shader shader)
+        {
+            m_ActiveShader = shader;
         }
 
         // load the geometry if it is not available, or find
@@ -68,7 +113,8 @@ namespace Client
         // pass the model matrix to the shader and draw the active geometry
         public void Draw()
         {
-           m_ActiveGeo.Draw(m_ModelMatrix);
+            m_ActiveShader.UseShader();
+            m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
         }
 
         // the public interface of the Update function

@@ -7,21 +7,24 @@ using Shared;
 
 namespace Client
 {
-    class LeafClient : GameObjectClient, ILeaf
+    class LeafClient : NetworkedGameObjectClient
     {
-        public bool Burning { get; set; }
-        public float TimeBurning { get; set; }
-
-        public const string LeafModelPath = @"../../Models/Leaf_V1.fbx";
-
-        public LeafClient() : base(LeafModelPath)
+        
+        public LeafClient(CreateObjectPacket createPacket) : 
+            base(createPacket, FileManager.LeafModel)
         {
-
         }
 
-        public LeafClient(Transform startTransform) : base(LeafModelPath, startTransform)
+        public void UpdateFromPacket(LeafPacket packet)
         {
+            Transform.Position.X = packet.MovementX;
+            Transform.Position.Z = packet.MovementZ;
+            Transform.Rotation.Y = packet.Rotation;
+        }
 
+        public override void UpdateFromPacket(Packet packet)
+        {
+            UpdateFromPacket(packet as LeafPacket);
         }
     }
 }

@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SlimDX.Direct3D9;
 using Buffer = SlimDX.Direct3D11.Buffer;
 using Format = SlimDX.DXGI.Format;
 using Material = Assimp.Material;
@@ -19,6 +18,9 @@ using Quaternion = SlimDX.Quaternion;
 
 namespace Client
 {
+    /// <summary>
+    /// used for storing information about the material properties of a mesh
+    /// </summary>
     public class MyMaterial
     {
         public Vector4 diffuse;
@@ -127,6 +129,9 @@ namespace Client
 
         private int count;
 
+        /// <summary>
+        /// Create a new vertex object
+        /// </summary>
         public VertexBoneData()
         {
             count = 0;
@@ -134,6 +139,11 @@ namespace Client
             BoneWeights = new float[4];
         }
 
+        /// <summary>
+        /// Add new bone weight data to this vertex
+        /// </summary>
+        /// <param name="boneIndex"> index of the bone </param>
+        /// <param name="boneWeight"> weight of the bone to this vertex </param>
         public void AddBoneData(int boneIndex, float boneWeight)
         {
             if (count < MAX_BONES_PER_VERTEX)
@@ -165,7 +175,9 @@ namespace Client
             }
         }
 
-        // to set the total weight to be ~1.0
+        /// <summary>
+        /// to set the total weight to be ~1.0
+        /// </summary>
         public void NormalizeBoneData()
         {
             float totalWeight = 0;
@@ -192,16 +204,22 @@ namespace Client
     /// </summary>
     public class MyMesh
     {
-
+        /// <summary>
+        /// The number of vertices this mesh stores
+        /// </summary>
         public int CountVertices;
 
+        /// <summary>
+        /// The various vertex buffer objects that need to be passed to the shader each frame
+        /// </summary>
         public Buffer EBO, VBOPositions, VBONormals, VBOTexCoords, VBOBoneIDs, VBOBoneWeights;
         public int vertSize, normSize, faceSize, texSize, boneIDSize, boneWeightSize;
         public DataStream Vertices, Normals, Faces, TexCoords, DSBoneIDs, DSBoneWeights;
         public MyMaterial Materials;
 
-        //public List<MyBone> Bones;
-        //public Dictionary<string, int> BoneMappings;
+        /// <summary>
+        /// The vertex weight and indices
+        /// </summary>
         public List<VertexBoneData> VertexBoneDatas;  // this is per vertex
         
     }
@@ -211,23 +229,44 @@ namespace Client
     /// </summary>
     public class MyBone
     {
+        /// <summary>
+        /// The name of the bone, used for various dictionary references
+        /// </summary>
         public string BoneName;
 
-        // applied every frame
+        /// <summary>
+        /// Used for transforming from object space to bone space
+        /// </summary>
         public Matrix BoneOffset;
 
+        /// <summary>
+        /// Stores the various transformation matrices of the bone
+        /// </summary>
         public Matrix LocalTransform;
         public Matrix GlobalBindPoseTransform;
         public Matrix GlobalAnimatedTransform;
         public Matrix OriginalLocalTranform;
 
+        /// <summary>
+        /// Stores the hierarchy information
+        /// </summary>
         public MyBone Parent;
         public List<MyBone> Children;
+
+        /// <summary>
+        /// Stores which indices this bone affects
+        /// </summary>
         public List<int> MeshIndices;
 
-        // passed into shader for transforming the bone vertices
+        /// <summary>
+        ///  passed into shader for transforming the bone vertices
+        /// </summary>
         public Matrix BoneFrameTransformation;
 
+        /// <summary>
+        /// Constructor. Initializes Children list
+        /// </summary>
+        /// <param name="name"></param>
         public MyBone(string name)
         {
             BoneName = name;
@@ -240,16 +279,33 @@ namespace Client
     /// </summary>
     public class MyAnimationNode
     {
+        /// <summary>
+        /// Name of the node, as referenced by bone nodes too
+        /// </summary>
         public String Name;
+
+        /// <summary>
+        /// The translation timing and vector of the animation
+        /// </summary>
         public List<Vector3> Translations;
         public List<Double> TranslationTime;
 
+        /// <summary>
+        /// The rotation timing and vector of the animation
+        /// </summary>
         public List<Quaternion> Rotations;
         public List<Double> RotationTime;
 
+        /// <summary>
+        /// The scaling timing and vector of the animation
+        /// </summary>
         public List<Vector3> Scalings;
         public List<Double> ScalingTime;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="name"></param>
         public MyAnimationNode(String name)
         {
             Name = name;
@@ -315,12 +371,33 @@ namespace Client
         private List<MyBone> _allBones;
         private Dictionary<string, MyBone> _allBoneLookup;
         private Dictionary<string, int> _allBoneMappings;
+
+        /// <summary>
+        /// Put the bone matrices into a list that is convenient to be passed into the shader
+        /// </summary>
         private List<Matrix> _boneTransformList;
 
+        /// <summary>
+        /// A constant that is also defined in the shader
+        /// </summary>
         public const int MAX_BONES_PER_GEO = 512;
+
+        /// <summary>
+        /// The root bone of the bone tree we are storing
+        /// </summary>
         private MyBone _rootBone;
 
+        /// <summary>
+        /// A temp integer for creating unique strings
+        /// </summary>
         private int _ubindex = 0;
+
+        /// <summary>
+        /// Recursively creates a bone tree based on the scenegraph returned by the importer
+        /// </summary>
+        /// <param name="node"> The node that is referenced to create the bone </param>
+        /// <param name="parent"> The parent of the bone to be created </param>
+        /// <returns> the bone that is created </returns>
         private MyBone CreateBoneTree(Node node, MyBone parent)
         {
             MyBone internalNode = new MyBone(node.Name)
@@ -334,6 +411,8 @@ namespace Client
             internalNode.OriginalLocalTranform = node.Transform.ToMatrix();
 
             internalNode.GlobalBindPoseTransform = CalculateBoneToWorldTransform(internalNode);
+            internalNode.GlobalAnimatedTransform = CalculateBoneToWorldTransform(internalNode);
+
             internalNode.MeshIndices = node.MeshIndices.ToList();
 
             for (int i = 0; i < node.ChildCount; i++)
@@ -348,24 +427,25 @@ namespace Client
             return internalNode;
         }
 
+        /// <summary>
+        /// Calculate the current bone's global transform based on its
+        /// local transform and the parent's global transform
+        /// </summary>
+        /// <param name="bone"> The bone whose global transform is to be calculated </param>
+        /// <returns> global transformation matrix of the node </returns>
         private Matrix CalculateBoneToWorldTransform(MyBone bone)
         {
             Matrix global = bone.LocalTransform.Clone() ;
             MyBone parent = bone.Parent;
-            while (parent != null)
-            {
-                global = global * parent.LocalTransform;
-                parent = parent.Parent;
-            }
-
+            global = parent == null ? global : global * parent.GlobalAnimatedTransform;
             return global;
         }
 
         /// <summary>
         /// Load the bone information for each vertex
         /// </summary>
-        /// <param name="assimpMesh"></param>
-        /// <param name="mesh"></param>
+        /// <param name="assimpMesh"> mesh that contains the information to be processed </param>
+        /// <param name="mesh"> customized mesh that stores information for later use </param>
         protected void LoadBoneWeights(Mesh assimpMesh, MyMesh mesh)
         {
             // create a new data structures to store the bones
@@ -413,9 +493,9 @@ namespace Client
         }
 
         /// <summary>
-        /// Update the stream of matrices to be passed into the shader
+        /// Update the list of matrices to be passed into the shader
         /// </summary>
-        protected void UpdateBoneTransformStream()
+        protected void UpdateBoneMatricesList()
         {
 
             for (int i = 0; i < MAX_BONES_PER_GEO; i++)
@@ -424,12 +504,9 @@ namespace Client
                 {
                     break;
                 }
-                
                 Matrix m = _allBones[i].BoneOffset * _allBones[i].GlobalAnimatedTransform * _inverseGlobalTransform;
                 _boneTransformList[i] = m;
-                
             }
-            
         }
 
         /// <summary>
@@ -478,6 +555,7 @@ namespace Client
 
             diffuseTextureSRV = new Dictionary<string, ShaderResourceView>();
 
+            // do all the processing that rigging is required to have
             if (enableRigging)
             {
                 _allBones = new List<MyBone>();
@@ -644,8 +722,8 @@ namespace Client
         /// Use this function to set the Bone Hierarchy to have the correct transformation
         /// matrices for this frame
         /// </summary>
-        /// <param name="AnimationIndex"></param>
-        /// <param name="TimeInSeconds"></param>
+        /// <param name="AnimationIndex"> The index of the animation sequences to be played </param>
+        /// <param name="TimeInSeconds"> The time since this animation is first started </param>
         protected void SetBoneTransform(int AnimationIndex, double TimeInSeconds)
         {
             // number of ticks per second
@@ -659,14 +737,13 @@ namespace Client
             double AnimationTime = TimeInTicks % scene.Animations[AnimationIndex].DurationInTicks;
 
             // read node hierarchy
-            // ReadNodeHierarchy( AnimationIndex, AnimationTime, scene.RootNode, Matrix.Identity );
             ResetLocalTransforms();
             Evaluate(AnimationTime+1, CurrentAnimationIndex);
             UpdateTransforms(_rootBone);
         }
 
         /// <summary>
-        /// Reset 
+        /// Reset the local tranformation matrices to their original (bind pose) values
         /// </summary>
         private void ResetLocalTransforms()
         {
@@ -676,7 +753,10 @@ namespace Client
             }
         }
 
-        // Use this to recusively update the animation transform values
+        /// <summary>
+        /// Use this to recusively update the animation transform values
+        /// </summary>
+        /// <param name="bone"> The bone whose, and whose children's, global transformation matrices are to be calculated </param>
         private void UpdateTransforms(MyBone bone)
         {
             bone.GlobalAnimatedTransform = CalculateBoneToWorldTransform(bone);
@@ -687,6 +767,11 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// Set the local tranformation matrices of the bone tree
+        /// </summary>
+        /// <param name="animationTime"> The time, in ticks, in the animation time domain </param>
+        /// <param name="animationIndex"> The index of the animation sequence </param>
         private void Evaluate(double animationTime, int animationIndex)
         {
             Dictionary<string, MyAnimationNode> currentChannels = _animationNodes[animationIndex];
@@ -710,6 +795,12 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// Find the translation vector at the specified animation time for the specified animation sequence 
+        /// </summary>
+        /// <param name="animationTime"> The number of ticks in the animation time domain </param>
+        /// <param name="animationNode"> The node to extract the translation vector from </param>
+        /// <returns> The linearly interpolated translation vector that represents the translation at specified time </returns>
         private Vector3 CalcInterpolateTranslation(double animationTime, MyAnimationNode animationNode)
         {
             if (animationNode.Translations.Count == 1) return animationNode.Translations[0];
@@ -740,6 +831,12 @@ namespace Client
                 animationNode.Translations[nextTranslationIndex], (float) factor);
         }
 
+        /// <summary>
+        /// Find the rotation quaternion at the specified animation time for the specified animation sequence 
+        /// </summary>
+        /// <param name="animationTime"> The number of ticks in the animation time domain </param>
+        /// <param name="animationNode"> The node to extract the translation vector from </param>
+        /// <returns> The linearly interpolated rotation quaternion that represents the rotation at specified time </returns>
         private Quaternion CalcInterpolateRotation(double animationTime, MyAnimationNode animationNode)
         {
             if (animationNode.Rotations.Count == 1) return animationNode.Rotations[0];
@@ -771,6 +868,12 @@ namespace Client
                 animationNode.Rotations[nextRotationIndex], (float)factor);
         }
 
+        /// <summary>
+        /// Find the scaling vector at the specified animation time for the specified animation sequence 
+        /// </summary>
+        /// <param name="animationTime"> The number of ticks in the animation time domain </param>
+        /// <param name="animationNode"> The node to extract the translation vector from </param>
+        /// <returns> The linearly interpolated scaling vector that represents the scaling at specified time </returns>
         private Vector3 CalcInterpolateScaling(double animationTime, MyAnimationNode animationNode)
         {
             if (animationNode.Scalings.Count == 1) return animationNode.Scalings[0];
@@ -802,6 +905,9 @@ namespace Client
                 animationNode.Scalings[nextScalingIndex], (float)factor);
         }
 
+        /// <summary>
+        /// Used to store information on the currently played animation sequences
+        /// </summary>
         private double CurrentAnimationTime = 0;
         private int CurrentAnimationIndex = -1;
         private string CurrentAnimationName = null;
@@ -823,7 +929,7 @@ namespace Client
                 if (scene.Animations[CurrentAnimationIndex].DurationInTicks > TimeInTicks || RepeatAnimation)
                 {
                     SetBoneTransform(CurrentAnimationIndex, CurrentAnimationTime);
-                    UpdateBoneTransformStream();
+                    UpdateBoneMatricesList();
                 }
                 // stop the animation if it is done
                 else
@@ -837,18 +943,29 @@ namespace Client
             else CurrentAnimationIndex = -1;
         }
 
-        // need to be called FIRST before an update, so that the skeletal animation can be drawn
+        /// <summary>
+        /// start playing the animation sequence as specified by its name
+        /// </summary>
+        /// <param name="animationName"> The name of the animation, specified by the artist </param>
+        /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
         public void StartAnimationSequenceByName(string animationName, bool repeatAnimation = false)
         {
+            if (!AnimationIndices.ContainsKey(animationName)) return;
+
             CurrentAnimationTime = 0;
             CurrentAnimationIndex = AnimationIndices.ContainsKey(animationName) ? AnimationIndices[animationName] : -1 ;
             RepeatAnimation = repeatAnimation;
             CurrentAnimationName = animationName;
         }
 
+        /// <summary>
+        /// start playing the animation sequence as specified by its index
+        /// </summary>
+        /// <param name="index"> The index of the animation, as interpreted by assimp </param>
+        /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
         public void StartAnimationSequenceByIndex(int index, bool repeatAnimation = false)
         {
-            if (index < -1 || index > scene.AnimationCount - 1) return;
+            if (index <= -1 || index > scene.AnimationCount - 1) return;
 
             CurrentAnimationTime = 0;
             CurrentAnimationIndex = index;
@@ -856,19 +973,28 @@ namespace Client
             RepeatAnimation = repeatAnimation;
         }
 
-        // Stop whatever animation that is taking place
+        /// <summary>
+        ///  Stop whatever animation that is taking place
+        /// </summary>
         public void StopCurrentAnimation()
         {
             CurrentAnimationIndex = -1;
             CurrentAnimationName = null;
         }
 
-        // find which animation is being set now
+        /// <summary>
+        /// find which animation is being set now
+        /// </summary>
+        /// <returns></returns>
         public int GetCurrentAnimationIndex()
         {
             return CurrentAnimationIndex;
         }
 
+        /// <summary>
+        /// find which animation is being played now
+        /// </summary>
+        /// <returns></returns>
         public string GetCurrentAnimationName()
         {
             return CurrentAnimationName;

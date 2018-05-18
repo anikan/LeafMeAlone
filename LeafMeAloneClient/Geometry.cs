@@ -726,6 +726,8 @@ namespace Client
         /// <param name="TimeInSeconds"> The time since this animation is first started </param>
         protected void SetBoneTransform(int AnimationIndex, double TimeInSeconds)
         {
+            float offset = 1;
+
             // number of ticks per second
             double TicksPerSecond = scene.Animations[AnimationIndex].TicksPerSecond;
             if (TicksPerSecond <= 0f) TicksPerSecond = 25.0f;
@@ -734,11 +736,11 @@ namespace Client
             double TimeInTicks = TimeInSeconds * scene.Animations[AnimationIndex].TicksPerSecond;
 
             // animation time in ticks
-            double AnimationTime = TimeInTicks % scene.Animations[AnimationIndex].DurationInTicks;
+            double AnimationTime = TimeInTicks % (scene.Animations[AnimationIndex].DurationInTicks - offset);
 
             // read node hierarchy
             ResetLocalTransforms();
-            Evaluate(AnimationTime+1, CurrentAnimationIndex);
+            Evaluate(AnimationTime + offset, CurrentAnimationIndex);
             UpdateTransforms(_rootBone);
         }
 
@@ -908,13 +910,13 @@ namespace Client
         /// <summary>
         /// Used to store information on the currently played animation sequences
         /// </summary>
-        private double CurrentAnimationTime = 0;
-        private int CurrentAnimationIndex = -1;
-        private string CurrentAnimationName = null;
-        private bool RepeatAnimation = false;
+        public double CurrentAnimationTime = 0;
+        public int CurrentAnimationIndex = -1;
+        public string CurrentAnimationName = null;
+        public bool RepeatAnimation = false;
 
         // need to be called in order to use the skeletal animation
-        public void Update(float delta_time)
+        public void UpdateAnimation()
         {
             if (CurrentAnimationIndex != -1 && RiggingEnabled)
             {
@@ -936,68 +938,27 @@ namespace Client
                 {
                     CurrentAnimationIndex = -1;
                 }
-
-                // advance the animation
-                CurrentAnimationTime += delta_time;
             }
             else CurrentAnimationIndex = -1;
         }
 
         /// <summary>
-        /// start playing the animation sequence as specified by its name
+        /// Find the name of an animation by name
         /// </summary>
-        /// <param name="animationName"> The name of the animation, specified by the artist </param>
-        /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
-        public void StartAnimationSequenceByName(string animationName, bool repeatAnimation = false)
-        {
-            if (!AnimationIndices.ContainsKey(animationName)) return;
-
-            CurrentAnimationTime = 0;
-            CurrentAnimationIndex = AnimationIndices.ContainsKey(animationName) ? AnimationIndices[animationName] : -1 ;
-            RepeatAnimation = repeatAnimation;
-            CurrentAnimationName = animationName;
-        }
-
-        /// <summary>
-        /// start playing the animation sequence as specified by its index
-        /// </summary>
-        /// <param name="index"> The index of the animation, as interpreted by assimp </param>
-        /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
-        public void StartAnimationSequenceByIndex(int index, bool repeatAnimation = false)
-        {
-            if (index <= -1 || index > scene.AnimationCount - 1) return;
-
-            CurrentAnimationTime = 0;
-            CurrentAnimationIndex = index;
-            CurrentAnimationName = scene.Animations[index].Name;
-            RepeatAnimation = repeatAnimation;
-        }
-
-        /// <summary>
-        ///  Stop whatever animation that is taking place
-        /// </summary>
-        public void StopCurrentAnimation()
-        {
-            CurrentAnimationIndex = -1;
-            CurrentAnimationName = null;
-        }
-
-        /// <summary>
-        /// find which animation is being set now
-        /// </summary>
+        /// <param name="index"></param>
         /// <returns></returns>
-        public int GetCurrentAnimationIndex()
+        public string GetAnimationNameByIndex(int index)
         {
-            return CurrentAnimationIndex;
+            return scene.Animations[index].Name;
         }
 
         /// <summary>
-        /// find which animation is being played now
+        /// Return the total number of animations stored
         /// </summary>
-        /// <returns></returns>
-        public string GetCurrentAnimationName()
+        /// <returns> number of animation sequences </returns>
+        public int GetAnimationCount()
         {
-            return CurrentAnimationName;
+            return _animationNodes.Count;
         }
 
         /// <summary>

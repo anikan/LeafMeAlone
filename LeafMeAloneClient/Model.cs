@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,8 +35,8 @@ namespace Client
         /// creates a new model; duplicate filepath will be used to detect
         /// if a geometry already exists. A default shader will be used if not specified
         /// </summary>
-        /// <param name="filePath"></param>
-
+        /// <param name="filePath"> the file path of the model to be loaded </param>
+        /// <param name="enableRigging"> specify if rigging is enabled or not </param>
         public Model(string filePath, bool enableRigging = false)
         {
             //confirm the file exists
@@ -43,8 +44,7 @@ namespace Client
 
             Load(filePath, enableRigging);
             m_ModelMatrix = Matrix.Identity;
-            // set the properties and update the model matrix
-            //m_ActiveShader = shader;
+
             m_Properties.Rotation = new Vector3(0, 0, 0);
             m_Properties.Position = new Vector3(0, 0, 0);
             m_Properties.Scale = new Vector3(1, 1, 1);
@@ -95,8 +95,12 @@ namespace Client
             m_ActiveShader = shader;
         }
 
-        // load the geometry if it is not available, or find
-        // reference to the existing geometry if it is found
+        /// <summary>
+        ///  load the geometry if it is not available, or find
+        ///  reference to the existing geometry if it is found
+        /// </summary>
+        /// <param name="filePath"> the filepath to the model file </param>
+        /// <param name="enableRigging"> whether or not rigging should be enabled </param>
         public void Load(string filePath, bool enableRigging)
         {
             if (GraphicsManager.DictGeometry.ContainsKey(filePath))
@@ -110,15 +114,36 @@ namespace Client
             }
         }
 
-        // pass the model matrix to the shader and draw the active geometry
+        /// <summary>
+        /// Used to store information on the currently played animation sequences
+        /// </summary>
+        private double CurrentAnimationTime = 0;
+        private int CurrentAnimationIndex = -1;
+        private string CurrentAnimationName = null;
+        private bool RepeatAnimation = false;
+        private bool PauseAnimation = false;
+
+        /// <summary>
+        /// pass the model matrix to the shader and draw the active geometry
+        /// </summary>
         public void Draw()
         {
+            m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
+            m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
+            m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
+            m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+            m_ActiveGeo.UpdateAnimation();
+
             m_ActiveShader.UseShader();
             m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
         }
 
-        // update the model matrix based on the properties
-        // assume by default the model is facing (0, 0, -1)
+        /// <summary>
+        /// Update the model matrix based on the properties
+        /// Assume by default the model is facing (0, 0, -1)
+        /// Also updates the animation sequence if available
+        /// </summary>
+        /// <param name="delta_time"> the time advanced since the previous frame </param>
         public void Update(float delta_time)
         {
             // update the matrix only if the properties has changes
@@ -138,32 +163,98 @@ namespace Client
                 m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);
             }
 
-            m_ActiveGeo.Update(delta_time);
+            if (!PauseAnimation)
+            {
+                CurrentAnimationTime += delta_time;
+            }
         }
 
-        public void StartAnimationSequenceByName(string animationName, bool repeatAnimation)
+        /// <summary>
+        /// start playing the animation sequence as specified by its name
+        /// </summary>
+        /// <param name="animationName"> The name of the animation, specified by the artist </param>
+        /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
+        /// <returns> true if succeeded in starting the animation, false if else </returns>
+        public bool StartAnimationSequenceByName(string animationName, bool repeatAnimation)
         {
-            m_ActiveGeo.StartAnimationSequenceByName(animationName, repeatAnimation);
+            if (!m_ActiveGeo.AnimationIndices.ContainsKey(animationName)) return false;
+
+            CurrentAnimationTime = 0;
+            CurrentAnimationIndex = m_ActiveGeo.AnimationIndices[animationName];
+            RepeatAnimation = repeatAnimation;
+            CurrentAnimationName = animationName;
+            PauseAnimation = false;
+            return true;
         }
 
-        public void StartAnimationSequenceByIndex(int index, bool repeatAnimation)
+        /// <summary>
+        /// start playing the animation sequence as specified by its index
+        /// </summary>
+        /// <param name="index"> The index of the animation, specified by the artist </param>
+        /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
+        /// <returns> true if succeeded in starting the animation, false if else </returns>
+        public bool StartAnimationSequenceByIndex(int index, bool repeatAnimation)
         {
-            m_ActiveGeo.StartAnimationSequenceByIndex(index, repeatAnimation);
+            if (index < 0 || index >= m_ActiveGeo.GetAnimationCount()) return false;
+
+            CurrentAnimationTime = 0;
+            CurrentAnimationIndex = index;
+            CurrentAnimationName = m_ActiveGeo.GetAnimationNameByIndex(index);
+            RepeatAnimation = repeatAnimation;
+            PauseAnimation = false;
+            return true;
         }
 
+        /// <summary>
+        ///  Stop whatever animation that is taking place
+        /// </summary>
         public void StopCurrentAnimation()
         {
-            m_ActiveGeo.StopCurrentAnimation();
+            CurrentAnimationIndex = -1;
+            CurrentAnimationName = null;
         }
 
-        public void GetCurrentAnimationIndex()
+        /// <summary>
+        /// find which animation is being set now
+        /// </summary>
+        /// <returns> the index of currently playing animation </returns>
+        public int GetCurrentAnimationIndex()
         {
-            m_ActiveGeo.GetCurrentAnimationIndex();
+            return CurrentAnimationIndex;
         }
 
-        public void GetCurrentAnimationName()
+        /// <summary>
+        /// find which animation is being played now
+        /// </summary>
+        /// <returns> the name of the currently playing animation </returns>
+        public string GetCurrentAnimationName()
         {
-            m_ActiveGeo.GetCurrentAnimationName();
+            return CurrentAnimationName;
+        }
+
+        /// <summary>
+        /// Pause the current animation sequence
+        /// </summary>
+        public void PauseCurrentAnimation()
+        {
+            PauseAnimation = true;
+        }
+
+        /// <summary>
+        /// Resume the current animation sequence
+        /// </summary>
+        public void ResumeCurrentAnimation()
+        {
+            PauseAnimation = false;
+        }
+
+        /// <summary>
+        /// Check if the animation sequence is paused or not
+        /// </summary>
+        /// <returns> true if paused, false otherwise </returns>
+        public bool IsAnimationPaused()
+        {
+            return PauseAnimation;
         }
     }
 }

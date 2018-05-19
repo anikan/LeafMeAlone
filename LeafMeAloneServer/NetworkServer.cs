@@ -223,9 +223,6 @@ namespace Server
                 ByteReceivedQueue.AddRange(state.buffer.Take(bytesReceived));
             }
 
-            // Go ahead and try to deserialize as much as possible.
-            Receive();
-
             // Create a new state object for the next packet.  
             StateObject newState = new StateObject
             {
@@ -239,7 +236,7 @@ namespace Server
         /// <summary>
         /// Receives what it can from the byte received queue and deserializes it into the neccessary updates.
         /// </summary>
-        private void Receive()
+        public void Receive()
         {
             while (ByteReceivedQueue.Count > 0)
             {

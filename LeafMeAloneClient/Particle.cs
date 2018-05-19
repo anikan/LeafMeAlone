@@ -26,7 +26,6 @@ namespace Client
         /// Current Velocity (Derivative of Position)
         /// </summary>
         public Vector3 Velocity;
-        public Vector3 InitVelocity;
 
         /// <summary>
         /// Current force exerted on particle. Note: Gets reset after every update loop.
@@ -36,12 +35,7 @@ namespace Client
         /// <summary>
         /// Current Acceleration (Derivative of Velocity)
         /// </summary>
-        public Vector3 Acceleration;
-
-        /// <summary>
-        /// Initial Acceleration (Derivative of Velocity)
-        /// </summary>
-        public Vector3 InitAcceleration;
+        private Vector3 Acceleration;
 
         /// <summary>
         /// Normal for object
@@ -58,21 +52,17 @@ namespace Client
         /// </summary>
         public float LifeRemaining;
 
-        public Particle(Vector3 position, Vector3 velocity, Vector3 acceleration, float mass, float lifeRemaining)
+
+        public Particle(Vector3 position, Vector3 velocity, float mass, float lifeRemaining)
         {
-            InitAcceleration = acceleration;
             Origin = position;
             Position = position;
             Velocity = velocity;
-            InitVelocity = velocity;
             LifeRemaining = lifeRemaining;
             Mass = mass;
             Force = Vector3.Zero;
 
-
         }
-
-
         public void Update(float deltaTime)
         {
             Acceleration = (1.0f / Mass) * Force;
@@ -81,8 +71,5 @@ namespace Client
             Force = Vector3.Zero;
             LifeRemaining -= deltaTime;
         }
-
-
-
     }
 }

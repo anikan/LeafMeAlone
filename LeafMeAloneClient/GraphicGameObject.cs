@@ -21,7 +21,7 @@ namespace Client
         /// <summary>
         /// Creates a new graphic game object with no model.
         /// </summary>
-        public GraphicGameObject() : base()
+        protected GraphicGameObject() : base()
         {
   
         }

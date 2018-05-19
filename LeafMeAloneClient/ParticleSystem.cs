@@ -12,6 +12,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.XAudio2;
 using Buffer = SlimDX.Direct3D11.Buffer;
+using MapFlags = SlimDX.Direct3D11.MapFlags;
 
 namespace Client
 {
@@ -34,13 +35,8 @@ namespace Client
         //create buffers
         private Buffer VBO_Verts, VBO_Tex, VBO_Origin;
         private Buffer EBO;
-        private DataStream Verts, Tex, Faces, StartingLocations;
-        private InputElement[] Elements;
+        private DataStream Tex, Faces;
 
-        //create shader effects
-        private InputLayout InputLayout;
-        private Effect Effects;
-        private EffectPass Pass;
 
         //create texture
         private ShaderResourceView TexSRV;
@@ -51,6 +47,9 @@ namespace Client
 
         //max number of particles.
         public int maxParticles = 1000;
+
+
+        public int Num_CurrentlyActiveParticles = 0;
 
         private readonly int size = Vector3.SizeInBytes * 4;
 
@@ -93,7 +92,7 @@ namespace Client
         /// <param name="stop_dist"> Specify the distance, where the particles stop showing up </param>
         /// <param name="emissionrate"> Specify the emission rate of the particle system </param>
         /// <param name="maxparticles"> Specify the max number of particles emitted at a time </param>
-        public ParticleSystem(ParticleSystemType type,
+        protected ParticleSystem(ParticleSystemType type,
             Vector3 init_pos,
             Vector3 acceleration,
             Vector3 init_velocity,
@@ -108,6 +107,7 @@ namespace Client
             int emissionrate = 2,
             int maxparticles = 100)
         {
+            Transform.Scale = new Vector3(1, 1, 1);
             delta = initial_size;
             emissionRate = emissionrate;
             maxParticles = maxparticles;
@@ -131,37 +131,20 @@ namespace Client
 
             for (int i = 0; i < maxParticles; i++)
             {
-                Particles.Add(new Particle(GenerationOrigin, InitVelocity, Acceleration, 1.0f, 0f));
+                Particles.Add(new Particle(GenerationOrigin, InitVelocity, 1.0f, 0f));
             }
-
-            Verts = new DataStream(Particles.Count * size, true, true);
-            StartingLocations = new DataStream(Particles.Count * size, true, true);
+            
             Faces = new DataStream(Particles.Count * sizeof(uint) * 6, true, true);
             Tex = new DataStream(Particles.Count * size, true, true);
+
+            var vert_desc = new BufferDescription(Particles.Count * size, ResourceUsage.Dynamic,BindFlags.VertexBuffer,CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            var orig_desc = new BufferDescription(Particles.Count * size, ResourceUsage.Dynamic, BindFlags.VertexBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+            VBO_Verts = new Buffer(GraphicsRenderer.Device,vert_desc);
+            VBO_Origin = new Buffer(GraphicsRenderer.Device,orig_desc);
 
             //calculate for quad
             for (var index = 0; index < Particles.Count; index++)
             {
-                var pt = Particles[index];
-                var initPos = pt.Position;
-
-                //delta = (float)r.NextDouble() - .7f;
-
-                Vector3 topLeft_Both = new Vector3(initPos.X - delta, initPos.Y + delta, initPos.Z);
-                Vector3 bottomRight_Both = new Vector3(initPos.X + delta, initPos.Y - delta, initPos.Z);
-                Vector3 topRight = new Vector3(initPos.X + delta, initPos.Y + delta, initPos.Z);
-                Vector3 bottomLeft = new Vector3(initPos.X - delta, initPos.Y - delta, initPos.Z);
-
-
-                Verts.Write(topLeft_Both);
-                Verts.Write(bottomRight_Both);
-                Verts.Write(topRight);
-                Verts.Write(bottomLeft);
-
-                StartingLocations.Write(pt.Origin);
-                StartingLocations.Write(pt.Origin);
-                StartingLocations.Write(pt.Origin);
-                StartingLocations.Write(pt.Origin);
 
                 Tex.Write(new Vector3(0f, 0f, 0f));
                 Tex.Write(new Vector3(1f, 1f, 0f));
@@ -176,33 +159,15 @@ namespace Client
                 Faces.Write((uint)((index * 4) + 3));
 
             }
-            Verts.Position = 0;
             Faces.Position = 0;
             Tex.Position = 0;
-            StartingLocations.Position = 0;
 
-            VBO_Verts = new Buffer(GraphicsRenderer.Device, Verts, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            VBO_Origin = new Buffer(GraphicsRenderer.Device, StartingLocations, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            var btcode = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "VS", "vs_4_0", ShaderFlags.None,
-                EffectFlags.None);
-            var btcode1 = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "PS", "fx_5_0", ShaderFlags.None,
-                EffectFlags.None);
-            var sig = ShaderSignature.GetInputSignature(btcode);
+            VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Immutable, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Immutable, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
-            Effects = new Effect(GraphicsRenderer.Device, btcode1);
-            EffectTechnique technique = Effects.GetTechniqueByIndex(0);
-            Pass = technique.GetPassByIndex(0);
 
-            Elements = new[]
-            {
-                new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
-                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 1),
-                new InputElement("ORIGIN", 0, Format.R32G32B32_Float, 2)
-            };
 
-            InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
+
 
             switch (type)
             {
@@ -224,12 +189,13 @@ namespace Client
         /// </summary>
         public void UpdateBuffer()
         {
-            Verts.Position = 0;
-            StartingLocations.Position = 0;
 
-            for (var index = 0; index < Particles.Count; index++)
+            var vertBox = GraphicsRenderer.DeviceContext.MapSubresource(VBO_Verts, 0, MapMode.WriteDiscard, MapFlags.None);
+            var originBox = GraphicsRenderer.DeviceContext.MapSubresource(VBO_Origin, 0, MapMode.WriteDiscard, MapFlags.None);
+
+
+            foreach (var pt in Particles)
             {
-                var pt = Particles[index];
                 var initPos = pt.Position;
 
                 // change the size of the particle after the cutoff
@@ -255,24 +221,18 @@ namespace Client
                 Vector3 topRight = new Vector3(initPos.X + resized_delta, initPos.Y + resized_delta, initPos.Z);
                 Vector3 bottomLeft = new Vector3(initPos.X - resized_delta, initPos.Y - resized_delta, initPos.Z);
 
-                Verts.Write(topLeft_Both);
-                Verts.Write(bottomRight_Both);
-                Verts.Write(topRight);
-                Verts.Write(bottomLeft);
+                vertBox.Data.Write(topLeft_Both);
+                vertBox.Data.Write(bottomRight_Both);
+                vertBox.Data.Write(topRight);
+                vertBox.Data.Write(bottomLeft);
 
-                StartingLocations.Write(pt.Origin);
-                StartingLocations.Write(pt.Origin);
-                StartingLocations.Write(pt.Origin);
-                StartingLocations.Write(pt.Origin);
+                originBox.Data.Write(pt.Origin);
+                originBox.Data.Write(pt.Origin);
+                originBox.Data.Write(pt.Origin);
+                originBox.Data.Write(pt.Origin);
             }
-            Verts.Position = 0;
-            StartingLocations.Position = 0;
-
-            VBO_Verts.Dispose();
-            VBO_Verts = new Buffer(GraphicsRenderer.Device, Verts, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            VBO_Origin.Dispose();
-            VBO_Origin = new Buffer(GraphicsRenderer.Device, StartingLocations, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            
+            GraphicsRenderer.DeviceContext.UnmapSubresource(VBO_Verts, 0);
+            GraphicsRenderer.DeviceContext.UnmapSubresource(VBO_Origin, 0);
         }
 
         /// <summary>
@@ -283,7 +243,7 @@ namespace Client
             if (!Enabled) return;
             if (!ShouldRender) return;
 
-            GraphicsRenderer.DeviceContext.InputAssembler.InputLayout = InputLayout;
+            GraphicsRenderer.DeviceContext.InputAssembler.InputLayout = ParticleSystemManager.InputLayout;
             GraphicsRenderer.DeviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO_Verts, Vector3.SizeInBytes, 0));
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(1, new VertexBufferBinding(VBO_Tex, Vector3.SizeInBytes, 0));
@@ -291,30 +251,37 @@ namespace Client
             GraphicsRenderer.DeviceContext.InputAssembler.SetIndexBuffer(EBO, Format.R32_UInt, 0);
 
 
-            Effects.GetVariableByName("AlphaCutoffOnly").AsScalar().Set(AlphaCutoffOnly);
-            Effects.GetVariableByName("CutoffSpeed").AsScalar().Set(CutOffSpeed);
-            Effects.GetVariableByName("CutoffDist").AsScalar().Set(CutoffDist);
-            Effects.GetVariableByName("gOrigin").AsVector().Set(GenerationOrigin);
-            Effects.GetVariableByName("gWorldViewProj").AsMatrix().SetMatrix(Matrix.Identity * GraphicsManager.ActiveCamera.m_ViewMatrix * GraphicsRenderer.ProjectionMatrix);
-            Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(TexSRV);
+            ParticleSystemManager.Effects.GetVariableByName("AlphaCutoffOnly").AsScalar().Set(AlphaCutoffOnly);
+            ParticleSystemManager.Effects.GetVariableByName("CutoffSpeed").AsScalar().Set(CutOffSpeed);
+            ParticleSystemManager.Effects.GetVariableByName("CutoffDist").AsScalar().Set(CutoffDist);
+            ParticleSystemManager.Effects.GetVariableByName("gOrigin").AsVector().Set(GenerationOrigin);
+            ParticleSystemManager.Effects.GetVariableByName("gWorldViewProj").AsMatrix().SetMatrix(Transform.AsMatrix() * GraphicsManager.ActiveCamera.m_ViewMatrix * GraphicsRenderer.ProjectionMatrix);
+            ParticleSystemManager.Effects.GetVariableByName("tex_diffuse").AsResource().SetResource(TexSRV);
+            
 
-            //var blendFactor = new Color4(1,1,1,1);
+
+            //set blend state
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = GraphicsRenderer.BlendState;
-            //GraphicsRenderer.DeviceContext.OutputMerger.BlendFactor = blendFactor;
-            //GraphicsRenderer.DeviceContext.OutputMerger.BlendSampleMask = ~0;
-
 
             //turn off depth for now
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthStateOff;
 
             //apply pass
-            Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
+            ParticleSystemManager.Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
             GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6, 0, 0);
 
             //turn back on depth 
             GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
         }
+
+        public void DrawMe(Transform parent)
+        {
+            Transform.CopyToThis(parent);
+            Draw();
+        }
+
+
 
         /// <summary>
         /// Update the particles.
@@ -327,12 +294,14 @@ namespace Client
             //    return;
 
             int emissionThisFrame = 0;
-            int activeParticles = 0;
+            Num_CurrentlyActiveParticles = 0;
             foreach (Particle particle in Particles)
             {
+
+                //This should be true if we want to prevent particles from moving behind us.
                 if (DisableRewind)
                 {
-                    float cosAngle = Vector3.Dot(Vector3.Normalize(particle.InitVelocity), Vector3.Normalize(particle.Velocity));
+                    float cosAngle = Vector3.Dot(Vector3.Normalize(particle.Velocity), Vector3.Normalize(particle.Velocity));
                     if (cosAngle < 0f)
                     {
                         particle.Force = Vector3.Zero;
@@ -340,38 +309,37 @@ namespace Client
                         particle.LifeRemaining = -1;
                     }
                 }
+
                 if (particle.LifeRemaining <= 0 || Vector3.Distance(particle.Position, particle.Origin) > StopDist)
                 {
                     if (emissionThisFrame < emissionRate && ShouldGenerate)
                     {
-                        particle.InitAcceleration = Acceleration;
                         particle.Origin = GenerationOrigin;
                         particle.Position = GenerationOrigin;
-                        particle.Acceleration = Vector3.Zero;
                         particle.Velocity = InitVelocity;
-                        particle.InitVelocity = InitVelocity;
                         particle.LifeRemaining = r.Range(10f);
                         emissionThisFrame++;
-                        activeParticles++;
+                        Num_CurrentlyActiveParticles++;
                     }
                 }
                 else
                 {
-                    activeParticles++;
+                    Num_CurrentlyActiveParticles++;
                 }
 
                 Vector3 prevForce = particle.Force;
                 particle.Force = new Vector3(
-                    ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.X + prevForce.X,
-                    ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.Y + prevForce.Y,
-                    ConeSize * (r.NextFloat() - 0.5f) + particle.InitAcceleration.Z + prevForce.Z);
+                    ConeSize * (r.NextFloat() - 0.5f) + Acceleration.X + prevForce.X,
+                    ConeSize * (r.NextFloat() - 0.5f) + Acceleration.Y + prevForce.Y,
+                    ConeSize * (r.NextFloat() - 0.5f) + Acceleration.Z + prevForce.Z);
 
                 
                 particle.Update(deltaTime);
             }
 
-            ShouldRender = (activeParticles != 0);
+            ShouldRender = (Num_CurrentlyActiveParticles != 0);
             UpdateBuffer();
+            //Console.WriteLine(Num_CurrentlyActiveParticles);
         }
 
         /// <summary>
@@ -391,10 +359,8 @@ namespace Client
         {
             foreach (var particle in Particles)
             {
-                particle.InitAcceleration = Acceleration;
                 particle.Origin = GenerationOrigin;
                 particle.Position = GenerationOrigin;
-                particle.Acceleration = Vector3.Zero;
                 particle.Velocity = InitVelocity;
                 particle.LifeRemaining = r.Range(10f);
             }
@@ -402,7 +368,9 @@ namespace Client
             UpdateBuffer();
         }
 
-        /// <summary>
+
+        #region GettersAndSetters
+       /// <summary>
         /// Set the origin of the particles in the system
         /// </summary>
         /// <param name="pos"></param>
@@ -457,5 +425,9 @@ namespace Client
         {
             return ShouldRender;
         }
+        
+
+        #endregion
+ 
     }
 }

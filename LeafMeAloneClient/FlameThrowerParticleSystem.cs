@@ -13,18 +13,19 @@ namespace Client
         public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f, 3.85f, 3.0f);
         public float FlameInitSpeed = 40.0f;
         public float FlameAcceleration = 15.0f;
+        public float CutoffDist = 10.0f;
 
-        public FlameThrowerParticleSystem(float initSpd = 40.0f, float initAccel = 15.0f) : 
+        public FlameThrowerParticleSystem(float initSpd = 40.0f, float initAccel = 15.0f,float cutoff = 10.0f) : 
             base(ParticleSystemType.FIRE,
                 Vector3.Zero +
                 Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, Matrix.Identity), // origin
                 Vector3.UnitZ * initSpd, // acceleration
                 Vector3.UnitZ * initAccel, // initial speed
                 false, // cutoff all colors
-                false, // no backward particle prevention
+                true, // no backward particle prevention
                 Tool.Thrower.ConeAngle * 10,//320.0f, // cone radius, may need to adjust whenever acceleration changes
                 1.0f, // initial delta size
-                10f, // cutoff distance
+                cutoff, // cutoff distance
                 0.2f, // cutoff speed
                 0.075f, // enlarge speed,
                 Tool.Thrower.Range
@@ -32,6 +33,7 @@ namespace Client
         {
             FlameInitSpeed = initSpd;
             FlameAcceleration = initAccel;
+            CutoffDist = cutoff;
         }
     }
 }

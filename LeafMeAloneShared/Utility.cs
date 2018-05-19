@@ -72,6 +72,13 @@ namespace Shared
         public Vector3 Rotation; // euler coordinate that represents the direction the object is facing
         public Vector3 Scale;     // scale of the model
 
+        //public Transform()
+        //{
+        //    Position = new Vector3(0,0,0);
+        //    Rotation = new Vector3(0, 0, 0);
+        //    Scale = new Vector3(1,1,1);
+        //}
+
         public Vector3 Forward  // getter returns the unit direction vector, based on the Rotation vector
         {
             get

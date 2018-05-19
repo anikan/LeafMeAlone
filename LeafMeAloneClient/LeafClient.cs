@@ -10,30 +10,39 @@ namespace Client
 {
     class LeafClient : NetworkedGameObjectClient
     {
-        private static ParticleSystem Fire;
-        public LeafClient(CreateObjectPacket createPacket) : 
+        public static ParticleSystem Fire;
+        public bool updateFire = false;
+        public LeafClient(CreateObjectPacket createPacket) :
             base(createPacket, FileManager.LeafModel)
         {
             if (Fire == null)
             {
-                Fire = new FlameThrowerParticleSystem(100.0f,100.0f);
+                Fire = new FlameThrowerParticleSystem(2, 20,2.5f);
                 Fire.emissionRate = 1;
                 Fire.EnableGeneration(true);
-
-                GraphicsManager.ParticleSystems.Add(Fire);
-               // OnDestroy += () => Fire.Destroy();
+                Console.Write("New Fire!");
+                //GraphicsManager.ParticleSystems.Add(Fire);
+                updateFire = true;
+                // OnDestroy += () => Fire.Destroy();
                 //Fire.Transform.Rotation.Y = 90f.ToRadians();
             }
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            Fire.DrawMe(Transform);
         }
 
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
             Fire.Enabled = true;
-            Fire.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, Fire.Transform.AsMatrix()));
+            Fire.SetOrigin(Vector3.Zero);//Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, Fire.Transform.AsMatrix()));
             //Fire.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
             //Fire.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
-            Fire.Update(deltaTime);
+            if (updateFire)
+                Fire.Update(deltaTime);
         }
 
         public void UpdateFromPacket(LeafPacket packet)
@@ -41,7 +50,7 @@ namespace Client
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
-            Fire.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, Fire.Transform.AsMatrix()));
+            //Fire.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, Fire.Transform.AsMatrix()));
         }
 
         public override void UpdateFromPacket(Packet packet)

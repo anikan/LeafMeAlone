@@ -60,7 +60,7 @@ namespace Server
 
             float HalfWidth = Constants.MAP_WIDTH / 2.0f;
             float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
-            CreateRandomLeaves(200, -HalfWidth + Constants.BORDER_MARGIN, HalfWidth - Constants.BORDER_MARGIN, -HalfHeight + Constants.BORDER_MARGIN, HalfHeight - Constants.BORDER_MARGIN);
+            CreateRandomLeaves(Constants.NUM_LEAVES, -HalfWidth + Constants.BORDER_MARGIN, HalfWidth - Constants.BORDER_MARGIN, -HalfHeight + Constants.BORDER_MARGIN, HalfHeight - Constants.BORDER_MARGIN);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }

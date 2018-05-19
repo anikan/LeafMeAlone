@@ -24,5 +24,8 @@
         public const string TreeModel = @"../../Models/TreeAttempt.fbx";
 
         public const float FLOOR_HEIGHT = -10.0f;
+        public const float MAP_WIDTH = 75.0f;
+        public const float MAP_HEIGHT = 75.0f;
+        public const float BORDER_MARGIN = 5.0f;
     }
 }

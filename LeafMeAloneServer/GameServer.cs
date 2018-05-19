@@ -57,7 +57,10 @@ namespace Server
             networkServer = new NetworkServer(networked);
 
             CreateMap();
-            CreateRandomLeaves(200, -10, 10, -10, 10);
+
+            float HalfWidth = Constants.MAP_WIDTH / 2.0f;
+            float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
+            CreateRandomLeaves(200, -HalfWidth + Constants.BORDER_MARGIN, HalfWidth - Constants.BORDER_MARGIN, -HalfHeight + Constants.BORDER_MARGIN, HalfHeight - Constants.BORDER_MARGIN);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -182,7 +185,7 @@ namespace Server
         public MapServer CreateMap()
         {
 
-            MapServer newMap = new MapServer(75.0f, 75.0f);
+            MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
             for (float y = -newMap.Height / 2.0f; y < newMap.Height / 2.0f; y+= TreeServer.TREE_RADIUS)
             {
@@ -243,7 +246,7 @@ namespace Server
                 // Bind random doubles to our range.
                 randX = (randX * (maxX - minX)) + minX;
                 randY = (randY * (maxY - minY)) + minY;
-                randZ = (randZ * (maxZ - minZ)) + maxZ;
+                randZ = (randZ * (maxZ - minZ)) + minZ;
 
                 // Get the new position
                 Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);

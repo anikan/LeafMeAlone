@@ -13,6 +13,54 @@ namespace Shared
             return new Vector3(vector.X, vector.Y, vector.Z);
         }
 
+        public static SlimDX.Quaternion ToQuaternion(this Assimp.Quaternion q)
+        {
+            SlimDX.Quaternion ret = new SlimDX.Quaternion();
+            ret.X = q.X;
+            ret.Y = q.Y;
+            ret.Z = q.Z;
+            ret.W = q.W;
+            return ret;
+        }
+
+        public static Assimp.Quaternion ToQuaternion(this SlimDX.Quaternion q)
+        {
+            Assimp.Quaternion ret= new Assimp.Quaternion();
+            ret.W = q.W;
+            ret.X = q.X;
+            ret.Y = q.Y;
+            ret.Z = q.Z;
+            return ret;
+        }
+
+        public static Matrix ToMatrix(this Matrix4x4 mat)
+        {
+            Matrix ret = new Matrix();
+
+            ret.M11 = mat.A1;
+            ret.M12 = mat.A2;
+            ret.M13 = mat.A3;
+            ret.M14 = mat.A4;
+
+            ret.M21 = mat.B1;
+            ret.M22 = mat.B2;
+            ret.M23 = mat.B3;
+            ret.M24 = mat.B4;
+
+            ret.M31 = mat.C1;
+            ret.M32 = mat.C2;
+            ret.M33 = mat.C3;
+            ret.M34 = mat.C4;
+            
+            ret.M41 = mat.D1;
+            ret.M42 = mat.D2;
+            ret.M43 = mat.D3;
+            ret.M44 = mat.D4;
+
+            ret = Matrix.Transpose(ret);
+            return ret;
+        }
+
         public static float ToRadians(this float degrees)
         {
             return degrees * ((float) Math.PI / 180.0f);
@@ -48,6 +96,21 @@ namespace Shared
             dest.Z = src.Z;
         }
 
+        public static Matrix Clone(this Matrix mat)
+        {
+            Matrix ret = new Matrix(  );
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+
+                    ret[i, j] = mat[i, j];
+                }
+            }
+
+            return ret;
+        }
+
         public static float NextFloat(this Random r)
         {
             return (float) r.NextDouble();
@@ -76,7 +139,7 @@ namespace Shared
         {
             get
             {
-                Vector3 retVec = new Vector3(0, -1, 0);
+                Vector3 retVec = new Vector3(0, 0, 1);
 
                 // set the rotation based on the three directions
                 Matrix m_ModelMatrix = Matrix.RotationX(Rotation.X) *
@@ -84,6 +147,8 @@ namespace Shared
                                 Matrix.RotationZ(Rotation.Z);
 
                 retVec = Vector3.Normalize(Vector3.TransformCoordinate(retVec, m_ModelMatrix));
+
+             //   Console.WriteLine("Forward is: " + retVec);
 
                 return retVec;
             }

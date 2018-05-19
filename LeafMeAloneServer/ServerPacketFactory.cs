@@ -14,9 +14,11 @@ namespace Server
     public class ServerPacketFactory
     {
         /// <summary>
-        /// Creates a network packet used to update the state of the player in the client
+        /// Creates a network packet used to update the state of the player 
+        /// in the client
         /// </summary>
-        /// <param name="player">The player object to serialize into a player</param>
+        /// <param name="player">The player object to serialize into a player
+        /// </param>
         public static Packet CreatePacket(GameObjectServer gameObj)
         {
             if (gameObj is PlayerServer player)
@@ -29,10 +31,7 @@ namespace Server
                     _ProtoObjId = player.Id,
                     Rotation = player.Transform.Rotation.Y,
                     ToolEquipped = player.ToolEquipped,
-                    UsingToolPrimary =
-                    player.ActiveToolMode == ToolMode.PRIMARY,
-                    UsingToolSecondary =
-                    player.ActiveToolMode == ToolMode.SECONDARY
+                    ActiveToolMode = player.ActiveToolMode
                 };
             }
             else if (gameObj is LeafServer leaf)
@@ -48,5 +47,9 @@ namespace Server
             return null;
         }
 
+        internal static Packet CreateDestroyPacket(GameObject gameObj)
+        {
+            return new DestroyObjectPacket(gameObj);
+        }
     }
 }

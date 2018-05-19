@@ -37,6 +37,9 @@ namespace Client
         // Current player.
         public static PlayerClient ActivePlayer;
 
+        // The list of particle systems
+        public static List<ParticleSystem> ParticleSystems;
+
         // Converts a screen point to a world position.
         // Converts a screen point to a world position.
         public static Vector3 ScreenToWorldPoint(Vector2 screenPos)
@@ -79,13 +82,28 @@ namespace Client
 
         public static Light ActiveLightSystem;
 
-        public static void Update()
+        // the offset of the camera from the player. Can be changed anytime to update the camera
+        public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
+
+        public static void Update(float delta_t)
         {
+
+            // update the camera position based on the player position
             if (ActivePlayer != null)
             {
-                // update the camera position based on the player position
-                ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + GameClient.CAMERA_OFFSET, ActivePlayer.Transform.Position);
+                ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
+                    ActivePlayer.Transform.Position);
             }
+        }
+
+        public static void Draw()
+        {
+
+            foreach (ParticleSystem particleSystem in ParticleSystems)
+            {
+                particleSystem.Draw();
+            }
+
         }
 
         /// <summary>
@@ -97,29 +115,39 @@ namespace Client
 
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  
-            LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
+            
             {
+                LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
                 light0.UseDirectionalPreset();
                 light0.intensities = new Vector4(1.3f,1.2f,1.0f,0);
                 light0.status = LightParameters.STATUS_ON;
+                light0.position = Vector4.Normalize(new Vector4(-1, 0, 0, 0));
             }
-            LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
             {
+                LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
                 light1.UseDirectionalPreset();
                 light1.status = LightParameters.STATUS_ON;
                 light1.intensities = new Vector4(0.8f,0.8f,0.8f,0);
                 light1.position = Vector4.Normalize(new Vector4(0,-1,0,0));
             }
-
-            LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
             {
+                LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
                 light2.UseDirectionalPreset();
                 light2.status = LightParameters.STATUS_ON;
-                light2.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
+                light2.intensities = new Vector4(1.2f, 1.2f, 1.2f, 0);
                 light2.position = Vector4.Normalize(new Vector4(0, 1, 0, 0));
+            }
+            {
+                LightParameters light3 = ActiveLightSystem.GetLightParameters(3);
+                light3.UseDirectionalPreset();
+                light3.status = LightParameters.STATUS_ON;
+                light3.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
+                light3.position = Vector4.Normalize(new Vector4(0, 0, -1, 0));
             }
 
             LoadAllShaders();
+
+            ParticleSystems = new List<ParticleSystem>();
         }
 
         /// <summary>
@@ -130,7 +158,7 @@ namespace Client
             // add more argument to each list as needed
             List <string> allShaderPaths = new List<string>( new string[]
             {
-                @"../../Shaders/defaultShader.fx"
+                FileManager.DefaultShader
             } );
 
             List <string> allShaderVSName = new List<string>(new string[]
@@ -147,7 +175,9 @@ namespace Client
             allShaderElements.Add(new[] {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
-                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2)
+                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2),
+                new InputElement("BONE_ID", 0, Format.R32G32B32A32_UInt, 3),
+                new InputElement("BONE_WEIGHT", 0, Format.R32G32B32A32_Float, 4)
             });
 
             for (int i = 0; i < allShaderPaths.Count; i++)

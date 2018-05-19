@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,7 @@ namespace Client
             if (model == null)
                 return;
             model.m_Properties = Transform;
-            model.Update();
+            model.Update(deltaTime);
         }
 
         /// <summary>
@@ -58,6 +59,7 @@ namespace Client
         /// <param name="filePath">Path of the model.</param>
         public void SetModel(string filePath)
         {
+            //Console.WriteLine(File.Exists(filePath));
             model = new Model(filePath);
             Name = filePath.Split('.')[0];
         }
@@ -67,7 +69,7 @@ namespace Client
         /// </summary>
         public override void Destroy()
         {
-            throw new NotImplementedException();
+            GameClient.instance.Destroy(this);
         }
     }
 }

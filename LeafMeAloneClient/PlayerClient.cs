@@ -13,8 +13,6 @@ namespace Client
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
 
-        public const string PlayerModelPath = @"../../Models/Player_V2.fbx";
-
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {
@@ -26,23 +24,28 @@ namespace Client
             public float RotationRequested;
 
             // Requests for the use of primary/secondary features of tools.
-            public bool UseToolPrimaryRequest;
-            public bool UseToolSecondaryRequest;
+            public ToolMode ActiveToolMode;
+
+            public ToolType EquipToolRequest;
         };
         
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
+        private ParticleSystem FlameThrower,LeafBlower;
+
         public PlayerClient(CreateObjectPacket createPacket) : 
-            base(createPacket, PlayerModelPath)
+            base(createPacket, FileManager.PlayerModel)
         {
+            FlameThrower = new FlameThrowerParticleSystem();
+            LeafBlower = new LeafBlowerParticleSystem();
+            GraphicsManager.ParticleSystems.Add(FlameThrower);
+            GraphicsManager.ParticleSystems.Add(LeafBlower);
         }
 
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
-        public bool UsingToolPrimary { get; set; }
-        public bool UsingToolSecondary { get; set; }
         public ToolMode ActiveToolMode { get; set; }
 
 
@@ -76,7 +79,7 @@ namespace Client
         public void RequestUsePrimary()
         {
             // Set request bool to true.
-            PlayerRequests.UseToolPrimaryRequest = true;
+            PlayerRequests.ActiveToolMode = ToolMode.PRIMARY;
 
         }
 
@@ -86,7 +89,20 @@ namespace Client
         public void RequestUseSecondary()
         {
             // Set request bool to true.
-            PlayerRequests.UseToolSecondaryRequest = true;
+            PlayerRequests.ActiveToolMode = ToolMode.SECONDARY;
+        }
+
+        public void RequestToolEquip(ToolType type)
+        {
+            if (type != ToolEquipped)
+            {
+                Console.WriteLine("Requesting new tool! " + type.ToString());
+                PlayerRequests.EquipToolRequest = type;
+            }
+            else
+            {
+                PlayerRequests.EquipToolRequest = ToolType.SAME;
+            }
         }
 
         // Note: Causes weird behaviour sometimes. Needs to be fixed if want to use.
@@ -114,6 +130,10 @@ namespace Client
 
         }
 
+        /// <summary>
+        /// Requests the player to look at a specified position, using mouse on screen space calculations.
+        /// </summary>
+        /// <param name="position">Screenspace position to look at.</param>
         public void RequestLookAtScreenSpace(Vector2 position)
         {
             // Screen sizes
@@ -150,9 +170,8 @@ namespace Client
 
             PlayerRequests.RotationRequested = angleMouse;
 
-            // TEMPORARY FOR TESTING
-            // Set rotation of player
-            //Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
+            // Set rotation of player locally, but still set to the rotation of server later.
+            Transform.Rotation = new Vector3(Transform.Rotation.X, angleMouse, Transform.Rotation.Z);
 
         }
 
@@ -173,10 +192,16 @@ namespace Client
         /// </summary>
         public void ResetRequests()
         {
+
+            //  ToolType equippedTool = PlayerRequests.EquipToolRequest;
+
             // Reset the player requests struct to clear all info.
             PlayerRequests = new PlayerRequestInfo();
             // Set rotation initially to the rotation of the player
+
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
+  
+            // PlayerRequests.EquipToolRequest = equippedTool;
 
         }
 
@@ -188,12 +213,60 @@ namespace Client
         public void UpdateFromPacket(PlayerPacket packet)
         {
             Dead = packet.Dead;
+
             ToolEquipped = packet.ToolEquipped;
-            UsingToolPrimary = packet.UsingToolPrimary;
-            UsingToolSecondary = packet.UsingToolSecondary;
+
+            ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
+
+            switch (ActiveToolMode)
+            {
+                case ToolMode.NONE:
+                    FlameThrower.EnableGeneration(false);
+                    LeafBlower.EnableGeneration(false);
+                    break;
+                case ToolMode.PRIMARY:
+                    switch (ToolEquipped)
+                    {
+                        case ToolType.BLOWER:
+                            FlameThrower.EnableGeneration(false);
+                            LeafBlower.EnableGeneration(true);
+                            break;
+                        case ToolType.THROWER:
+                            FlameThrower.EnableGeneration(true);
+                            LeafBlower.EnableGeneration(false);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case ToolMode.SECONDARY:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+        }
+
+        public override void Update(float deltaTime)
+        {
+            base.Update(deltaTime);
+            Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
+                         Matrix.RotationY(Transform.Rotation.Y) *
+                         Matrix.RotationZ(Transform.Rotation.Z);
+
+            // flame throwing particle system update
+            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            FlameThrower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
+            FlameThrower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
+            FlameThrower.Update(deltaTime);
+
+            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            LeafBlower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
+            LeafBlower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
+            LeafBlower.Update(deltaTime);
         }
 
         /// <summary>

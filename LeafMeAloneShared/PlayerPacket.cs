@@ -44,18 +44,14 @@ namespace Shared
         // If the player is actively using their tool this frame.
 
         [ProtoMember(5)]
-        public bool UsingToolPrimary;
-
-        // If the player is using the secondary ability of their tool this frame.
-        [ProtoMember(6)]
-        public bool UsingToolSecondary;
+        public ToolMode ActiveToolMode;
 
         // Currently equipped tool.
-        [ProtoMember(7)]
+        [ProtoMember(6)]
         public ToolType ToolEquipped;
 
         // Is the player dead? RIP.
-        [ProtoMember(8)]
+        [ProtoMember(7)]
         public bool Dead;
 
         /// <summary>
@@ -70,8 +66,8 @@ namespace Shared
         {
 
             string printString = string.Format(
-                "Player packet info: Movement=({0}, {1}), Rotation={2}, UseToolPrimary={3}, UseToolSecondary={4}",
-                MovementX, MovementZ, Rotation, UsingToolPrimary, UsingToolSecondary);
+                "Player packet info: Movement=({0}, {1}), Rotation={2}, ToolMode={3}",
+                MovementX, MovementZ, Rotation, ActiveToolMode.ToString());
 
             return printString;
 

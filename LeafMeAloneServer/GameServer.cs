@@ -14,28 +14,35 @@ namespace Server
     {
         public static GameServer instance;
 
+        public List<GameObject> toDestroyQueue = new List<GameObject>();
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
-
         public List<LeafServer> LeafList = new List<LeafServer>();
-        public Dictionary<int, GameObjectServer> gameObjectDict = new Dictionary<int, GameObjectServer>();
+        public Dictionary<int, GameObjectServer> gameObjectDict =
+            new Dictionary<int, GameObjectServer>();
 
         private NetworkServer networkServer;
 
         //Time in ms for each tick.
-        public const long TICK_TIME= 33;
+        public const long TICK_TIME = 33;
 
         //Time per second for each tick.
         public const float TICK_TIME_S = .033f;
-
+        private const string SINGLETON_VIOLATED =
+            "ERROR: Singleton pattern violated on GameServer.cs. There are multiple instances!";
         private Stopwatch timer;
 
         private List<Vector3> spawnPoints = new List<Vector3>();
 
         private Stopwatch testTimer;
 
-        public GameServer(IPAddress address)
+        public GameServer(bool networked)
         {
-            instance = this; 
+            if (instance != null)
+            {
+                Console.WriteLine(SINGLETON_VIOLATED);
+            }
+
+            instance = this;
 
             timer = new Stopwatch();
             testTimer = new Stopwatch();
@@ -48,26 +55,24 @@ namespace Server
             spawnPoints.Add(new Vector3(10, -10, 0));
             spawnPoints.Add(new Vector3(10, 10, 0));
 
-            networkServer = new NetworkServer(address);
+            networkServer = new NetworkServer(networked);
 
-            CreateLeaves(100, -10, 10, -10, 10);
+            CreateRandomLeaves(200, -10, -10, 10, -10, 10);
+
+            //CreateLeaves(100, -10, 10, -10, 10);
         }
 
         public static int Main(String[] args)
         {
-            IPAddress address;
-            if (args.Length > 1)
+            bool networked = false;
+
+            if (args.Length > 0)
             {
-                address = IPAddress.Parse(args[1]);
+                networked = true;
             }
 
-            else
-            {
-                address = IPAddress.Loopback;
-            }
+            GameServer gameServer = new GameServer(networked);
 
-            GameServer gameServer = new GameServer(address);
-            
             gameServer.networkServer.StartListening();
 
             gameServer.DoGameLoop();
@@ -91,13 +96,13 @@ namespace Server
                 {
                     PlayerPacket packet = networkServer.PlayerPackets[i];
 
-                    if (gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject))
+                    if (packet != null &&
+                        gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject)
+                        )
                     {
-                        PlayerServer player = (PlayerServer) playerGameObject;
+                        PlayerServer player = (PlayerServer)playerGameObject;
 
                         player.UpdateFromPacket(networkServer.PlayerPackets[i]);
-
-                        Console.WriteLine("Player {0} is at {1}", player.Id, player.Transform.Position);
                     }
                 }
 
@@ -108,10 +113,11 @@ namespace Server
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
+                toDestroyQueue.Clear();
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
-               //     Console.WriteLine("Warning: Server is falling behind.");
+                    //     Console.WriteLine("Warning: Server is falling behind.");
                 }
 
                 timer.Restart();
@@ -121,40 +127,24 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Call Update() on all objects in the object dict.
+        /// </summary>
+        /// <param name="deltaTime"></param>
         public void UpdateObjects(float deltaTime)
         {
-
             //TestPhysics();
-            
+
+            List<GameObjectServer> toUpdateList = gameObjectDict.Values.ToList();
             //This foreach loop hurts my soul. May consider making it normal for loop.
-            foreach (KeyValuePair<int, GameObjectServer> pair in gameObjectDict )
+            foreach (GameObjectServer toUpdate in toUpdateList)
             {
-                pair.Value.Update(deltaTime);
-            }
-        }
-
-        public void TestPhysics()
-        {
-
-            if (testTimer.Elapsed.Seconds > 3)
-            {
-
-                for (int i = 0; i < LeafList.Count; i++)
-                {
-                    Console.WriteLine("APPLYING FORCE");
-                    Vector3 testForce = new Vector3(100.0f, 0.0f, 0.0f);
-                    LeafList[i].ApplyForce(testForce);
-                    testTimer.Restart();
-
-                }
+                toUpdate.Update(deltaTime);
             }
 
-            for (int i = 0; i < LeafList.Count; i++)
-            {
-                string printString = string.Format("Leaf {0}: {1}", i, LeafList[i].Transform.Position);
-                Console.WriteLine(printString);
+            // Add the effects of the player tools.
+            AddPlayerToolEffects();
 
-            }
         }
 
         public PlayerServer CreateNewPlayer()
@@ -170,44 +160,69 @@ namespace Server
             PlayerServer newActivePlayer = new PlayerServer();
             newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
             newActivePlayer.Id = newPlayer.Id;
-            
+
             playerServerList.Add(newPlayer);
 
             //Note currently assuming players get ids 0-3
             newActivePlayer.Transform.Position = spawnPoints[0];
             newPlayer.Transform.Position = spawnPoints[0];
-            
-            CreateObjectPacket objPacket = 
+
+            CreateObjectPacket objPacket =
                 new CreateObjectPacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-             networkServer.SendAll(objPacket.Serialize());
-               
+            networkServer.SendAll(objPacket.Serialize());
+
             return newActivePlayer;
         }
 
-        public void CreateLeaves(int num, float minX, float maxX, float minY, float maxY)
+        /// <summary>
+        /// Creates all leaves in the scene, placing them randomly.
+        /// </summary>
+        /// <param name="num">Number of leaves to create.</param>
+        /// <param name="floorHeight">Height of the floor in the world..</param>
+        /// <param name="minX">Min x position to spawn leaves.</param>
+        /// <param name="maxX">Max x position to spawn leaves.</param>
+        /// <param name="minZ">Min y position to spawn leaves.</param>
+        /// <param name="maxZ">Max y position to spawn leaves.</param>
+        public void CreateRandomLeaves(int num, float floorHeight, float minX, float maxX, float minZ, float maxZ)
         {
+            // Create a new random number generator.
             Random rnd = new Random();
 
+            // Very slight random offset for leaves so that there's no z-fighting.
+            double minY = floorHeight - 0.1f;
+            double maxY = floorHeight;
+
+            // Itereate through number of leaves we want to create.
             for (int i = 0; i < num; i++)
             {
 
+                // Get random doubles for position.
                 double randX = rnd.NextDouble();
                 double randY = rnd.NextDouble();
+                double randZ = rnd.NextDouble();
 
+                // Bind random doubles to our range.
                 randX = (randX * (maxX - minX)) + minX;
-                randY = (randY * (maxY - minY)) + maxY;
+                randY = (randY * (maxY - minY)) + minY;
+                randZ = (randZ * (maxZ - minZ)) + maxZ;
 
-                Vector3 pos = new Vector3((float)randX, 0.0f, (float)randY);
+                // Get the new position
+                Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
 
+                // Create a new leaf
                 LeafServer newLeaf = new LeafServer();
+
+                // Set the leaf's initial position.
                 newLeaf.Transform.Position = pos;
+
+                // Send this object to the other object's.
                 networkServer.SendNewObjectToAll(newLeaf);
+
+                // Add this leaf to the leaf list and object dictionary.
                 LeafList.Add(newLeaf);
                 newLeaf.Register();
-
-                Console.WriteLine("Creating leaf at position " + pos);
             }
         }
 
@@ -216,17 +231,44 @@ namespace Server
 
         }
 
+        /// <summary>
+        /// Add the tool effects of all the players.
+        /// </summary>
         public void AddPlayerToolEffects()
         {
 
+            // Iterate through all players.
             for (int i = 0; i < playerServerList.Count; i++)
             {
 
+                // Get this player.
                 PlayerServer player = playerServerList[i];
 
-                //player.AffectObjectsInToolRange(gameObjectList);
+                // Affect all objects within range of the player.
+                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList<GameObjectServer>());
 
             }
+        }
+
+        /// <summary>
+        /// Destroys the given game object; removes it from the dictionary of 
+        /// objects to send update packets for, and adds the destory packet to 
+        /// the toDestroy Queue
+        /// </summary>
+        /// <param name="gameObj">The game object to destroy</param>
+        public void Destroy(GameObject gameObj)
+        {
+            gameObjectDict.Remove(gameObj.Id);
+            if (gameObj is LeafServer leaf)
+            {
+                LeafList.Remove(leaf);
+            }
+            else if (gameObj is PlayerServer player)
+            {
+                playerServerList.Remove(player);
+            }
+
+            toDestroyQueue.Add(gameObj);
         }
     }
 }

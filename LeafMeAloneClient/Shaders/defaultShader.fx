@@ -1,17 +1,26 @@
 // Transformation matrices
-uniform extern float4x4 gWorld; 
-uniform extern float4x4 gView;
-uniform extern float4x4 gProj;
+uniform float4x4 gWorld; 
+uniform float4x4 gView;
+uniform float4x4 gProj;
 
 // Textures, applicable if texCount > 0
-uniform extern Texture2D tex_diffuse;
-uniform extern int texCount;
+uniform Texture2D tex_diffuse;
+uniform int texCount;
+uniform float Shininess, Opacity;
+uniform int animationIndex;
 
 // some material properties
-uniform extern float4 Diffuse, Specular, Ambient, Emissive;
-uniform extern float Shininess, Opacity;
+uniform float4 Diffuse, Specular, Ambient, Emissive;
 
-uniform extern float4 CamPosObj;
+// Camera Position in object coordinates
+uniform float4 CamPosObj;
+
+// For rendering bones
+uniform float4x4 boneTransforms[512];
+uniform float4x4 meshTransform;
+
+// Bone Transformation Matrices
+static const int MAX_BONES_PER_GEO = 512;
 
 // light parameters
 static const int NUM_LIGHTS = 20;
@@ -51,18 +60,38 @@ SamplerState MeshTextureSampler
 
 // Vertex shader, handles the positioning of the vertices
 void VS(float4 iPosL  : POSITION,
-		float4 iNormL : NORMAL,
-		float3 iTex : TEXTURE,
-        out float4 oPosH  : SV_POSITION,
-		out float4 oPosObj : W_POSITION,
-		out float4 oNormal: NORMALS, 
-		out float2 oTex : UV_TEX )
+	float4 iNormL : NORMAL,
+	float3 iTex : TEXTURE,
+	int4 iBoneID : BONE_ID,
+	float4 iBoneWeight : BONE_WEIGHT,
+    out float4 oPosH  : SV_POSITION,
+	out float4 oPosObj : W_POSITION,
+	out float4 oNormal: NORMALS, 
+	out float2 oTex : UV_TEX )
 {
-	float4x4 worldViewProj = mul(mul(gWorld, gView), gProj);
-	oPosH = mul(iPosL, worldViewProj);
+	float4x4 worldViewProj = mul(gWorld, mul(gView, gProj));
+	float4 posBone = iPosL;
+	float4 normBone = iNormL;
 
-	oPosObj = iPosL;
-	oNormal = iNormL;
+	if (animationIndex != -1 && iBoneWeight.x + iBoneWeight.y + iBoneWeight.z + iBoneWeight.w > 0.9f)
+	{
+		posBone = iBoneWeight[0] * mul(posBone, boneTransforms[iBoneID[0]])
+			+ iBoneWeight[1] * mul(posBone, boneTransforms[iBoneID[1]] )
+			+ iBoneWeight[2] * mul(posBone, boneTransforms[iBoneID[2]] )
+			+ iBoneWeight[3] * mul(posBone, boneTransforms[iBoneID[3]] );
+
+		normBone.w = 0.0f;
+		normBone = iBoneWeight[0] * mul(normBone, boneTransforms[iBoneID[0]])
+			+ iBoneWeight[1] * mul(normBone, boneTransforms[iBoneID[1]])
+			+ iBoneWeight[2] * mul(normBone, boneTransforms[iBoneID[2]])
+			+ iBoneWeight[3] * mul(normBone, boneTransforms[iBoneID[3]]);
+	}
+
+	posBone.w = 1.0f;
+	normBone.w = 0.0f;
+	oPosH = mul(posBone, worldViewProj);
+	oPosObj = posBone;
+	oNormal = normBone;
 	oTex = float2(iTex.x, iTex.y);
 }
 
@@ -74,6 +103,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		float2 iTex : UV_TEX)
 		: SV_TARGET
 {
+
 	float4 retColor = float4(0,0,0,1);
 
 	float3 eVec = (float3) normalize(CamPosObj - PositionObj);
@@ -154,7 +184,8 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
 			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
-			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient;
+
+			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
 		}
 
 		// else if there is a texture.... MAKE IT RED FOR NOW 
@@ -162,10 +193,10 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
 			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
-			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .2f;
+			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
 		}
 
-		retColor += max( float4(0,0,0,0), c_l * c_mat ) ;
+		retColor += max( float4(0,0,0,0),  c_l * c_mat ) ;
 	}
 
 	// if there is texture

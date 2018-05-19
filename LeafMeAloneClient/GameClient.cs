@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Client;
 using Shared;
 using SlimDX;
-using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
-using Device = SlimDX.DXGI.Device;
 using System.Net;
 
 namespace Client
@@ -22,6 +17,8 @@ namespace Client
     /// </summary>
     class GameClient
     {
+        private const string BAD_PACKET_REF =
+            "Warning: Packet references object whose ID not created yet";
 
         // Offset of the camera from the player at origin.
         public static Vector3 CAMERA_OFFSET = new Vector3(0, 50, -30);
@@ -44,48 +41,58 @@ namespace Client
 
         // Timer to calculate time between frames.
         public Stopwatch FrameTimer;
-        
-        // Initial particle system.
-        private ParticleSystem p;
+        private UIFramesPersecond fps;
+        private UITimer gameTimer;
 
         private NetworkClient networkClient;
+
+        public static GameClient instance;
 
         private static void Main(String[] args)
         {
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
 
-            IPAddress address;
-            if (args.Length > 1)
+            IPAddress ipAddress = IPAddress.Loopback;
+            if (args.Length > 0)
             {
-                address = IPAddress.Parse(args[1]);
-            }
-
-            else
-            {
-                address = IPAddress.Loopback;
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+                ipAddress = ipHostInfo.AddressList[0];
             }
 
             // Create a new camera with a specified offset.
-            Camera activeCamera = new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
+            Camera activeCamera =
+                new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
 
             // Initialize graphics classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
 
-            GameClient Client = new GameClient(new NetworkClient(address));
+            GameClient Client = new GameClient(new NetworkClient(ipAddress));
+
+
+            //TODO FOR TESTING ONLY
+            //GraphicsRenderer.Form.KeyDown += 
+            // TestPlayerMovementWithoutNetworking;
+            Client.fps = new UIFramesPersecond(new Size(5, 30),
+                new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
+            Client.gameTimer =
+                new UITimer(60, new Size(225, 3), new Point(0, 0));
+
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
         }
 
-        /// <summary>
-        /// Main game loop code.
-        /// </summary>
+
         private void DoGameLoop()
         {
-            GraphicsRenderer.DeviceContext.ClearRenderTargetView(GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
-            GraphicsRenderer.DeviceContext.ClearDepthStencilView(GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth, 1.0f, 0);
+            fps.Start();
+            GraphicsRenderer.DeviceContext.ClearRenderTargetView(
+                GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
+            GraphicsRenderer.DeviceContext.ClearDepthStencilView(
+                GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth,
+                1.0f, 0);
 
             // Receive any packets from the server.
             ReceivePackets();
@@ -106,37 +113,31 @@ namespace Client
             // Draw everythhing.
             Render();
 
-            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
 
+            GraphicsRenderer.BarContext.Draw();
+            GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+            fps.StopAndCalculateFps();
         }
 
         // Start the networked client (connect to server).
         public GameClient(NetworkClient networkClient)
         {
+            if (instance != null)
+            {
+                Console.WriteLine("WARNING: Attempting to double instantiate GameClient!");
+            }
+            instance = this;
+
             this.networkClient = networkClient;
             networkClient.StartClient();
 
             // Initialize frame timer
             FrameTimer = new Stopwatch();
             FrameTimer.Start();
-            
+
             // Initialize game object lists.
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
-
-            // TEMPORARY: Create a new test particle system.
-            // TODO: Move this to better place.
-            p = new ParticleSystem 
-            (
-                ParticleSystemType.FIRE,
-                new Vector3(-10, 0, 0),   // origin
-                new Vector3(2.0f, 0f, 0f),  // velocity
-                2.0f,   // cone radius
-                1.0f,    // initial delta size
-                10f,     // cutoff distance
-                0.2f,     // cutoff speed
-                0.075f      // enlarge speed
-            );
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -154,7 +155,8 @@ namespace Client
             // Get the time since the last frame.
             float delta = FrameTimer.ElapsedMilliseconds;
             delta /= 1000.0f;
-
+            delta = Math.Max(.001f, delta);
+            delta = Math.Min(.01f, delta);
             // Iterate through all networked objects and update them.
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in NetworkedGameObjects.AsEnumerable())
             {
@@ -171,7 +173,7 @@ namespace Client
             }
 
             // Update the graphics manager.
-            GraphicsManager.Update();
+            GraphicsManager.Update(delta);
 
             // Restart the frame timer.
             FrameTimer.Restart();
@@ -185,17 +187,21 @@ namespace Client
         {
 
             // Iterate through all networked game objects and draw them.
-            foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in NetworkedGameObjects.AsEnumerable())
+            foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in
+                NetworkedGameObjects.AsEnumerable())
             {
                 NetworkedGameObjectClient gameObject = kv.Value;
                 gameObject.Draw();
             }
 
-            // Iterate through all the non-networked objects and draw them.
-            foreach (NonNetworkedGameObjectClient obj in NonNetworkedGameObjects)
+            // iterate through all the non-networked objects and draw them.
+            foreach (
+                NonNetworkedGameObjectClient obj in NonNetworkedGameObjects
+                )
             {
                 obj.Draw();
             }
+            GraphicsManager.Draw();
         }
 
 
@@ -222,25 +228,33 @@ namespace Client
                     // Create the new object.
                     CreateObjectFromPacket(packet as CreateObjectPacket);
                 }
-
                 // Otherwise, if this is not a create packet.
                 else
                 {
                     // Get the object ID so we can update the object.
                     NetworkedGameObjects.TryGetValue(
-                        packet.ObjectId, out NetworkedGameObjectClient toUpdate);
+                        packet.ObjectId,
+                        out NetworkedGameObjectClient packetObject);
 
-                    // If we didn't get an object, object doesn't exist and something is wrong.
-                    if (toUpdate == null)
+                    // If we didn't get an object, object doesn't exist 
+                    // and something is wrong.
+                    if (packetObject == null)
                     {
-                        Console.WriteLine("Warning: Packet references object whose ID not created yet");
+                        Console.WriteLine(
+                            BAD_PACKET_REF);
                     }
 
-                    // Update the packet we found.
-                    toUpdate.UpdateFromPacket(packet);
+                    if (packet is LeafPacket || packet is PlayerPacket)
+                    {
+                        // Update the packet we found.
+                        packetObject.UpdateFromPacket(packet);
+                    }
+                    else if (packet is DestroyObjectPacket)
+                    {
+                        packetObject.Destroy();
+                    }
                 }
             }
-
             // Clear the queue of packets.
             networkClient.PacketQueue.Clear();
         }
@@ -263,15 +277,15 @@ namespace Client
 
                 // Create an other player
                 case (ObjectType.PLAYER):
-                    NetworkedGameObjects.Add( 
-                        createPacket.ObjectId, new PlayerClient( createPacket )
+                    NetworkedGameObjects.Add(
+                        createPacket.ObjectId, new PlayerClient(createPacket)
                         );
                     break;
 
                 // Create a leaf.
                 case (ObjectType.LEAF):
                     NetworkedGameObjects.Add(
-                        createPacket.ObjectId, new LeafClient( createPacket )
+                        createPacket.ObjectId, new LeafClient(createPacket)
 
                         );
                     break;
@@ -284,10 +298,12 @@ namespace Client
         /// </summary>
         /// <param name="createPacket">The createPacket that holds info 
         /// on intitial pos, etc</param>
-        private void InitializeUserPlayerAndMovement(CreateObjectPacket createPacket)
+        private void InitializeUserPlayerAndMovement(
+            CreateObjectPacket createPacket
+            )
         {
             // Create a new player with the specified packet info.
-            ActivePlayer = new PlayerClient( createPacket );
+            ActivePlayer = new PlayerClient(createPacket);
 
             // Set the active plyer in the graphics manager.
             GraphicsManager.ActivePlayer = ActivePlayer;
@@ -300,19 +316,16 @@ namespace Client
         }
 
         /// <summary>
-        /// Sends out the data associated with the active player's input, resets requested movement
+        /// Sends out the data associated with the active player's input, 
+        /// resets requested movement
         /// </summary>
         private void SendPackets()
         {
-            // Create a new player packet, and fill it with player's relevant info.
-            PlayerPacket toSend = ClientPacketFactory.CreatePacket(ActivePlayer);
+            // Create a new player packet, and fill it with player info.
+            PlayerPacket toSend =
+                ClientPacketFactory.CreatePacket(ActivePlayer);
             byte[] data = toSend.Serialize();
             networkClient.Send(data);
-
-            // COMMENT OUT WHEN SERVER IS INTEGRATED
-            /*ActivePlayer.Transform.Position = new Vector3(ActivePlayer.Transform.Position.X - playerPack.Movement.X * 0.01f,
-                                                          ActivePlayer.Transform.Position.Y,
-                                                          ActivePlayer.Transform.Position.Z - playerPack.Movement.Y * 0.01f );*/
 
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
@@ -334,6 +347,22 @@ namespace Client
             GraphicsRenderer.Form.MouseDown += InputManager.OnMouseDown;
             GraphicsRenderer.Form.MouseUp += InputManager.OnMouseUp;
             GraphicsRenderer.Form.MouseMove += InputManager.OnMouseMove;
+        }
+
+        /// <summary>
+        /// Destroys the game object on the client 
+        /// </summary>
+        /// <param name="gameObj">the game object to destroy</param>
+        public void Destroy(GameObject gameObj)
+        {
+            if (gameObj is NetworkedGameObjectClient networkedObj)
+            {
+                NetworkedGameObjects.Remove(networkedObj.Id);
+            }
+            else if (gameObj is NonNetworkedGameObjectClient nonNetObj)
+            {
+                NonNetworkedGameObjects.Remove(nonNetObj);
+            }
         }
 
     }

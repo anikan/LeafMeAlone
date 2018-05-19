@@ -79,6 +79,8 @@ namespace Server
         /// <param name="deltaTime"></param>
         public override void Update(float deltaTime)
         {
+            base.Update(deltaTime);
+
             // Calculate accelaration from F = ma
             Acceleration = Force / Mass;
 
@@ -120,9 +122,9 @@ namespace Server
         private Vector3 RoundVectorToZero(Vector3 vector, float minBeforeZero)
         {
             // Checks each value and sets to zero if less than minimum.
-            if (vector.X < minBeforeZero) vector.X = 0.0f;
-            if (vector.Y < minBeforeZero) vector.Y = 0.0f;
-            if (vector.Z < minBeforeZero) vector.Z = 0.0f;
+            if (Math.Abs(vector.X) < minBeforeZero) vector.X = 0.0f;
+            if (Math.Abs(vector.Y) < minBeforeZero) vector.Y = 0.0f;
+            if (Math.Abs(vector.Z) < minBeforeZero) vector.Z = 0.0f;
 
             return vector;
         }
@@ -148,6 +150,8 @@ namespace Server
                 // If this is the leafblower's primary tool.
                 if (toolMode == ToolMode.PRIMARY)
                 {
+
+
                     // Extinguish any objects that get blowed by the leaf blower.
                     Extinguish();
 
@@ -156,6 +160,7 @@ namespace Server
 
                     // Get the vector from the player to the object.
                     Vector3 playerToObj = Transform.Position - playerPosition;
+                    playerToObj.Y = 0.0f;
                     float distance = playerToObj.Length();
 
                     // Divide the vector by the range of the tool to normalize it.
@@ -168,6 +173,10 @@ namespace Server
                     // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
                     ApplyForce(force);
+
+                    // Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
+
+
                 }
             }
         }

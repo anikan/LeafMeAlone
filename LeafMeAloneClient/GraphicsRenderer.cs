@@ -6,6 +6,7 @@ using SlimDX.Windows;
 using Device = SlimDX.Direct3D11.Device;
 using Resource = SlimDX.Direct3D11.Resource;
 using System.Windows.Forms;
+using AntTweakBar;
 
 namespace Client
 {
@@ -36,6 +37,8 @@ namespace Client
         public static Viewport Viewport;
 
         public static Matrix ProjectionMatrix;
+
+        public static Context BarContext;
 
         #region Depth Buffer and Rasterizer
         private static Texture2DDescription depthBufferDesc;
@@ -132,7 +135,7 @@ namespace Client
             BlendState = BlendState.FromDescription(Device, bs);
         }
 
-
+        
         /// <summary>
         /// Initialize graphics properties and create the main window.
         /// </summary>
@@ -192,6 +195,9 @@ namespace Client
                 if (e.KeyCode == Keys.Escape)
                     Application.Exit();
             };
+
+           BarContext = new Context(Tw.GraphicsAPI.D3D11,Device.ComPointer);
+           BarContext.HandleResize(Form.ClientSize);
         }
 
         /// <summary>
@@ -205,6 +211,7 @@ namespace Client
             Viewport.Width = Form.ClientSize.Width;
             ProjectionMatrix = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Viewport.Width / Viewport.Height, .1f, 1000.0f);
             DeviceContext.Rasterizer.SetViewports(Viewport);
+            BarContext.HandleResize(Form.ClientSize);
         }
 
 

@@ -21,7 +21,7 @@ namespace Shared
     /// </summary>
     public abstract class Packet
     {
-        public const int HEADER_SIZE = 5;
+        public const int PACK_HEAD_SIZE = 5;
 
         // Was this packet changed?
         public bool Modified;
@@ -59,20 +59,16 @@ namespace Shared
         /// packet info</param>
         /// <param name="bytesRead">the number of bytes read in total</param>
         /// <returns>the packet deserialized</returns>
-        public static Packet Deserialize(byte[] data, out int bytesRead)
+        public static Packet Deserialize(byte[] data)
         {
             Byte[] objectData =
                 RemoveHeader(data);
-
-            bytesRead = 0;
 
             //If we haven't received the full packet, objectData will be null, return null.
             if (objectData == null)
             {
                 return null;
             }
-
-            bytesRead = HEADER_SIZE + objectData.Length;
 
             switch ((PacketType)data[0])
             {
@@ -106,7 +102,7 @@ namespace Shared
         public static byte[] RemoveHeader(byte[] data)
         {
             //Check whether we can get the size.
-            if (data.Length <= 5)
+            if (data.Length <= PACK_HEAD_SIZE)
             {
                 return null;
             }
@@ -120,12 +116,12 @@ namespace Shared
             int packetSize = BitConverter.ToInt32(sizePortion, 0);
 
             //Check whether the full packet has arrived.
-            if (data.Length < packetSize + HEADER_SIZE)
+            if (data.Length < packetSize + PACK_HEAD_SIZE)
             {
                 return null;
             }
             byte[] resizedBuffer = new byte[packetSize];
-            Buffer.BlockCopy(data, 5, resizedBuffer, 0, packetSize);
+            Buffer.BlockCopy(data, PACK_HEAD_SIZE, resizedBuffer, 0, packetSize);
             return resizedBuffer;
         }
 

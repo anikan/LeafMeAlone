@@ -50,6 +50,7 @@ namespace Client
         //Socket to communicate with the server.
         private Socket client;
 
+        public List<byte> ByteReceivedQueue = new List<byte>();
         //List of received packets. Populated by ReadCallback
         public List<Packet> PacketQueue = new List<Packet>();
 
@@ -99,6 +100,11 @@ namespace Client
 
                 Console.WriteLine("Socket connected to {0}",
                     client.RemoteEndPoint.ToString());
+
+                StateObject state = new StateObject();
+                state.workSocket = client;
+                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                               new AsyncCallback(ReceiveCallback), state);
             }
             catch (Exception e)
             {
@@ -106,12 +112,64 @@ namespace Client
             }
         }
 
+        public void ReceiveCallback(IAsyncResult asyncResult)
+        {
+            // Retrieve the state object and the client socket   
+            // from the asynchronous state object.  
+            StateObject state = (StateObject)asyncResult.AsyncState;
+            Socket client = state.workSocket;
+            // Read data from the remote device.  
+            int bytesRead = client.EndReceive(asyncResult);
+
+            // There might be more data, so store the data received so far.  
+            lock (ByteReceivedQueue)
+            {
+                ByteReceivedQueue.AddRange(state.buffer.Take(bytesRead));
+            }
+            //  Get the rest of the data.  
+            client.BeginReceive(
+                state.buffer, 0, StateObject.BufferSize, 0,
+                new AsyncCallback(ReceiveCallback), state);
+
+        }
+
+        public void Receive()
+        {
+            while (ByteReceivedQueue.Count > 0)
+            {
+                if (ByteReceivedQueue.Count < 5)
+                {
+                    break;
+                }
+
+                byte[] headerByteBuf = ByteReceivedQueue.GetRange(0, 5).ToArray();
+                int packetSize = BitConverter.ToInt32(headerByteBuf, 1);
+
+                if (ByteReceivedQueue.Count < packetSize + 5)
+                {
+                    break;
+                }
+
+                byte[] packetData = ByteReceivedQueue.GetRange(5, packetSize).ToArray();
+
+                byte[] fullPacket = headerByteBuf.Concat(packetData).ToArray();
+                Packet packet = Packet.Deserialize(fullPacket, out int b);
+
+                PacketQueue.Add(packet);
+
+                lock (ByteReceivedQueue)
+                {
+                    ByteReceivedQueue.RemoveRange(0, packetSize + 5);
+                }
+            }
+        }
+
         /// <summary>
         /// Receive packets from the server and add them to the appropriate queue.
         /// </summary>
-        public void Receive()
+        public void oldReceive()
         {
-         //   Console.WriteLine(client.Available);
+            //   Console.WriteLine(client.Available);
 
             byte[] savedBuffer = new byte[0];
 
@@ -151,6 +209,12 @@ namespace Client
 
                     buffer = buffer.Skip(bytesRead).ToArray();
                     bytesToRead -= bytesRead;
+                }
+
+                if (bytesToRead < 0)
+                {
+                    Console.WriteLine("Less than read");
+
                 }
             }
         }

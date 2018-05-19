@@ -87,10 +87,6 @@ namespace Client
 
         public static void Update(float delta_t)
         {
-            // TODO:REMOVE AFTER TESTING
-            animatedModel.Update(delta_t);
-            animatedModel2.Update(delta_t/2.0f);
-            animatedModel3.Update(delta_t*2.0f);
 
             // update the camera position based on the player position
             if (ActivePlayer != null)
@@ -102,10 +98,6 @@ namespace Client
 
         public static void Draw()
         {
-            // TODO: REMOVE AFTER TESTING
-            animatedModel.Draw();
-            animatedModel2.Draw();
-            animatedModel3.Draw();
 
             foreach (ParticleSystem particleSystem in ParticleSystems)
             {
@@ -113,9 +105,6 @@ namespace Client
             }
 
         }
-
-        // TODO: REMOVE AFTER TESTING
-        private static Model animatedModel, animatedModel2, animatedModel3;
 
         /// <summary>
         /// Initialize the graphics manager
@@ -159,38 +148,6 @@ namespace Client
             LoadAllShaders();
 
             ParticleSystems = new List<ParticleSystem>();
-
-            //TODO: REMOVE AFTER TESTING
-            animatedModel = new Model(@"../../Models/Example_Running_Anim.fbx", true);
-            float scale = 0.124f;
-            animatedModel.m_Properties.Scale = new Vector3(scale, scale, scale);
-            animatedModel.m_Properties.Rotation.X = (float) Math.PI/2.0f*3.0f;
-            animatedModel.m_Properties.Rotation.Y = (float) Math.PI;
-            //animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
-            //animatedModel.m_Properties.Position = new Vector3(0, 10, 0);
-            animatedModel.StartAnimationSequenceByIndex(0, true);
-            animatedModel.PauseCurrentAnimation();
-
-            animatedModel2 = new Model(@"../../Models/Example_Running_Anim.fbx", true);
-            scale = 0.124f;
-            animatedModel2.m_Properties.Scale = new Vector3(scale, scale, scale);
-            animatedModel2.m_Properties.Rotation.X = (float)Math.PI / 2.0f * 3.0f;
-            animatedModel2.m_Properties.Rotation.Y = (float)Math.PI;
-            //animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
-            animatedModel2.m_Properties.Position = new Vector3(-10, 0, 0);
-            animatedModel2.StartAnimationSequenceByIndex(0, true);
-            animatedModel2.PauseCurrentAnimation();
-
-            animatedModel3 = new Model(@"../../Models/Example_Running_Anim.fbx", true);
-            scale = 0.124f;
-            animatedModel3.m_Properties.Scale = new Vector3(scale, scale, scale);
-            animatedModel3.m_Properties.Rotation.X = (float)Math.PI / 2.0f * 3.0f;
-            animatedModel3.m_Properties.Rotation.Y = (float)Math.PI;
-            //animatedModel.m_Properties.Rotation.Z = (float) Math.PI;
-            animatedModel3.m_Properties.Position = new Vector3(10, 0, 0);
-            animatedModel3.StartAnimationSequenceByIndex(0, true);
-            animatedModel3.PauseCurrentAnimation();
-            animatedModel3.ResumeCurrentAnimation();
         }
 
         /// <summary>

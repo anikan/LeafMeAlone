@@ -91,6 +91,9 @@ namespace Server
                 //Check if a client wants to connect.
                 networkServer.CheckForConnections();
 
+                // Go ahead and try to receive new updates
+                networkServer.Receive();
+
                 //Update the server players based on received packets.
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {

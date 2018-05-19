@@ -21,6 +21,6 @@
         public const string LeafModel = @"../../Models/05.13.18_Leaf.fbx";
         public const string PlayerModel = @"../../Models/05.03.18_Version2.fbx";
         public const string DefaultMapModel = @"../../Models/Terrain.fbx";
-        public const string TreeModel = @"../../Models/Tree.fbx";
+        public const string TreeModel = @"../../Models/Tree.dae";
     }
 }

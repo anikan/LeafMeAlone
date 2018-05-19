@@ -142,11 +142,16 @@ namespace Server
                     }
                 }
             }
+
+            // If this is a blower.
             else if (toolType == ToolType.BLOWER)
             {
 
+                // If this is the primary function of the blower.
                 if (toolMode == ToolMode.PRIMARY)
                 {
+
+                    // Extinguish the leaf.
                     Burning = false;
                 }
             }

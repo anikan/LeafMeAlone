@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using SlimDX;
 
 namespace Client
 {
@@ -12,7 +13,9 @@ namespace Client
 
         public TreeClient(CreateObjectPacket createPacket) : base(createPacket, FileManager.TreeModel)
         {
-            Console.WriteLine("Making tree at position" + Transform.Position);
+           // Console.WriteLine("Making tree at position" + Transform.Position);
+            //Transform.Rotation.Z = 90.0f;
+            Transform.Scale = new Vector3(3.0f, 3.0f, 3.0f);
         }
 
         public override void UpdateFromPacket(Packet packet)

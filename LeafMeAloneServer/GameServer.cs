@@ -179,7 +179,7 @@ namespace Server
         public MapServer CreateMap()
         {
 
-            MapServer newMap = new MapServer(100.0f, 100.0f);
+            MapServer newMap = new MapServer(75.0f, 75.0f);
 
             for (float y = -newMap.Height / 2.0f; y < newMap.Height / 2.0f; y+= TreeServer.TREE_RADIUS)
             {

@@ -8,16 +8,26 @@ using SlimDX;
 
 namespace Client
 {
+    /// <summary>
+    /// A tree on the client-side.
+    /// </summary>
     public class TreeClient : NetworkedGameObjectClient
     {
 
+        /// <summary>
+        /// Create a new tree, based on a packet sent from the server.
+        /// </summary>
+        /// <param name="createPacket">Packet of a tree being created.</param>
         public TreeClient(CreateObjectPacket createPacket) : base(createPacket, Constants.TreeModel)
         {
-           // Console.WriteLine("Making tree at position" + Transform.Position);
-           // Transform.Rotation.Z = 90.0f;
-           // Transform.Scale = new Vector3(3.0f, 3.0f, 3.0f);
+            // Scale the tree to make it slightly bigger.
+            Transform.Scale = new Vector3(1.5f, 1.5f, 1.5f);
         }
 
+        /// <summary>
+        /// Update this object from a server packet.
+        /// </summary>
+        /// <param name="packet">Packet from server.</param>
         public override void UpdateFromPacket(Packet packet)
         {
            // throw new NotImplementedException();

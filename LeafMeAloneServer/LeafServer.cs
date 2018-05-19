@@ -18,6 +18,9 @@ namespace Server
         public const float LEAF_MASS = 0.1f;
         public const float LEAF_RADIUS = 0.0f;
 
+        /// <summary>
+        /// Create a new leaf on the server.
+        /// </summary>
         public LeafServer() : base(ObjectType.LEAF, LEAF_HEALTH, LEAF_MASS, LEAF_RADIUS)
         {
 

@@ -8,19 +8,24 @@ using SlimDX;
 
 namespace Client
 {
+    /// <summary>
+    /// Client-side game map. Mainly for just rendering a terrain.
+    /// </summary>
     public class MapClient : NonNetworkedGameObjectClient
     {
 
+        /// <summary>
+        /// Creates a new map with a map model.
+        /// </summary>
+        /// <param name="modelPath"></param>
         public MapClient(string modelPath = Constants.DefaultMapModel) : base(modelPath)
         {
 
-            Transform.Position.Y = -15.0f;
-            Transform.Scale = new Vector3(100, 1, 100);
-        }
+            // Create the terrain at floor height, slightly below.
+            Transform.Position.Y = Constants.FLOOR_HEIGHT - 1.0f;
 
-        public override void Update(float deltaTime)
-        {
-            base.Update(deltaTime);
+            // Scale the terrain.
+            Transform.Scale = new Vector3(100, 1, 100);
         }
     }
 }

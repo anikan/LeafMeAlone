@@ -11,6 +11,7 @@ namespace Server
     public class PlayerServer : PhysicsObject, IPlayer
     {
 
+        // Constant values of the player.
         public const float PLAYER_HEALTH = 100.0f;
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 1.0f;

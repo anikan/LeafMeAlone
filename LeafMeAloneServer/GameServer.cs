@@ -265,11 +265,6 @@ namespace Server
             }
         }
 
-        public void AddUniversalPhysics()
-        {
-
-        }
-
         /// <summary>
         /// Add the tool effects of all the players.
         /// </summary>
@@ -308,8 +303,13 @@ namespace Server
             toDestroyQueue.Add(gameObj);
         }
 
+        /// <summary>
+        /// Gets a list of game objects from the dictionary.
+        /// </summary>
+        /// <returns>A list of all objects from the object dictionary.</returns>
         public List<GameObjectServer> GetGameObjectList()
         {
+            // Turn the game objects to a value list.
             return gameObjectDict.Values.ToList<GameObjectServer>();
         }
     }

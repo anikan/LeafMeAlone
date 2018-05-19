@@ -1,6 +1,6 @@
-﻿namespace Client
+﻿namespace Shared
 {
-    public static class FileManager
+    public static class Constants
     {
         /// <summary>
         /// Shaders
@@ -21,6 +21,8 @@
         public const string LeafModel = @"../../Models/05.13.18_Leaf.fbx";
         public const string PlayerModel = @"../../Models/05.03.18_Version2.fbx";
         public const string DefaultMapModel = @"../../Models/Terrain.fbx";
-        public const string TreeModel = @"../../Models/Tree.dae";
+        public const string TreeModel = @"../../Models/TreeAttempt.fbx";
+
+        public const float FLOOR_HEIGHT = -10.0f;
     }
 }

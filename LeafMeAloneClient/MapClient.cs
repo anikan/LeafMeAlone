@@ -11,7 +11,7 @@ namespace Client
     public class MapClient : NonNetworkedGameObjectClient
     {
 
-        public MapClient(string modelPath = FileManager.DefaultMapModel) : base(modelPath)
+        public MapClient(string modelPath = Constants.DefaultMapModel) : base(modelPath)
         {
 
             Transform.Position.Y = -15.0f;

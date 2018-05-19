@@ -11,7 +11,7 @@ namespace Client
     {
         
         public LeafClient(CreateObjectPacket createPacket) : 
-            base(createPacket, FileManager.LeafModel)
+            base(createPacket, Constants.LeafModel)
         {
         }
 

@@ -11,7 +11,7 @@ namespace Server
     public class TreeServer : ColliderObject
     {
 
-        public const float TREE_RADIUS = 8.0f;
+        public const float TREE_RADIUS = 3.0f;
         public const float TREE_HEALTH = 10000.0f;
 
         public TreeServer() : base(ObjectType.TREE, TREE_HEALTH, TREE_RADIUS)

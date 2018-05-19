@@ -57,7 +57,7 @@ namespace Server
             networkServer = new NetworkServer(networked);
 
             CreateMap();
-            CreateRandomLeaves(200, -10, -10, 10, -10, 10);
+            CreateRandomLeaves(200, -10, 10, -10, 10);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -191,7 +191,7 @@ namespace Server
                     {
 
                         TreeServer newTree = new TreeServer();
-                        newTree.Transform.Position = new Vector3(x, 0.0f, y);
+                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
                         networkServer.SendNewObjectToAll(newTree);
 
                     }
@@ -199,7 +199,7 @@ namespace Server
                     {
 
                         TreeServer newTree = new TreeServer();
-                        newTree.Transform.Position = new Vector3(x, 0.0f, y);
+                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
                         networkServer.SendNewObjectToAll(newTree);
 
                     }
@@ -219,14 +219,14 @@ namespace Server
         /// <param name="maxX">Max x position to spawn leaves.</param>
         /// <param name="minZ">Min y position to spawn leaves.</param>
         /// <param name="maxZ">Max y position to spawn leaves.</param>
-        public void CreateRandomLeaves(int num, float floorHeight, float minX, float maxX, float minZ, float maxZ)
+        public void CreateRandomLeaves(int num, float minX, float maxX, float minZ, float maxZ)
         {
             // Create a new random number generator.
             Random rnd = new Random();
 
             // Very slight random offset for leaves so that there's no z-fighting.
-            double minY = floorHeight - 0.1f;
-            double maxY = floorHeight;
+            double minY = Constants.FLOOR_HEIGHT;
+            double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
             // Itereate through number of leaves we want to create.
             for (int i = 0; i < num; i++)

@@ -77,7 +77,7 @@ namespace Server
             Velocity = Velocity + (Acceleration * deltaTime);
 
             // Set position based on the new velocity
-            Transform.Position = Transform.Position + (Velocity * deltaTime);
+            TryMoveObject(Transform.Position + (Velocity * deltaTime));
 
             // Zero out force, it's been used
             Force = Vector3.Zero;

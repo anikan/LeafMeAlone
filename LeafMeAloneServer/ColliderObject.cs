@@ -109,7 +109,7 @@ namespace Server
                     // If the object is colliding, just return. No movement.
                     if (obj != this && IsColliding(obj))
                     {
-                        Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
+                    //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
 
                         Transform.Position = OriginalPosition;
                         break;

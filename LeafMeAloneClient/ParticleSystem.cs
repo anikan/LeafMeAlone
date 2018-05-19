@@ -184,9 +184,9 @@ namespace Client
             VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             VBO_Origin = new Buffer(GraphicsRenderer.Device, StartingLocations, Particles.Count * size, ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Default, BindFlags.None, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            var btcode = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "VS", "vs_4_0", ShaderFlags.None,
+            var btcode = ShaderBytecode.CompileFromFile(Constants.ParticleShader, "VS", "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);
-            var btcode1 = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "PS", "fx_5_0", ShaderFlags.None,
+            var btcode1 = ShaderBytecode.CompileFromFile(Constants.ParticleShader, "PS", "fx_5_0", ShaderFlags.None,
                 EffectFlags.None);
             var sig = ShaderSignature.GetInputSignature(btcode);
 
@@ -206,10 +206,10 @@ namespace Client
             switch (type)
             {
                 case ParticleSystemType.FIRE:
-                    TexSRV = CreateTexture(FileManager.FireTexture);
+                    TexSRV = CreateTexture(Constants.FireTexture);
                     break;
                 case ParticleSystemType.WIND:
-                    TexSRV = CreateTexture(FileManager.WindTexture);
+                    TexSRV = CreateTexture(Constants.WindTexture);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

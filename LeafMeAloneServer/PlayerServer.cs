@@ -12,7 +12,7 @@ namespace Server
     {
 
         public const float PLAYER_HEALTH = 100.0f;
-        public const float PLAYER_MASS = 1.0f;
+        public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 1.0f;
         public const float PLAYER_SPEED = 20.0f;
 

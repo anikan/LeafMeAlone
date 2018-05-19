@@ -85,7 +85,7 @@ namespace Shared
                         new MemoryStream(objectData)
                     );
                 case PacketType.LeafPacket:
-                    return Serializer.Deserialize<LeafPacket>(
+                    return Serializer.Deserialize<ObjectPacket>(
                         new MemoryStream(objectData)
                     );
                 case PacketType.DestroyObjectPacket:

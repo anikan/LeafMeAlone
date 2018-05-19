@@ -14,7 +14,8 @@ namespace Shared
         ACTIVE_PLAYER,
         PLAYER,
         LEAF,
-        MAP
+        MAP,
+        TREE
     };
 
     /// <summary>

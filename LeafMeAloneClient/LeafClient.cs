@@ -15,7 +15,7 @@ namespace Client
         {
         }
 
-        public void UpdateFromPacket(LeafPacket packet)
+        public void UpdateFromPacket(ObjectPacket packet)
         {
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
@@ -25,7 +25,7 @@ namespace Client
 
         public override void UpdateFromPacket(Packet packet)
         {
-            UpdateFromPacket(packet as LeafPacket);
+            UpdateFromPacket(packet as ObjectPacket);
         }
     }
 }

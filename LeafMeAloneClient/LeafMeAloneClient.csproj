@@ -102,6 +102,7 @@
     <Compile Include="FileManager.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
+    <Compile Include="TreeClient.cs" />
     <Compile Include="UIFramesPersecond.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="GraphicGameObject.cs" />

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Shared
 {
     [ProtoContract]
-    public class LeafPacket : Packet
+    public class ObjectPacket : Packet
     {
         [ProtoMember(1)]
         public int _ProtoObjId
@@ -32,7 +32,7 @@ namespace Shared
         /// <summary>
         /// Creates a new packet for a leaf
         /// </summary>
-        public LeafPacket()  : base(PacketType.LeafPacket)
+        public ObjectPacket()  : base(PacketType.LeafPacket)
         { }
     }
 }

@@ -56,6 +56,7 @@ namespace Server
 
             networkServer = new NetworkServer(networked);
 
+            CreateMap();
             CreateRandomLeaves(200, -10, -10, 10, -10, 10);
 
             //CreateLeaves(100, -10, 10, -10, 10);
@@ -179,6 +180,31 @@ namespace Server
         {
 
             MapServer newMap = new MapServer(100.0f, 100.0f);
+
+            for (float y = -newMap.Height / 2.0f; y < newMap.Height / 2.0f; y+= TreeServer.TREE_RADIUS)
+            {
+
+                for (float x = -newMap.Width / 2.0f; x < newMap.Width / 2.0f; x+= TreeServer.TREE_RADIUS)
+                {
+
+                    if (y <= -newMap.Height / 2.0f || (newMap.Height / 2.0f) <= y + TreeServer.TREE_RADIUS)
+                    {
+
+                        TreeServer newTree = new TreeServer();
+                        newTree.Transform.Position = new Vector3(x, 0.0f, y);
+                        networkServer.SendNewObjectToAll(newTree);
+
+                    }
+                    else if (x <= -newMap.Width / 2.0f || (newMap.Width / 2.0f) <= x + TreeServer.TREE_RADIUS)
+                    {
+
+                        TreeServer newTree = new TreeServer();
+                        newTree.Transform.Position = new Vector3(x, 0.0f, y);
+                        networkServer.SendNewObjectToAll(newTree);
+
+                    }
+                }
+            }
 
             return newMap;
 

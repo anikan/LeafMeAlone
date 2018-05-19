@@ -25,7 +25,7 @@ namespace Server
         /// <param name="radius">Radius of the object for collisions.</param>
         public ColliderObject(ObjectType objectType, float health, float radius) : base(objectType, health)
         {
-
+            Radius = radius;
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Server
             float distance = Vector3.Distance(colliderPos, otherPos);
 
             // Check if the objects are overlapping.
-            if (distance <= Radius + other.Radius)
+            if (other.Radius > 0.0f && distance <= Radius + other.Radius)
             {
                 // If overlapping, they're colliding. Return true.
                 return true;
@@ -94,7 +94,7 @@ namespace Server
             // Save the original position of this object.
             Vector3 OriginalPosition = Transform.Position;
 
-            // First, update the position.
+            // First, update the     position.
             Transform.Position = newPosition;
 
             // First, we need all the game objects on the server.
@@ -107,8 +107,10 @@ namespace Server
                 if (allObjects[i] is ColliderObject obj)
                 {
                     // If the object is colliding, just return. No movement.
-                    if (IsColliding(obj))
+                    if (obj != this && IsColliding(obj))
                     {
+                        Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
+
                         Transform.Position = OriginalPosition;
                         break;
                     }

@@ -14,15 +14,13 @@ namespace Client
         public MapClient(string modelPath = FileManager.DefaultMapModel) : base(modelPath)
         {
 
-            Transform.Position.Y = -10.0f;
+            Transform.Position.Y = -15.0f;
             Transform.Scale = new Vector3(100, 1, 100);
         }
 
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
-
-            Console.WriteLine("Map position is " + Transform.Position);
         }
     }
 }

@@ -253,7 +253,7 @@ namespace Client
                             BAD_PACKET_REF);
                     }
 
-                    if (packet is LeafPacket || packet is PlayerPacket)
+                    if (packet is ObjectPacket || packet is PlayerPacket)
                     {
                         // Update the packet we found.
                         packetObject.UpdateFromPacket(packet);
@@ -297,6 +297,12 @@ namespace Client
                         createPacket.ObjectId, new LeafClient(createPacket)
 
                         );
+                    break;
+
+                case (ObjectType.TREE):
+                    Transform startTransform = new Transform();
+                    startTransform.Position = new Vector3(createPacket.InitialX, createPacket.InitialY, createPacket.InitialZ);
+                    NetworkedGameObjects.Add(createPacket.ObjectId, new TreeClient(createPacket));
                     break;
             }
         }

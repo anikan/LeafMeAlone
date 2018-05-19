@@ -34,17 +34,18 @@ namespace Server
                     ActiveToolMode = player.ActiveToolMode
                 };
             }
-            else if (gameObj is LeafServer leaf)
+            else if (gameObj is GameObjectServer obj)
             {
-                return new LeafPacket()
+                return new ObjectPacket()
                 {
-                    MovementX = leaf.Transform.Position.X,
-                    MovementZ = leaf.Transform.Position.Z,
-                    ObjectId = leaf.Id,
-                    Rotation = leaf.Transform.Rotation.Y,
-                    Burning = leaf.Burning
+                    MovementX = obj.Transform.Position.X,
+                    MovementZ = obj.Transform.Position.Z,
+                    ObjectId = obj.Id,
+                    Rotation = obj.Transform.Rotation.Y,
+                    Burning = obj.Burning
                 };
             }
+
             return null;
         }
 

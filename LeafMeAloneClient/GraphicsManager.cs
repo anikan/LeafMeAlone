@@ -87,6 +87,7 @@ namespace Client
 
         public static void Update(float delta_t)
         {
+
             // update the camera position based on the player position
             if (ActivePlayer != null)
             {
@@ -97,6 +98,7 @@ namespace Client
 
         public static void Draw()
         {
+
             foreach (ParticleSystem particleSystem in ParticleSystems)
             {
                 particleSystem.Draw();
@@ -135,6 +137,13 @@ namespace Client
                 light2.intensities = new Vector4(1.2f, 1.2f, 1.2f, 0);
                 light2.position = Vector4.Normalize(new Vector4(0, 1, 0, 0));
             }
+            {
+                LightParameters light3 = ActiveLightSystem.GetLightParameters(3);
+                light3.UseDirectionalPreset();
+                light3.status = LightParameters.STATUS_ON;
+                light3.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
+                light3.position = Vector4.Normalize(new Vector4(0, 0, -1, 0));
+            }
 
             LoadAllShaders();
 
@@ -166,7 +175,9 @@ namespace Client
             allShaderElements.Add(new[] {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
-                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2)
+                new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2),
+                new InputElement("BONE_ID", 0, Format.R32G32B32A32_UInt, 3),
+                new InputElement("BONE_WEIGHT", 0, Format.R32G32B32A32_Float, 4)
             });
 
             for (int i = 0; i < allShaderPaths.Count; i++)

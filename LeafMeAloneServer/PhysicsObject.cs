@@ -11,7 +11,7 @@ namespace Server
     /// <summary>
     /// An object that responds to physics and has physics operations.
     /// </summary>
-    public abstract class PhysicsObject : GameObjectServer
+    public abstract class PhysicsObject : ColliderObject
     {
 
         // Universal gravity constant
@@ -43,18 +43,7 @@ namespace Server
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
         /// <param name="mass">Optional mass of the object, default 1</param>
-        public PhysicsObject(ObjectType objectType, float health, float mass = 1.0f) : base(objectType, health)
-        {
-            Mass = mass;
-        }
-
-        /// <summary>
-        /// Creates a new physics object, given an object type and optionally mass.
-        /// </summary>
-        /// <param name="objectType">Type of this object.</param>
-        /// <param name="startTransform">Starting position.</param>
-        /// <param name="mass">Optional mass of the object, default 1.</param>
-        public PhysicsObject(ObjectType objectType, Transform startTransform, float health, float mass = 1.0f) : base(objectType, startTransform, health)
+        public PhysicsObject(ObjectType objectType, float health, float mass, float radius) : base(objectType, health, radius)
         {
             Mass = mass;
         }

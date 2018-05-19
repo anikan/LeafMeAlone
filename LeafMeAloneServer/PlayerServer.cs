@@ -8,10 +8,12 @@ using SlimDX;
 
 namespace Server
 {
-    public class PlayerServer : GameObjectServer, IPlayer
+    public class PlayerServer : PhysicsObject, IPlayer
     {
 
-        public const float PLAYER_BURN_TIME = 10000.0f;
+        public const float PLAYER_HEALTH = 100.0f;
+        public const float PLAYER_MASS = 1.0f;
+        public const float PLAYER_RADIUS = 1.0f;
 
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
@@ -19,7 +21,7 @@ namespace Server
         // If the user is using the primary function of their tool or secondary
         public ToolMode ActiveToolMode { get; set; }
 
-        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_BURN_TIME)
+        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS)
         {
 
             ToolEquipped = ToolType.BLOWER;
@@ -69,7 +71,9 @@ namespace Server
         /// <param name="packet">Packet from client.</param>
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            Transform.Position += new Vector3(packet.MovementX, 0.0f, packet.MovementZ) * GameServer.TICK_TIME_S;
+            Vector3 newPlayerPos = Transform.Position + new Vector3(packet.MovementX, 0.0f, packet.MovementZ) * GameServer.TICK_TIME_S;
+
+            TryMoveObject(newPlayerPos);
 
             Transform.Rotation.Y = packet.Rotation;
 

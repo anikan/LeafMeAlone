@@ -142,6 +142,14 @@ namespace Server
                     }
                 }
             }
+            else if (toolType == ToolType.BLOWER)
+            {
+
+                if (toolMode == ToolMode.PRIMARY)
+                {
+                    Burning = false;
+                }
+            }
         }
 
         /// <summary>

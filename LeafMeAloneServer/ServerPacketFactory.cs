@@ -42,6 +42,7 @@ namespace Server
                     MovementZ = leaf.Transform.Position.Z,
                     ObjectId = leaf.Id,
                     Rotation = leaf.Transform.Rotation.Y,
+                    Burning = leaf.Burning
                 };
             }
             return null;

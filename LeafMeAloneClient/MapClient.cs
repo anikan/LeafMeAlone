@@ -4,13 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using SlimDX;
 
 namespace Client
 {
-    public class MapClient : Map
+    public class MapClient : NonNetworkedGameObjectClient
     {
-        public MapClient(float width, float height) : base(width, height)
+
+        public MapClient(string modelPath = FileManager.DefaultMapModel) : base(modelPath)
         {
+
+            Transform.Position.Y = -10.0f;
+            Transform.Scale = new Vector3(100, 1, 100);
+        }
+
+        public override void Update(float deltaTime)
+        {
+            base.Update(deltaTime);
+
+            Console.WriteLine("Map position is " + Transform.Position);
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Server
 
         public List<GameObject> toDestroyQueue = new List<GameObject>();
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
-        public List<LeafServer> LeafList = new List<LeafServer>();
         public Dictionary<int, GameObjectServer> gameObjectDict =
             new Dictionary<int, GameObjectServer>();
 
@@ -176,6 +175,15 @@ namespace Server
             return newActivePlayer;
         }
 
+        public MapServer CreateMap()
+        {
+
+            MapServer newMap = new MapServer(100.0f, 100.0f);
+
+            return newMap;
+
+        }
+
         /// <summary>
         /// Creates all leaves in the scene, placing them randomly.
         /// </summary>
@@ -221,7 +229,6 @@ namespace Server
                 networkServer.SendNewObjectToAll(newLeaf);
 
                 // Add this leaf to the leaf list and object dictionary.
-                LeafList.Add(newLeaf);
                 newLeaf.Register();
             }
         }
@@ -258,17 +265,20 @@ namespace Server
         /// <param name="gameObj">The game object to destroy</param>
         public void Destroy(GameObject gameObj)
         {
+
             gameObjectDict.Remove(gameObj.Id);
-            if (gameObj is LeafServer leaf)
-            {
-                LeafList.Remove(leaf);
-            }
-            else if (gameObj is PlayerServer player)
+
+            if (gameObj is PlayerServer player)
             {
                 playerServerList.Remove(player);
             }
 
             toDestroyQueue.Add(gameObj);
+        }
+
+        public List<GameObjectServer> GetGameObjectList()
+        {
+            return gameObjectDict.Values.ToList<GameObjectServer>();
         }
     }
 }

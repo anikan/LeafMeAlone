@@ -139,11 +139,19 @@ namespace Client
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
 
+
+
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
 
             // Receive the response from the remote device.  
             //networkClient.Receive();
+        }
+
+        public void CreateMap()
+        {
+            MapClient gameMap = new MapClient();
+            NonNetworkedGameObjects.Add(gameMap);
         }
 
         /// <summary>
@@ -199,6 +207,7 @@ namespace Client
                 NonNetworkedGameObjectClient obj in NonNetworkedGameObjects
                 )
             {
+
                 obj.Draw();
             }
             GraphicsManager.Draw();
@@ -313,6 +322,8 @@ namespace Client
 
             // Set up the input manager.
             SetupInputManager(ActivePlayer);
+
+            CreateMap();
         }
 
         /// <summary>
@@ -364,6 +375,5 @@ namespace Client
                 NonNetworkedGameObjects.Remove(nonNetObj);
             }
         }
-
     }
 }

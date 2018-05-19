@@ -5,20 +5,21 @@
         /// <summary>
         /// Shaders
         /// </summary>
-        public static string DefaultShader = @"../../Shaders/defaultShader.fx";
-        public static string ParticleShader = @"../../Shaders/particle.fx";
+        public const string DefaultShader = @"../../Shaders/defaultShader.fx";
+        public const string ParticleShader = @"../../Shaders/particle.fx";
 
         /// <summary>
         /// Textures
         /// </summary>
-        public static string FireTexture = @"../../Particles/fire_red.png";
-        public static string WindTexture = @"../../Particles/Wind_Transparent2.png";
+        public const string FireTexture = @"../../Particles/fire_red.png";
+        public const string WindTexture = @"../../Particles/Wind_Transparent2.png";
 
 
         /// <summary>
         /// Models
         /// </summary>
-        public static string LeafModel = @"../../Models/05.13.18_Leaf.fbx";
-        public static string PlayerModel = @"../../Models/05.03.18_Version2.fbx";
+        public const string LeafModel = @"../../Models/05.13.18_Leaf.fbx";
+        public const string PlayerModel = @"../../Models/05.03.18_Version2.fbx";
+        public const string DefaultMapModel = @"../../Models/TerrainCube.fbx";
     }
 }

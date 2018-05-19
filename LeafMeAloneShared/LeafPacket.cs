@@ -26,6 +26,9 @@ namespace Shared
         [ProtoMember(4)]
         public float Rotation;
 
+        [ProtoMember(5)]
+        public bool Burning;
+
         /// <summary>
         /// Creates a new packet for a leaf
         /// </summary>

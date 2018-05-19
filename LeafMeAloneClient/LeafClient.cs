@@ -20,6 +20,7 @@ namespace Client
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
+            Burning = packet.Burning;
         }
 
         public override void UpdateFromPacket(Packet packet)

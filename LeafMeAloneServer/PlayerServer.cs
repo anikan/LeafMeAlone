@@ -14,12 +14,15 @@ namespace Server
         public const float PLAYER_HEALTH = 100.0f;
         public const float PLAYER_MASS = 1.0f;
         public const float PLAYER_RADIUS = 1.0f;
+        public const float PLAYER_SPEED = 20.0f;
 
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
 
         // If the user is using the primary function of their tool or secondary
         public ToolMode ActiveToolMode { get; set; }
+
+        public Vector3 moveRequest;
 
         public PlayerServer() : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS)
         {
@@ -34,10 +37,13 @@ namespace Server
         /// <param name="deltaTime">Time since lsat frame, in seconds.</param>
         public override void Update(float deltaTime)
         {
-
             base.Update(deltaTime);
+            Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
 
-           //  Console.WriteLine("Tool equipped is " + ToolEquipped.ToString() + " and mode is " + ActiveToolMode.ToString());
+
+            TryMoveObject(newPlayerPos);
+
+            //  Console.WriteLine("Tool equipped is " + ToolEquipped.ToString() + " and mode is " + ActiveToolMode.ToString());
 
         }
 
@@ -71,9 +77,9 @@ namespace Server
         /// <param name="packet">Packet from client.</param>
         public void UpdateFromPacket(PlayerPacket packet)
         {
-            Vector3 newPlayerPos = Transform.Position + new Vector3(packet.MovementX, 0.0f, packet.MovementZ) * GameServer.TICK_TIME_S;
-
-            TryMoveObject(newPlayerPos);
+            //Save movement request and normalize it so that we only move once per tick.
+            moveRequest = new Vector3(packet.MovementX, 0.0f, packet.MovementZ);
+            moveRequest.Normalize();
 
             Transform.Rotation.Y = packet.Rotation;
 

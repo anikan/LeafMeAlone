@@ -301,7 +301,8 @@ namespace Client
                 //This should be true if we want to prevent particles from moving behind us.
                 if (DisableRewind)
                 {
-                    float cosAngle = Vector3.Dot(Vector3.Normalize(particle.Velocity), Vector3.Normalize(particle.Velocity));
+                    float cosAngle = Vector3.Dot(Vector3.Normalize(particle.InitialVelocity), Vector3.Normalize(particle.Velocity));
+                    //Console.WriteLine(cosAngle);
                     if (cosAngle < 0f)
                     {
                         particle.Force = Vector3.Zero;
@@ -317,6 +318,7 @@ namespace Client
                         particle.Origin = GenerationOrigin;
                         particle.Position = GenerationOrigin;
                         particle.Velocity = InitVelocity;
+                        particle.InitialVelocity = InitVelocity;
                         particle.LifeRemaining = r.Range(10f);
                         emissionThisFrame++;
                         Num_CurrentlyActiveParticles++;
@@ -363,6 +365,7 @@ namespace Client
                 particle.Position = GenerationOrigin;
                 particle.Velocity = InitVelocity;
                 particle.LifeRemaining = r.Range(10f);
+                particle.InitialVelocity = InitVelocity;
             }
 
             UpdateBuffer();

@@ -27,6 +27,8 @@ namespace Client
         /// </summary>
         public Vector3 Velocity;
 
+        public Vector3 InitialVelocity;
+
         /// <summary>
         /// Current force exerted on particle. Note: Gets reset after every update loop.
         /// </summary>
@@ -58,6 +60,7 @@ namespace Client
             Origin = position;
             Position = position;
             Velocity = velocity;
+            InitialVelocity = velocity;
             LifeRemaining = lifeRemaining;
             Mass = mass;
             Force = Vector3.Zero;

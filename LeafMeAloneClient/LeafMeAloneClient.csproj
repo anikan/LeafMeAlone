@@ -102,10 +102,10 @@
     <Compile Include="FileManager.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
-    <Compile Include="MyAnimationNode.cs" />
-    <Compile Include="MyBone.cs" />
-    <Compile Include="MyMaterial.cs" />
-    <Compile Include="MyMesh.cs" />
+    <Compile Include="ClientAnimationNode.cs" />
+    <Compile Include="ClientBone.cs" />
+    <Compile Include="ClientMaterial.cs" />
+    <Compile Include="ClientMesh.cs" />
     <Compile Include="UIFramesPersecond.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="GraphicGameObject.cs" />

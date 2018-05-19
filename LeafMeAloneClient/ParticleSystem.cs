@@ -172,10 +172,10 @@ namespace Client
             switch (type)
             {
                 case ParticleSystemType.FIRE:
-                    TexSRV = CreateTexture(FileManager.FireTexture);
+                    TexSRV = CreateTexture(Constants.FireTexture);
                     break;
                 case ParticleSystemType.WIND:
-                    TexSRV = CreateTexture(FileManager.WindTexture);
+                    TexSRV = CreateTexture(Constants.WindTexture);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

@@ -146,6 +146,13 @@ namespace Client
             //networkClient.Receive();
         }
 
+        // Create a map on the client and add it to the objects.
+        public void CreateMap()
+        {
+            MapClient gameMap = new MapClient();
+            NonNetworkedGameObjects.Add(gameMap);
+        }
+
         /// <summary>
         /// Updates each of the game object's models with the time
         /// </summary>
@@ -199,6 +206,7 @@ namespace Client
                 NonNetworkedGameObjectClient obj in NonNetworkedGameObjects
                 )
             {
+
                 obj.Draw();
             }
             GraphicsManager.Draw();
@@ -244,7 +252,7 @@ namespace Client
                             BAD_PACKET_REF);
                     }
 
-                    if (packet is LeafPacket || packet is PlayerPacket)
+                    if (packet is ObjectPacket || packet is PlayerPacket)
                     {
                         // Update the packet we found.
                         packetObject.UpdateFromPacket(packet);
@@ -289,6 +297,12 @@ namespace Client
 
                         );
                     break;
+
+                case (ObjectType.TREE):
+                    Transform startTransform = new Transform();
+                    startTransform.Position = new Vector3(createPacket.InitialX, createPacket.InitialY, createPacket.InitialZ);
+                    NetworkedGameObjects.Add(createPacket.ObjectId, new TreeClient(createPacket));
+                    break;
             }
         }
 
@@ -313,6 +327,8 @@ namespace Client
 
             // Set up the input manager.
             SetupInputManager(ActivePlayer);
+
+            CreateMap();
         }
 
         /// <summary>
@@ -364,6 +380,5 @@ namespace Client
                 NonNetworkedGameObjects.Remove(nonNetObj);
             }
         }
-
     }
 }

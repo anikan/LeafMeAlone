@@ -94,11 +94,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DestroyObjectPacket.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="ILeaf.cs" />
     <Compile Include="IObject.cs" />
     <Compile Include="CreateObjectPacket.cs" />
     <Compile Include="LeafPacket.cs" />
-    <Compile Include="Map.cs" />
     <Compile Include="PlayerPacket.cs" />
     <Compile Include="Packet.cs" />
     <Compile Include="GameObject.cs" />

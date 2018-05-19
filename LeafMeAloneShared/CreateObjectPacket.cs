@@ -37,6 +37,9 @@ namespace Shared
         [ProtoMember(5)]
         public ObjectType objectType;
 
+        [ProtoMember(6)]
+        public bool Burning;
+
         public CreateObjectPacket() : base(PacketType.CreateObjectPacket)
         { }
 
@@ -48,6 +51,7 @@ namespace Shared
             InitialY = gameObject.Transform.Position.Y;
             InitialZ = gameObject.Transform.Position.Z;
             objectType = gameObject.ObjectType;
+            Burning = gameObject.Burning;
         }
     }
 }

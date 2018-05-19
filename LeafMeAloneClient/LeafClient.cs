@@ -8,12 +8,15 @@ using SlimDX;
 
 namespace Client
 {
+    /// <summary>
+    /// A leaf on the client, mainly for rendering.
+    /// </summary>
     class LeafClient : NetworkedGameObjectClient
     {
         public static ParticleSystem Fire;
         private bool updateFire = false;
         public LeafClient(CreateObjectPacket createPacket) :
-            base(createPacket, FileManager.LeafModel)
+            base(createPacket, Constants.LeafModel)
         {
             if (Fire == null)
             {
@@ -41,17 +44,28 @@ namespace Client
                 Fire.Update(deltaTime);
         }
 
-        public void UpdateFromPacket(LeafPacket packet)
+        /// <summary>
+        /// Update from a server packet.
+        /// </summary>
+        /// <param name="packet">Packet from the server.</param>
+        public void UpdateFromPacket(ObjectPacket packet)
         {
+            // Set the initial positions of the object.
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
-            //Fire.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, Fire.Transform.AsMatrix()));
+
+            // Set the initial burning status.
+            Burning = packet.Burning;
         }
 
+        /// <summary>
+        /// Update this object from a server packet.
+        /// </summary>
+        /// <param name="packet">Packet from server.</param>
         public override void UpdateFromPacket(Packet packet)
         {
-            UpdateFromPacket(packet as LeafPacket);
+            UpdateFromPacket(packet as ObjectPacket);
         }
     }
 }

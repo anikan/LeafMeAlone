@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Shared;
 using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
@@ -21,9 +22,9 @@ namespace Client
 
         public static void Init()
         {
-            var btcode = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "VS", "vs_4_0", ShaderFlags.None,
+            var btcode = ShaderBytecode.CompileFromFile(Constants.ParticleShader, "VS", "vs_4_0", ShaderFlags.None,
                 EffectFlags.None);
-            var btcode1 = ShaderBytecode.CompileFromFile(FileManager.ParticleShader, "PS", "fx_5_0", ShaderFlags.None,
+            var btcode1 = ShaderBytecode.CompileFromFile(Constants.ParticleShader, "PS", "fx_5_0", ShaderFlags.None,
                 EffectFlags.None);
             var sig = ShaderSignature.GetInputSignature(btcode);
 

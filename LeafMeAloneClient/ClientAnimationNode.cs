@@ -11,7 +11,7 @@ namespace Client
     /// <summary>
     /// Copies over animation node information
     /// </summary>
-    public class MyAnimationNode
+    public class ClientAnimationNode
     {
         /// <summary>
         /// Name of the node, as referenced by bone nodes too
@@ -40,7 +40,7 @@ namespace Client
         /// constructor
         /// </summary>
         /// <param name="name"></param>
-        public MyAnimationNode(String name)
+        public ClientAnimationNode(String name)
         {
             Name = name;
         }

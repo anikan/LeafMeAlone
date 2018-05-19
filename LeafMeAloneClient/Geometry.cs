@@ -26,7 +26,7 @@ namespace Client {
         /// <summary>
         /// Store information on all the meshes
         /// </summary>
-        protected List<MyMesh> allMeshes;
+        protected List<ClientMesh> allMeshes;
 
         /// <summary>
         /// Holds references to the textures
@@ -65,7 +65,7 @@ namespace Client {
         /// animation may have multiple animation channels.
         /// The animations are all indiced the same way as stored in AnimationIndices
         /// </summary>
-        private List< Dictionary<String, MyAnimationNode> > _animationNodes;
+        private List< Dictionary<String, ClientAnimationNode> > _animationNodes;
 
         /// <summary>
         /// For inverting from the root node
@@ -75,8 +75,8 @@ namespace Client {
         /// <summary>
         /// Store information on the bones here
         /// </summary>
-        private List<MyBone> _allBones;
-        private Dictionary<string, MyBone> _allBoneLookup;
+        private List<ClientBone> _allBones;
+        private Dictionary<string, ClientBone> _allBoneLookup;
         private Dictionary<string, int> _allBoneMappings;
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Client {
         /// <summary>
         /// The root bone of the bone tree we are storing
         /// </summary>
-        private MyBone _rootBone;
+        private ClientBone _rootBone;
 
         /// <summary>
         /// A temp integer for creating unique strings
@@ -105,9 +105,9 @@ namespace Client {
         /// <param name="node"> The node that is referenced to create the bone </param>
         /// <param name="parent"> The parent of the bone to be created </param>
         /// <returns> the bone that is created </returns>
-        private MyBone CreateBoneTree(Node node, MyBone parent)
+        private ClientBone CreateBoneTree(Node node, ClientBone parent)
         {
-            MyBone internalNode = new MyBone(node.Name)
+            ClientBone internalNode = new ClientBone(node.Name)
             {
                 Parent = parent
             };
@@ -124,7 +124,7 @@ namespace Client {
 
             for (int i = 0; i < node.ChildCount; i++)
             {
-                MyBone child = CreateBoneTree(node.Children[i], internalNode);
+                ClientBone child = CreateBoneTree(node.Children[i], internalNode);
                 if (child != null)
                 {
                     internalNode.Children.Add(child);
@@ -140,10 +140,10 @@ namespace Client {
         /// </summary>
         /// <param name="bone"> The bone whose global transform is to be calculated </param>
         /// <returns> global transformation matrix of the node </returns>
-        private Matrix CalculateBoneToWorldTransform(MyBone bone)
+        private Matrix CalculateBoneToWorldTransform(ClientBone bone)
         {
             Matrix global = bone.LocalTransform.Clone() ;
-            MyBone parent = bone.Parent;
+            ClientBone parent = bone.Parent;
             global = parent == null ? global : global * parent.GlobalAnimatedTransform;
             return global;
         }
@@ -153,7 +153,7 @@ namespace Client {
         /// </summary>
         /// <param name="assimpMesh"> mesh that contains the information to be processed </param>
         /// <param name="mesh"> customized mesh that stores information for later use </param>
-        protected void LoadBoneWeights(Mesh assimpMesh, MyMesh mesh)
+        protected void LoadBoneWeights(Mesh assimpMesh, ClientMesh mesh)
         {
             // create a new data structures to store the bones
             mesh.VertexBoneDatas = new List<VertexBoneData>(mesh.CountVertices);
@@ -240,12 +240,12 @@ namespace Client {
                 throw new FileNotFoundException();
 
             //loop through sizes and count them.
-            allMeshes = new List<MyMesh>(scene.MeshCount);
+            allMeshes = new List<ClientMesh>(scene.MeshCount);
 
             //loop through and store sizes 
             for (int idx = 0; idx < scene.MeshCount; idx++)
             {
-                MyMesh mesh = new MyMesh();
+                ClientMesh mesh = new ClientMesh();
                 allMeshes.Add(mesh);
 
                 mesh.CountVertices = scene.Meshes[idx].VertexCount;
@@ -265,23 +265,23 @@ namespace Client {
             // do all the processing that rigging is required to have
             if (enableRigging)
             {
-                _allBones = new List<MyBone>();
+                _allBones = new List<ClientBone>();
                 _allBoneMappings = new Dictionary<string, int>();
-                _allBoneLookup = new Dictionary<string, MyBone>();
+                _allBoneLookup = new Dictionary<string, ClientBone>();
                 
                 // set the animation related lookup tables
                 AnimationIndices = new Dictionary<string, int>();
-                _animationNodes = new List<Dictionary<string, MyAnimationNode>>(scene.AnimationCount);
+                _animationNodes = new List<Dictionary<string, ClientAnimationNode>>(scene.AnimationCount);
                 for (int i = 0; i < scene.AnimationCount; i++)
                 {
                     AnimationIndices[scene.Animations[i].Name] = i;
-                    _animationNodes.Add(new Dictionary<string, MyAnimationNode>());
+                    _animationNodes.Add(new Dictionary<string, ClientAnimationNode>());
 
                     for (int j = 0; j < scene.Animations[i].NodeAnimationChannelCount; j++)
                     {
 
                         NodeAnimationChannel ch = scene.Animations[i].NodeAnimationChannels[j];
-                        MyAnimationNode myNode = new MyAnimationNode(ch.NodeName);
+                        ClientAnimationNode myNode = new ClientAnimationNode(ch.NodeName);
                         
                         _animationNodes[i][ch.NodeName] = myNode;
                         myNode.Translations = new List<Vector3>();
@@ -320,7 +320,7 @@ namespace Client {
                 {
                     foreach (var rawBone in sceneMesh.Bones)
                     {
-                        MyBone found;
+                        ClientBone found;
                         if (!_allBoneLookup.TryGetValue(rawBone.Name, out found))
                         {
                             Console.WriteLine("Cannot find bone: " + rawBone.Name);
@@ -359,7 +359,7 @@ namespace Client {
             // main loading loop; copy cover the scene content into the datastreams and then to the buffers
             for (int idx = 0; idx < scene.MeshCount; idx++)
             {
-                MyMesh mesh = allMeshes[idx];
+                ClientMesh mesh = allMeshes[idx];
 
                 //create new datastreams.
                 mesh.Vertices = new DataStream(mesh.vertSize, true, true);
@@ -367,7 +367,7 @@ namespace Client {
                 mesh.Faces = new DataStream(mesh.faceSize, true, true);
 
                 // create a new material
-                mesh.Materials = new MyMaterial();
+                mesh.Materials = new ClientMaterial();
 
                 // copy the buffers
                 scene.Meshes[idx].Vertices.ForEach(vertex =>
@@ -466,7 +466,7 @@ namespace Client {
         /// Use this to recusively update the animation transform values
         /// </summary>
         /// <param name="bone"> The bone whose, and whose children's, global transformation matrices are to be calculated </param>
-        private void UpdateTransforms(MyBone bone)
+        private void UpdateTransforms(ClientBone bone)
         {
             bone.GlobalAnimatedTransform = CalculateBoneToWorldTransform(bone);
 
@@ -483,7 +483,7 @@ namespace Client {
         /// <param name="animationIndex"> The index of the animation sequence </param>
         private void Evaluate(double animationTime, int animationIndex)
         {
-            Dictionary<string, MyAnimationNode> currentChannels = _animationNodes[animationIndex];
+            Dictionary<string, ClientAnimationNode> currentChannels = _animationNodes[animationIndex];
             foreach (var chpair in currentChannels)
             {
                 if (!_allBoneLookup.ContainsKey(chpair.Key))
@@ -510,7 +510,7 @@ namespace Client {
         /// <param name="animationTime"> The number of ticks in the animation time domain </param>
         /// <param name="animationNode"> The node to extract the translation vector from </param>
         /// <returns> The linearly interpolated translation vector that represents the translation at specified time </returns>
-        private Vector3 CalcInterpolateTranslation(double animationTime, MyAnimationNode animationNode)
+        private Vector3 CalcInterpolateTranslation(double animationTime, ClientAnimationNode animationNode)
         {
             if (animationNode.Translations.Count == 1) return animationNode.Translations[0];
             if (animationNode.TranslationTime[0] > animationTime) return animationNode.Translations[0];
@@ -546,7 +546,7 @@ namespace Client {
         /// <param name="animationTime"> The number of ticks in the animation time domain </param>
         /// <param name="animationNode"> The node to extract the translation vector from </param>
         /// <returns> The linearly interpolated rotation quaternion that represents the rotation at specified time </returns>
-        private Quaternion CalcInterpolateRotation(double animationTime, MyAnimationNode animationNode)
+        private Quaternion CalcInterpolateRotation(double animationTime, ClientAnimationNode animationNode)
         {
             if (animationNode.Rotations.Count == 1) return animationNode.Rotations[0];
             if (animationNode.RotationTime[0] > animationTime) return animationNode.Rotations[0];
@@ -583,7 +583,7 @@ namespace Client {
         /// <param name="animationTime"> The number of ticks in the animation time domain </param>
         /// <param name="animationNode"> The node to extract the translation vector from </param>
         /// <returns> The linearly interpolated scaling vector that represents the scaling at specified time </returns>
-        private Vector3 CalcInterpolateScaling(double animationTime, MyAnimationNode animationNode)
+        private Vector3 CalcInterpolateScaling(double animationTime, ClientAnimationNode animationNode)
         {
             if (animationNode.Scalings.Count == 1) return animationNode.Scalings[0];
             if (animationNode.ScalingTime[0] > animationTime) return animationNode.Scalings[0];
@@ -690,11 +690,11 @@ namespace Client {
         }
 
         /// <summary>
-        /// Helper method, used to transfer information from Material to MyMaterial
+        /// Helper method, used to transfer information from Material to ClientMaterial
         /// </summary>
         /// <param name="mat"> the source Material </param>
-        /// <param name="myMat"> the destination MyMaterial </param>
-        protected void ApplyMaterial(Material mat, MyMaterial myMat)
+        /// <param name="myMat"> the destination ClientMaterial </param>
+        protected void ApplyMaterial(Material mat, ClientMaterial myMat)
         {
             if (mat.GetMaterialTextureCount(TextureType.Diffuse) > 0)
             {
@@ -807,7 +807,7 @@ namespace Client {
 
             for (int i = 0; i < scene.MeshCount; i++)
             {
-                MyMesh mesh = allMeshes[i];
+                ClientMesh mesh = allMeshes[i];
 
                 // pass vertices, normals, and indices into the shader
                 GraphicsRenderer.Device.ImmediateContext.InputAssembler.SetVertexBuffers(VertexLoc,

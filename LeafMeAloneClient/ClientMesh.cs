@@ -12,7 +12,7 @@ namespace Client
     /// <summary>
     /// To store information on each mesh
     /// </summary>
-    public class MyMesh
+    public class ClientMesh
     {
         /// <summary>
         /// The number of vertices this mesh stores
@@ -25,7 +25,7 @@ namespace Client
         public Buffer EBO, VBOPositions, VBONormals, VBOTexCoords, VBOBoneIDs, VBOBoneWeights;
         public int vertSize, normSize, faceSize, texSize, boneIDSize, boneWeightSize;
         public DataStream Vertices, Normals, Faces, TexCoords, DSBoneIDs, DSBoneWeights;
-        public MyMaterial Materials;
+        public ClientMaterial Materials;
 
         /// <summary>
         /// The vertex weight and indices

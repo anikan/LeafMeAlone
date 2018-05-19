@@ -12,7 +12,7 @@ namespace Client
     /// <summary>
     /// To store information on each bone
     /// </summary>
-    public class MyBone
+    public class ClientBone
     {
         /// <summary>
         /// The name of the bone, used for various dictionary references
@@ -35,8 +35,8 @@ namespace Client
         /// <summary>
         /// Stores the hierarchy information
         /// </summary>
-        public MyBone Parent;
-        public List<MyBone> Children;
+        public ClientBone Parent;
+        public List<ClientBone> Children;
 
         /// <summary>
         /// Stores which indices this bone affects
@@ -52,10 +52,10 @@ namespace Client
         /// Constructor. Initializes Children list
         /// </summary>
         /// <param name="name"></param>
-        public MyBone(string name)
+        public ClientBone(string name)
         {
             BoneName = name;
-            Children = new List<MyBone>();
+            Children = new List<ClientBone>();
         }
     }
 }

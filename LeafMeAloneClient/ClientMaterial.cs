@@ -11,7 +11,7 @@ namespace Client
     /// <summary>
     /// used for storing information about the material properties of a mesh
     /// </summary>
-    public class MyMaterial
+    public class ClientMaterial
     {
         public Vector4 diffuse;
         public Vector4 ambient;

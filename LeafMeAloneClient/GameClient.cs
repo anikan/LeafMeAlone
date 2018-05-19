@@ -139,8 +139,6 @@ namespace Client
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
 
-
-
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
 
@@ -148,6 +146,7 @@ namespace Client
             //networkClient.Receive();
         }
 
+        // Create a map on the client and add it to the objects.
         public void CreateMap()
         {
             MapClient gameMap = new MapClient();

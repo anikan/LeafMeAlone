@@ -56,10 +56,14 @@ namespace Server
 
             networkServer = new NetworkServer(networked);
 
+            // Create the initial game map.
             CreateMap();
 
+            // Variables for determining leaf spawn locations.
             float HalfWidth = Constants.MAP_WIDTH / 2.0f;
             float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
+
+            // Create the leaves for the game.
             CreateRandomLeaves(Constants.NUM_LEAVES, -HalfWidth + Constants.BORDER_MARGIN, HalfWidth - Constants.BORDER_MARGIN, -HalfHeight + Constants.BORDER_MARGIN, HalfHeight - Constants.BORDER_MARGIN);
 
             //CreateLeaves(100, -10, 10, -10, 10);
@@ -182,36 +186,58 @@ namespace Server
             return newActivePlayer;
         }
 
+        /// <summary>
+        /// Creates the initial game map.
+        /// </summary>
+        /// <returns>The new map</returns>
         public MapServer CreateMap()
         {
 
+            // Create the map with a width and height.
             MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
+            // Spawn trees around the border of the map!
+            // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
             for (float y = -newMap.Height / 2.0f; y < newMap.Height / 2.0f; y+= TreeServer.TREE_RADIUS)
             {
 
+                // Iterate through the width of the map, centered on origin and increase by radius of a tree.
                 for (float x = -newMap.Width / 2.0f; x < newMap.Width / 2.0f; x+= TreeServer.TREE_RADIUS)
                 {
 
+                    // If this is a top or bottom row, create trees.
                     if (y <= -newMap.Height / 2.0f || (newMap.Height / 2.0f) <= y + TreeServer.TREE_RADIUS)
                     {
 
+                        // Make a new tree.
                         TreeServer newTree = new TreeServer();
+
+                        // Set the tree's initial position.
                         newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // Send the new object to client.
                         networkServer.SendNewObjectToAll(newTree);
 
                     }
+
+                    // If this is the far left or right columns, create a tree.
                     else if (x <= -newMap.Width / 2.0f || (newMap.Width / 2.0f) <= x + TreeServer.TREE_RADIUS)
                     {
 
+                        // Make a new tree.
                         TreeServer newTree = new TreeServer();
+
+                        // Set the tree's initial position.
                         newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // Send the new object to client.
                         networkServer.SendNewObjectToAll(newTree);
 
                     }
                 }
             }
 
+            // Return the new map.
             return newMap;
 
         }

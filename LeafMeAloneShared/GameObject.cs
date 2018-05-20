@@ -42,13 +42,7 @@ namespace Shared
           
         protected GameObject()
         {
-            Transform EmptyTransform = new Transform();
-
-            EmptyTransform.Rotation = new Vector3(0, 0, 0);
-            EmptyTransform.Position = new Vector3(0, 0, 0);
-            EmptyTransform.Scale = new Vector3(1, 1, 1);
-
-            Transform = EmptyTransform;
+            Transform = new Transform();
         }
 
         protected GameObject(Transform startTransform)

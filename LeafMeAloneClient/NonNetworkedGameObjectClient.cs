@@ -16,9 +16,8 @@ namespace Client
         /// Constructor to create a new object with no model (mainly for particle systems).
         /// </summary>
         /// <param name="startTransform">Starting position of the object.</param>
-        public NonNetworkedGameObjectClient(Transform startTransform = new Transform()) : base()
+        public NonNetworkedGameObjectClient() : base()
         {
-            Transform = startTransform;
         }
 
         /// <summary>
@@ -26,9 +25,8 @@ namespace Client
         /// </summary>
         /// <param name="modelPath">Path to this object's model</param>
         /// <param name="startTransform">Starting transform of this object.</param>
-        public NonNetworkedGameObjectClient(string modelPath, Transform startTransform = new Transform()) : base(modelPath)
+        public NonNetworkedGameObjectClient(string modelPath) : base(modelPath)
         {
-            Transform = startTransform;
         }
     }
 }

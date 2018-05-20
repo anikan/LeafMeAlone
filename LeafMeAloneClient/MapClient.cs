@@ -23,9 +23,6 @@ namespace Client
 
             // Create the terrain at floor height, slightly below.
             Transform.Position.Y = Constants.FLOOR_HEIGHT - 1.0f;
-
-            // Scale the terrain.
-            Transform.Scale = new Vector3(100, 1, 100);
         }
     }
 }

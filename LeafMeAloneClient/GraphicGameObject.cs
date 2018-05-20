@@ -82,7 +82,8 @@ namespace Client
             //if the object is currently burning, draw the fire on them.
             if (Burning)
             {
-                Fire?.DrawTransform(Transform);
+                Transform t = new Transform {Position = Transform.Position,Scale =  new Vector3(1,1,1)};
+                Fire?.DrawTransform(t);
             }
         }
 

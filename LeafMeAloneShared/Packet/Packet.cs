@@ -11,7 +11,7 @@ namespace Shared
     /// </summary>
     public class Packet
     {
-        PacketType packetType;
+        public PacketType packetType;
         public Packet(PacketType type)
         {
             packetType = type;

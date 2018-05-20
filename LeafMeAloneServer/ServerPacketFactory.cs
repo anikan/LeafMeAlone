@@ -14,9 +14,17 @@ namespace Server
     public class ServerPacketFactory : PacketFactory
     {
 
+        internal static Packet CreateUpdatePacket(GameObjectServer serverObject)
+        {
+                if (serverObject is PlayerServer player)
+                {
+                    return CreatePlayerPacket(player);
+                } 
+                return NewObjectPacket(serverObject);
+        }
         internal static PlayerPacket CreatePlayerPacket(PlayerServer player)
         {
-            return new PlayerPacket(CreateObjectPacket(player), player.ActiveToolMode, player.ToolEquipped,
+            return new PlayerPacket(NewObjectPacket(player), player.ActiveToolMode, player.ToolEquipped,
                 player.Dead);
         }
     }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Shared
 {
     [ProtoContract]
-    public class ObjectPacket : Packet
+    public class ObjectPacket : Packet, IIdentifiable
     {
         [ProtoMember(1)]
         public float PositionX;
@@ -23,6 +23,7 @@ namespace Shared
         [ProtoMember(6)]
         public IdPacket IdData;
 
+        public ObjectPacket() : base (PacketType.ObjectPacket) { }
         public ObjectPacket(float positionX, float positionY, float positionZ, 
             float rotation, bool burning, IdPacket idData) : base (PacketType.ObjectPacket)
         {
@@ -32,6 +33,11 @@ namespace Shared
             Rotation = rotation;
             Burning = burning;
             IdData = idData;
+        }
+
+        public int GetId()
+        {
+            return IdData.ObjectId;
         }
     }
 }

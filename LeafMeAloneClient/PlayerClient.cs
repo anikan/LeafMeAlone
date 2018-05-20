@@ -217,9 +217,9 @@ namespace Client
             ToolEquipped = packet.ToolEquipped;
 
             ActiveToolMode = packet.ActiveToolMode;
-            Transform.Position.X = packet.MovementX;
-            Transform.Position.Z = packet.MovementZ;
-            Transform.Rotation.Y = packet.Rotation;
+            Transform.Position.X = packet.ObjData.PositionX;
+            Transform.Position.Z = packet.ObjData.PositionZ;
+            Transform.Rotation.Y = packet.ObjData.Rotation;
 
             switch (ActiveToolMode)
             {

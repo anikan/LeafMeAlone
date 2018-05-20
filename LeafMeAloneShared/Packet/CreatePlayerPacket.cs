@@ -17,11 +17,12 @@ namespace Shared
     public class CreatePlayerPacket : Packet
     {
         [ProtoMember(1)]
-        CreateObjectPacket createPacket;
+        public CreateObjectPacket createPacket;
 
         [ProtoMember(2)]
-        Team team;
+        public Team team;
 
+        public CreatePlayerPacket() : base(PacketType.CreatePlayerPacket) { }
         public CreatePlayerPacket(CreateObjectPacket createPacket, Team team) : base(PacketType.CreatePlayerPacket)
         {
             this.createPacket = createPacket;

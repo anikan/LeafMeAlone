@@ -19,6 +19,7 @@ namespace Shared
         [ProtoMember(1)]
         public int ObjectId;
 
+        public IdPacket() : base(PacketType.IdPacket) { }
         public IdPacket(int objectId) : base(PacketType.IdPacket)
         {
             ObjectId = objectId;

@@ -24,6 +24,11 @@ namespace Shared
         [ProtoMember(2)]
         public ObjectType ObjectType;
 
+        public CreateObjectPacket() : base(PacketType.CreateObjectPacket)
+        {
+
+        }
+
         public CreateObjectPacket(ObjectPacket objData, ObjectType objectType) : base(PacketType.CreateObjectPacket)
         {
             ObjData = objData;

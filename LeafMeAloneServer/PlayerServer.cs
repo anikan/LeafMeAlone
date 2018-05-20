@@ -76,22 +76,20 @@ namespace Server
         /// Update the player based on a packet sent from the client.
         /// </summary>
         /// <param name="packet">Packet from client.</param>
-        public void UpdateFromPacket(PlayerPacket packet)
+        public void UpdateFromPacket(RequestPacket packet)
         {
             //Save movement request and normalize it so that we only move once per tick.
-            moveRequest = new Vector3(packet.MovementX, 0.0f, packet.MovementZ);
+            moveRequest = new Vector3(packet.DeltaX, 0.0f, packet.DeltaZ);
             moveRequest.Normalize();
 
-            Transform.Rotation.Y = packet.Rotation;
+            Transform.Rotation.Y = packet.DeltaRot;
 
-            if (packet.ToolEquipped != ToolType.SAME)
+            if (packet.ToolRequest != ToolType.SAME)
             {
-                ToolEquipped = packet.ToolEquipped;
-                Console.WriteLine(string.Format("Player {0} switching to {1}", Id, ToolEquipped.ToString()));
+                ToolEquipped = packet.ToolRequest;
             }
 
-            ActiveToolMode = packet.ActiveToolMode;
-
+            ActiveToolMode = packet.ToolMode;
         }
 
         /// <summary>

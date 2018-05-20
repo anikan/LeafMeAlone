@@ -13,7 +13,6 @@ namespace Shared
     {
         CreateObjectPacket,
         PlayerPacket,
-        LeafPacket,
         DestroyObjectPacket,
         CreatePlayerPacket,
         ObjectPacket,
@@ -27,18 +26,12 @@ namespace Shared
             new Dictionary<PacketType, Type>() {
             { PacketType.CreateObjectPacket, typeof(CreateObjectPacket) },
             { PacketType.PlayerPacket, typeof(PlayerPacket) },
-            { PacketType.ObjectPacket, typeof(ObjectPacket) },
             { PacketType.DestroyObjectPacket, typeof(DestroyObjectPacket) },
-            { PacketType.CreatePlayerPacket, typeof(CreatePlayerPacket) }
+            { PacketType.CreatePlayerPacket, typeof(CreatePlayerPacket) },
+            { PacketType.ObjectPacket, typeof(ObjectPacket) },
+            { PacketType.IdPacket, typeof(IdPacket) },
+            { PacketType.RequestPacket, typeof(RequestPacket) },
         };
-        //public static Dictionary<Type, PacketType> classPacketMap =
-        //    new Dictionary<Type, PacketType>() {
-        //    { typeof(CreateObjectPacket), PacketType.CreateObjectPacket },
-        //    { typeof(PlayerPacket), PacketType.PlayerPacket },
-        //    { typeof(LeafPacket), PacketType.LeafPacket },
-        //    { typeof(DestroyObjectPacket), PacketType.DestroyObjectPacket },
-        //    { typeof(CreatePlayerPacket), PacketType.CreatePlayerPacket }
-        //};
 
         public const int PACK_HEAD_SIZE = 5;
         /// <summary>
@@ -103,6 +96,10 @@ namespace Shared
             }
 
             packetClassMap.TryGetValue((PacketType)data[0], out Type packetType);
+            if (packetType == null)
+            {
+                throw new Exception("PacketType not recognized by deserializer!");
+            }
             return (Packet) Serializer.Deserialize(packetType, new MemoryStream(objectData));
         }
 
@@ -110,13 +107,13 @@ namespace Shared
         /// Serializes the packet to a byte array
         /// </summary>
         /// <returns>the serialized object</returns>
-        public static byte[] Serialize(Packet packet, PacketType type)
+        public static byte[] Serialize(Packet packet)
         {
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);
             byte[] serializedObject = ms.ToArray();
 
-            return PrependHeader(serializedObject, type);
+            return PrependHeader(serializedObject, packet.packetType);
         }
     }
 }

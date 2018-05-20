@@ -21,14 +21,15 @@ namespace Client
         {
         }
 
-        public override void UpdateFromPacket(ObjectPacket packet )
+        public override void UpdateFromPacket(Packet packet )
         {
+            ObjectPacket objPacket = packet as ObjectPacket;
             // Set the initial positions of the object.
-            Transform.Position.X = packet.PositionX;
-            Transform.Position.Z = packet.PositionZ;
-            Transform.Rotation.Y = packet.Rotation;
+            Transform.Position.X = objPacket.PositionX;
+            Transform.Position.Z = objPacket.PositionZ;
+            Transform.Rotation.Y = objPacket.Rotation;
             // Set the initial burning status.
-            Burning = packet.Burning;
+            Burning = objPacket.Burning;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Shared
     public class PacketFactory
     {
 
-        public static ObjectPacket CreateObjectPacket(GameObject gameObj)
+        public static ObjectPacket NewObjectPacket(GameObject gameObj)
         {
             IdPacket idPack = new IdPacket(gameObj.Id);
             Vector3 pos = gameObj.Transform.Position;
@@ -18,14 +18,14 @@ namespace Shared
             return new ObjectPacket(pos.X, pos.Y, pos.Z, rot.Y, gameObj.Burning, idPack);
         }
 
-        public static Packet CreateDestroyPacket(GameObject gameObj)
+        public static Packet NewDestroyPacket(GameObject gameObj)
         {
             return new DestroyObjectPacket(new IdPacket(gameObj.Id));
         }
 
-        public static CreateObjectPacket CreateCreatePacket(GameObject obj)
+        public static CreateObjectPacket NewCreatePacket(GameObject obj)
         {
-            return new CreateObjectPacket(CreateObjectPacket(obj), obj.ObjectType);
+            return new CreateObjectPacket(NewObjectPacket(obj), obj.ObjectType);
         }
     }
 }

@@ -104,14 +104,13 @@ namespace Server
                 //Update the server players based on received packets.
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {
-                    PlayerPacket packet = networkServer.PlayerPackets[i];
+                    RequestPacket packet = networkServer.PlayerPackets[i];
+                    int playerId = packet.GetId();
+                    gameObjectDict.TryGetValue(playerId, out GameObjectServer playerGameObject);
 
-                    if (packet != null &&
-                        gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject)
-                        )
+                    if (packet != null && playerGameObject != null)
                     {
                         PlayerServer player = (PlayerServer)playerGameObject;
-
                         player.UpdateFromPacket(networkServer.PlayerPackets[i]);
                     }
                 }
@@ -177,11 +176,10 @@ namespace Server
             newActivePlayer.Transform.Position = spawnPoints[0];
             newPlayer.Transform.Position = spawnPoints[0];
 
-            CreateObjectPacket objPacket =
-                new CreateObjectPacket(newPlayer);
+            CreateObjectPacket objPacket = PacketFactory.NewCreatePacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-            networkServer.SendAll(objPacket.Serialize());
+            networkServer.SendAll(PacketUtil.Serialize(objPacket));
 
             return newActivePlayer;
         }

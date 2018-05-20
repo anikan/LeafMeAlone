@@ -19,10 +19,14 @@ namespace Client
         /// <param name="player">The player object to serialize into a player</param>
         public static RequestPacket CreateRequestPacket(PlayerClient player)
         {
-            float deltaX = 
-            return new RequestPacket(player.PlayerRequests.MovementRequested.X, 
-                player.PlayerRequests.MovementRequested.Y, 
-                player.PlayerRequests.RotationRequested, new IdPacket(player.Id));
+            float deltaX = player.PlayerRequests.MovementRequested.X;
+            float deltaZ = player.PlayerRequests.MovementRequested.Y;
+            float deltaRot = player.PlayerRequests.RotationRequested;
+            return new RequestPacket(
+                deltaX, deltaZ, deltaRot, new IdPacket(player.Id), 
+                player.PlayerRequests.EquipToolRequest,
+                player.PlayerRequests.ActiveToolMode
+                );
         }
 
     }

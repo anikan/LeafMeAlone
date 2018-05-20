@@ -15,7 +15,7 @@ namespace Shared
     /// Packet of player information, to send or receive from the server.
     /// </summary>
     [ProtoContract]
-    public class PlayerPacket : Packet
+    public class PlayerPacket : Packet, IIdentifiable
     {
         // Associated Object data of the playerpacket
         [ProtoMember(1)]
@@ -33,12 +33,18 @@ namespace Shared
         [ProtoMember(4)]
         public bool Dead;
 
+        public PlayerPacket() : base(PacketType.PlayerPacket) { }
         public PlayerPacket(ObjectPacket objData, ToolMode activeToolMode, ToolType toolEquipped, bool dead) : base(PacketType.PlayerPacket)
         {
             ObjData = objData;
             ActiveToolMode = activeToolMode;
             ToolEquipped = toolEquipped;
             Dead = dead;
+        }
+
+        public int GetId()
+        {
+            return ObjData.IdData.ObjectId;
         }
     }
 }

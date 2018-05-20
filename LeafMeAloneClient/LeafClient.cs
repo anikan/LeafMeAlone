@@ -19,9 +19,9 @@ namespace Client
         {
             if (Fire == null)
             {
-                Fire = new FlameThrowerParticleSystem(2, 20, 2.5f,1f,5f)
+                Fire = new FlameThrowerParticleSystem(2, 10, 2.5f,1f,5f)
                 {
-                    emissionRate = 1,
+                    emissionRate = 5,
                     Enabled = true
                 };
                 Fire.EnableGeneration(true);

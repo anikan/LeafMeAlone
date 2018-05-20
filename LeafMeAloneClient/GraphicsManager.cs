@@ -148,6 +148,10 @@ namespace Client
             LoadAllShaders();
 
             ParticleSystems = new List<ParticleSystem>();
+
+            AudioSystem audioSystem = new AudioSystem();
+            int src = audioSystem.GenSource();
+            audioSystem.Play(@"../../Sound/song_mono.wav", src);
         }
 
         /// <summary>

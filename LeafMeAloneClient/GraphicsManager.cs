@@ -82,6 +82,8 @@ namespace Client
 
         public static Light ActiveLightSystem;
 
+        public static AudioSystem audioSystem;
+
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
 
@@ -94,6 +96,8 @@ namespace Client
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
             }
+
+            audioSystem.UpdateListener(ActiveCamera.CameraPosition, ActiveCamera.CameraLookAt, ActiveCamera.CameraUp);
         }
 
         public static void Draw()
@@ -149,9 +153,11 @@ namespace Client
 
             ParticleSystems = new List<ParticleSystem>();
 
-            AudioSystem audioSystem = new AudioSystem();
+            audioSystem = new AudioSystem();
             int src = audioSystem.GenSource();
-            audioSystem.Play(@"../../Sound/song_mono.wav", src);
+            audioSystem.UpdateSourcePosition(src, new Vector3(-10, 0, 0));
+            
+            audioSystem.Play(src, @"../../Sound/song.wav", true);
         }
 
         /// <summary>

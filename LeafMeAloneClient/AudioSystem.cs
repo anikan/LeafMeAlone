@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using libsndfile.NET;
@@ -11,12 +7,16 @@ using SlimDX;
 
 namespace Client
 {
-    // Note: only playing WAV files for now
+    // Note: only playing WAV 8/16 bits mono/stereo files for now
+    // Note: For 3D sound effects, must use mono wav files
     class AudioSystem : IDisposable
     {
         private AudioContext _context;
         private Dictionary<String, int> _audioBuffers;
 
+        /// <summary>
+        /// Create a new audio system
+        /// </summary>
         public AudioSystem()
         { 
             _context = new AudioContext();  // use default audio device
@@ -48,9 +48,15 @@ namespace Client
         /// Update the position of the listener, typically the position of the camera
         /// </summary>
         /// <param name="listenerPosition"> new position of the listener </param>
-        public void UpdateListenerPosition(Vector3 listenerPosition)
+        /// <param name="listenerLookat"> new look-at position of the listener </param>
+        /// <param name="listenerUp"> new up direction of the listener </param>
+        public void UpdateListener(Vector3 listenerPosition, Vector3 listenerLookat, Vector3 listenerUp)
         {
             AL.Listener(ALListener3f.Position, listenerPosition.X, listenerPosition.Y, listenerPosition.Z);
+            Vector3 lookAtDirection = listenerLookat - listenerPosition;
+            OpenTK.Vector3 dir = new OpenTK.Vector3(lookAtDirection.X, lookAtDirection.Y, lookAtDirection.Z);
+            OpenTK.Vector3 up = new OpenTK.Vector3(listenerUp.X, listenerUp.Y, listenerUp.Z);
+            AL.Listener(ALListenerfv.Orientation, ref dir, ref up);
         }
 
         /// <summary>
@@ -111,17 +117,51 @@ namespace Client
 
             // create a openAL buffer
             int buffer = AL.GenBuffer();
-            AL.BufferData(buffer, subtype, soundData, (int) bufferSize, freq);
+            AL.BufferData(buffer, subtype, soundData, (int) bufferSize * sizeof(short), freq);
 
             // assign it
             _audioBuffers[fileName] = buffer;
         }
 
-        public void Play(string fileName, int soundSource, bool repeat = false)
+        /// <summary>
+        /// Play the source with the audio data stored in the specified file name
+        /// </summary>
+        /// <param name="fileName"> file to be played </param>
+        /// <param name="soundSource"> source where the sound is played </param>
+        /// <param name="repeat"> loop the play infinitely or not </param>
+        public void Play(int soundSource, string fileName, bool repeat = false)
         {
             // stop whatever it is playing right now
             AL.SourceStop(soundSource);
 
+            BindBufferToSource(soundSource, fileName);
+
+            // specify if the sound is repeating
+            AL.Source(soundSource, ALSourceb.Looping, repeat);
+
+            // play the source
+            AL.SourcePlay(soundSource);
+        }
+
+        /// <summary>
+        /// Play the source with whatever buffer that is bound to it previously
+        /// </summary>
+        /// <param name="soundSource"> source where the sound is played </param>
+        /// <param name="repeat"> loop the play infinitely or not </param>
+        public void Play(int soundSource, bool repeat = false)
+        {
+            // stop whatever it is playing right now
+            AL.SourceStop(soundSource);
+
+            // specify if the sound is repeating
+            AL.Source(soundSource, ALSourceb.Looping, repeat);
+
+            // play the source
+            AL.SourcePlay(soundSource);
+        }
+
+        public void BindBufferToSource(int soundSource, string fileName)
+        {
             // find the buffer
             int buffer = -1;
             if (!_audioBuffers.ContainsKey(fileName))
@@ -142,12 +182,6 @@ namespace Client
 
             // bind the buffer to the source
             AL.BindBufferToSource(soundSource, buffer);
-
-            // specify if the sound is repeating
-            AL.Source(soundSource, ALSourceb.Looping, repeat);
-
-            // play the source
-            AL.SourcePlay(soundSource);
         }
 
         /// <summary>

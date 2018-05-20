@@ -38,5 +38,7 @@
 
         // Total number of leaves in the game.
         public const int NUM_LEAVES = 300;
+
+        public const float PUSH_FACTOR = 3.0f;
     }
 }

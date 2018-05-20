@@ -89,22 +89,6 @@ namespace Server
 
         }
 
-        public ColliderObject GetFirstCollidingObject()
-        {
-            List<GameObjectServer> allObjects = GameServer.instance.GetGameObjectList();
-            for (int i = 0; i < allObjects.Count; i++)
-            {
-
-                if (allObjects[i] is ColliderObject obj && IsColliding(obj))
-                {
-                    return obj;
-                }
-            }
-
-            return null;
-
-        }
-
         /// <summary>
         /// Tries to move an object to a new position, based on collider positions.
         /// </summary>
@@ -130,14 +114,20 @@ namespace Server
                     // If the object is colliding, just return. No movement.
                     if (obj != this && IsColliding(obj))
                     {
-                    //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
+                        //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
 
-                        if (this is PhysicsObject me && obj is PhysicsObject other)
+                        Transform.Position = OriginalPosition;
+
+                        if (this is PhysicsObject me)
                         {
 
-                            Vector3 forceVector = other.Transform.Position = me.Transform.Position;
+                            if (obj is PhysicsObject other)
+                            {
 
-                            other.ApplyForce(forceVector * me.Mass);
+                                me.Push(other);
+                            }
+
+                            me.Bounce(obj);
 
                         }
 

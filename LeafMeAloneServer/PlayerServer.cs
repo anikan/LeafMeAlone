@@ -14,7 +14,7 @@ namespace Server
         // Constant values of the player.
         public const float PLAYER_HEALTH = 100.0f;
         public const float PLAYER_MASS = 0.1f;
-        public const float PLAYER_RADIUS = 1.0f;
+        public const float PLAYER_RADIUS = 3.0f;
         public const float PLAYER_SPEED = 20.0f;
 
         public bool Dead { get; set; }
@@ -25,7 +25,7 @@ namespace Server
 
         public Vector3 moveRequest;
 
-        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS)
+        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
         {
 
             ToolEquipped = ToolType.BLOWER;

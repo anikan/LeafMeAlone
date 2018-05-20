@@ -16,12 +16,6 @@ using MapFlags = SlimDX.Direct3D11.MapFlags;
 
 namespace Client
 {
-    public enum ParticleSystemType
-    {
-        FIRE,
-        WIND
-    }
-
     /// <summary>
     /// Particle system object, only exists client-side.
     /// </summary>
@@ -70,7 +64,6 @@ namespace Client
         private float StopDist;
         private int AlphaCutoffOnly;
         private bool DisableRewind;
-        private ParticleSystemType Type;
 
         private bool ShouldGenerate;
         private bool ShouldRender;
@@ -92,7 +85,7 @@ namespace Client
         /// <param name="stop_dist"> Specify the distance, where the particles stop showing up </param>
         /// <param name="emissionrate"> Specify the emission rate of the particle system </param>
         /// <param name="maxparticles"> Specify the max number of particles emitted at a time </param>
-        protected ParticleSystem(ParticleSystemType type,
+        protected ParticleSystem(string TexturePath,
             Vector3 init_pos,
             Vector3 acceleration,
             Vector3 init_velocity,
@@ -124,7 +117,6 @@ namespace Client
             DisableRewind = disable_rewind;
             ShouldGenerate = true;
             ShouldRender = true;
-            Type = type;
 
             if(r == null)
                 r = new Random();
@@ -165,22 +157,7 @@ namespace Client
             VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Immutable, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Immutable, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
-
-
-
-
-            switch (type)
-            {
-                case ParticleSystemType.FIRE:
-                    TexSRV = CreateTexture(Constants.FireTexture);
-                    break;
-                case ParticleSystemType.WIND:
-                    TexSRV = CreateTexture(Constants.WindTexture);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-
+            TexSRV = CreateTexture(TexturePath);
             ResetSystem();
         }
 

@@ -14,17 +14,19 @@ namespace Client
     class LeafClient : NetworkedGameObjectClient
     {
         public static ParticleSystem Fire;
-        private bool updateFire = false;
         public LeafClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.LeafModel)
         {
             if (Fire == null)
             {
-                Fire = new FlameThrowerParticleSystem(2, 20,2.5f);
-                Fire.emissionRate = 1;
+                Fire = new FlameThrowerParticleSystem(2, 20, 2.5f,1f,5f)
+                {
+                    emissionRate = 1,
+                    Enabled = true
+                };
                 Fire.EnableGeneration(true);
-                updateFire = true;
                 Fire.Transform.Rotation.Y = 90f.ToRadians();
+                Fire.SetOrigin(Vector3.Zero);
             }
         }
 
@@ -33,15 +35,6 @@ namespace Client
             base.Draw();
             if(Burning)
                 Fire.DrawMe(Transform);
-        }
-
-        public override void Update(float deltaTime)
-        {
-            base.Update(deltaTime);
-            Fire.Enabled = true;
-            Fire.SetOrigin(Vector3.Zero);
-            if (updateFire)
-                Fire.Update(deltaTime);
         }
 
         /// <summary>

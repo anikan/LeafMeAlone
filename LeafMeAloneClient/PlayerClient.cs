@@ -259,12 +259,12 @@ namespace Client
 
             FlameThrowerParticleSystem p = FlameThrower as FlameThrowerParticleSystem;
             // flame throwing particle system update
-            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
             FlameThrower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             FlameThrower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             FlameThrower.Update(deltaTime);
 
-            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
+            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
             LeafBlower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             LeafBlower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             LeafBlower.Update(deltaTime);

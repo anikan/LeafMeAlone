@@ -31,6 +31,7 @@ namespace Server
         private Stopwatch timer;
 
         private List<Vector3> spawnPoints = new List<Vector3>();
+        private int playerSpawnIndex = 0;
 
         private Stopwatch testTimer;
 
@@ -49,10 +50,10 @@ namespace Server
             timer.Start();
             testTimer.Start();
 
-            spawnPoints.Add(new Vector3(-10, -10, 0));
-            spawnPoints.Add(new Vector3(-10, 10, 0));
-            spawnPoints.Add(new Vector3(10, -10, 0));
-            spawnPoints.Add(new Vector3(10, 10, 0));
+            spawnPoints.Add(new Vector3(-10, 0, -10));
+            spawnPoints.Add(new Vector3(-10, 0, 10));
+            spawnPoints.Add(new Vector3(10, 0, -10));
+            spawnPoints.Add(new Vector3(10, 0, 10));
 
             networkServer = new NetworkServer(networked);
 
@@ -173,9 +174,11 @@ namespace Server
 
             playerServerList.Add(newPlayer);
 
+            Vector3 nextSpawnPoint = spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
+
             //Note currently assuming players get ids 0-3
-            newActivePlayer.Transform.Position = spawnPoints[0];
-            newPlayer.Transform.Position = spawnPoints[0];
+            newActivePlayer.Transform.Position = nextSpawnPoint;
+            newPlayer.Transform.Position = nextSpawnPoint;
 
             CreateObjectPacket objPacket =
                 new CreateObjectPacket(newPlayer);

@@ -132,6 +132,15 @@ namespace Server
                     {
                     //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
 
+                        if (this is PhysicsObject me && obj is PhysicsObject other)
+                        {
+
+                            Vector3 forceVector = other.Transform.Position = me.Transform.Position;
+
+                            other.ApplyForce(forceVector * me.Mass);
+
+                        }
+
                         return false;
                     }
                 }

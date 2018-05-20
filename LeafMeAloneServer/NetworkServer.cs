@@ -317,15 +317,6 @@ namespace Server
             {
                 Socket socket = clientSockets[i];
 
-                /*if (!socket.Connected)
-                {
-                    Console.WriteLine("Client Disconnected");
-                    //socket.Close();
-
-                    clientSockets.Remove(socket);
-                    i -= 1;
-                }*/
-
                 //If a client disconnected, close the socket and remove it from the list of sockets.
                 try
                 {

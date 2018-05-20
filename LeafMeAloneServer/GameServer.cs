@@ -35,6 +35,8 @@ namespace Server
 
         private Stopwatch testTimer;
 
+        private Random rnd;
+
         public GameServer(bool networked)
         {
             if (instance != null)
@@ -46,6 +48,7 @@ namespace Server
 
             timer = new Stopwatch();
             testTimer = new Stopwatch();
+            rnd = new Random();
 
             timer.Start();
             testTimer.Start();
@@ -59,10 +62,6 @@ namespace Server
 
             // Create the initial game map.
             CreateMap();
-
-            // Variables for determining leaf spawn locations.
-            float HalfWidth = Constants.MAP_WIDTH / 2.0f;
-            float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
 
             // Create the leaves for the game.
             CreateRandomLeaves(Constants.NUM_LEAVES);
@@ -263,8 +262,6 @@ namespace Server
 
         public void CreateRandomLeaf()
         {
-            // Create a new random number generator.
-            Random rnd = new Random();
 
             // Very slight random offset for leaves so that there's no z-fighting.
             double minY = Constants.FLOOR_HEIGHT;

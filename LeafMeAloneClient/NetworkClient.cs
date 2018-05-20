@@ -21,7 +21,7 @@ namespace Client
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public static int BufferSize = 10000;
+        public static int BufferSize = 4096;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  

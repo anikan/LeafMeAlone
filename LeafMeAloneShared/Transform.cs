@@ -83,5 +83,19 @@ namespace Shared
         {
             return base.GetHashCode();
         }
+
+        public Matrix AsMatrix()
+        {
+            Matrix modelMatrix = Matrix.Scaling(Scale);
+
+            // set the rotation based on the three directions
+            modelMatrix = modelMatrix * Matrix.RotationX(Rotation.X) *
+                            Matrix.RotationY(Rotation.Y) *
+                            Matrix.RotationZ(Rotation.Z);
+
+            // set the translation based on the position
+            modelMatrix = modelMatrix * Matrix.Translation(Position);
+            return modelMatrix;
+        }
     }
 }

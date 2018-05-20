@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using SlimDX;
 
 namespace Client
 {
@@ -12,13 +13,10 @@ namespace Client
     /// </summary>
     class LeafClient : NetworkedGameObjectClient
     {
-        
-        /// <summary>
-        /// Create a new leaf client, from a server packet.
-        /// </summary>
-        /// <param name="createPacket"></param>
-        public LeafClient(CreateObjectPacket createPacket) : base(createPacket, Constants.LeafModel)
+        public LeafClient(CreateObjectPacket createPacket) :
+            base(createPacket, Constants.LeafModel)
         {
+        
         }
 
         /// <summary>

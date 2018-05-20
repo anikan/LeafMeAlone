@@ -339,7 +339,7 @@ namespace Client
         {
             // Create a new player packet, and fill it with player info.
             PlayerPacket toSend =
-                ClientPacketFactory.CreatePacket(ActivePlayer);
+                ClientPacketFactory.CreateRequestPacket(ActivePlayer);
             byte[] data = toSend.Serialize();
             networkClient.Send(data);
 

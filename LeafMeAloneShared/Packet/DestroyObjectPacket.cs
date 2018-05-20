@@ -14,19 +14,11 @@ namespace Shared
     public class DestroyObjectPacket : Packet
     {
         [ProtoMember(1)]
-        public int _ProtoObjId
-        {
-            get { return ObjectId; }
-            set { ObjectId = value; }
-        }
+        public IdPacket idData;
 
-        public DestroyObjectPacket() : base(PacketType.DestroyObjectPacket)
-        { }
-
-        public DestroyObjectPacket(GameObject gameObject) :
-            base(PacketType.DestroyObjectPacket)
+        public DestroyObjectPacket(IdPacket idData) : base (PacketType.DestroyObjectPacket)
         {
-            ObjectId = gameObject.Id;
+            this.idData = idData;
         }
     }
 }

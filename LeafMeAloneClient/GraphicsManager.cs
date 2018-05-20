@@ -158,7 +158,7 @@ namespace Client
             // add more argument to each list as needed
             List <string> allShaderPaths = new List<string>( new string[]
             {
-                FileManager.DefaultShader
+                Constants.DefaultShader
             } );
 
             List <string> allShaderVSName = new List<string>(new string[]

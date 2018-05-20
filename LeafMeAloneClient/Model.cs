@@ -54,7 +54,7 @@ namespace Client
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
             Update(0);
 
-            setShader(FileManager.DefaultShader);
+            setShader(Constants.DefaultShader);
         }
 
         /// <summary>
@@ -128,11 +128,14 @@ namespace Client
         /// </summary>
         public void Draw()
         {
-            m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
-            m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
-            m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
-            m_ActiveGeo.RepeatAnimation = RepeatAnimation;
-            m_ActiveGeo.UpdateAnimation();
+            if (CurrentAnimationIndex != -1)
+            {
+                m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
+                m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
+                m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
+                m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+                m_ActiveGeo.UpdateAnimation();
+            }
 
             m_ActiveShader.UseShader();
             m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
@@ -163,7 +166,7 @@ namespace Client
                 m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);
             }
 
-            if (!PauseAnimation)
+            if (!PauseAnimation && CurrentAnimationIndex != -1)
             {
                 CurrentAnimationTime += delta_time;
             }

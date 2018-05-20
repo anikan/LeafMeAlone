@@ -35,6 +35,7 @@ namespace Client
     {
         // The port number for the remote device.  
         private const int port = 2302;
+        private const int PACK_HEAD_SIZE = 5;
 
         // ManualResetEvent instances signal completion.  
         private static ManualResetEvent connectDone =
@@ -146,31 +147,31 @@ namespace Client
             while (ByteReceivedQueue.Count > 0)
             {
                 // If there is not enough data left to read the size of the next packet, do other game updates
-                if (ByteReceivedQueue.Count < 5)
+                if (ByteReceivedQueue.Count < Packet.PACK_HEAD_SIZE)
                 {
                     break;
                 }
 
                 // Get packet size
-                byte[] headerByteBuf = ByteReceivedQueue.GetRange(0, 5).ToArray();
+                byte[] headerByteBuf = ByteReceivedQueue.GetRange(0, Packet.PACK_HEAD_SIZE).ToArray();
                 int packetSize = BitConverter.ToInt32(headerByteBuf, 1);
 
                 // If there is not enough data left to read the next packet, do other game updates
-                if (ByteReceivedQueue.Count < packetSize + 5)
+                if (ByteReceivedQueue.Count < packetSize + Packet.PACK_HEAD_SIZE)
                 {
                     break;
                 }
 
                 // Get full packet and add it to the queue 
-                byte[] packetData = ByteReceivedQueue.GetRange(5, packetSize).ToArray();
+                byte[] packetData = ByteReceivedQueue.GetRange(Packet.PACK_HEAD_SIZE, packetSize).ToArray();
                 byte[] fullPacket = headerByteBuf.Concat(packetData).ToArray();
-                Packet packet = Packet.Deserialize(fullPacket, out int b);
+                Packet packet = Packet.Deserialize(fullPacket);
                 PacketQueue.Add(packet);
 
                 // Remove the read data 
                 lock (ByteReceivedQueue)
                 {
-                    ByteReceivedQueue.RemoveRange(0, packetSize + 5);
+                    ByteReceivedQueue.RemoveRange(0, packetSize + Packet.PACK_HEAD_SIZE);
                 }
             }
         }

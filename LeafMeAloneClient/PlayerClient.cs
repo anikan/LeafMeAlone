@@ -35,7 +35,7 @@ namespace Client
         private ParticleSystem FlameThrower,LeafBlower;
 
         public PlayerClient(CreateObjectPacket createPacket) : 
-            base(createPacket, FileManager.PlayerModel)
+            base(createPacket, Constants.PlayerModel)
         {
             FlameThrower = new FlameThrowerParticleSystem();
             LeafBlower = new LeafBlowerParticleSystem();

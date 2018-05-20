@@ -102,6 +102,7 @@ namespace Server
         /// <param name="toolMode">Tool mode hit by.</param>
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
+            base.HitByTool(playerPosition, toolType, toolMode);
             // TODO
         }
     }

@@ -82,7 +82,7 @@ namespace Client
             //if the object is currently burning, draw the fire on them.
             if (Burning)
             {
-                Fire?.DrawMe(Transform);
+                Fire?.DrawTransform(Transform);
             }
         }
 

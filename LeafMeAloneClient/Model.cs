@@ -54,7 +54,7 @@ namespace Client
             m_PrevProperties.Scale = new Vector3(0, 0, 0);
             Update(0);
 
-            setShader(FileManager.DefaultShader);
+            setShader(Constants.DefaultShader);
         }
 
         /// <summary>

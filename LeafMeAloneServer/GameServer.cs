@@ -298,11 +298,12 @@ namespace Server
             // Set the leaf's initial position.
             newLeaf.Transform.Position = pos;
 
+            // Add this leaf to the leaf list and object dictionary.
+            newLeaf.Register();
+
             // Send this object to the other object's.
             networkServer.SendNewObjectToAll(newLeaf);
 
-            // Add this leaf to the leaf list and object dictionary.
-            newLeaf.Register();
 
         }
 
@@ -341,12 +342,12 @@ namespace Server
                 playerServerList.Remove(player);
             }
 
+            toDestroyQueue.Add(gameObj);
+
             if (gameObj is LeafServer)
             {
                 CreateRandomLeaf();
             }
-
-            toDestroyQueue.Add(gameObj);
         }
 
         /// <summary>

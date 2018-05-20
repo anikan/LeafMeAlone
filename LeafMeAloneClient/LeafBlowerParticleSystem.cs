@@ -10,16 +10,14 @@ namespace Client
 {
     public class LeafBlowerParticleSystem : ParticleSystem
     {
-
-        public static Vector3 PlayerToWindOffset = new Vector3(1.8f, 3.85f, 3.0f);
         public static float WindInitSpeed = 60.0f;
         public static float WindAcceleration = -30.0f;
         public static float WindStopDistance = 60.0f;
         public static Vector3 WindDirection = Vector3.UnitX;
 
-        public LeafBlowerParticleSystem(): base(ParticleSystemType.WIND,
+        public LeafBlowerParticleSystem(): base(Constants.WindTexture,
             Vector3.Zero +
-            Vector3.TransformCoordinate(PlayerToWindOffset, Matrix.Identity), // origin
+            Vector3.TransformCoordinate(Constants.PlayerToToolOffset, Matrix.Identity), // origin
             WindDirection * WindAcceleration, // acceleration
             WindDirection * WindInitSpeed, // initial speed
             true, // cutoff alpha only

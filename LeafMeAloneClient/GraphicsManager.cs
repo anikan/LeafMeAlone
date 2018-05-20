@@ -94,6 +94,7 @@ namespace Client
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
             }
+            LeafClient.Fire?.Update(delta_t);
         }
 
         public static void Draw()
@@ -112,7 +113,7 @@ namespace Client
         public static void Init(Camera activeCamera)
         {
             ActiveCamera = activeCamera;
-
+            ParticleSystemManager.Init();
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  
             

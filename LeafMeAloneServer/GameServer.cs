@@ -65,7 +65,7 @@ namespace Server
             float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
 
             // Create the leaves for the game.
-            CreateRandomLeaves(Constants.NUM_LEAVES, -HalfWidth + Constants.BORDER_MARGIN, HalfWidth - Constants.BORDER_MARGIN, -HalfHeight + Constants.BORDER_MARGIN, HalfHeight - Constants.BORDER_MARGIN);
+            CreateRandomLeaves(Constants.NUM_LEAVES);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -249,12 +249,19 @@ namespace Server
         /// Creates all leaves in the scene, placing them randomly.
         /// </summary>
         /// <param name="num">Number of leaves to create.</param>
-        /// <param name="floorHeight">Height of the floor in the world..</param>
-        /// <param name="minX">Min x position to spawn leaves.</param>
-        /// <param name="maxX">Max x position to spawn leaves.</param>
-        /// <param name="minZ">Min y position to spawn leaves.</param>
-        /// <param name="maxZ">Max y position to spawn leaves.</param>
-        public void CreateRandomLeaves(int num, float minX, float maxX, float minZ, float maxZ)
+        public void CreateRandomLeaves(int num)
+        {
+
+            // Itereate through number of leaves we want to create.
+            for (int i = 0; i < num; i++)
+            {
+
+                CreateRandomLeaf();
+               
+            }
+        }
+
+        public void CreateRandomLeaf()
         {
             // Create a new random number generator.
             Random rnd = new Random();
@@ -263,35 +270,40 @@ namespace Server
             double minY = Constants.FLOOR_HEIGHT;
             double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
-            // Itereate through number of leaves we want to create.
-            for (int i = 0; i < num; i++)
-            {
+            // Variables for determining leaf spawn locations.
+            float HalfWidth = Constants.MAP_WIDTH / 2.0f;
+            float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
 
-                // Get random doubles for position.
-                double randX = rnd.NextDouble();
-                double randY = rnd.NextDouble();
-                double randZ = rnd.NextDouble();
+            float minX = -HalfWidth + Constants.BORDER_MARGIN;
+            float maxX = HalfWidth - Constants.BORDER_MARGIN;
+            float minZ = -HalfHeight + Constants.BORDER_MARGIN;
+            float maxZ = HalfHeight - Constants.BORDER_MARGIN;
 
-                // Bind random doubles to our range.
-                randX = (randX * (maxX - minX)) + minX;
-                randY = (randY * (maxY - minY)) + minY;
-                randZ = (randZ * (maxZ - minZ)) + minZ;
+            // Get random doubles for position.
+            double randX = rnd.NextDouble();
+            double randY = rnd.NextDouble();
+            double randZ = rnd.NextDouble();
 
-                // Get the new position
-                Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
+            // Bind random doubles to our range.
+            randX = (randX * (maxX - minX)) + minX;
+            randY = (randY * (maxY - minY)) + minY;
+            randZ = (randZ * (maxZ - minZ)) + minZ;
 
-                // Create a new leaf
-                LeafServer newLeaf = new LeafServer();
+            // Get the new position
+            Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
 
-                // Set the leaf's initial position.
-                newLeaf.Transform.Position = pos;
+            // Create a new leaf
+            LeafServer newLeaf = new LeafServer();
 
-                // Send this object to the other object's.
-                networkServer.SendNewObjectToAll(newLeaf);
+            // Set the leaf's initial position.
+            newLeaf.Transform.Position = pos;
 
-                // Add this leaf to the leaf list and object dictionary.
-                newLeaf.Register();
-            }
+            // Send this object to the other object's.
+            networkServer.SendNewObjectToAll(newLeaf);
+
+            // Add this leaf to the leaf list and object dictionary.
+            newLeaf.Register();
+
         }
 
         /// <summary>
@@ -327,6 +339,11 @@ namespace Server
             if (gameObj is PlayerServer player)
             {
                 playerServerList.Remove(player);
+            }
+
+            if (gameObj is LeafServer)
+            {
+                CreateRandomLeaf();
             }
 
             toDestroyQueue.Add(gameObj);

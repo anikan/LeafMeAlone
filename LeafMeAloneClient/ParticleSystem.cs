@@ -9,9 +9,9 @@ using Shared;
 using SlimDX;
 using SlimDX.D3DCompiler;
 using SlimDX.Direct3D11;
-using SlimDX.DXGI;
 using SlimDX.XAudio2;
 using Buffer = SlimDX.Direct3D11.Buffer;
+using Format = SlimDX.DXGI.Format;
 using MapFlags = SlimDX.Direct3D11.MapFlags;
 
 namespace Client
@@ -126,7 +126,7 @@ namespace Client
                 Particles.Add(new Particle(GenerationOrigin, InitVelocity, 1.0f, 0f));
             }
             
-            Faces = new DataStream(Particles.Count * sizeof(uint) * 6, true, true);
+            Faces = new DataStream(Particles.Count * 16 * 6, true, true);
             Tex = new DataStream(Particles.Count * size, true, true);
 
             var vert_desc = new BufferDescription(Particles.Count * size, ResourceUsage.Dynamic,BindFlags.VertexBuffer,CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
@@ -155,7 +155,10 @@ namespace Client
             Tex.Position = 0;
 
             VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Immutable, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
-            EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Immutable, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+
+            var ibuffer = new BufferDescription(Particles.Count * 6 * 16,ResourceUsage.Immutable, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+            EBO = new Buffer(GraphicsRenderer.Device, Faces, ibuffer);
+            //EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Immutable, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
             TexSRV = CreateTexture(TexturePath);
             ResetSystem();
@@ -252,7 +255,7 @@ namespace Client
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
         }
 
-        public void DrawMe(Transform parent)
+        public void DrawTransform(Transform parent)
         {
             Transform.CopyToThis(parent);
             Draw();

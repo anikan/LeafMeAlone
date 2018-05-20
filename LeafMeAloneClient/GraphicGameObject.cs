@@ -23,7 +23,7 @@ namespace Client
 
 
         /// <summary>
-        /// Init the particle system for burning. This will only ever run once, if the particle systemhas not been initialized yet.
+        /// Init the particle system for burning. This will only ever run once, if the particle system has not been initialized yet.
         /// </summary>
         private static void InitializeBurning()
         {

@@ -37,6 +37,9 @@ namespace Server
 
         private Random rnd;
 
+        //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
+        public int nextObjectId = 0;
+        
         public GameServer(bool networked)
         {
             if (instance != null)

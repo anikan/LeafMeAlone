@@ -252,7 +252,7 @@ namespace Client
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
         }
 
-        public void DrawMe(Transform parent)
+        public void DrawTransform(Transform parent)
         {
             Transform.CopyToThis(parent);
             Draw();

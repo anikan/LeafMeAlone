@@ -46,7 +46,7 @@ namespace Client
         public static DepthStencilView DepthView;
         public static DepthStencilState DepthState;
         private static DepthStencilStateDescription dsStateDesc;
-        
+
         public static DepthStencilState DepthStateOff;
         private static DepthStencilStateDescription dsStateDescOff;
 
@@ -135,7 +135,7 @@ namespace Client
             BlendState = BlendState.FromDescription(Device, bs);
         }
 
-        
+
         /// <summary>
         /// Initialize graphics properties and create the main window.
         /// </summary>
@@ -189,15 +189,14 @@ namespace Client
             // handle alt+enter ourselves
             Form.KeyDown += (o, e) =>
             {
-                //if (e.Alt && e.KeyCode == Keys.Enter)
-                //    SwapChain.IsFullScreen = !SwapChain.IsFullScreen;
-                //else 
+                if (e.Shift && e.KeyCode == Keys.Enter)
+                    SwapChain.IsFullScreen = !SwapChain.IsFullScreen;
                 if (e.KeyCode == Keys.Escape)
                     Application.Exit();
             };
 
-           BarContext = new Context(Tw.GraphicsAPI.D3D11,Device.ComPointer);
-           BarContext.HandleResize(Form.ClientSize);
+            BarContext = new Context(Tw.GraphicsAPI.D3D11, Device.ComPointer);
+            BarContext.HandleResize(Form.ClientSize);
         }
 
         /// <summary>
@@ -207,10 +206,38 @@ namespace Client
         /// <param name="eventArgs">event argument</param>
         private static void FormOnResize(object sender, EventArgs eventArgs)
         {
-            Viewport.Height = Form.ClientSize.Height;
-            Viewport.Width = Form.ClientSize.Width;
-            ProjectionMatrix = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Viewport.Width / Viewport.Height, .1f, 1000.0f);
+            RenderTarget.Dispose();
+            DepthView.Dispose();
+            depthBuffer.Dispose();
+
+
+            DeviceContext = Device.ImmediateContext;
+
+            DeviceContext.Rasterizer.State = RasterizerState.FromDescription(Device, Rasterizer);
+
+            depthBufferDesc.Width = Form.Width;
+            depthBufferDesc.Height = Form.Height;
+
+
+            depthBuffer = new Texture2D(Device, depthBufferDesc);
+            DepthView = new DepthStencilView(Device, depthBuffer);
+
+
+            DepthState = DepthStencilState.FromDescription(Device, dsStateDesc);
+            DeviceContext.OutputMerger.DepthStencilState = DepthState;
+
+
+
+            SwapChain.ResizeBuffers(2, Form.Width, Form.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
+            using (var resource = Resource.FromSwapChain<Texture2D>(SwapChain, 0))
+                RenderTarget = new RenderTargetView(Device, resource);
+
+            DeviceContext.OutputMerger.SetTargets(DepthView, RenderTarget);
+
+
+            Viewport = new Viewport(0.0f, 0.0f, Form.ClientSize.Width, Form.ClientSize.Height);
             DeviceContext.Rasterizer.SetViewports(Viewport);
+            ProjectionMatrix = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Viewport.Width / Viewport.Height, .1f, 1000.0f);
             BarContext.HandleResize(Form.ClientSize);
         }
 

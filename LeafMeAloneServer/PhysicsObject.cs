@@ -187,8 +187,6 @@ namespace Server
                 // If this is the leafblower's primary tool.
                 if (toolMode == ToolMode.PRIMARY)
                 {
-
-
                     // Extinguish any objects that get blowed by the leaf blower.
                     Extinguish();
 
@@ -205,14 +203,35 @@ namespace Server
 
                     // Multiply tool force by distance so that it's stronger on objects that are closer.
                     // Also make sure denominator can't be zero.
-                    toolForce /= Math.Max(0.001f, distance);
+                    toolForce /= Math.Max(0.001f, distance * Constants.BLOWER_DISTANCE_SCALER);
 
                     // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
                     ApplyForce(force);
 
                     // Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
+                }
+                else if (toolMode == ToolMode.SECONDARY)
+                {
 
+                    // Get the force of this tool.
+                    float toolForce = toolInfo.Force;
+
+                    // Get the vector from the player to the object.
+                    Vector3 objToPlayer = playerPosition - Transform.Position;
+                    objToPlayer.Y = 0.0f;
+                    float distance = objToPlayer.Length();
+
+                    // Divide the vector by the range of the tool to normalize it.
+                    objToPlayer /= toolInfo.Range;
+
+                    // Multiply tool force by distance so that it's stronger on objects that are closer.
+                    // Also make sure denominator can't be zero.
+                    toolForce /= Math.Max(0.001f, distance * Constants.BLOWER_DISTANCE_SCALER);
+
+                    // Apply a force in the direction of the player -> object.
+                    Vector3 force = objToPlayer * toolForce;
+                    ApplyForce(force);
 
                 }
             }

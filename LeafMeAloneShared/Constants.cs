@@ -46,5 +46,7 @@ namespace Shared
         public const int NUM_LEAVES = 300;
 
         public const float PUSH_FACTOR = 3.0f;
+
+        public const float BLOWER_DISTANCE_SCALER = 2.0f;
     }
 }

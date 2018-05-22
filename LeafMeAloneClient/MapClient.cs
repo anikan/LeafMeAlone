@@ -14,10 +14,11 @@ namespace Client
     public class MapClient : NonNetworkedGameObjectClient
     {
 
-        private const float TILE_WIDTH = 5.0f;
-        private const float TILE_HEIGHT = 5.0f;
+        private const float TILE_WIDTH = 10.0f;
+        private const float TILE_HEIGHT = 10.0f;
+        private const int BORDER_TILES = 10;
 
-        private const int NUM_TILES_PER_SIDE = 20;
+        private const int NUM_TILES_PER_SIDE = (int)(Constants.MAP_WIDTH / TILE_WIDTH) + BORDER_TILES;
 
         private List<MapTile> MapTiles;
 
@@ -28,12 +29,14 @@ namespace Client
         public MapClient() : base()
         {
 
+            Random rnd = new Random();
+
             MapTiles = new List<MapTile>();
 
-            for (float y = -(NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y < (NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y += TILE_HEIGHT)
+            for (float y = -(NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y < (NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y += TILE_HEIGHT - 0.2f)
             {
 
-                for (float x = -(NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x < (NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x +=TILE_WIDTH)
+                for (float x = -(NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x < (NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x +=TILE_WIDTH - 0.2f)
                 {
 
                     MapTile newTile = new MapTile();
@@ -41,13 +44,17 @@ namespace Client
                     newTile.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT - 1.0f, y);
                     newTile.Transform.Scale = new Vector3(TILE_WIDTH, 1.0f, TILE_HEIGHT);
 
+                    float random = (float) rnd.NextDouble();
+
+                    float yOffset = (random * (0.1f - (-0.1f))) + (-0.1f);
+
+
                     MapTiles.Add(newTile);
 
                 }
             }
 
-            // Create the terrain at floor height, slightly below.
-            Transform.Position.Y = Constants.FLOOR_HEIGHT - 1.0f;
+
         }
 
         public override void Update(float deltaTime)

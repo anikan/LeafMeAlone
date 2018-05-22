@@ -15,7 +15,7 @@ namespace Server
         public const float PLAYER_HEALTH = 100.0f;
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 3.0f;
-        public const float PLAYER_SPEED = 20.0f;
+        public const float PLAYER_SPEED = 25.0f;
 
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
@@ -40,6 +40,7 @@ namespace Server
         {
             base.Update(deltaTime);
             Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
+            newPlayerPos.Y = Constants.FLOOR_HEIGHT;
 
 
             TryMoveObject(newPlayerPos);

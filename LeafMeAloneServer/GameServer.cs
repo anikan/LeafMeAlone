@@ -198,6 +198,8 @@ namespace Server
         public MapServer CreateMap()
         {
 
+            Random rnd = new Random();
+
             // Create the map with a width and height.
             MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
@@ -209,6 +211,22 @@ namespace Server
                 // Iterate through the width of the map, centered on origin and increase by radius of a tree.
                 for (float x = -newMap.Width / 2.0f; x < newMap.Width / 2.0f; x+= TreeServer.TREE_RADIUS)
                 {
+
+                    float random = (float)rnd.NextDouble();
+                    
+                    if (random < Constants.TREE_FREQUENCY)
+                    {
+
+                        // Make a new tree.
+                        TreeServer newTree = new TreeServer();
+
+                        // Set the tree's initial position.
+                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // Send the new object to client.
+                        networkServer.SendNewObjectToAll(newTree);
+
+                    }
 
                     // If this is a top or bottom row, create trees.
                     if (y <= -newMap.Height / 2.0f || (newMap.Height / 2.0f) <= y + TreeServer.TREE_RADIUS)

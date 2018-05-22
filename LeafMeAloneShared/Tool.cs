@@ -57,7 +57,7 @@ namespace Shared
 
         // Flamethrower tool information. 
         private const float ThrowerAngle = 30.0f;
-        private const float ThrowerRange = 20.0f;
+        private const float ThrowerRange = 10.0f;
         private const float ThrowerForce = 0.0f;
         private const float ThrowerDamage = 1.0f;
 

@@ -45,9 +45,8 @@ namespace Client
             Load(filePath, enableRigging);
             m_ModelMatrix = Matrix.Identity;
 
-            m_Properties.Rotation = new Vector3(0, 0, 0);
-            m_Properties.Position = new Vector3(0, 0, 0);
-            m_Properties.Scale = new Vector3(1, 1, 1);
+            m_Properties = new Transform();
+            m_PrevProperties = new Transform();
 
             m_PrevProperties.Rotation = new Vector3(0, 0, 0);
             m_PrevProperties.Position = new Vector3(0, 0, 0);

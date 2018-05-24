@@ -21,6 +21,8 @@ namespace Client
         // Model that's associated with this object.
         public Model model;
 
+        private NonNetworkedGameObjectClient PivotCube;
+
 
         /// <summary>
         /// Init the particle system for burning. This will only ever run once, if the particle system has not been initialized yet.
@@ -48,6 +50,16 @@ namespace Client
         /// </summary>
         protected GraphicGameObject() : base()
         {
+
+            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            {
+
+                PivotCube = new MapTile();
+                PivotCube.Transform.Scale.Y = 20.0f;
+
+            }
+
+
         }
 
         /// <summary>
@@ -58,6 +70,16 @@ namespace Client
         {
             SetModel(modelPath);
             InitializeBurning();
+
+            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            {
+                
+
+                PivotCube = new MapTile();
+                PivotCube.Transform.Scale.Y = 20.0f;
+
+            }
+
         }
 
         /// <summary>
@@ -66,10 +88,19 @@ namespace Client
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
-            if (model == null)
-                return;
-            model.m_Properties = Transform;
-            model.Update(deltaTime);
+            if (model != null)
+            {
+                model.m_Properties = Transform;
+                model.Update(deltaTime);
+            }
+
+
+            if (PivotCube != null)
+            {
+                PivotCube.Transform.Position = Transform.Position;
+                PivotCube.Update(deltaTime);
+            }
+
         }
 
         /// <summary>
@@ -83,6 +114,11 @@ namespace Client
             if (Burning)
             {
                 Fire?.DrawTransform(Transform);
+            }
+
+            if (PivotCube != null)
+            {
+                PivotCube.Draw();
             }
         }
 

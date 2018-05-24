@@ -112,6 +112,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
+    <Compile Include="MapTile.cs" />
     <Compile Include="ParticleSystemManager.cs" />
     <Compile Include="TreeClient.cs" />
     <Compile Include="ClientAnimationNode.cs" />

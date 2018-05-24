@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using System.Diagnostics;
 using SlimDX;
 
 namespace Server
@@ -17,6 +18,8 @@ namespace Server
         // Radius of this object for basic n00b collisions.
         public float Radius = 1.0f;
 
+        private Stopwatch timer;
+
         /// <summary>
         /// Creates a new collider object.
         /// </summary>
@@ -26,6 +29,7 @@ namespace Server
         public ColliderObject(ObjectType objectType, float health, float radius) : base(objectType, health)
         {
             Radius = radius;
+            timer = new Stopwatch();
         }
 
         /// <summary>
@@ -54,6 +58,7 @@ namespace Server
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
+
         }
 
         /// <summary>
@@ -88,13 +93,13 @@ namespace Server
         /// Tries to move an object to a new position, based on collider positions.
         /// </summary>
         /// <param name="newPosition"></param>
-        public void TryMoveObject(Vector3 newPosition)
+        public bool TryMoveObject(Vector3 newPosition)
         {
 
             // Save the original position of this object.
             Vector3 OriginalPosition = Transform.Position;
 
-            // First, update the     position.
+            // First, update the position.
             Transform.Position = newPosition;
 
             // First, we need all the game objects on the server.
@@ -109,13 +114,29 @@ namespace Server
                     // If the object is colliding, just return. No movement.
                     if (obj != this && IsColliding(obj))
                     {
-                    //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
+                        //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
 
                         Transform.Position = OriginalPosition;
-                        break;
+
+                        if (this is PhysicsObject me)
+                        {
+
+                            if (obj is PhysicsObject other)
+                            {
+
+                                me.Push(other);
+                            }
+
+                            me.Bounce(obj);
+
+                        }
+
+                        return false;
                     }
                 }
             }
+
+            return true;
         }
     }
 }

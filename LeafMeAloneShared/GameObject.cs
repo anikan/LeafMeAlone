@@ -42,12 +42,7 @@ namespace Shared
           
         protected GameObject()
         {
-            Transform =  new Transform
-            {
-                Rotation = new Vector3(0, 0, 0),
-                Position = new Vector3(0, 0, 0),
-                Scale = new Vector3(1, 1, 1)
-            };
+            Transform = new Transform();
         }
 
         protected GameObject(Transform startTransform)

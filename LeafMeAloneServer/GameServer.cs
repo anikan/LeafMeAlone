@@ -311,20 +311,22 @@ namespace Server
 
             // Get the new position
             Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
+            float rotation = rnd.NextFloat() * 360.0f;
 
             // Create a new leaf
             LeafServer newLeaf = new LeafServer();
 
             // Set the leaf's initial position.
             newLeaf.Transform.Position = pos;
+          
+            // Set the leaf's initial rotation.
+            newLeaf.Transform.Rotation.Y = rotation;
 
             // Add this leaf to the leaf list and object dictionary.
             newLeaf.Register();
-
-            // Send this object to the other object's.
+             
+            // Send this object to the other objects.
             networkServer.SendNewObjectToAll(newLeaf);
-
-
         }
 
         /// <summary>

@@ -224,6 +224,16 @@ namespace Client
         }
 
         /// <summary>
+        /// Check if the sound source is playing something
+        /// </summary>
+        /// <param name="soundSource"> check if the sound source is playing </param>
+        /// <returns> true if it is playing, false otherwise </returns>
+        public bool IsPlaying(int soundSource)
+        {
+            return AL.GetSourceState(soundSource) == ALSourceState.Playing;
+        }
+
+        /// <summary>
         /// Dispose
         /// </summary>
         public void Dispose()

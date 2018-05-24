@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using System.Diagnostics;
 using SlimDX;
 
 namespace Server
@@ -54,6 +55,7 @@ namespace Server
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
+
         }
 
         /// <summary>
@@ -88,13 +90,13 @@ namespace Server
         /// Tries to move an object to a new position, based on collider positions.
         /// </summary>
         /// <param name="newPosition"></param>
-        public void TryMoveObject(Vector3 newPosition)
+        public bool TryMoveObject(Vector3 newPosition)
         {
 
             // Save the original position of this object.
             Vector3 OriginalPosition = Transform.Position;
 
-            // First, update the     position.
+            // First, update the position.
             Transform.Position = newPosition;
 
             // First, we need all the game objects on the server.
@@ -109,13 +111,36 @@ namespace Server
                     // If the object is colliding, just return. No movement.
                     if (obj != this && IsColliding(obj))
                     {
-                    //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
-
+                        //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
+                        
+                        // Set the object back to it's original position.
                         Transform.Position = OriginalPosition;
-                        break;
+
+                        // If this is a physics object
+                        if (this is PhysicsObject me)
+                        {
+
+                            // If the other object is also a physics object.
+                            if (obj is PhysicsObject other)
+                            {
+
+                                // Push the other object.
+                                me.Push(other);
+                            }
+
+                            // Bounce off the other object.
+                            me.Bounce(obj);
+
+                        }
+
+                        // couldn't move
+                        return false;
                     }
                 }
             }
+
+            // Moved!
+            return true;
         }
     }
 }

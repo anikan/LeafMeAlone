@@ -32,8 +32,11 @@ namespace Server
         private Stopwatch timer;
 
         private List<Vector3> spawnPoints = new List<Vector3>();
+        private int playerSpawnIndex = 0;
 
         private Stopwatch testTimer;
+
+        private Random rnd;
 
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
@@ -49,26 +52,23 @@ namespace Server
 
             timer = new Stopwatch();
             testTimer = new Stopwatch();
+            rnd = new Random();
 
             timer.Start();
             testTimer.Start();
 
-            spawnPoints.Add(new Vector3(-10, -10, 0));
-            spawnPoints.Add(new Vector3(-10, 10, 0));
-            spawnPoints.Add(new Vector3(10, -10, 0));
-            spawnPoints.Add(new Vector3(10, 10, 0));
+            spawnPoints.Add(new Vector3(-10, 0, -10));
+            spawnPoints.Add(new Vector3(-10, 0, 10));
+            spawnPoints.Add(new Vector3(10, 0, -10));
+            spawnPoints.Add(new Vector3(10, 0, 10));
 
             networkServer = new NetworkServer(networked);
 
             // Create the initial game map.
             CreateMap();
 
-            // Variables for determining leaf spawn locations.
-            float HalfWidth = Constants.MAP_WIDTH / 2.0f;
-            float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
-
             // Create the leaves for the game.
-            CreateRandomLeaves(Constants.NUM_LEAVES, -HalfWidth + Constants.BORDER_MARGIN, HalfWidth - Constants.BORDER_MARGIN, -HalfHeight + Constants.BORDER_MARGIN, HalfHeight - Constants.BORDER_MARGIN);
+            CreateRandomLeaves(Constants.NUM_LEAVES);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -176,14 +176,18 @@ namespace Server
 
             playerServerList.Add(newPlayer);
 
+            Vector3 nextSpawnPoint = spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
+
             //Note currently assuming players get ids 0-3
-            newActivePlayer.Transform.Position = spawnPoints[0];
-            newPlayer.Transform.Position = spawnPoints[0];
+            newActivePlayer.Transform.Position = nextSpawnPoint;
+            newPlayer.Transform.Position = nextSpawnPoint;
 
             CreateObjectPacket objPacket = PacketFactory.NewCreatePacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
             networkServer.SendAll(PacketUtil.Serialize(objPacket));
+
+
 
             return newActivePlayer;
         }
@@ -194,6 +198,8 @@ namespace Server
         /// <returns>The new map</returns>
         public MapServer CreateMap()
         {
+
+            Random rnd = new Random();
 
             // Create the map with a width and height.
             MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
@@ -206,6 +212,22 @@ namespace Server
                 // Iterate through the width of the map, centered on origin and increase by radius of a tree.
                 for (float x = -newMap.Width / 2.0f; x < newMap.Width / 2.0f; x+= TreeServer.TREE_RADIUS)
                 {
+
+                    float random = (float)rnd.NextDouble();
+                    
+                    if (random < Constants.TREE_FREQUENCY)
+                    {
+
+                        // Make a new tree.
+                        TreeServer newTree = new TreeServer();
+
+                        // Set the tree's initial position.
+                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // Send the new object to client.
+                        networkServer.SendNewObjectToAll(newTree);
+
+                    }
 
                     // If this is a top or bottom row, create trees.
                     if (y <= -newMap.Height / 2.0f || (newMap.Height / 2.0f) <= y + TreeServer.TREE_RADIUS)
@@ -248,49 +270,62 @@ namespace Server
         /// Creates all leaves in the scene, placing them randomly.
         /// </summary>
         /// <param name="num">Number of leaves to create.</param>
-        /// <param name="floorHeight">Height of the floor in the world..</param>
-        /// <param name="minX">Min x position to spawn leaves.</param>
-        /// <param name="maxX">Max x position to spawn leaves.</param>
-        /// <param name="minZ">Min y position to spawn leaves.</param>
-        /// <param name="maxZ">Max y position to spawn leaves.</param>
-        public void CreateRandomLeaves(int num, float minX, float maxX, float minZ, float maxZ)
+        public void CreateRandomLeaves(int num)
         {
-            // Create a new random number generator.
-            Random rnd = new Random();
-
-            // Very slight random offset for leaves so that there's no z-fighting.
-            double minY = Constants.FLOOR_HEIGHT;
-            double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
             // Itereate through number of leaves we want to create.
             for (int i = 0; i < num; i++)
             {
 
-                // Get random doubles for position.
-                double randX = rnd.NextDouble();
-                double randY = rnd.NextDouble();
-                double randZ = rnd.NextDouble();
-
-                // Bind random doubles to our range.
-                randX = (randX * (maxX - minX)) + minX;
-                randY = (randY * (maxY - minY)) + minY;
-                randZ = (randZ * (maxZ - minZ)) + minZ;
-
-                // Get the new position
-                Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
-
-                // Create a new leaf
-                LeafServer newLeaf = new LeafServer();
-
-                // Set the leaf's initial position.
-                newLeaf.Transform.Position = pos;
-
-                // Send this object to the other object's.
-                networkServer.SendNewObjectToAll(newLeaf);
-
-                // Add this leaf to the leaf list and object dictionary.
-                newLeaf.Register();
+                CreateRandomLeaf();
+               
             }
+        }
+
+        public void CreateRandomLeaf()
+        {
+
+            // Very slight random offset for leaves so that there's no z-fighting.
+            double minY = Constants.FLOOR_HEIGHT;
+            double maxY = Constants.FLOOR_HEIGHT + 0.2f;
+
+            // Variables for determining leaf spawn locations.
+            float HalfWidth = Constants.MAP_WIDTH / 2.0f;
+            float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
+
+            float minX = -HalfWidth + Constants.BORDER_MARGIN;
+            float maxX = HalfWidth - Constants.BORDER_MARGIN;
+            float minZ = -HalfHeight + Constants.BORDER_MARGIN;
+            float maxZ = HalfHeight - Constants.BORDER_MARGIN;
+
+            // Get random doubles for position.
+            double randX = rnd.NextDouble();
+            double randY = rnd.NextDouble();
+            double randZ = rnd.NextDouble();
+
+            // Bind random doubles to our range.
+            randX = (randX * (maxX - minX)) + minX;
+            randY = (randY * (maxY - minY)) + minY;
+            randZ = (randZ * (maxZ - minZ)) + minZ;
+
+            // Get the new position
+            Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
+            float rotation = rnd.NextFloat() * 360.0f;
+
+            // Create a new leaf
+            LeafServer newLeaf = new LeafServer();
+
+            // Set the leaf's initial position.
+            newLeaf.Transform.Position = pos;
+          
+            // Set the leaf's initial rotation.
+            newLeaf.Transform.Rotation.Y = rotation;
+
+            // Add this leaf to the leaf list and object dictionary.
+            newLeaf.Register();
+             
+            // Send this object to the other objects.
+            networkServer.SendNewObjectToAll(newLeaf);
         }
 
         /// <summary>
@@ -329,6 +364,11 @@ namespace Server
             }
 
             toDestroyQueue.Add(gameObj);
+
+            if (gameObj is LeafServer)
+            {
+                CreateRandomLeaf();
+            }
         }
 
         /// <summary>

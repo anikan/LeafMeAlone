@@ -81,9 +81,7 @@ namespace Client
         public static Shader ActiveShader;
 
         public static Light ActiveLightSystem;
-
-        public static AudioSystem audioSystem;
-
+        
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
 
@@ -98,7 +96,6 @@ namespace Client
             }
             LeafClient.Fire?.Update(delta_t);
 
-            audioSystem.UpdateListener(ActiveCamera.CameraPosition, ActiveCamera.CameraLookAt, ActiveCamera.CameraUp);
         }
 
         public static void Draw()
@@ -154,11 +151,6 @@ namespace Client
 
             ParticleSystems = new List<ParticleSystem>();
 
-            audioSystem = new AudioSystem();
-            int src = audioSystem.GenSource();
-            audioSystem.UpdateSourcePosition(src, new Vector3(-10, 0, 0));
-            
-            audioSystem.Play(src, @"../../Sound/song.wav", true);
         }
 
         /// <summary>

@@ -77,11 +77,12 @@ namespace Client
                 new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
             Client.gameTimer =
                 new UITimer(60, new Size(225, 3), new Point(0, 0));
-
-
+            
+            AudioManager.Init();
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
+
         }
 
 
@@ -117,6 +118,8 @@ namespace Client
             GraphicsRenderer.BarContext.Draw();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
+
+            AudioManager.Update();
         }
 
         // Start the networked client (connect to server).
@@ -374,6 +377,11 @@ namespace Client
             if (gameObj is NetworkedGameObjectClient networkedObj)
             {
                 NetworkedGameObjects.Remove(networkedObj.Id);
+                if (gameObj is LeafClient leaf)
+                {
+                    leaf.Health = -1;
+                    leaf.Burning = false;
+                }
             }
             else if (gameObj is NonNetworkedGameObjectClient nonNetObj)
             {

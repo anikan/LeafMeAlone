@@ -16,7 +16,7 @@ namespace Client
         public LeafClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.LeafModel)
         {
-        
+            AudioManager.AddLeafSource( this );
         }
 
         /// <summary>

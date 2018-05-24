@@ -19,7 +19,7 @@ namespace Client
         public static ParticleSystem Fire;
 
         // Model that's associated with this object.
-        private Model model;
+        public Model model;
 
 
         /// <summary>

@@ -13,6 +13,7 @@ namespace Client
     {
         private AudioContext _context;
         private Dictionary<String, int> _audioBuffers;
+        private static int sourceCount = 0;
 
         /// <summary>
         /// Create a new audio system
@@ -30,7 +31,16 @@ namespace Client
         /// <returns> ID of the source, save it for source manipulations and play </returns>
         public int GenSource()
         {
-            return AL.GenSource();
+            int src = AL.GenSource();
+            sourceCount++;
+
+            ALError err = AL.GetError();
+            if ( err != ALError.NoError)
+            {
+                Console.WriteLine("Generating " + sourceCount + "th source, encountered error: " + AL.GetErrorString(err));
+            }
+
+            return src;
         }
 
         /// <summary>
@@ -228,10 +238,7 @@ namespace Client
         /// </summary>
         /// <param name="soundSource"> check if the sound source is playing </param>
         /// <returns> true if it is playing, false otherwise </returns>
-        public bool IsPlaying(int soundSource)
-        {
-            return AL.GetSourceState(soundSource) == ALSourceState.Playing;
-        }
+        public bool IsPlaying(int soundSource) => AL.GetSourceState(soundSource) == ALSourceState.Playing;
 
         /// <summary>
         /// Dispose

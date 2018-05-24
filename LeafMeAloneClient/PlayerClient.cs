@@ -41,13 +41,15 @@ namespace Client
             LeafBlower = new LeafBlowerParticleSystem();
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
+
+            AudioManager.AddPlayerSource( this );
         }
 
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
         public ToolMode ActiveToolMode { get; set; }
-
+        public bool Moving { get; set; }
 
         /// <summary>
         /// Moves the player in a specified direction (NESW)
@@ -217,6 +219,7 @@ namespace Client
             ToolEquipped = packet.ToolEquipped;
 
             ActiveToolMode = packet.ActiveToolMode;
+            Moving = Transform.Position.X != packet.MovementX || Transform.Position.Z != packet.MovementZ;
             Transform.Position.X = packet.MovementX;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;

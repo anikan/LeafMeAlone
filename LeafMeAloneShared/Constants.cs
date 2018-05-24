@@ -32,6 +32,25 @@ namespace Shared
         public const string DefaultMapModel = @"../../Models/Terrain.fbx";
         public const string TreeModel = @"../../Models/TreeAttempt.fbx";
 
+        /// <summary>
+        /// Sounds/Audio files
+        /// </summary>
+        public const string Bgm = @"../../Sound/song.wav";
+        public const string FlameThrowerStart = @"../../Sound/collision.wav";
+        public const string FlameThrowerLoop = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string FlameThrowerEnd = @"../../Sound/collision.wav";
+
+        public const string LeafBlowerStart = @"../../Sound/collision.wav";
+        public const string LeafBlowerLoop = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string LeafBlowerEnd = @"../../Sound/collision.wav";
+
+        public const string LeafIgniting = @"../../Sound/collision.wav";
+        public const string LeafBurning = @"../../Sound/burn.wav";
+        public const string LeafBurnup = @"../../Sound/collision.wav";
+        public const string LeafPutoff = @"../../Sound/collision.wav";
+
+        public const string PlayerFootstep = @"../../Sound/running.wav";
+
         // Height of the world floor.
         public const float FLOOR_HEIGHT = -10.0f;
 

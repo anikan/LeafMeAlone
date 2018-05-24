@@ -129,6 +129,10 @@ namespace Server
             return vector;
         }
 
+        /// <summary>
+        /// Bounce off of another object.
+        /// </summary>
+        /// <param name="other">The collider of the other object </param>
         public void Bounce(ColliderObject other)
         {
 

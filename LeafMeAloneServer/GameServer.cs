@@ -188,6 +188,8 @@ namespace Server
             // Sending this new packet before the new client joins. 
             networkServer.SendAll(objPacket.Serialize());
 
+
+
             return newActivePlayer;
         }
 

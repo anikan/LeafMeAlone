@@ -21,6 +21,7 @@ namespace Client
         // Model that's associated with this object.
         private Model model;
 
+        // Debug cube to find the pivots of objects.
         private NonNetworkedGameObjectClient PivotCube;
 
 
@@ -51,9 +52,10 @@ namespace Client
         protected GraphicGameObject() : base()
         {
 
+            // Check if debug mode is on and this isn't a particle system or another cube.
             if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
             {
-
+                // Create a new cube at the pivot.
                 PivotCube = new MapTile();
                 PivotCube.Transform.Scale.Y = 20.0f;
 
@@ -71,10 +73,11 @@ namespace Client
             SetModel(modelPath);
             InitializeBurning();
 
+            // Check if debug mode is on and this isn't a particle system or another cube.
             if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
             {
-                
 
+                // Create a new cube at the pivot.
                 PivotCube = new MapTile();
                 PivotCube.Transform.Scale.Y = 20.0f;
 
@@ -94,7 +97,7 @@ namespace Client
                 model.Update(deltaTime);
             }
 
-
+            // If we're debugging, move the pivot cube.
             if (PivotCube != null)
             {
                 PivotCube.Transform.Position = Transform.Position;
@@ -116,6 +119,7 @@ namespace Client
                 Fire?.DrawTransform(Transform);
             }
 
+            // If we're debugging, draw the pivot cube.
             if (PivotCube != null)
             {
                 PivotCube.Draw();

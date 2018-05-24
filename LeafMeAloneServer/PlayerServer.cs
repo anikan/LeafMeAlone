@@ -18,6 +18,7 @@ namespace Server
         public const float PLAYER_RADIUS = 3.0f;
         public const float PLAYER_SPEED = 25.0f;
 
+        public Team Team { get; set; }
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
 
@@ -26,11 +27,10 @@ namespace Server
 
         public Vector3 moveRequest;
 
-        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
+        public PlayerServer(Team team) : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
         {
-
+            Team = team;
             ToolEquipped = ToolType.BLOWER;
-
         }
 
         /// <summary>

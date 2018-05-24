@@ -166,11 +166,11 @@ namespace Server
             int id = gameObjectDict.Count();
 
             //Create two players, one to send as an active player to client. Other to keep track of on server.
-            PlayerServer newPlayer = new PlayerServer();
+            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
             newPlayer.Register();
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer();
+            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
             newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
             newActivePlayer.Id = newPlayer.Id;
 

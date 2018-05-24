@@ -220,7 +220,7 @@ namespace Server
         /// </summary>
         public void Register()
         {
-            Id = GameServer.instance.gameObjectDict.Count();
+            Id = GameServer.instance.nextObjectId++;
 
             GameServer.instance.gameObjectDict.Add(Id, this);
         }

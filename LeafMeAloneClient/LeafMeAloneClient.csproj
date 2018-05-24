@@ -109,9 +109,10 @@
   <ItemGroup>
     <Compile Include="AudioSystem.cs" />
     <Compile Include="Camera.cs" />
-    <Compile Include="FileManager.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
+    <Compile Include="ParticleSystemManager.cs" />
+    <Compile Include="TreeClient.cs" />
     <Compile Include="ClientAnimationNode.cs" />
     <Compile Include="ClientBone.cs" />
     <Compile Include="ClientMaterial.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="GameClient.cs" />
     <Compile Include="GraphicGameObject.cs" />
     <Compile Include="LeafClient.cs" />
+    <Compile Include="MapClient.cs" />
     <Compile Include="NetworkClient.cs" />
     <Compile Include="NetworkedGameObjectClient.cs" />
     <Compile Include="Geometry.cs" />

@@ -51,10 +51,10 @@ namespace Client
 
             m_PrevProperties.Rotation = new Vector3(0, 0, 0);
             m_PrevProperties.Position = new Vector3(0, 0, 0);
-            m_PrevProperties.Scale = new Vector3(0, 0, 0);
+            m_PrevProperties.Scale = new Vector3(1,1,1);
             Update(0);
 
-            setShader(FileManager.DefaultShader);
+            setShader(Constants.DefaultShader);
         }
 
         /// <summary>

@@ -96,6 +96,7 @@ namespace Client
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
             }
+            LeafClient.Fire?.Update(delta_t);
 
             audioSystem.UpdateListener(ActiveCamera.CameraPosition, ActiveCamera.CameraLookAt, ActiveCamera.CameraUp);
         }
@@ -116,7 +117,7 @@ namespace Client
         public static void Init(Camera activeCamera)
         {
             ActiveCamera = activeCamera;
-
+            ParticleSystemManager.Init();
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  
             
@@ -168,7 +169,7 @@ namespace Client
             // add more argument to each list as needed
             List <string> allShaderPaths = new List<string>( new string[]
             {
-                FileManager.DefaultShader
+                Constants.DefaultShader
             } );
 
             List <string> allShaderVSName = new List<string>(new string[]

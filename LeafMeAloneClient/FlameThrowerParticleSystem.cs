@@ -10,26 +10,30 @@ namespace Client
 {
     public class FlameThrowerParticleSystem : ParticleSystem
     {  
-        public static Vector3 PlayerToFlamethrowerOffset = new Vector3(1.8f, 3.85f, 3.0f);
-        public static float FlameInitSpeed = 40.0f;
-        public static float FlameAcceleration = 15.0f;
+        public float FlameInitSpeed = 40.0f;
+        public float FlameAcceleration = 15.0f;
+        public float CutoffDist = 10.0f;
 
-        public FlameThrowerParticleSystem() : 
-            base(ParticleSystemType.FIRE,
+        public FlameThrowerParticleSystem(float initSpd = 40.0f, float initAccel = 15.0f,float cutoff = 10.0f, float size = 1.0f, float range = 20f) : 
+            base(Constants.FireTexture,
                 Vector3.Zero +
-                Vector3.TransformCoordinate(PlayerToFlamethrowerOffset, Matrix.Identity), // origin
-                Vector3.UnitZ * FlameInitSpeed, // acceleration
-                Vector3.UnitZ * FlameAcceleration, // initial speed
+                Vector3.TransformCoordinate(Constants.PlayerToToolOffset, Matrix.Identity), // origin
+                Vector3.UnitZ * initSpd, // acceleration
+                Vector3.UnitZ * initAccel, // initial speed
                 false, // cutoff all colors
-                false, // no backward particle prevention
+                true, // no backward particle prevention
                 Tool.Thrower.ConeAngle * 10,//320.0f, // cone radius, may need to adjust whenever acceleration changes
-                1.0f, // initial delta size
-                10f, // cutoff distance
+                size, // initial delta size
+                cutoff * .3f, // cutoff distance
                 0.2f, // cutoff speed
-                0.075f, // enlarge speed,
-                Tool.Thrower.Range
+                0.075f, // enlarge speed,,
+                range
+                //Tool.Thrower.Range
                 )
         {
+            FlameInitSpeed = initSpd;
+            FlameAcceleration = initAccel;
+            CutoffDist = cutoff;
         }
     }
 }

@@ -16,7 +16,6 @@ namespace Server
 
         public List<GameObject> toDestroyQueue = new List<GameObject>();
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
-        public List<LeafServer> LeafList = new List<LeafServer>();
         public Dictionary<int, GameObjectServer> gameObjectDict =
             new Dictionary<int, GameObjectServer>();
 
@@ -57,7 +56,15 @@ namespace Server
 
             networkServer = new NetworkServer(networked);
 
-            CreateRandomLeaves(200, -10, -10, 10, -10, 10);
+            // Create the initial game map.
+            CreateMap();
+
+            // Variables for determining leaf spawn locations.
+            float HalfWidth = Constants.MAP_WIDTH / 2.0f;
+            float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
+
+            // Create the leaves for the game.
+            CreateRandomLeaves(Constants.NUM_LEAVES, -HalfWidth + Constants.BORDER_MARGIN, HalfWidth - Constants.BORDER_MARGIN, -HalfHeight + Constants.BORDER_MARGIN, HalfHeight - Constants.BORDER_MARGIN);
 
             //CreateLeaves(100, -10, 10, -10, 10);
         }
@@ -180,6 +187,62 @@ namespace Server
         }
 
         /// <summary>
+        /// Creates the initial game map.
+        /// </summary>
+        /// <returns>The new map</returns>
+        public MapServer CreateMap()
+        {
+
+            // Create the map with a width and height.
+            MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
+
+            // Spawn trees around the border of the map!
+            // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
+            for (float y = -newMap.Height / 2.0f; y < newMap.Height / 2.0f; y+= TreeServer.TREE_RADIUS)
+            {
+
+                // Iterate through the width of the map, centered on origin and increase by radius of a tree.
+                for (float x = -newMap.Width / 2.0f; x < newMap.Width / 2.0f; x+= TreeServer.TREE_RADIUS)
+                {
+
+                    // If this is a top or bottom row, create trees.
+                    if (y <= -newMap.Height / 2.0f || (newMap.Height / 2.0f) <= y + TreeServer.TREE_RADIUS)
+                    {
+
+                        // Make a new tree.
+                        TreeServer newTree = new TreeServer();
+
+                        // Set the tree's initial position.
+                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // Send the new object to client.
+                        networkServer.SendNewObjectToAll(newTree);
+
+                    }
+
+                    // If this is the far left or right columns, create a tree.
+                    else if (x <= -newMap.Width / 2.0f || (newMap.Width / 2.0f) <= x + TreeServer.TREE_RADIUS)
+                    {
+
+                        // Make a new tree.
+                        TreeServer newTree = new TreeServer();
+
+                        // Set the tree's initial position.
+                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // Send the new object to client.
+                        networkServer.SendNewObjectToAll(newTree);
+
+                    }
+                }
+            }
+
+            // Return the new map.
+            return newMap;
+
+        }
+
+        /// <summary>
         /// Creates all leaves in the scene, placing them randomly.
         /// </summary>
         /// <param name="num">Number of leaves to create.</param>
@@ -188,14 +251,14 @@ namespace Server
         /// <param name="maxX">Max x position to spawn leaves.</param>
         /// <param name="minZ">Min y position to spawn leaves.</param>
         /// <param name="maxZ">Max y position to spawn leaves.</param>
-        public void CreateRandomLeaves(int num, float floorHeight, float minX, float maxX, float minZ, float maxZ)
+        public void CreateRandomLeaves(int num, float minX, float maxX, float minZ, float maxZ)
         {
             // Create a new random number generator.
             Random rnd = new Random();
 
             // Very slight random offset for leaves so that there's no z-fighting.
-            double minY = floorHeight - 0.1f;
-            double maxY = floorHeight;
+            double minY = Constants.FLOOR_HEIGHT;
+            double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
             // Itereate through number of leaves we want to create.
             for (int i = 0; i < num; i++)
@@ -209,7 +272,7 @@ namespace Server
                 // Bind random doubles to our range.
                 randX = (randX * (maxX - minX)) + minX;
                 randY = (randY * (maxY - minY)) + minY;
-                randZ = (randZ * (maxZ - minZ)) + maxZ;
+                randZ = (randZ * (maxZ - minZ)) + minZ;
 
                 // Get the new position
                 Vector3 pos = new Vector3((float)randX, (float)randY, (float)randZ);
@@ -224,14 +287,8 @@ namespace Server
                 networkServer.SendNewObjectToAll(newLeaf);
 
                 // Add this leaf to the leaf list and object dictionary.
-                LeafList.Add(newLeaf);
                 newLeaf.Register();
             }
-        }
-
-        public void AddUniversalPhysics()
-        {
-
         }
 
         /// <summary>
@@ -261,17 +318,25 @@ namespace Server
         /// <param name="gameObj">The game object to destroy</param>
         public void Destroy(GameObject gameObj)
         {
+
             gameObjectDict.Remove(gameObj.Id);
-            if (gameObj is LeafServer leaf)
-            {
-                LeafList.Remove(leaf);
-            }
-            else if (gameObj is PlayerServer player)
+
+            if (gameObj is PlayerServer player)
             {
                 playerServerList.Remove(player);
             }
 
             toDestroyQueue.Add(gameObj);
+        }
+
+        /// <summary>
+        /// Gets a list of game objects from the dictionary.
+        /// </summary>
+        /// <returns>A list of all objects from the object dictionary.</returns>
+        public List<GameObjectServer> GetGameObjectList()
+        {
+            // Turn the game objects to a value list.
+            return gameObjectDict.Values.ToList<GameObjectServer>();
         }
     }
 }

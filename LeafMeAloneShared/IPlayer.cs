@@ -11,7 +11,7 @@ namespace Shared
     /// <summary>
     /// Class for an actual player of the game.
     /// </summary>
-    public interface IPlayer : INetworked
+    public interface IPlayer : IObject
     {
         bool Dead { get; set; }
 

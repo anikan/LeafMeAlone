@@ -21,6 +21,9 @@ namespace Client
         // Model that's associated with this object.
         private Model model;
 
+        // Debug cube to find the pivots of objects.
+        private NonNetworkedGameObjectClient PivotCube;
+
 
         /// <summary>
         /// Init the particle system for burning. This will only ever run once, if the particle system has not been initialized yet.
@@ -48,6 +51,17 @@ namespace Client
         /// </summary>
         protected GraphicGameObject() : base()
         {
+
+            // Check if debug mode is on and this isn't a particle system or another cube.
+            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            {
+                // Create a new cube at the pivot.
+                PivotCube = new MapTile();
+                PivotCube.Transform.Scale.Y = 20.0f;
+
+            }
+
+
         }
 
         /// <summary>
@@ -58,6 +72,17 @@ namespace Client
         {
             SetModel(modelPath);
             InitializeBurning();
+
+            // Check if debug mode is on and this isn't a particle system or another cube.
+            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            {
+
+                // Create a new cube at the pivot.
+                PivotCube = new MapTile();
+                PivotCube.Transform.Scale.Y = 20.0f;
+
+            }
+
         }
 
         /// <summary>
@@ -66,10 +91,19 @@ namespace Client
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
-            if (model == null)
-                return;
-            model.m_Properties = Transform;
-            model.Update(deltaTime);
+            if (model != null)
+            {
+                model.m_Properties = Transform;
+                model.Update(deltaTime);
+            }
+
+            // If we're debugging, move the pivot cube.
+            if (PivotCube != null)
+            {
+                PivotCube.Transform.Position = Transform.Position;
+                PivotCube.Update(deltaTime);
+            }
+
         }
 
         /// <summary>
@@ -84,6 +118,12 @@ namespace Client
             {
                 Transform t = new Transform {Position = Transform.Position,Scale =  new Vector3(1,1,1)};
                 Fire?.DrawTransform(t);
+            }
+
+            // If we're debugging, draw the pivot cube.
+            if (PivotCube != null)
+            {
+                PivotCube.Draw();
             }
         }
 

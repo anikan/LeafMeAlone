@@ -57,14 +57,14 @@ namespace Shared
 
         // Flamethrower tool information. 
         private const float ThrowerAngle = 30.0f;
-        private const float ThrowerRange = 20.0f;
+        private const float ThrowerRange = 10.0f;
         private const float ThrowerForce = 0.0f;
         private const float ThrowerDamage = 1.0f;
 
         // Leafblower tool information.
         private const float BlowerAngle = 45.0f;
-        private const float BlowerRange = 20.0f;
-        private const float BlowerForce = 200.0f;
+        private const float BlowerRange = 30.0f;
+        private const float BlowerForce = 300.0f;
         private const float BlowerDamage = 0.0f;
 
         // Create a flamethrower struct to store flamethrower info.

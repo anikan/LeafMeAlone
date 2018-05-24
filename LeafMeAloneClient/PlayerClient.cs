@@ -218,6 +218,7 @@ namespace Client
 
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.X = packet.MovementX;
+            Transform.Position.Y = Constants.FLOOR_HEIGHT;
             Transform.Position.Z = packet.MovementZ;
             Transform.Rotation.Y = packet.Rotation;
 

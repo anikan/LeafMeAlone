@@ -89,7 +89,7 @@ namespace Client
         {
             fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(
-                GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
+                GraphicsRenderer.RenderTarget, new Color4(0.0f, .4f, 0.0f));
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(
                 GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth,
                 1.0f, 0);

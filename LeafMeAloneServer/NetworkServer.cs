@@ -195,8 +195,8 @@ namespace Server
         /// </param>
         private void ProcessNewPlayer(Socket clientSocket)
         {
-            GameObject player = GameServer.instance.CreateNewPlayer();
-            CreateObjectPacket createPlayPack = PacketFactory.NewCreatePacket(player);
+            PlayerServer player = GameServer.instance.CreateNewPlayer();
+            CreatePlayerPacket createPlayPack = ServerPacketFactory.NewCreatePacket(player);
             // Create createObjectPacket, send to client
             byte[] data = PacketUtil.Serialize(createPlayPack);
             Send(clientSocket, data);

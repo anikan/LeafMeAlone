@@ -23,6 +23,13 @@ namespace Server
                 } 
                 return NewObjectPacket(serverObject);
         }
+
+        internal static CreatePlayerPacket NewCreatePacket(PlayerServer player)
+        {
+            CreateObjectPacket createPacket = NewCreatePacket((GameObject) player);
+            return new CreatePlayerPacket(createPacket, player.Team);
+        }
+
         internal static PlayerPacket CreatePlayerPacket(PlayerServer player)
         {
             return new PlayerPacket(NewObjectPacket(player), player.ActiveToolMode, player.ToolEquipped,

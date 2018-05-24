@@ -182,12 +182,10 @@ namespace Server
             newActivePlayer.Transform.Position = nextSpawnPoint;
             newPlayer.Transform.Position = nextSpawnPoint;
 
-            CreateObjectPacket objPacket = PacketFactory.NewCreatePacket(newPlayer);
+            CreatePlayerPacket objPacket = ServerPacketFactory.NewCreatePacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
             networkServer.SendAll(PacketUtil.Serialize(objPacket));
-
-
 
             return newActivePlayer;
         }

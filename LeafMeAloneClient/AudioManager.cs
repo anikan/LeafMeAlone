@@ -268,6 +268,7 @@ namespace Client
             
             for (int i = 0; i < _allLeafRef.Count; i++)
             {
+                if (_allLeafRef[i] == null) continue;
                 if (_leafSrcIndex[i] != -1)
                 {
                     int leafIdx = _leafSrcIndex[i];
@@ -323,7 +324,9 @@ namespace Client
                             {
                                 _leafSrcInUse[leafIdx] = false;
                                 _leafSrcIndex[i] = -1;
+                                RemoveLeafSource(i);
                             }
+
                             break;
                         }
                     }
@@ -380,6 +383,16 @@ namespace Client
             _srcLeaves.Add( _audio.GenSource() );
             _leafStates.Add( LeafState.Inactive );
             _leafSrcInUse.Add( false );
+        }
+
+        /// <summary>
+        /// Remove a leaf at the index 
+        /// </summary>
+        /// <param name="index"></param>
+        private static void RemoveLeafSource(int index)
+        {
+            // lazy remove
+            _allLeafRef[index] = null;
         }
 
         /// <summary>

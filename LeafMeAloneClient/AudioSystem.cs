@@ -63,7 +63,7 @@ namespace Client
         public void UpdateListener(Vector3 listenerPosition, Vector3 listenerLookat, Vector3 listenerUp)
         {
             AL.Listener(ALListener3f.Position, listenerPosition.X, listenerPosition.Y, listenerPosition.Z);
-            Vector3 lookAtDirection = listenerLookat - listenerPosition;
+            Vector3 lookAtDirection = Vector3.Normalize(listenerPosition - listenerLookat);
             OpenTK.Vector3 dir = new OpenTK.Vector3(lookAtDirection.X, lookAtDirection.Y, lookAtDirection.Z);
             OpenTK.Vector3 up = new OpenTK.Vector3(listenerUp.X, listenerUp.Y, listenerUp.Z);
             AL.Listener(ALListenerfv.Orientation, ref dir, ref up);

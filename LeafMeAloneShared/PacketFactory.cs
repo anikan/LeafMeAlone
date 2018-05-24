@@ -16,7 +16,7 @@ namespace Shared
             IdPacket idPack = new IdPacket(gameObj.Id);
             Vector3 pos = gameObj.Transform.Position;
             Vector3 rot = gameObj.Transform.Rotation;
-            return new ObjectPacket(pos.X, pos.Y, pos.Z, rot.Y, gameObj.Burning, idPack);
+            return new ObjectPacket(pos.X, pos.Y, pos.Z, rot.Y, gameObj.Burning, gameObj.Health, idPack);
         }
 
         public static BasePacket NewDestroyPacket(GameObject gameObj)

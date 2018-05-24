@@ -22,16 +22,19 @@ namespace Shared.Packet
         public bool Burning;
         [ProtoMember(6)]
         public IdPacket IdData;
+        [ProtoMember(7)]
+        public float Health;
 
         public ObjectPacket() : base (PacketType.ObjectPacket) { }
         public ObjectPacket(float positionX, float positionY, float positionZ, 
-            float rotation, bool burning, IdPacket idData) : base (PacketType.ObjectPacket)
+            float rotation, bool burning, float health, IdPacket idData) : base (PacketType.ObjectPacket)
         {
             PositionX = positionX;
             PositionY = positionY;
             PositionZ = positionZ;
             Rotation = rotation;
             Burning = burning;
+            Health = health;
             IdData = idData;
         }
 

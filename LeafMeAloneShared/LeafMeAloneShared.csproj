@@ -94,13 +94,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="IObject.cs" />
     <Compile Include="PacketFactory.cs" />
     <Compile Include="PacketUtil.cs" />
     <Compile Include="Packet\CreateObjectPacket.cs" />
     <Compile Include="Packet\CreatePlayerPacket.cs" />
     <Compile Include="Packet\DestroyObjectPacket.cs" />
     <Compile Include="ILeaf.cs" />
-    <Compile Include="INetworked.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="IPlayer.cs" />
     <Compile Include="Packet\IdPacket.cs" />

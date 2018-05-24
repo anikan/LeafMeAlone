@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Shared.Packet;
 
 namespace Shared
 {
@@ -84,7 +85,7 @@ namespace Shared
         /// packet info</param>
         /// <param name="bytesRead">the number of bytes read in total</param>
         /// <returns>the packet deserialized</returns>
-        public static Packet Deserialize(byte[] data)
+        public static BasePacket Deserialize(byte[] data)
         {
             Byte[] objectData =
                 RemoveHeader(data);
@@ -100,14 +101,14 @@ namespace Shared
             {
                 throw new Exception("PacketType not recognized by deserializer!");
             }
-            return (Packet) Serializer.Deserialize(packetType, new MemoryStream(objectData));
+            return (BasePacket) Serializer.Deserialize(packetType, new MemoryStream(objectData));
         }
 
         /// <summary>
         /// Serializes the packet to a byte array
         /// </summary>
         /// <returns>the serialized object</returns>
-        public static byte[] Serialize(Packet packet)
+        public static byte[] Serialize(BasePacket packet)
         {
             MemoryStream ms = new MemoryStream();
             Serializer.Serialize(ms, packet);

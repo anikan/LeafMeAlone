@@ -1,4 +1,5 @@
 ﻿using Shared;
+using Shared.Packet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,31 +10,31 @@ namespace Client
 {
     class ClientPacketHandler
     {
-        private Dictionary<PacketType, Action<Packet>> packetHandlers;
+        private Dictionary<PacketType, Action<BasePacket>> packetHandlers;
         private GameClient client;
 
         public ClientPacketHandler(GameClient client)
         {
             this.client = client;
 
-            void UpdateAction(Packet p)
+            void UpdateAction(BasePacket p)
             {
                 NetworkedGameObjectClient packetObject = client.GetObjectFromPacket((IIdentifiable)p);
                 packetObject.UpdateFromPacket(p);
             }
 
-            void DestroyAction(Packet p)
+            void DestroyAction(BasePacket p)
             {
                 NetworkedGameObjectClient packetObject = client.GetObjectFromPacket((IIdentifiable)p);
                 packetObject.Destroy();
             }
             
-            void CreateObjectAction(Packet p)
+            void CreateObjectAction(BasePacket p)
             {
                 client.CreateObjectFromPacket(((CreateObjectPacket)p));
             }
 
-            packetHandlers = new Dictionary<PacketType, Action<Packet>>()
+            packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
                 {
                     {PacketType.CreatePlayerPacket, p => {
                         CreateObjectAction(((CreatePlayerPacket)p).createPacket);
@@ -45,9 +46,9 @@ namespace Client
                 };
         }
 
-        internal void HandlePacket(Packet packet)
+        internal void HandlePacket(BasePacket packet)
         {
-            packetHandlers.TryGetValue(packet.packetType, out Action<Packet> action);
+            packetHandlers.TryGetValue(packet.packetType, out Action<BasePacket> action);
             action.Invoke(packet);
         }
     }

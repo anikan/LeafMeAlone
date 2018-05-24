@@ -1,4 +1,4 @@
-﻿namespace Shared
+﻿namespace Shared.Packet
 {
     public interface IIdentifiable
     {

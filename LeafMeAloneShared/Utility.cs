@@ -135,6 +135,13 @@ namespace Shared
         public Vector3 Rotation; // euler coordinate that represents the direction the object is facing
         public Vector3 Scale;     // scale of the model
 
+        //public Transform()
+        //{
+        //    Position = new Vector3(0,0,0);
+        //    Rotation = new Vector3(0, 0, 0);
+        //    Scale = new Vector3(1,1,1);
+        //}
+
         public Vector3 Forward  // getter returns the unit direction vector, based on the Rotation vector
         {
             get
@@ -186,6 +193,20 @@ namespace Shared
         public Vector2 Get2dPosition()
         {
             return new Vector2(Position.X, Position.Z);
+        }
+
+        public Matrix AsMatrix()
+        {
+            Matrix modelMatrix = Matrix.Scaling(Scale);
+
+            // set the rotation based on the three directions
+            modelMatrix = modelMatrix * Matrix.RotationX(Rotation.X) *
+                            Matrix.RotationY(Rotation.Y) *
+                            Matrix.RotationZ(Rotation.Z);
+
+            // set the translation based on the position
+            modelMatrix = modelMatrix * Matrix.Translation(Position);
+            return modelMatrix;
         }
     }
 }

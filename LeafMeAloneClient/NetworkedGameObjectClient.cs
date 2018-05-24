@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 
 namespace Client
 {
@@ -31,6 +32,6 @@ namespace Client
         /// Updates this object from a network packet.
         /// </summary>
         /// <param name="packet">Packet to update from.</param>
-        public abstract void UpdateFromPacket(Packet packet);
+        public abstract void UpdateFromPacket(BasePacket packet);
     }
 }

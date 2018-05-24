@@ -1,4 +1,5 @@
-﻿using SlimDX;
+﻿using Shared.Packet;
+using SlimDX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace Shared
             return new ObjectPacket(pos.X, pos.Y, pos.Z, rot.Y, gameObj.Burning, idPack);
         }
 
-        public static Packet NewDestroyPacket(GameObject gameObj)
+        public static BasePacket NewDestroyPacket(GameObject gameObj)
         {
             return new DestroyObjectPacket(new IdPacket(gameObj.Id));
         }

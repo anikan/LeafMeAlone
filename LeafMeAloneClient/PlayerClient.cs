@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
 using Shared;
+using Shared.Packet;
 
 namespace Client
 {
@@ -257,15 +258,16 @@ namespace Client
                          Matrix.RotationY(Transform.Rotation.Y) *
                          Matrix.RotationZ(Transform.Rotation.Z);
 
+            FlameThrowerParticleSystem p = FlameThrower as FlameThrowerParticleSystem;
             // flame throwing particle system update
-            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
-            FlameThrower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
-            FlameThrower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
+            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
+            FlameThrower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
+            FlameThrower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             FlameThrower.Update(deltaTime);
 
-            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(FlameThrowerParticleSystem.PlayerToFlamethrowerOffset, mat));
-            LeafBlower.SetVelocity(Transform.Forward * FlameThrowerParticleSystem.FlameInitSpeed);
-            LeafBlower.SetAcceleration(Transform.Forward * FlameThrowerParticleSystem.FlameAcceleration);
+            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
+            LeafBlower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
+            LeafBlower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             LeafBlower.Update(deltaTime);
         }
 
@@ -275,7 +277,7 @@ namespace Client
         /// </summary>
         /// <param name="packet">Abstract packet which gets casted to an actual 
         /// object type</param>
-        public override void UpdateFromPacket(Packet packet)
+        public override void UpdateFromPacket(BasePacket packet)
         {
             UpdateFromPacket(packet as PlayerPacket);
         }

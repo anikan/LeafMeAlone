@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Shared;
+using Shared.Packet;
 
 namespace Server
 {
@@ -43,6 +44,9 @@ namespace Server
 
         private bool networked;
         private List<byte> ByteReceivedQueue = new List<byte>();
+
+        //Keep track of which player is connected to each socket.
+        private Dictionary<Socket, int> playerDictionary = new Dictionary<Socket, int>();
 
         public NetworkServer(bool networked)
         {
@@ -161,23 +165,23 @@ namespace Server
 
         public void SendWorldUpdateToAllClients()
         {
-            foreach (KeyValuePair<int, GameObjectServer> pair in
-                GameServer.instance.gameObjectDict.ToList())
+            List<GameObjectServer> gameObjects = GameServer.instance.gameObjectDict.Values.ToList();
+            for (int i = 0; i < gameObjects.Count; i++)
             {
-                Packet packetToSend = ServerPacketFactory.CreateUpdatePacket(pair.Value);
+                BasePacket packetToSend = ServerPacketFactory.CreateUpdatePacket(gameObjects[i]);
                 SendAll(PacketUtil.Serialize(packetToSend));
             }
 
             foreach (var gameObj in GameServer.instance.toDestroyQueue)
             {
-                Packet packet = PacketFactory.NewDestroyPacket(gameObj);
+                BasePacket packet = PacketFactory.NewDestroyPacket(gameObj);
                 SendAll(PacketUtil.Serialize(packet));
             }
         }
 
         public void SendNewObjectToAll(GameObjectServer newObject)
         {
-            Packet packetToSend = PacketFactory.NewCreatePacket(newObject);
+            BasePacket packetToSend = PacketFactory.NewCreatePacket(newObject);
             SendAll(PacketUtil.Serialize(packetToSend));
         }
 
@@ -208,24 +212,34 @@ namespace Server
             // from the asynchronous state object.  
             StateObject state = (StateObject)ar.AsyncState;
             Socket handler = state.workSocket;
-
-            // Read data from the client socket.   
-            int bytesReceived = handler.EndReceive(ar);
-
-            // There might be more data, so store the data received so far.  
-            lock (ByteReceivedQueue)
+            
+            try
             {
-                ByteReceivedQueue.AddRange(state.buffer.Take(bytesReceived));
+                // Read data from the client socket.   
+                int bytesReceived = handler.EndReceive(ar);
+
+
+                // There might be more data, so store the data received so far.  
+                lock (ByteReceivedQueue)
+                {
+                    ByteReceivedQueue.AddRange(state.buffer.Take(bytesReceived));
+                }
+
+                // Create a new state object for the next packet.  
+                StateObject newState = new StateObject
+                {
+                    workSocket = handler
+                };
+                //Begin listening again for more packets.
+                handler.BeginReceive(newState.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReceiveCallback), newState);
             }
 
-            // Create a new state object for the next packet.  
-            StateObject newState = new StateObject
+            catch (SocketException e)
             {
-                workSocket = handler
-            };
-            //Begin listening again for more packets.
-            handler.BeginReceive(newState.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReceiveCallback), newState);
+                Console.WriteLine(e);
+                return;
+            }
         }
 
         /// <summary>
@@ -254,7 +268,7 @@ namespace Server
                 // Get full packet and add it to the queue 
                 byte[] packetData = ByteReceivedQueue.GetRange(PacketUtil.PACK_HEAD_SIZE, packetSize).ToArray();
                 byte[] fullPacket = headerByteBuf.Concat(packetData).ToArray();
-                Packet packet = PacketUtil.Deserialize(fullPacket);
+                BasePacket packet = PacketUtil.Deserialize(fullPacket);
                 PlayerPackets.Add((RequestPacket)packet);
 
                 // Remove the read data 
@@ -264,8 +278,6 @@ namespace Server
                 }
             }
         }
-
-
 
         /// <summary>
         /// Send the byteData to the socket.
@@ -293,11 +305,25 @@ namespace Server
         /// <param name="byteData">Data to send.</param>
         public void SendAll(byte[] byteData)
         {
-            foreach (Socket socket in clientSockets.ToList())
+            for (int i = 0; i < clientSockets.Count; i++)
             {
-                // Begin sending the data to the remote device.  
-                socket.BeginSend(byteData, 0, byteData.Length, 0,
-                    new AsyncCallback(SendCallback), socket);
+                Socket socket = clientSockets[i];
+
+                //If a client disconnected, close the socket and remove it from the list of sockets.
+                try
+                {
+                    // Begin sending the data to the remote device.
+                    Send(socket, byteData);
+                }
+
+                catch (SocketException e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine("Player Disconnected");
+
+                    clientSockets.Remove(socket);
+                    i -= 1;
+                }
             }
         }
 
@@ -317,7 +343,7 @@ namespace Server
 
                 //Console.WriteLine("Sent {0} bytes to client.\n", bytesSent);
             }
-            catch (Exception e)
+            catch (SocketException e)
             {
                 Console.WriteLine(e.ToString());
             }

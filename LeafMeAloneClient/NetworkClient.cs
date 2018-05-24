@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Security.AccessControl;
 using System.Threading;
 using Shared;
+using Shared.Packet;
 
 namespace Client
 {
@@ -21,7 +22,7 @@ namespace Client
         // Client socket.  
         public Socket workSocket = null;
         // Size of receive buffer.  
-        public static int BufferSize = 10000;
+        public static int BufferSize = 4096;
         // Receive buffer.  
         public byte[] buffer = new byte[BufferSize];
         // Received data string.  
@@ -53,7 +54,7 @@ namespace Client
 
         public List<byte> ByteReceivedQueue = new List<byte>();
         //List of received packets. Populated by ReadCallback
-        public List<Packet> PacketQueue = new List<Packet>();
+        public List<BasePacket> PacketQueue = new List<BasePacket>();
 
         private IPAddress ipAddress;
 
@@ -165,7 +166,7 @@ namespace Client
                 // Get full packet and add it to the queue 
                 byte[] packetData = ByteReceivedQueue.GetRange(PacketUtil.PACK_HEAD_SIZE, packetSize).ToArray();
                 byte[] fullPacket = headerByteBuf.Concat(packetData).ToArray();
-                Packet packet = PacketUtil.Deserialize(fullPacket);
+                BasePacket packet = PacketUtil.Deserialize(fullPacket);
                 PacketQueue.Add(packet);
 
                 // Remove the read data 

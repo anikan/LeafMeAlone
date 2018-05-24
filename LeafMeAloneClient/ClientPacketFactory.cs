@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Client

@@ -9,13 +9,13 @@ using System.Runtime.Serialization.Formatters.Binary;
 using ProtoBuf;
 using System.IO;
 
-namespace Shared
+namespace Shared.Packet
 {
     /// <summary>
     /// Packet of player information, to send or receive from the server.
     /// </summary>
     [ProtoContract]
-    public class PlayerPacket : Packet, IIdentifiable
+    public class PlayerPacket : BasePacket, IIdentifiable
     {
         // Associated Object data of the playerpacket
         [ProtoMember(1)]

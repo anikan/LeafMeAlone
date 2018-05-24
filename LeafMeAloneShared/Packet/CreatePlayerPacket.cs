@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace Shared.Packet
 {
     public enum Team
     {
@@ -14,7 +14,7 @@ namespace Shared
     };
 
     [ProtoContract]
-    public class CreatePlayerPacket : Packet
+    public class CreatePlayerPacket : BasePacket
     {
         [ProtoMember(1)]
         public CreateObjectPacket createPacket;

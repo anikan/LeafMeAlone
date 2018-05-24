@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace Shared.Packet
 {
     /// <summary>
     /// Empty base class for packet which is extended by all packet subclasses.
     /// </summary>
-    public class Packet
+    public class BasePacket
     {
         public PacketType packetType;
-        public Packet(PacketType type)
+        public BasePacket(PacketType type)
         {
             packetType = type;
         }

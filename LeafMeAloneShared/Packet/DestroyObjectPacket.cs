@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace Shared.Packet
 {
     /// <summary>
     /// Packet that gets sent to the client when an object is to be destroyed
     /// </summary>
     [ProtoContract]
-    public class DestroyObjectPacket : Packet, IIdentifiable
+    public class DestroyObjectPacket : BasePacket, IIdentifiable
     {
         [ProtoMember(1)]
         public IdPacket idData;

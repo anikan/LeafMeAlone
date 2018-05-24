@@ -9,6 +9,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using System.Net;
+using Shared.Packet;
 
 namespace Client
 {
@@ -92,7 +93,7 @@ namespace Client
         {
             fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(
-                GraphicsRenderer.RenderTarget, new Color4(0.5f, 0.5f, 1.0f));
+                GraphicsRenderer.RenderTarget, new Color4(0.0f, .4f, 0.0f));
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(
                 GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth,
                 1.0f, 0);
@@ -228,7 +229,7 @@ namespace Client
             networkClient.Receive();
 
             // Iterate through every packet received.
-            foreach (Packet packet in networkClient.PacketQueue)
+            foreach (BasePacket packet in networkClient.PacketQueue)
             {
                 // If this is a packet to create a new object, create the object.
                 if (packet == null)

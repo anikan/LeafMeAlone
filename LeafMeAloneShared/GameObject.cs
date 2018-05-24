@@ -21,7 +21,7 @@ namespace Shared
     /// <summary>
     /// Abstract GameObject class, for both GameObjectClient and GameObjectServer to extend
     /// </summary>
-    public abstract class GameObject : INetworked
+    public abstract class GameObject : IObject
     {
 
         public bool Burning;
@@ -42,13 +42,12 @@ namespace Shared
           
         protected GameObject()
         {
-            Transform EmptyTransform = new Transform();
-
-            EmptyTransform.Rotation = new Vector3(0, 0, 0);
-            EmptyTransform.Position = new Vector3(0, 0, 0);
-            EmptyTransform.Scale = new Vector3(1, 1, 1);
-
-            Transform = EmptyTransform;
+            Transform =  new Transform
+            {
+                Rotation = new Vector3(0, 0, 0),
+                Position = new Vector3(0, 0, 0),
+                Scale = new Vector3(1, 1, 1)
+            };
         }
 
         protected GameObject(Transform startTransform)

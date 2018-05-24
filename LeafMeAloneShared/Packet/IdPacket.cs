@@ -6,14 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using ProtoBuf;
 
-namespace Shared
+namespace Shared.Packet
 {
 
     /// <summary>
     /// Packet to send or receive from the server
     /// </summary>
     [ProtoContract]
-    public class IdPacket : Packet
+    public class IdPacket : BasePacket
     {
         // ID of the object this packet is associated with.
         [ProtoMember(1)]

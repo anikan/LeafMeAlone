@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared
+namespace Shared.Packet
 {
     [ProtoContract]
-    public class ObjectPacket : Packet, IIdentifiable
+    public class ObjectPacket : BasePacket, IIdentifiable
     {
         [ProtoMember(1)]
         public float PositionX;

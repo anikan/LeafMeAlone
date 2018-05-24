@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Server
@@ -34,6 +35,9 @@ namespace Server
 
         private Stopwatch testTimer;
 
+        //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
+        public int nextObjectId = 0;
+        
         public GameServer(bool networked)
         {
             if (instance != null)

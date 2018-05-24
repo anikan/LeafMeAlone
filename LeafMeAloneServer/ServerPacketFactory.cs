@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Server
@@ -14,7 +15,7 @@ namespace Server
     public class ServerPacketFactory : PacketFactory
     {
 
-        internal static Packet CreateUpdatePacket(GameObjectServer serverObject)
+        internal static BasePacket CreateUpdatePacket(GameObjectServer serverObject)
         {
                 if (serverObject is PlayerServer player)
                 {

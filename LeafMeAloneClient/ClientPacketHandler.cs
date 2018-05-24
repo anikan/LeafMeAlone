@@ -38,18 +38,24 @@ namespace Client
                 NetworkedGameObjectClient packetObject = client.GetObjectFromPacket((IIdentifiable)p);
                 packetObject.Destroy();
             }
-            
+
             // What to do when creating an object
             void CreateObjectAction(BasePacket p)
             {
                 client.CreateObjectFromPacket(((CreateObjectPacket)p));
             }
 
+            // What to do when creating a player
+            void CreatePlayerAction(BasePacket p)
+            {
+                PlayerClient player = (PlayerClient)client.CreateObjectFromPacket(((CreateObjectPacket)p));
+                player.team = ((CreatePlayerPacket)p).team;
+
+            }
+
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
                 {
-                    {PacketType.CreatePlayerPacket, p => {
-                        CreateObjectAction(((CreatePlayerPacket)p).createPacket);
-                    } },
+                    {PacketType.CreatePlayerPacket, CreatePlayerAction },
                     {PacketType.CreateObjectPacket, CreateObjectAction },
                     {PacketType.ObjectPacket, UpdateAction },
                     {PacketType.PlayerPacket, UpdateAction },

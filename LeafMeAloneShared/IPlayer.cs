@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
+    public enum Team
+    {
+        RED,
+        BLUE
+    };
 
     /// <summary>
     /// Class for an actual player of the game.

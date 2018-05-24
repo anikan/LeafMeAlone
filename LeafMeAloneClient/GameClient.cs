@@ -248,7 +248,8 @@ namespace Client
         /// or a player.
         /// </summary>
         /// <param name="createPacket"></param>
-        public void CreateObjectFromPacket(CreateObjectPacket createPacket)
+        /// <returns>The object which was created</returns>
+        public GameObject CreateObjectFromPacket(CreateObjectPacket createPacket)
         {
 
             int objId = createPacket.ObjData.IdData.ObjectId;
@@ -258,25 +259,28 @@ namespace Client
             {
                 // Create an active player
                 case (ObjectType.ACTIVE_PLAYER):
-                    InitializeUserPlayerAndMovement(createPacket);
-                    break;
+                    return InitializeUserPlayerAndMovement(createPacket);
                 // Create an other player
                 case (ObjectType.PLAYER):
-                    NetworkedGameObjects.Add(objId, new PlayerClient(createPacket));
-                    break;
+                    NetworkedGameObjectClient player = new PlayerClient(createPacket);
+                    NetworkedGameObjects.Add(objId, player);
+                    return player;
                 // Create a leaf.
                 case (ObjectType.LEAF):
-                    NetworkedGameObjects.Add(objId, new LeafClient(createPacket));
-                    break;
+                    NetworkedGameObjectClient leaf = new LeafClient(createPacket);
+                    NetworkedGameObjects.Add(objId, leaf);
+                    return leaf;
                 case (ObjectType.TREE):
                     Transform startTransform = new Transform();
                     float initX = createPacket.ObjData.PositionX;
                     float initY = createPacket.ObjData.PositionY;
                     float initZ = createPacket.ObjData.PositionZ;
                     startTransform.Position = new Vector3(initX, initY, initZ);
-                    NetworkedGameObjects.Add(objId, new TreeClient(createPacket));
-                    break;
+                    NetworkedGameObjectClient tree = new TreeClient(createPacket);
+                    NetworkedGameObjects.Add(objId, tree);
+                    return tree;
             }
+            return null;
         }
 
         /// <summary>
@@ -285,7 +289,8 @@ namespace Client
         /// </summary>
         /// <param name="createPacket">The createPacket that holds info 
         /// on intitial pos, etc</param>
-        private void InitializeUserPlayerAndMovement(
+        /// <returns>the created player</returns>
+        private GameObject InitializeUserPlayerAndMovement(
             CreateObjectPacket createPacket
             )
         {
@@ -302,6 +307,8 @@ namespace Client
             SetupInputManager(ActivePlayer);
 
             CreateMap();
+
+            return ActivePlayer;
         }
 
         /// <summary>

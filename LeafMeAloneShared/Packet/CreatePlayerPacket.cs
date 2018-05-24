@@ -7,11 +7,6 @@ using System.Threading.Tasks;
 
 namespace Shared.Packet
 {
-    public enum Team
-    {
-        RED,
-        BLUE
-    };
 
     [ProtoContract]
     public class CreatePlayerPacket : BasePacket

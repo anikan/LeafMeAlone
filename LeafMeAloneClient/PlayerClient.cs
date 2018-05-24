@@ -44,6 +44,7 @@ namespace Client
             GraphicsManager.ParticleSystems.Add(LeafBlower);
         }
 
+        public Team team { get; set; }
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }

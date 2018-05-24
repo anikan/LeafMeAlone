@@ -12,7 +12,7 @@ using System.IO;
 namespace Shared.Packet
 {
     /// <summary>
-    /// Packet of player information, to send or receive from the server.
+    /// Packet which is used for creating new objects
     /// </summary>
     [ProtoContract]
     public class CreateObjectPacket : BasePacket

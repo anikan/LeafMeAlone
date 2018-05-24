@@ -9,7 +9,11 @@ namespace Shared
     {
         public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 3.85f, 3.0f);
 
-
+        /// <summary>
+        /// animation files
+        /// </summary>
+        public const string PlayerWalkAnim = @"../../Models/Animations/Final_Walk.dae";
+        public const string PlayerIdleAnim = @"../../Models/Animations/Tail_Wag.dae";
 
         /// <summary>
         /// Shaders

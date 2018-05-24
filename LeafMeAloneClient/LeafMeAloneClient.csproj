@@ -98,6 +98,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationManager.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />

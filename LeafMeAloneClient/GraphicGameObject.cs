@@ -21,7 +21,6 @@ namespace Client
         // Model that's associated with this object.
         private Model model;
 
-
         /// <summary>
         /// Init the particle system for burning. This will only ever run once, if the particle system has not been initialized yet.
         /// </summary>
@@ -40,6 +39,11 @@ namespace Client
                 Fire.Transform.Rotation.X = 90f.ToRadians();
                 Fire.SetOrigin(Vector3.Zero);
             }
+        }
+
+        public void SetTint(Vector3 tint)
+        {
+            model.Tint = tint;
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace Client
         public void SetModel(string filePath)
         {
             //Console.WriteLine(File.Exists(filePath));
-            model = new Model(filePath);
+            model = new Model(filePath,false,true);
             Name = filePath.Split('.')[0];
         }
 

@@ -19,6 +19,21 @@ namespace Client
         
         }
 
+        private Vector3 tint = new Vector3(0, 1, 1);
+        public override void Update(float deltaTime)
+        {
+            base.Update(deltaTime);
+
+
+            //todo fix based on health
+           //// if (Health > 0)
+           // {
+                tint.X = 1.0f/(Health/5.0f);
+//                tint.X += .1f;
+                SetTint(tint);
+           // }
+        }
+
         /// <summary>
         /// Update from a server packet.
         /// </summary>

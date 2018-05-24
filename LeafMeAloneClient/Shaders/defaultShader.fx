@@ -12,6 +12,10 @@ uniform int animationIndex;
 // some material properties
 uniform float4 Diffuse, Specular, Ambient, Emissive;
 
+//uniform int slowBurnEnabled;
+//uniform float slowBurnColor;
+uniform float4 Tint;
+
 // Camera Position in object coordinates
 uniform float4 CamPosObj;
 
@@ -185,7 +189,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 			c_mat = Diffuse * max(0.0f, nDotL);
 			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
 
-			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
+			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f * Tint;
 		}
 
 		// else if there is a texture.... MAKE IT RED FOR NOW 
@@ -193,7 +197,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
 			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
-			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
+			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f * Tint;
 		}
 
 		retColor += max( float4(0,0,0,0),  c_l * c_mat ) ;
@@ -206,6 +210,10 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		retColor = retColor * tex_diffuse.Sample(MeshTextureSampler, iTex);
 	}
 
+	/*if (slowBurnEnabled == 1) 
+	{
+		retColor.x = slowBurnColor;
+	}*/
 	return float4( retColor.xyz, Opacity );
 }
 

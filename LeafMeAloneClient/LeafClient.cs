@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using Shared;
 using Shared.Packet;
 using SlimDX;
@@ -16,24 +17,8 @@ namespace Client
     {
         public LeafClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.LeafModel)
-        {
-
-        }
-
-        private Vector3 tint = new Vector3(0, 1, 1);
-        public override void Update(float deltaTime)
-        {
-            base.Update(deltaTime);
-
-
-            //todo fix based on health
-            //// if (Health > 0)
-            // {
-            tint.X = 1.0f / (Health / 5.0f);
-            //                tint.X += .1f;
-            SetTint(tint);
-            // }
-        }
+        {}
+     
 
         /// <summary>
         /// Update from a server packet.
@@ -49,7 +34,18 @@ namespace Client
             Transform.Rotation.Y = objPacket.Rotation;
             // Set the initial burning status.
             Burning = objPacket.Burning;
+
+            var oldHealth = Health;
             Health = objPacket.Health;
+
+            if (Burning)
+            {
+                var deltaHealth = oldHealth-Health;
+                var maxHealth = 5.0f;
+                CurrentTint -= new Vector3((deltaHealth / maxHealth), (deltaHealth / maxHealth), (deltaHealth / maxHealth));
+
+            }
+
         }
     }
 }

@@ -24,6 +24,9 @@ namespace Client
         // Debug cube to find the pivots of objects.
         private NonNetworkedGameObjectClient PivotCube;
 
+        public Vector3 CurrentTint = new Vector3(1,1,1);
+
+
         /// <summary>
         /// Init the particle system for burning. This will only ever run once, if the particle system has not been initialized yet.
         /// </summary>
@@ -44,9 +47,10 @@ namespace Client
             }
         }
 
-        public void SetTint(Vector3 tint)
+        private void SetTint(Vector3 tint)
         {
-            model.Tint = tint;
+            if(model != null)
+                model.Tint = tint;
         }
 
         /// <summary>
@@ -107,6 +111,8 @@ namespace Client
                 PivotCube.Transform.Position = Transform.Position;
                 PivotCube.Update(deltaTime);
             }
+
+            SetTint(CurrentTint);
 
         }
 

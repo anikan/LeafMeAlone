@@ -29,6 +29,10 @@ namespace Server
 
         // Mass of this object.
         public float Mass;
+        public float Bounciness = 0.0f;
+
+        public bool CanPush;
+
 
         // Force, applied each tick and then reset.
         // Affects through the ApplyForce() function.
@@ -36,16 +40,19 @@ namespace Server
 
         // Acceleration and Velocity, calculated from force.
         private Vector3 Acceleration;
-        private Vector3 Velocity;
+        public Vector3 Velocity;
 
         /// <summary>
         /// Creates a new physics object, given an object type and optionally mass.
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
         /// <param name="mass">Optional mass of the object, default 1</param>
-        public PhysicsObject(ObjectType objectType, float health, float mass, float radius) : base(objectType, health, radius)
+        public PhysicsObject(ObjectType objectType, float health, float mass, float radius, float bouncieness = 0.0f, bool canPush = false) : base(objectType, health, radius)
         {
             Mass = mass;
+            Bounciness = bouncieness;
+            CanPush = canPush;
+
         }
 
         /// <summary>
@@ -76,8 +83,12 @@ namespace Server
             // Calculate velocity given acceleration and a delta time in seconds
             Velocity = Velocity + (Acceleration * deltaTime);
 
-            // Set position based on the new velocity
-            TryMoveObject(Transform.Position + (Velocity * deltaTime));
+            if (RoundVectorToZero(Velocity, MIN_VELOCITY) != Vector3.Zero)
+            {
+                // Set position based on the new velocity
+                TryMoveObject(Transform.Position + (Velocity * deltaTime));
+            }
+
 
             // Zero out force, it's been used
             Force = Vector3.Zero;
@@ -119,6 +130,47 @@ namespace Server
         }
 
         /// <summary>
+        /// Bounce off of another object.
+        /// </summary>
+        /// <param name="other">The collider of the other object </param>
+        public void Bounce(ColliderObject other)
+        {
+
+
+            //Console.WriteLine(string.Format("{0} {1} is bouncing off of {2} {2}", GetType(), Id, other.GetType(), other.Id));
+
+            // TODO: Make this work
+
+            /*
+            Vector3 v = Velocity;
+            Vector3 n = Transform.Position - other.Transform.Position;
+            n.Normalize();
+            n.Y = 0.0f;
+
+            Vector3 u = (Vector3.Dot(v, n) / Vector3.Dot(n, n)) * n;
+
+            Vector3 w = v - u;
+
+            Vector3 afterVelocity = (w - u) * Bounciness;
+            */
+
+        }
+
+        public void Push(PhysicsObject other)
+        {
+
+            if (CanPush)
+            {
+                //Console.Write(string.Format("{0} {1} is pushing {2} {2}", GetType(), Id, other.GetType(), other.Id));
+
+                Vector3 forceVector = other.Transform.Position - Transform.Position;
+                forceVector.Normalize();
+
+                other.ApplyForce(forceVector * Mass * Constants.PUSH_FACTOR);
+            }
+        }
+
+        /// <summary>
         /// Function called when this object is hit by a player's tool.
         /// </summary>
         /// <param name="playerPosition">Position of the player that hit this object.</param>
@@ -139,8 +191,6 @@ namespace Server
                 // If this is the leafblower's primary tool.
                 if (toolMode == ToolMode.PRIMARY)
                 {
-
-
                     // Extinguish any objects that get blowed by the leaf blower.
                     Extinguish();
 
@@ -157,14 +207,35 @@ namespace Server
 
                     // Multiply tool force by distance so that it's stronger on objects that are closer.
                     // Also make sure denominator can't be zero.
-                    toolForce /= Math.Max(0.001f, distance);
+                    toolForce /= Math.Max(0.001f, distance * Constants.BLOWER_DISTANCE_SCALER);
 
                     // Apply a force in the direction of the player -> object.
                     Vector3 force = playerToObj * toolForce;
                     ApplyForce(force);
 
                     // Console.WriteLine("Blowing object {0} {1} with force {2}", this.GetType().ToString(), Id, force);
+                }
+                else if (toolMode == ToolMode.SECONDARY)
+                {
 
+                    // Get the force of this tool.
+                    float toolForce = toolInfo.Force;
+
+                    // Get the vector from the player to the object.
+                    Vector3 objToPlayer = playerPosition - Transform.Position;
+                    objToPlayer.Y = 0.0f;
+                    float distance = objToPlayer.Length();
+
+                    // Divide the vector by the range of the tool to normalize it.
+                    objToPlayer /= toolInfo.Range;
+
+                    // Multiply tool force by distance so that it's stronger on objects that are closer.
+                    // Also make sure denominator can't be zero.
+                    toolForce /= Math.Max(0.001f, distance * Constants.BLOWER_DISTANCE_SCALER);
+
+                    // Apply a force in the direction of the player -> object.
+                    Vector3 force = objToPlayer * toolForce;
+                    ApplyForce(force);
 
                 }
             }

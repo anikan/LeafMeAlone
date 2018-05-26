@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
 using Shared;
+using Shared.Packet;
 
 namespace Client
 {
@@ -43,6 +44,7 @@ namespace Client
             GraphicsManager.ParticleSystems.Add(LeafBlower);
         }
 
+        public Team team { get; set; }
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
@@ -217,9 +219,11 @@ namespace Client
             ToolEquipped = packet.ToolEquipped;
 
             ActiveToolMode = packet.ActiveToolMode;
-            Transform.Position.X = packet.MovementX;
-            Transform.Position.Z = packet.MovementZ;
-            Transform.Rotation.Y = packet.Rotation;
+
+            Transform.Position.X = packet.ObjData.PositionX;
+            Transform.Position.Y = Constants.FLOOR_HEIGHT;
+            Transform.Position.Z = packet.ObjData.PositionZ;
+            Transform.Rotation.Y = packet.ObjData.Rotation;
 
             switch (ActiveToolMode)
             {
@@ -276,7 +280,7 @@ namespace Client
         /// </summary>
         /// <param name="packet">Abstract packet which gets casted to an actual 
         /// object type</param>
-        public override void UpdateFromPacket(Packet packet)
+        public override void UpdateFromPacket(BasePacket packet)
         {
             UpdateFromPacket(packet as PlayerPacket);
         }

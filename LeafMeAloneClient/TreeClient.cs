@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Client
@@ -28,7 +29,7 @@ namespace Client
         /// Update this object from a server packet.
         /// </summary>
         /// <param name="packet">Packet from server.</param>
-        public override void UpdateFromPacket(Packet packet)
+        public override void UpdateFromPacket(BasePacket packet)
         {
            // throw new NotImplementedException();
         }

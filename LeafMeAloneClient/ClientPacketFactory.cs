@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Client
@@ -11,26 +12,22 @@ namespace Client
     /// <summary>
     /// Handles the generation of packets on the server
     /// </summary>
-    public class ClientPacketFactory
+    public class ClientPacketFactory : PacketFactory
     {
         /// <summary>
         /// Creates a network packet used to update the state of the player in the client
         /// </summary>
         /// <param name="player">The player object to serialize into a player</param>
-        public static PlayerPacket CreatePacket(PlayerClient player)
+        public static RequestPacket CreateRequestPacket(PlayerClient player)
         {
-            PlayerPacket packet = new PlayerPacket()
-            {
-                Dead = player.Dead,
-                MovementX = player.PlayerRequests.MovementRequested.X,
-                MovementZ = player.PlayerRequests.MovementRequested.Y,
-                _ProtoObjId = player.Id,
-                ToolEquipped = player.PlayerRequests.EquipToolRequest,
-                Rotation = player.PlayerRequests.RotationRequested,
-                ActiveToolMode = player.PlayerRequests.ActiveToolMode
-            };
-
-            return packet;
+            float deltaX = player.PlayerRequests.MovementRequested.X;
+            float deltaZ = player.PlayerRequests.MovementRequested.Y;
+            float deltaRot = player.PlayerRequests.RotationRequested;
+            return new RequestPacket(
+                deltaX, deltaZ, deltaRot, new IdPacket(player.Id), 
+                player.PlayerRequests.EquipToolRequest,
+                player.PlayerRequests.ActiveToolMode
+                );
         }
 
     }

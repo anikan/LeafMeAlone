@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Client
@@ -16,7 +17,7 @@ namespace Client
         public LeafClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.LeafModel)
         {
-        
+
         }
 
         private Vector3 tint = new Vector3(0, 1, 1);
@@ -26,36 +27,29 @@ namespace Client
 
 
             //todo fix based on health
-           //// if (Health > 0)
-           // {
-                tint.X = 1.0f/(Health/5.0f);
-//                tint.X += .1f;
-                SetTint(tint);
-           // }
+            //// if (Health > 0)
+            // {
+            tint.X = 1.0f / (Health / 5.0f);
+            //                tint.X += .1f;
+            SetTint(tint);
+            // }
         }
 
         /// <summary>
         /// Update from a server packet.
         /// </summary>
         /// <param name="packet">Packet from the server.</param>
-        public void UpdateFromPacket(ObjectPacket packet)
+        public override void UpdateFromPacket(BasePacket packet)
         {
+            ObjectPacket objPacket = packet as ObjectPacket;
             // Set the initial positions of the object.
-            Transform.Position.X = packet.MovementX;
-            Transform.Position.Z = packet.MovementZ;
-            Transform.Rotation.Y = packet.Rotation;
 
+            Transform.Position.X = objPacket.PositionX;
+            Transform.Position.Z = objPacket.PositionZ;
+            Transform.Rotation.Y = objPacket.Rotation;
             // Set the initial burning status.
-            Burning = packet.Burning;
-        }
-
-        /// <summary>
-        /// Update this object from a server packet.
-        /// </summary>
-        /// <param name="packet">Packet from server.</param>
-        public override void UpdateFromPacket(Packet packet)
-        {
-            UpdateFromPacket(packet as ObjectPacket);
+            Burning = objPacket.Burning;
+            Health = objPacket.Health;
         }
     }
 }

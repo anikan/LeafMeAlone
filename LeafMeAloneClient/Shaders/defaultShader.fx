@@ -12,8 +12,8 @@ uniform int animationIndex;
 // some material properties
 uniform float4 Diffuse, Specular, Ambient, Emissive;
 
-//uniform int slowBurnEnabled;
-//uniform float slowBurnColor;
+
+//the tint of the object
 uniform float4 Tint;
 
 // Camera Position in object coordinates

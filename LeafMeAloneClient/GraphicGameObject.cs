@@ -47,6 +47,10 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// Set the tint of the object.
+        /// </summary>
+        /// <param name="tint"></param>
         private void SetTint(Vector3 tint)
         {
             if(model != null)

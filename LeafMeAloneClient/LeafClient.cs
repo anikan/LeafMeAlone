@@ -38,8 +38,10 @@ namespace Client
             var oldHealth = Health;
             Health = objPacket.Health;
 
+            //If the player is burning then change the leaf color.
             if (Burning)
             {
+                //change of health
                 var deltaHealth = oldHealth-Health;
                 var maxHealth = 5.0f;
                 CurrentTint -= new Vector3((deltaHealth / maxHealth), (deltaHealth / maxHealth), (deltaHealth / maxHealth));

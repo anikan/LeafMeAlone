@@ -14,8 +14,11 @@ namespace Client
     public class MapClient : NonNetworkedGameObjectClient
     {
 
+        // Tile width/height information.
         private const float TILE_WIDTH = 10.0f;
         private const float TILE_HEIGHT = 10.0f;
+
+        // Number of tiles beyond the treeline (so player can't see blue).
         private const int BORDER_TILES = 10;
 
         private const int NUM_TILES_PER_SIDE = (int)(Constants.MAP_WIDTH / TILE_WIDTH) + BORDER_TILES;

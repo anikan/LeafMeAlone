@@ -18,8 +18,6 @@ namespace Server
         // Radius of this object for basic n00b collisions.
         public float Radius = 1.0f;
 
-        private Stopwatch timer;
-
         /// <summary>
         /// Creates a new collider object.
         /// </summary>
@@ -29,7 +27,6 @@ namespace Server
         public ColliderObject(ObjectType objectType, float health, float radius) : base(objectType, health)
         {
             Radius = radius;
-            timer = new Stopwatch();
         }
 
         /// <summary>
@@ -115,27 +112,34 @@ namespace Server
                     if (obj != this && IsColliding(obj))
                     {
                         //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
-
+                        
+                        // Set the object back to it's original position.
                         Transform.Position = OriginalPosition;
 
+                        // If this is a physics object
                         if (this is PhysicsObject me)
                         {
 
+                            // If the other object is also a physics object.
                             if (obj is PhysicsObject other)
                             {
 
+                                // Push the other object.
                                 me.Push(other);
                             }
 
+                            // Bounce off the other object.
                             me.Bounce(obj);
 
                         }
 
+                        // couldn't move
                         return false;
                     }
                 }
             }
 
+            // Moved!
             return true;
         }
     }

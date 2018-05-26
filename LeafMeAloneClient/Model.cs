@@ -17,6 +17,8 @@ namespace Client
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 
+        public bool Enabled = true;
+        
         // active geometry and shader in use
         private Geometry m_ActiveGeo;
         private Shader m_ActiveShader;
@@ -127,17 +129,20 @@ namespace Client
         /// </summary>
         public void Draw()
         {
-            if (CurrentAnimationIndex != -1)
+            if (Enabled)
             {
-                m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
-                m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
-                m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
-                m_ActiveGeo.RepeatAnimation = RepeatAnimation;
-                m_ActiveGeo.UpdateAnimation();
-            }
+                if (CurrentAnimationIndex != -1)
+                {
+                    m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
+                    m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
+                    m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
+                    m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+                    m_ActiveGeo.UpdateAnimation();
+                }
 
-            m_ActiveShader.UseShader();
-            m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                m_ActiveShader.UseShader();
+                m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+            }
         }
 
         /// <summary>

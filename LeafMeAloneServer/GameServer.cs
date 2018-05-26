@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Server
@@ -107,14 +108,13 @@ namespace Server
                 //Update the server players based on received packets.
                 for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                 {
-                    PlayerPacket packet = networkServer.PlayerPackets[i];
+                    RequestPacket packet = networkServer.PlayerPackets[i];
+                    int playerId = packet.GetId();
+                    gameObjectDict.TryGetValue(playerId, out GameObjectServer playerGameObject);
 
-                    if (packet != null &&
-                        gameObjectDict.TryGetValue(packet._ProtoObjId, out GameObjectServer playerGameObject)
-                        )
+                    if (packet != null && playerGameObject != null)
                     {
                         PlayerServer player = (PlayerServer)playerGameObject;
-
                         player.UpdateFromPacket(networkServer.PlayerPackets[i]);
                     }
                 }
@@ -166,11 +166,11 @@ namespace Server
             int id = gameObjectDict.Count();
 
             //Create two players, one to send as an active player to client. Other to keep track of on server.
-            PlayerServer newPlayer = new PlayerServer();
+            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
             newPlayer.Register();
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer();
+            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
             newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
             newActivePlayer.Id = newPlayer.Id;
 
@@ -182,13 +182,10 @@ namespace Server
             newActivePlayer.Transform.Position = nextSpawnPoint;
             newPlayer.Transform.Position = nextSpawnPoint;
 
-            CreateObjectPacket objPacket =
-                new CreateObjectPacket(newPlayer);
+            CreatePlayerPacket objPacket = ServerPacketFactory.NewCreatePacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
-            networkServer.SendAll(objPacket.Serialize());
-
-
+            networkServer.SendAll(PacketUtil.Serialize(objPacket));
 
             return newActivePlayer;
         }

@@ -82,7 +82,7 @@ namespace Client
                 for (int j = 0; j < currentMatch.teamSections.Count; j++)
                 {
 
-                    if (currentMatch.teamSections[j].IsInSquare(MapTiles[i].Transform.Position))
+                    if (currentMatch.teamSections[j].IsInBounds(MapTiles[i].Transform.Position))
                     {
 
                         MapTiles[i].Transform.Position.Y += currentMatch.teamSections[j].sectionColor.X;

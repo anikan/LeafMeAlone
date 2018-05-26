@@ -12,17 +12,20 @@ namespace Shared
     /// </summary>
     public class TeamSection
     {
-
+        // Bounds of this section.
         public float leftX;
         public float rightX;
         public float upZ;
         public float downZ;
 
+        // Number of leaves in this section.
         public int numLeaves;
 
+        // Color of the section.
         public Vector3 sectionColor;
 
-        public bool IsInSquare(Vector3 position)
+        // Checks if a position is in the bounds.
+        public bool IsInBounds(Vector3 position)
         {
 
             if (position.X > leftX && position.X < rightX && position.Z < upZ && position.Z > downZ)
@@ -41,7 +44,7 @@ namespace Shared
 
             foreach (GameObject obj in positions)
             {
-                if (IsInSquare(obj.Transform.Position))
+                if (IsInBounds(obj.Transform.Position))
                 {
                     numLeaves++;
                 //    Console.WriteLine("Num objects is now " + numLeaves);

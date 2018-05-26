@@ -7,6 +7,9 @@ using SlimDX;
 
 namespace Shared
 {
+    /// <summary>
+    /// One section of the map that belongs to a team.
+    /// </summary>
     public class TeamSection
     {
 

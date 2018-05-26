@@ -53,11 +53,11 @@ namespace Client
         private const int MAX_FRAME_PER_UDPATE = 15;
 
         /// <summary>
-        /// 
+        /// Play an audio from a pool then free that source automatically
         /// </summary>
-        /// <param name="poolId"></param>
-        /// <param name="src"></param>
-        /// <param name="fileName"></param>
+        /// <param name="poolId"> the ID of the pool </param>
+        /// <param name="src"> the source to play </param>
+        /// <param name="fileName"> the filename of the audio to play </param>
         public static void PlayAudioThenFree(int poolId, int src, string fileName)
         {
             ReusePoolSource(poolId, src, fileName, false);
@@ -66,17 +66,17 @@ namespace Client
         }
 
         /// <summary>
-        /// 
+        /// Used for evaluating burning object audio logic
         /// </summary>
-        /// <param name="burning"></param>
-        /// <param name="burnup"></param>
-        /// <param name="src"></param>
-        /// <param name="currentState"></param>
-        /// <param name="igniteFile"></param>
-        /// <param name="loopFile"></param>
-        /// <param name="burnupFile"></param>
-        /// <param name="putoffFile"></param>
-        /// <returns></returns>
+        /// <param name="burning"> whether or not the object is burning </param>
+        /// <param name="burnup"> whether or not the object is burned up </param>
+        /// <param name="src"> the audio source to play the sound </param>
+        /// <param name="currentState"> the current state of the object </param>
+        /// <param name="igniteFile"> the audio file for ignition </param>
+        /// <param name="loopFile"> the audio file for looping/burning </param>
+        /// <param name="burnupFile"> the audio file for burned up </param>
+        /// <param name="putoffFile"> the audio file for putting off </param>
+        /// <returns> the next state </returns>
         public static byte EvaluateBurningObjectAudio(bool burning, bool burnup, int src, byte currentState, 
             string igniteFile, string loopFile, string burnupFile, string putoffFile)
         {
@@ -301,6 +301,7 @@ namespace Client
             _audio.UpdateListener(GraphicsManager.ActiveCamera.CameraPosition, GraphicsManager.ActiveCamera.CameraLookAt,
                 GraphicsManager.ActiveCamera.CameraUp);
 
+            // If some audio needs to be freed automatically...
             for (int i = 0; i < _freeSourceAfterPlay.Count; i++)
             {
                 if (!IsSourcePlaying(_freeSourceAfterPlay[i]))
@@ -311,89 +312,6 @@ namespace Client
                     i--;
                 }
             }
-
-//            for (int i = 0; i < _allLeafRef.Count; i++)
-//            {
-//                if (_allLeafRef[i] == null) continue;
-//                if (_leafSrcIndex[i] != -1)
-//                {
-//                    int leafIdx = _leafSrcIndex[i];
-//                    _audio.UpdateSourcePosition( _srcLeaves[leafIdx], _allLeafRef[i].Transform.Position);
-//
-//                    switch (_leafStates[leafIdx])
-//                    {
-//                        case LeafState.Ignite: 
-//                        {
-//                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
-//                            {
-//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurning, true);
-//                                _leafStates[leafIdx] = LeafState.Loop;
-//                            }
-//                            else if (_allLeafRef[i].Health < 0)
-//                            {
-//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurnup, false);
-//                                _leafStates[leafIdx] = LeafState.Burnup;
-//                            }
-//                            else if (!_allLeafRef[i].Burning)
-//                            {
-//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafPutoff, false);
-//                                _leafStates[leafIdx] = LeafState.Putoff;
-//                            }
-//                            break;
-//                        }
-//                        case LeafState.Loop:
-//                        {
-//                            if (_allLeafRef[i].Health < 0)
-//                            {
-//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurnup, false);
-//                                _leafStates[leafIdx] = LeafState.Burnup;
-//                            }
-//                            else if (!_allLeafRef[i].Burning)
-//                            {
-//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafPutoff, false);
-//                                _leafStates[leafIdx] = LeafState.Putoff;
-//                            }
-//                            break;
-//                        }
-//                        case LeafState.Putoff:
-//                        {
-//                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
-//                            {
-//                                _leafSrcInUse[leafIdx] = false;
-//                                _leafSrcIndex[i] = -1;
-//                            }
-//                            break;
-//                        }
-//                        case LeafState.Burnup:
-//                        {
-//                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
-//                            {
-//                                _leafSrcInUse[leafIdx] = false;
-//                                _leafSrcIndex[i] = -1;
-//                                RemoveLeafSource(i);
-//                            }
-//
-//                            break;
-//                        }
-//                    }
-//
-//                }
-//
-//                // make a new source ignite
-//                else if (_allLeafRef[i].Burning)
-//                {
-//                    int leafidx = _leafSrcInUse.IndexOf(false);
-//                    if (leafidx < 0)
-//                    {
-//                        break;
-//                    }
-//                    _leafSrcIndex[i] = leafidx;
-//                    _leafSrcInUse[leafidx] = true;
-//
-//                    _audio.Play(_srcLeaves[leafidx], Constants.LeafIgniting, false);
-//                    _leafStates[leafidx] = LeafState.Ignite;
-//                }
-//            }
         }
 
         /// <summary>
@@ -416,11 +334,11 @@ namespace Client
         }
 
         /// <summary>
-        /// 
+        /// Find a new source to use and play it
         /// </summary>
-        /// <param name="poolID"></param>
-        /// <param name="audioFile"></param>
-        /// <param name="loop"></param>
+        /// <param name="poolID"> specify which pool to use </param>
+        /// <param name="audioFile"> audiofile to be played; null if don't need to play </param>
+        /// <param name="loop"> whether or not the audio is looped </param>
         /// <returns> the source ID that is being used </returns>
         public static int UseNextPoolSource(int poolID, string audioFile = null, bool loop = false)
         {
@@ -428,19 +346,19 @@ namespace Client
         }
 
         /// <summary>
-        /// 
+        /// Play a source with a source that is already allocated
         /// </summary>
-        /// <param name="poolID"></param>
-        /// <param name="src"></param>
-        /// <param name="audioFile"></param>
-        /// <param name="loop"></param>
+        /// <param name="poolID"> specify which pool to use </param>
+        /// <param name="src"> the source to reuse </param>
+        /// <param name="audioFile"> the audio file to be played </param>
+        /// <param name="loop"> whether or not the audio is looped </param>
         public static void ReusePoolSource(int poolID, int src, string audioFile, bool loop)
         {
             _allPools[poolID].PlayThisSource(src, audioFile, loop);
         }
 
         /// <summary>
-        /// 
+        /// Free the source so that it can be reused by others
         /// </summary>
         /// <param name="poolID"> The ID of the pool </param>
         /// <param name="src"> The source to be freed </param>
@@ -463,13 +381,37 @@ namespace Client
         }
     }
 
+    /// <summary>
+    /// An audio pool, to help managing pooling multiple sources
+    /// </summary>
     public class AudioSourcePool
     {
+        /// <summary>
+        /// The list of all sources that are pooled
+        /// </summary>
         public List<int> Src;
+
+        /// <summary>
+        /// The list that indicates which sources are available
+        /// </summary>
         public List<bool> Avail;
+
+        /// <summary>
+        /// The map from source to list index of the previous two lists
+        /// </summary>
         public Dictionary<int, int> SrcMap;
+
+        /// <summary>
+        /// The audio system to use
+        /// </summary>
         private AudioSystem _audio;
 
+
+        /// <summary>
+        /// Constructor: initialize the pool with the desired number of sources
+        /// </summary>
+        /// <param name="capacity"> the number of sources in this pool </param>
+        /// <param name="audio"> the audio system that needs to be used </param>
         public AudioSourcePool(int capacity, AudioSystem audio)
         {
             Src = new List<int>();
@@ -487,6 +429,12 @@ namespace Client
             _audio = audio;
         }
 
+        /// <summary>
+        /// Play the source with some audio
+        /// </summary>
+        /// <param name="src"> source to use </param>
+        /// <param name="audioFile"> audio file to play </param>
+        /// <param name="loop"> whether the audio is looped or not </param>
         public void PlayThisSource(int src, string audioFile, bool loop)
         {
             int srcIndex = SrcMap[src];
@@ -494,7 +442,13 @@ namespace Client
 
             _audio.Play(src, audioFile, loop);
         }
-
+        
+        /// <summary>
+        /// Find a new source to allocate so that another entity can use it 
+        /// </summary>
+        /// <param name="audioFile"> play the audio if not null </param>
+        /// <param name="loop"> if played, specify if it should be repeated </param>
+        /// <returns> the new source to be used </returns>
         public int UseNextPoolSource(string audioFile, bool loop)
         {
             int nextSrcIndex = Avail.IndexOf(true);
@@ -511,6 +465,10 @@ namespace Client
             return src;
         }
 
+        /// <summary>
+        /// Free the source so that it can be reused by others
+        /// </summary>
+        /// <param name="src"> source to be freed </param>
         public void FreeSource(int src)
         {
             int srcIndex = SrcMap[src];

@@ -37,6 +37,10 @@ namespace Client
             _isPlaying = false;
         }
 
+        /// <summary>
+        /// Update the audio states, and play the sounds if necessary
+        /// </summary>
+        /// <param name="audioPoolID"> the pool to use </param>
         public void UpdateAudio(int audioPoolID)
         {
             if (_isPlaying)
@@ -60,7 +64,11 @@ namespace Client
             }
         }
 
-        public void PlayDeathAudio(int audioPoolID)
+        /// <summary>
+        /// Play the burnup audio, making sure to free the resouce afterwards
+        /// </summary>
+        /// <param name="audioPoolID"> the audio source pool to use </param>
+        public void PlayBurnupAudio(int audioPoolID)
         {
             if (!_isPlaying)
             {

@@ -35,6 +35,10 @@ namespace Client
 
         // All leaves in the scene. 
         public List<LeafClient> leaves;
+
+        /// <summary>
+        /// The ID of the audio pool to be used by all the leaves collectively
+        /// </summary>
         public int leafAudioPoolId;
         public const int LeafAudioCapacity = 50;
 
@@ -389,7 +393,8 @@ namespace Client
                 NetworkedGameObjects.Remove(networkedObj.Id);
                 if (gameObj is LeafClient leaf)
                 {
-                    leaf.PlayDeathAudio(leafAudioPoolId);
+                    // play the death audio sound
+                    leaf.PlayBurnupAudio(leafAudioPoolId);
                 }
             }
             else if (gameObj is NonNetworkedGameObjectClient nonNetObj)

@@ -214,6 +214,7 @@ namespace Client
         /// <param name="packet">The packet to update from.</param>
         private void UpdateFromPacket(PlayerPacket packet)
         {
+            base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
@@ -276,7 +277,6 @@ namespace Client
         /// object type</param>
         public override void UpdateFromPacket(BasePacket packet)
         {
-            base.UpdateFromPacket(packet);
             UpdateFromPacket(packet as PlayerPacket);
         }
 

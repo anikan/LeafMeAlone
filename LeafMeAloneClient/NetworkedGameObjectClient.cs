@@ -32,6 +32,16 @@ namespace Client
         /// Updates this object from a network packet.
         /// </summary>
         /// <param name="packet">Packet to update from.</param>
-        public abstract void UpdateFromPacket(BasePacket packet);
+        public virtual void UpdateFromPacket(BasePacket packet)
+        {
+            ObjectPacket objPacket = packet as ObjectPacket;
+            // Set the initial positions of the object.
+            Transform.Position.X = objPacket.PositionX;
+            Transform.Position.Z = objPacket.PositionZ;
+            Transform.Rotation.Y = objPacket.Rotation;
+            // Set the initial burning status.
+            Burning = objPacket.Burning;
+            Health = objPacket.Health;
+        }
     }
 }

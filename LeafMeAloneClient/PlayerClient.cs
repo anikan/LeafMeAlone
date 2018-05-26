@@ -212,18 +212,12 @@ namespace Client
         /// Updates the player's values based on a received packet.
         /// </summary>
         /// <param name="packet">The packet to update from.</param>
-        public void UpdateFromPacket(PlayerPacket packet)
+        private void UpdateFromPacket(PlayerPacket packet)
         {
             Dead = packet.Dead;
-
             ToolEquipped = packet.ToolEquipped;
-
             ActiveToolMode = packet.ActiveToolMode;
-
-            Transform.Position.X = packet.ObjData.PositionX;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;
-            Transform.Position.Z = packet.ObjData.PositionZ;
-            Transform.Rotation.Y = packet.ObjData.Rotation;
 
             switch (ActiveToolMode)
             {
@@ -282,6 +276,7 @@ namespace Client
         /// object type</param>
         public override void UpdateFromPacket(BasePacket packet)
         {
+            base.UpdateFromPacket(packet);
             UpdateFromPacket(packet as PlayerPacket);
         }
 

@@ -9,7 +9,7 @@ namespace Client
 {
     // Note: only playing WAV 8/16 bits mono/stereo files for now
     // Note: For 3D sound effects, must use mono wav files
-    class AudioSystem : IDisposable
+    public class AudioSystem : IDisposable
     {
         private AudioContext _context;
         private Dictionary<String, int> _audioBuffers;

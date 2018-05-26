@@ -3,83 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Graphics.OpenGL;
 using Shared;
 using SlimDX;
 
 namespace Client
 {
     /// <summary>
-    /// For controlling the flamethrower source
-    /// </summary>
-    public enum FlameThrowerState
-    {
-        Start,
-        Loop,
-        End,
-        Inactive
-    }
-
-    /// <summary>
-    /// For controlling the windblower source
-    /// </summary>
-    public enum LeafBlowerState
-    {
-        Start,
-        Loop,
-        End,
-        Inactive
-    }
-
-    /// <summary>
-    /// For controlling the burning sound of leaves
-    /// </summary>
-    public enum LeafState
-    {
-        Ignite,
-        Loop,
-        Putoff,
-        Burnup,
-        Inactive
-    }
-
-    /// <summary>
-    /// For controlling player footstep sound
-    /// </summary>
-    public enum PlayerFootstepState
-    {
-        Loop,
-        Inactive
-    }
-
-    /// <summary>
     /// Manages all audio stuffs with a singleton audio system
     /// </summary>
-    static class AudioManager
+    public static class AudioManager
     {
         private static AudioSystem _audio;
+        
+        private static List<AudioSourcePool> _allPools;
 
+        private static List<int> _freeSourceAfterPlay;
+        private static List<int> _freeSourcePoolAfterPlay;
+
+        private static int _countPools = 0;
         private static int _srcBgm;
+        
+        public const byte GenericToolStart = 1;
+        public const byte GenericToolLoop = 2;
+        public const byte GenericToolEnd = 3;
+        public const byte GenericToolInactive = 4;
 
-        private static List<PlayerClient> _allPlayerRef;
-        private static List<LeafClient> _allLeafRef;
+        public const byte GenericLoopOnlyActiveState = 1;
+        public const byte GenericLoopOnlyInactiveState = 2;
 
-        private static int _playerCount;
-        private static List<int> _srcPlayerFootSteps;
-        private static List<PlayerFootstepState> _playerFootstepStates;
-        private static List<Vector3> _playerPositions;
-
-        private static List<int> _srcFlameThrowers;
-        private static List<FlameThrowerState> _flameThrowerStates;
-
-        private static List<int> _srcLeafBlowers;
-        private static List<LeafBlowerState> _leafBlowerStates;
-
-        private const int MAX_LEAF_SOURCE = 50;
-        private static int _leafCount;
-        private static List<int> _srcLeaves;
-        private static List<bool> _leafSrcInUse;
-        private static Dictionary<int, int> _leafSrcIndex;  // map from index of _allLeafRef to index of _srcLeaves
-        private static List<LeafState> _leafStates;
+        public const byte GenericBurningObjectIgnite = 1;
+        public const byte GenericBurningObjectLoop = 2;
+        public const byte GenericBurningObjectBurnup = 3;
+        public const byte GenericBurningObjectPutoff = 4;
+        public const byte GenericBurningObjectInactive = 5;
 
         /// <summary>
         /// Initialize fields
@@ -88,28 +45,252 @@ namespace Client
         {
             _audio = new AudioSystem();
             _srcBgm = _audio.GenSource();
-
-            _srcFlameThrowers = new List<int>();
-            _srcLeafBlowers = new List<int>();
-            _srcLeaves = new List<int>();
-            _srcPlayerFootSteps = new List<int>();
-
-            _flameThrowerStates = new List<FlameThrowerState>();
-            _leafBlowerStates = new List<LeafBlowerState>();
-            _leafStates = new List<LeafState>();
-            _playerFootstepStates = new List<PlayerFootstepState>();
-
-            _leafSrcInUse = new List<bool>();
-            _leafSrcIndex = new Dictionary<int, int>();
-            _allPlayerRef = new List<PlayerClient>();
-            _allLeafRef = new List<LeafClient>();
-            _playerPositions = new List<Vector3>();
-
-            _playerCount = 0;
-            _leafCount = 0;
+            _allPools = new List<AudioSourcePool>();
+            _freeSourcePoolAfterPlay = new List<int>();
+            _freeSourceAfterPlay = new List<int>();
         }
 
         private const int MAX_FRAME_PER_UDPATE = 15;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="poolId"></param>
+        /// <param name="src"></param>
+        /// <param name="fileName"></param>
+        public static void PlayAudioThenFree(int poolId, int src, string fileName)
+        {
+            ReusePoolSource(poolId, src, fileName, false);
+            _freeSourceAfterPlay.Add(src);
+            _freeSourcePoolAfterPlay.Add(poolId);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="burning"></param>
+        /// <param name="burnup"></param>
+        /// <param name="src"></param>
+        /// <param name="currentState"></param>
+        /// <param name="igniteFile"></param>
+        /// <param name="loopFile"></param>
+        /// <param name="burnupFile"></param>
+        /// <param name="putoffFile"></param>
+        /// <returns></returns>
+        public static byte EvaluateBurningObjectAudio(bool burning, bool burnup, int src, byte currentState, 
+            string igniteFile, string loopFile, string burnupFile, string putoffFile)
+        {
+            byte nextState = currentState;
+            switch (currentState)
+            {
+                case GenericBurningObjectInactive:
+                {
+                    break;
+                }
+                case GenericBurningObjectIgnite: 
+                {
+                    if (!_audio.IsPlaying(src) )
+                    {
+                        if (loopFile != null)
+                        {
+                            _audio.Play(src, loopFile, true);
+                        }
+
+                        nextState = GenericBurningObjectLoop;
+                    }
+                    else if (burnup)
+                    {
+                        if (burnupFile != null)
+                        {
+                            _audio.Play(src, burnupFile, false);
+                        }
+
+                        nextState = GenericBurningObjectBurnup;
+                    }
+                    else if (!burning)
+                    {
+                        if (putoffFile != null)
+                        {
+                            _audio.Play(src, putoffFile, false);
+                        }
+
+                        nextState = GenericBurningObjectPutoff;
+                    }
+                    break;
+                }
+                case GenericBurningObjectLoop:
+                {
+                    if (burnup)
+                    {
+                        if (burnupFile != null)
+                        {
+                            _audio.Play(src, burnupFile, false);
+                        }
+
+                        nextState = GenericBurningObjectBurnup;
+                    }
+                    else if (!burning)
+                    {
+                        if (putoffFile != null)
+                        {
+                            _audio.Play(src, putoffFile, false);
+                        }
+
+                        nextState = GenericBurningObjectPutoff;
+                    }
+                    break;
+                }
+                case GenericBurningObjectPutoff:
+                {
+                    if (!_audio.IsPlaying(src))
+                    {
+                        nextState = GenericBurningObjectInactive;
+                    }
+                    break;
+                }
+                case GenericBurningObjectBurnup:
+                {
+                    if (!_audio.IsPlaying(src))
+                    {
+                        nextState = GenericBurningObjectBurnup;
+                    }
+            
+                    break;
+                }
+            }
+
+            return nextState;
+        }
+
+
+        /// <summary>
+        /// Used for evaluating looping audio logic
+        /// </summary>
+        /// <param name="looping"> Whether or not the looping music should be played </param>
+        /// <param name="src"> The source to play the looping music </param>
+        /// <param name="currentState"> The current state of the audio logic </param>
+        /// <param name="loopFile"> The looping audio filed to be played; null if not needed </param>
+        /// <returns> the next state </returns>
+        public static byte EvaluateLoopOnlyAudio(bool looping, int src, byte currentState, string loopFile)
+        {
+            byte nextState = currentState;
+            switch (currentState)
+            {
+                case GenericLoopOnlyInactiveState:
+                {
+                    if (looping)
+                    {
+                        nextState = GenericLoopOnlyActiveState;
+                        if (loopFile != null)
+                        {
+                            _audio.Play(src, loopFile, true);
+                        }
+                    }
+                    break;
+                }
+                case GenericLoopOnlyActiveState:
+                {
+                    if (!looping)
+                    {
+                        nextState = GenericLoopOnlyInactiveState;
+                        _audio.Stop( src );
+                    }
+                    break;
+                }
+            }
+
+            return nextState;
+        }
+
+        /// <summary>
+        /// Used for evaluating tool audio, and playing them
+        /// </summary>
+        /// <param name="inUse"> whether the tool is being used or not </param>
+        /// <param name="src"> the audio source that is generated and stored </param>
+        /// <param name="currentState"> the current state </param>
+        /// <param name="startFile"> the audio file of the start sequence; null if no audio is to be played </param>
+        /// <param name="loopFile"> the audio file of the loop sequence; null if no audio is to be played </param>
+        /// <param name="endFile"> the audio file of the end sequence; null if no audio is to be played </param>
+        /// <returns> the evaluated state </returns>
+        /// <side_effect> audio file will be played accordingly </side_effect>
+        public static byte EvaluateToolAudio(bool inUse, int src, byte currentState, string startFile, string loopFile, string endFile)
+        {
+            byte nextState = currentState;
+
+            switch (currentState)
+            {
+                case GenericToolInactive:
+                {
+                    if (inUse)
+                    {
+                        if (startFile != null)
+                        {
+                            _audio.Play(src, startFile, false);
+                        }
+
+                        nextState = GenericToolStart;
+                    }
+                    break;
+                }
+                case GenericToolStart:
+                {
+                    if (inUse)
+                    {
+                        if (! _audio.IsPlaying( src ) )
+                        {
+                            if (loopFile != null)
+                            {
+                                _audio.Play(src, loopFile, true);
+                            }
+
+                            nextState = GenericToolLoop;
+                        }
+                    }
+                    else
+                    {
+                        if (endFile != null)
+                        {
+                            _audio.Play(src, endFile, false);
+                        }
+
+                        nextState = GenericToolEnd;
+                    }
+                    break;
+                }
+                case GenericToolLoop:
+                {
+                    if (!(inUse))
+                    {
+                        if (endFile != null)
+                        {
+                            _audio.Play(src, endFile, false);
+                        }
+
+                        nextState = GenericToolEnd;
+                    }
+                    break;
+                }
+                case GenericToolEnd:
+                {
+                    if (!_audio.IsPlaying( src ))
+                    {
+                        nextState = GenericToolInactive;
+                    }
+                    else if (inUse)
+                    {
+                        if (startFile != null)
+                        {
+                            _audio.Play(src, startFile, false);
+                        }
+
+                        nextState = GenericToolStart;
+                    }
+                    break;
+                }
+            }
+
+            return nextState;
+        }
 
         /// <summary>
         /// Update audio effects
@@ -120,296 +301,221 @@ namespace Client
             _audio.UpdateListener(GraphicsManager.ActiveCamera.CameraPosition, GraphicsManager.ActiveCamera.CameraLookAt,
                 GraphicsManager.ActiveCamera.CameraUp);
 
-            for(int i = 0; i < _playerCount; i++)
+            for (int i = 0; i < _freeSourceAfterPlay.Count; i++)
             {
-
-                //moved = ! _playerPositions[i].Equals(_allPlayerRef[i].Transform.Position);
-                bool moved = _allPlayerRef[i].Moving;
-                if (moved)
+                if (!IsSourcePlaying(_freeSourceAfterPlay[i]))
                 {
-                    _audio.UpdateSourcePosition(_srcPlayerFootSteps[i], _allPlayerRef[i].Transform.Position);
-                    _audio.UpdateSourcePosition(_srcFlameThrowers[i], _allPlayerRef[i].Transform.Position);
-                    _audio.UpdateSourcePosition(_srcLeafBlowers[i], _allPlayerRef[i].Transform.Position);
-                }
-
-                bool throwerEquipped = _allPlayerRef[i].ToolEquipped == ToolType.THROWER;
-                bool blowerEquipped = _allPlayerRef[i].ToolEquipped == ToolType.BLOWER;
-                bool toolPrimaryInUse = _allPlayerRef[i].ActiveToolMode == ToolMode.PRIMARY;
-
-                // Control player footstep audio
-                switch (_playerFootstepStates[i])
-                {
-                    case PlayerFootstepState.Inactive:
-                    {
-                        if (moved)
-                        {
-                            _playerFootstepStates[i] = PlayerFootstepState.Loop;
-                            _audio.Play( _srcPlayerFootSteps[i], Constants.PlayerFootstep, true );
-                        }
-                        break;
-                    }
-                    case PlayerFootstepState.Loop:
-                    {
-                        if (!moved)
-                        {
-                            _playerFootstepStates[i] = PlayerFootstepState.Inactive;
-                            _audio.Stop( _srcPlayerFootSteps[i] );
-                        }
-                        break;
-                    }
-                }
-
-                // Control flamethrower audio
-                switch (_flameThrowerStates[i])
-                {
-                    case FlameThrowerState.Inactive:
-                    {
-                        if (throwerEquipped && toolPrimaryInUse)
-                        {
-                            _flameThrowerStates[i] = FlameThrowerState.Start;
-                            _audio.Play(_srcFlameThrowers[i], Constants.FlameThrowerStart, false);
-                        }
-                        break;
-                    }
-                    case FlameThrowerState.Start:
-                    {
-                        if (throwerEquipped && toolPrimaryInUse)
-                        {
-                            if (! _audio.IsPlaying( _srcFlameThrowers[i]) )
-                            {
-                                _audio.Play(_srcFlameThrowers[i], Constants.FlameThrowerLoop, true);
-                                _flameThrowerStates[i] = FlameThrowerState.Loop;
-                            }
-                        }
-                        else
-                        {
-                            _audio.Play(_srcFlameThrowers[i], Constants.FlameThrowerEnd, false);
-                            _flameThrowerStates[i] = FlameThrowerState.End;
-                        }
-                        break;
-                    }
-                    case FlameThrowerState.Loop:
-                    {
-                        if (!(throwerEquipped && toolPrimaryInUse))
-                        {
-                            _audio.Play(_srcFlameThrowers[i], Constants.FlameThrowerEnd, false);
-                            _flameThrowerStates[i] = FlameThrowerState.End;
-                        }
-                        break;
-                    }
-                    case FlameThrowerState.End:
-                    {
-                        if (!_audio.IsPlaying(_srcFlameThrowers[i]) )
-                        {
-                            _flameThrowerStates[i] = FlameThrowerState.Inactive;
-                        }
-                        else if (throwerEquipped && toolPrimaryInUse)
-                        {
-                            _audio.Play( _srcFlameThrowers[i], Constants.FlameThrowerStart, false);
-                            _flameThrowerStates[i] = FlameThrowerState.Start;
-                        }
-                        break;
-                    }
-                }
-                
-                // control leaf blower audio
-                switch (_leafBlowerStates[i])
-                {
-                    case LeafBlowerState.Inactive:
-                    {
-                        if (blowerEquipped && toolPrimaryInUse)
-                        {
-                            _leafBlowerStates[i] = LeafBlowerState.Start;
-                            _audio.Play(_srcLeafBlowers[i], Constants.LeafBlowerStart, false);
-                        }
-                        break;
-                    }
-                    case LeafBlowerState.Start:
-                    {
-                        if (blowerEquipped && toolPrimaryInUse)
-                        {
-                            if (!_audio.IsPlaying(_srcLeafBlowers[i]))
-                            {
-                                _audio.Play(_srcLeafBlowers[i], Constants.LeafBlowerLoop, true);
-                                _leafBlowerStates[i] = LeafBlowerState.Loop;
-                            }
-                        }
-                        else
-                        {
-                            _audio.Play(_srcLeafBlowers[i], Constants.LeafBlowerEnd, false);
-                            _leafBlowerStates[i] = LeafBlowerState.End;
-                        }
-                        break;
-                    }
-                    case LeafBlowerState.Loop:
-                    {
-                        if (!(blowerEquipped && toolPrimaryInUse))
-                        {
-                            _audio.Play(_srcLeafBlowers[i], Constants.LeafBlowerEnd, false);
-                            _leafBlowerStates[i] = LeafBlowerState.End;
-                        }
-                        break;
-                    }
-                    case LeafBlowerState.End:
-                    {
-                        if (!_audio.IsPlaying(_srcLeafBlowers[i]))
-                        {
-                            _leafBlowerStates[i] = LeafBlowerState.Inactive;
-                        }
-                        else if (blowerEquipped && toolPrimaryInUse)
-                        {
-                            _audio.Play(_srcLeafBlowers[i], Constants.LeafBlowerStart, false);
-                            _leafBlowerStates[i] = LeafBlowerState.Start;
-                        }
-                        break;
-                    }
+                    FreeSource( _freeSourcePoolAfterPlay[i], _freeSourceAfterPlay[i] );
+                    _freeSourceAfterPlay.RemoveAt(i);
+                    _freeSourcePoolAfterPlay.RemoveAt(i);
+                    i--;
                 }
             }
+
+//            for (int i = 0; i < _allLeafRef.Count; i++)
+//            {
+//                if (_allLeafRef[i] == null) continue;
+//                if (_leafSrcIndex[i] != -1)
+//                {
+//                    int leafIdx = _leafSrcIndex[i];
+//                    _audio.UpdateSourcePosition( _srcLeaves[leafIdx], _allLeafRef[i].Transform.Position);
+//
+//                    switch (_leafStates[leafIdx])
+//                    {
+//                        case LeafState.Ignite: 
+//                        {
+//                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
+//                            {
+//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurning, true);
+//                                _leafStates[leafIdx] = LeafState.Loop;
+//                            }
+//                            else if (_allLeafRef[i].Health < 0)
+//                            {
+//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurnup, false);
+//                                _leafStates[leafIdx] = LeafState.Burnup;
+//                            }
+//                            else if (!_allLeafRef[i].Burning)
+//                            {
+//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafPutoff, false);
+//                                _leafStates[leafIdx] = LeafState.Putoff;
+//                            }
+//                            break;
+//                        }
+//                        case LeafState.Loop:
+//                        {
+//                            if (_allLeafRef[i].Health < 0)
+//                            {
+//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurnup, false);
+//                                _leafStates[leafIdx] = LeafState.Burnup;
+//                            }
+//                            else if (!_allLeafRef[i].Burning)
+//                            {
+//                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafPutoff, false);
+//                                _leafStates[leafIdx] = LeafState.Putoff;
+//                            }
+//                            break;
+//                        }
+//                        case LeafState.Putoff:
+//                        {
+//                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
+//                            {
+//                                _leafSrcInUse[leafIdx] = false;
+//                                _leafSrcIndex[i] = -1;
+//                            }
+//                            break;
+//                        }
+//                        case LeafState.Burnup:
+//                        {
+//                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
+//                            {
+//                                _leafSrcInUse[leafIdx] = false;
+//                                _leafSrcIndex[i] = -1;
+//                                RemoveLeafSource(i);
+//                            }
+//
+//                            break;
+//                        }
+//                    }
+//
+//                }
+//
+//                // make a new source ignite
+//                else if (_allLeafRef[i].Burning)
+//                {
+//                    int leafidx = _leafSrcInUse.IndexOf(false);
+//                    if (leafidx < 0)
+//                    {
+//                        break;
+//                    }
+//                    _leafSrcIndex[i] = leafidx;
+//                    _leafSrcInUse[leafidx] = true;
+//
+//                    _audio.Play(_srcLeaves[leafidx], Constants.LeafIgniting, false);
+//                    _leafStates[leafidx] = LeafState.Ignite;
+//                }
+//            }
+        }
+
+        /// <summary>
+        /// Check if the source is playing
+        /// </summary>
+        /// <param name="src"> the source to be checked </param>
+        /// <returns> true if the source is playing something, false otherwise </returns>
+        public static bool IsSourcePlaying(int src)
+        {
+            return _audio.IsPlaying(src);
+        }
+
+        /// <summary>
+        /// Generate a new source to use
+        /// </summary>
+        /// <returns> the new source </returns>
+        public static int GetNewSource()
+        {
+            return _audio.GenSource();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="poolID"></param>
+        /// <param name="audioFile"></param>
+        /// <param name="loop"></param>
+        /// <returns> the source ID that is being used </returns>
+        public static int UseNextPoolSource(int poolID, string audioFile = null, bool loop = false)
+        {
+            return _allPools[poolID].UseNextPoolSource(audioFile, loop);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="poolID"></param>
+        /// <param name="src"></param>
+        /// <param name="audioFile"></param>
+        /// <param name="loop"></param>
+        public static void ReusePoolSource(int poolID, int src, string audioFile, bool loop)
+        {
+            _allPools[poolID].PlayThisSource(src, audioFile, loop);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="poolID"> The ID of the pool </param>
+        /// <param name="src"> The source to be freed </param>
+        public static void FreeSource(int poolID, int src)
+        {
+            _allPools[poolID].FreeSource(src);
+        }
+
+        /// <summary>
+        /// Create a new pool of audio sources
+        /// </summary>
+        /// <param name="capacity"> capacity of the audio source list to be used </param>
+        /// <returns> the ID of the new pool </returns>
+        public static int NewSourcePool(int capacity)
+        {
+            _allPools.Add(new AudioSourcePool(capacity, _audio));
             
-            for (int i = 0; i < _allLeafRef.Count; i++)
+            _countPools++;
+            return _countPools - 1;
+        }
+    }
+
+    public class AudioSourcePool
+    {
+        public List<int> Src;
+        public List<bool> Avail;
+        public Dictionary<int, int> SrcMap;
+        private AudioSystem _audio;
+
+        public AudioSourcePool(int capacity, AudioSystem audio)
+        {
+            Src = new List<int>();
+            Avail = new List<bool>();
+            SrcMap = new Dictionary<int, int>();
+
+            for (int i = 0; i < capacity; i++)
             {
-                if (_allLeafRef[i] == null) continue;
-                if (_leafSrcIndex[i] != -1)
-                {
-                    int leafIdx = _leafSrcIndex[i];
-                    _audio.UpdateSourcePosition( _srcLeaves[leafIdx], _allLeafRef[i].Transform.Position);
-
-                    switch (_leafStates[leafIdx])
-                    {
-                        case LeafState.Ignite: 
-                        {
-                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
-                            {
-                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurning, true);
-                                _leafStates[leafIdx] = LeafState.Loop;
-                            }
-                            else if (_allLeafRef[i].Health < 0)
-                            {
-                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurnup, false);
-                                _leafStates[leafIdx] = LeafState.Burnup;
-                            }
-                            else if (!_allLeafRef[i].Burning)
-                            {
-                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafPutoff, false);
-                                _leafStates[leafIdx] = LeafState.Putoff;
-                            }
-                            break;
-                        }
-                        case LeafState.Loop:
-                        {
-                            if (_allLeafRef[i].Health < 0)
-                            {
-                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafBurnup, false);
-                                _leafStates[leafIdx] = LeafState.Burnup;
-                            }
-                            else if (!_allLeafRef[i].Burning)
-                            {
-                                _audio.Play(_srcLeaves[leafIdx], Constants.LeafPutoff, false);
-                                _leafStates[leafIdx] = LeafState.Putoff;
-                            }
-                            break;
-                        }
-                        case LeafState.Putoff:
-                        {
-                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
-                            {
-                                _leafSrcInUse[leafIdx] = false;
-                                _leafSrcIndex[i] = -1;
-                            }
-                            break;
-                        }
-                        case LeafState.Burnup:
-                        {
-                            if (!_audio.IsPlaying(_srcLeaves[leafIdx]))
-                            {
-                                _leafSrcInUse[leafIdx] = false;
-                                _leafSrcIndex[i] = -1;
-                                RemoveLeafSource(i);
-                            }
-
-                            break;
-                        }
-                    }
-
-                }
-
-                // make a new source ignite
-                else if (_allLeafRef[i].Burning)
-                {
-                    int leafidx = _leafSrcInUse.IndexOf(false);
-                    if (leafidx < 0)
-                    {
-                        break;
-                    }
-                    _leafSrcIndex[i] = leafidx;
-                    _leafSrcInUse[leafidx] = true;
-
-                    _audio.Play(_srcLeaves[leafidx], Constants.LeafIgniting, false);
-                    _leafStates[leafidx] = LeafState.Ignite;
-                }
+                int src = audio.GenSource();
+                Src.Add(src);
+                Avail.Add(true);
+                SrcMap[src] = i;
             }
+
+            _audio = audio;
         }
 
-        /// <summary>
-        /// Add a new player 
-        /// </summary>
-        /// <param name="player"> player to be added </param>
-        public static void AddPlayerSource(PlayerClient player)
+        public void PlayThisSource(int src, string audioFile, bool loop)
         {
-            _playerCount++;
-            _allPlayerRef.Add( player );
-            _srcPlayerFootSteps.Add( _audio.GenSource() );
-            _srcLeafBlowers.Add( _audio.GenSource() );
-            _srcFlameThrowers.Add( _audio.GenSource() );
-            _playerFootstepStates.Add( PlayerFootstepState.Inactive );
-            _leafBlowerStates.Add( LeafBlowerState.Inactive );
-            _flameThrowerStates.Add( FlameThrowerState.Inactive );
+            int srcIndex = SrcMap[src];
+            Avail[srcIndex] = false;
 
-            Vector3 temp;
-            _playerPositions.Add( (temp = new Vector3()) );
-            temp.Copy(player.Transform.Position);
+            _audio.Play(src, audioFile, loop);
         }
 
-        /// <summary>
-        /// Add a new leaf source 
-        /// </summary>
-        /// <param name="leaf"> the leaf to be added </param>
-        public static void AddLeafSource(LeafClient leaf)
+        public int UseNextPoolSource(string audioFile, bool loop)
         {
-            _allLeafRef.Add(leaf);
-            _leafSrcIndex[_leafCount] = -1;
-            if (++_leafCount > MAX_LEAF_SOURCE) return;
+            int nextSrcIndex = Avail.IndexOf(true);
+            if (nextSrcIndex == -1) return -1;
 
-            _srcLeaves.Add( _audio.GenSource() );
-            _leafStates.Add( LeafState.Inactive );
-            _leafSrcInUse.Add( false );
-        }
+            int src = Src[nextSrcIndex];
+            Avail[nextSrcIndex] = false;
 
-        /// <summary>
-        /// Remove a leaf at the index 
-        /// </summary>
-        /// <param name="index"></param>
-        private static void RemoveLeafSource(int index)
-        {
-            // lazy remove
-            _allLeafRef[index] = null;
-        }
-
-        /// <summary>
-        /// Start or stop playing the BGM
-        /// </summary>
-        /// <param name="enableBGM"> indicate to start or stop the BGM</param>
-        public static void PlayBGM(bool enableBGM)
-        {
-            if (enableBGM)
+            if (audioFile != null)
             {
-                _audio.Play(_srcBgm, Constants.Bgm, true);
+                _audio.Play(src, audioFile, loop);
             }
-            else
-            {
-                _audio.Stop(_srcBgm);
-            }
+
+            return src;
         }
-        
+
+        public void FreeSource(int src)
+        {
+            int srcIndex = SrcMap[src];
+            Avail[srcIndex] = true;
+            _audio.Stop(src);
+        }
     }
 }

@@ -46,8 +46,8 @@ namespace Shared
 
         public const string LeafIgniting = @"../../Sound/collision.wav";
         public const string LeafBurning = @"../../Sound/burn.wav";
-        public const string LeafBurnup = @"../../Sound/collision.wav";
-        public const string LeafPutoff = @"../../Sound/collision.wav";
+        public const string LeafBurnup = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string LeafPutoff = @"../../Sound/Crash-Cymbal-1.wav";
 
         public const string PlayerFootstep = @"../../Sound/running.wav";
 

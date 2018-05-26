@@ -35,6 +35,8 @@ namespace Client
 
         // All leaves in the scene. 
         public List<LeafClient> leaves;
+        public int leafAudioPoolId;
+        public const int LeafAudioCapacity = 50;
 
         // The active camera in the scene.
         private Camera Camera => GraphicsManager.ActiveCamera;
@@ -66,6 +68,7 @@ namespace Client
             // Initialize graphics classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
+            AudioManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
@@ -78,7 +81,7 @@ namespace Client
             Client.gameTimer =
                 new UITimer(60, new Size(225, 3), new Point(0, 0));
             
-            AudioManager.Init();
+
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
@@ -142,6 +145,8 @@ namespace Client
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
 
+            leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
+
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
 
@@ -171,6 +176,11 @@ namespace Client
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in NetworkedGameObjects.AsEnumerable())
             {
                 NetworkedGameObjectClient gameObject = kv.Value;
+
+                if (gameObject is LeafClient leaf)
+                {
+                    leaf.UpdateAudio(leafAudioPoolId);
+                }
 
                 // Update with delta in seconds
                 gameObject.Update(delta);
@@ -379,8 +389,7 @@ namespace Client
                 NetworkedGameObjects.Remove(networkedObj.Id);
                 if (gameObj is LeafClient leaf)
                 {
-                    leaf.Health = -1;
-                    leaf.Burning = false;
+                    leaf.PlayDeathAudio(leafAudioPoolId);
                 }
             }
             else if (gameObj is NonNetworkedGameObjectClient nonNetObj)

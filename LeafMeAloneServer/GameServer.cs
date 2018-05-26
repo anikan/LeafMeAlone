@@ -378,5 +378,11 @@ namespace Server
             // Turn the game objects to a value list.
             return gameObjectDict.Values.ToList<GameObjectServer>();
         }
+
+        public Vector3 GetRandomSpawnPoint()
+        {
+            int index = new Random().Next(spawnPoints.Count);
+            return spawnPoints.ElementAt(index);
+        }
     }
 }

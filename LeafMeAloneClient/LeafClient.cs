@@ -49,5 +49,16 @@ namespace Client
             }
 
         }
+
+        public override void Update(float deltaTime)
+        {
+            base.Update(deltaTime);
+
+            if (Burning)
+            {
+                Console.WriteLine(Health);
+            }
+
+        }
     }
 }

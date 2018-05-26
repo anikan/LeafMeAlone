@@ -28,6 +28,7 @@ namespace Shared
         public bool IsInBounds(Vector3 position)
         {
 
+            // Is it in bounds? If so, return true.
             if (position.X > leftX && position.X < rightX && position.Z < upZ && position.Z > downZ)
             {
                 return true;
@@ -37,26 +38,38 @@ namespace Shared
 
         }
 
+        /// <summary>
+        /// Count all of the objects against all of the different sections, and update values.
+        /// </summary>
+        /// <param name="positions">Objects to check.</param>
         public void CountObjectsInBounds(List<GameObject> positions)
         {
 
+            // Set the number of leaves in this section to zero.
             numLeaves = 0;
 
+            // Iterate through all the passed in object positions.
             foreach (GameObject obj in positions)
             {
+                // Check if the position is in bounds.
                 if (IsInBounds(obj.Transform.Position))
                 {
+                    // Increase the number of leaves.
                     numLeaves++;
                 //    Console.WriteLine("Num objects is now " + numLeaves);
                 }
             }
         }
 
+        /// <summary>
+        /// Get this section as a string.
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
 
+            // Just print out the bounds.
             return string.Format("Left Bound: {0}, Right Bound: {1}, Up Bound: {2}, Low Bound: {3}", leftX, rightX, upZ, downZ);
-
 
         }
     }

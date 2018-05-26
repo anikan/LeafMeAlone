@@ -25,6 +25,8 @@ namespace Client
 
         private List<MapTile> MapTiles;
 
+        private Match activeMatch;
+
         /// <summary>
         /// Creates a new map with a map model.
         /// </summary>
@@ -32,32 +34,62 @@ namespace Client
         public MapClient() : base()
         {
 
+            // Random number generator, to be used for y offsets. 
             Random rnd = new Random();
+            activeMatch = Match.DefaultMatch;
 
             MapTiles = new List<MapTile>();
 
+            // Iterate through the height of tiles.
             for (float y = -(NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y < (NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y += TILE_HEIGHT - 0.2f)
             {
 
+                // Iterate through the width of tiles.
                 for (float x = -(NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x < (NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x +=TILE_WIDTH - 0.2f)
                 {
 
+                    //Create a new tile.
                     MapTile newTile = new MapTile();
 
+                    // Set the position of the tile
                     newTile.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT - 1.0f, y);
+
+                    // Scale the tile to the correct size.
                     newTile.Transform.Scale = new Vector3(TILE_WIDTH, 1.0f, TILE_HEIGHT);
 
+                    // Get a random offset.
                     float random = (float) rnd.NextDouble();
 
+                    // Apply the random offset to mitigate z fighting
                     float yOffset = (random * (0.1f - (-0.1f))) + (-0.1f);
 
-
+                    // Add the new tile to the tile list
                     MapTiles.Add(newTile);
 
                 }
             }
 
+            CreateDistinctTeamSections(activeMatch);
 
+        }
+
+        public void CreateDistinctTeamSections(Match currentMatch)
+        {
+
+            for (int i = 0; i < MapTiles.Count; i++)
+            {
+
+                for (int j = 0; j < currentMatch.teamSections.Count; j++)
+                {
+
+                    if (currentMatch.teamSections[j].IsInSquare(MapTiles[i].Transform.Position))
+                    {
+
+                        MapTiles[i].Transform.Position.Y += currentMatch.teamSections[j].sectionColor.X;
+
+                    }
+                }
+            }
         }
 
         public override void Update(float deltaTime)
@@ -68,7 +100,6 @@ namespace Client
             {
                 obj.Update(deltaTime);
             }
-
         }
 
         public override void Draw()
@@ -78,7 +109,6 @@ namespace Client
             {
                 obj.Draw();
             }
-
         }
     }
 }

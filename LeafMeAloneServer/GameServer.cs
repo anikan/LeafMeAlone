@@ -37,6 +37,8 @@ namespace Server
 
         private Random rnd;
 
+        private Match defaultMatch = Match.DefaultMatch;
+
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
         
@@ -68,7 +70,6 @@ namespace Server
 
             // Create the leaves for the game.
             CreateRandomLeaves(Constants.NUM_LEAVES);
-
             //CreateLeaves(100, -10, 10, -10, 10);
         }
 
@@ -157,6 +158,15 @@ namespace Server
 
             // Add the effects of the player tools.
             AddPlayerToolEffects();
+
+            defaultMatch.CountObjectsOnSides(GetLeafListAsObjects());
+            Console.WriteLine(defaultMatch);
+
+            if (playerServerList.Count > 0)
+            {
+           //     Console.WriteLine(playerServerList[0].Transform.Position);
+
+            }
 
         }
 
@@ -324,7 +334,6 @@ namespace Server
             // Send this object to the other object's.
             networkServer.SendNewObjectToAll(newLeaf);
 
-
         }
 
         /// <summary>
@@ -378,6 +387,25 @@ namespace Server
         {
             // Turn the game objects to a value list.
             return gameObjectDict.Values.ToList<GameObjectServer>();
+        }
+
+        public List<GameObject> GetLeafListAsObjects()
+        {
+
+            List<GameObjectServer> gameObjects = GetGameObjectList();
+            List<GameObject> leaves = new List<GameObject>();
+
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                
+                if (gameObjects[i] is LeafServer)
+                {
+                    leaves.Add(gameObjects[i]);
+                }
+
+            }
+
+            return leaves;
         }
     }
 }

@@ -48,9 +48,9 @@ namespace Client
             // What to do when creating a player
             void CreatePlayerAction(BasePacket p)
             {
-                PlayerClient player = (PlayerClient)client.CreateObjectFromPacket(((CreateObjectPacket)p));
-                player.team = ((CreatePlayerPacket)p).team;
-
+                CreatePlayerPacket toCreate = (CreatePlayerPacket)p;
+                PlayerClient player = (PlayerClient)client.CreateObjectFromPacket(toCreate.createPacket);
+                player.team = toCreate.team;
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()

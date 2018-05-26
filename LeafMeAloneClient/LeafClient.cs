@@ -19,16 +19,5 @@ namespace Client
         {
         
         }
-
-        public override void UpdateFromPacket(BasePacket packet )
-        {
-            ObjectPacket objPacket = packet as ObjectPacket;
-            // Set the initial positions of the object.
-            Transform.Position.X = objPacket.PositionX;
-            Transform.Position.Z = objPacket.PositionZ;
-            Transform.Rotation.Y = objPacket.Rotation;
-            // Set the initial burning status.
-            Burning = objPacket.Burning;
-        }
     }
 }

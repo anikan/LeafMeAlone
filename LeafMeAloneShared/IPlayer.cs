@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
+    public enum Team
+    {
+        RED,
+        BLUE
+    };
 
     /// <summary>
     /// Class for an actual player of the game.
@@ -18,8 +23,5 @@ namespace Shared
         ToolType ToolEquipped { get; set; }
 
         ToolMode ActiveToolMode { get; set; }
-
-        void UpdateFromPacket(PlayerPacket packet);
-
     }
 }

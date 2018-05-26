@@ -18,8 +18,6 @@ namespace Server
         // Radius of this object for basic n00b collisions.
         public float Radius = 1.0f;
 
-        private Stopwatch timer;
-
         /// <summary>
         /// Creates a new collider object.
         /// </summary>
@@ -29,7 +27,6 @@ namespace Server
         public ColliderObject(ObjectType objectType, float health, float radius) : base(objectType, health)
         {
             Radius = radius;
-            timer = new Stopwatch();
         }
 
         /// <summary>

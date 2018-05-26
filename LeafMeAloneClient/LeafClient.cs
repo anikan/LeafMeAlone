@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Client
@@ -17,30 +18,6 @@ namespace Client
             base(createPacket, Constants.LeafModel)
         {
         
-        }
-
-        /// <summary>
-        /// Update from a server packet.
-        /// </summary>
-        /// <param name="packet">Packet from the server.</param>
-        public void UpdateFromPacket(ObjectPacket packet)
-        {
-            // Set the initial positions of the object.
-            Transform.Position.X = packet.MovementX;
-            Transform.Position.Z = packet.MovementZ;
-            Transform.Rotation.Y = packet.Rotation;
-
-            // Set the initial burning status.
-            Burning = packet.Burning;
-        }
-
-        /// <summary>
-        /// Update this object from a server packet.
-        /// </summary>
-        /// <param name="packet">Packet from server.</param>
-        public override void UpdateFromPacket(Packet packet)
-        {
-            UpdateFromPacket(packet as ObjectPacket);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using Shared.Packet;
 using SlimDX;
 
 namespace Server
@@ -17,6 +18,7 @@ namespace Server
         public const float PLAYER_RADIUS = 3.0f;
         public const float PLAYER_SPEED = 25.0f;
 
+        public Team Team { get; set; }
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
 
@@ -25,11 +27,10 @@ namespace Server
 
         public Vector3 moveRequest;
 
-        public PlayerServer() : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
+        public PlayerServer(Team team) : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
         {
-
+            Team = team;
             ToolEquipped = ToolType.BLOWER;
-
         }
 
         /// <summary>
@@ -77,22 +78,20 @@ namespace Server
         /// Update the player based on a packet sent from the client.
         /// </summary>
         /// <param name="packet">Packet from client.</param>
-        public void UpdateFromPacket(PlayerPacket packet)
+        public void UpdateFromPacket(RequestPacket packet)
         {
             //Save movement request and normalize it so that we only move once per tick.
-            moveRequest = new Vector3(packet.MovementX, 0.0f, packet.MovementZ);
+            moveRequest = new Vector3(packet.DeltaX, 0.0f, packet.DeltaZ);
             moveRequest.Normalize();
 
-            Transform.Rotation.Y = packet.Rotation;
+            Transform.Rotation.Y = packet.DeltaRot;
 
-            if (packet.ToolEquipped != ToolType.SAME)
+            if (packet.ToolRequest != ToolType.SAME)
             {
-                ToolEquipped = packet.ToolEquipped;
-                Console.WriteLine(string.Format("Player {0} switching to {1}", Id, ToolEquipped.ToString()));
+                ToolEquipped = packet.ToolRequest;
             }
 
-            ActiveToolMode = packet.ActiveToolMode;
-
+            ActiveToolMode = packet.ToolMode;
         }
 
         /// <summary>

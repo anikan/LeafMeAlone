@@ -160,7 +160,7 @@ namespace Server
             AddPlayerToolEffects();
 
             defaultMatch.CountObjectsOnSides(GetLeafListAsObjects());
-            Console.WriteLine(defaultMatch);
+          //  Console.WriteLine(defaultMatch);
 
             if (playerServerList.Count > 0)
             {

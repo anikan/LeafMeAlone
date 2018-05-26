@@ -81,7 +81,7 @@ namespace Server
                 // If not actively being burned this frame, set burn frames to just 1.
                 else
                 {
-                    //
+                    // Set to 1.
                     burnFrames = 1;
                 }
 
@@ -90,6 +90,8 @@ namespace Server
 
                 // Decrease health by burn damage.
                 Health -= fireDamage * deltaTime * Math.Min(burnFrames * BURNING_RAMP_RATE, 10);
+
+//                Console.WriteLine("Health is " + Health);
 
                 // If health goes negative, destroy the object.
                 if (Health <= 0)

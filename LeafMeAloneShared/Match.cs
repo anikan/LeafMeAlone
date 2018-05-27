@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
 using Shared;
+using System.Diagnostics;
 
 namespace Shared
 {
@@ -41,8 +42,11 @@ namespace Shared
         // Sections of the map that belong to teams.
         public List<TeamSection> teamSections;
 
+        private Stopwatch matchTimer = new Stopwatch();
+
         // Area that doesn't belong to any teams.
         public TeamSection NoMansLand;
+        private int matchTime;
 
         public Match()
         {
@@ -119,6 +123,15 @@ namespace Shared
         }
 
         /// <summary>
+        /// Whether the current match is active or not
+        /// </summary>
+        /// <returns>Whether the match is running</returns>
+        public bool Started()
+        {
+            return matchTimer.IsRunning;
+        }
+
+        /// <summary>
         /// Count the objects in all sections, and store them.
         /// </summary>
         /// <param name="objects">Objects to count.</param>
@@ -164,14 +177,23 @@ namespace Shared
         /// <returns>The winning team or null on not game over.</returns>
         public Team GameOver()
         {
+            Team winningTeam = Team.NONE;
+
+            int maxLeaves = 0;
             foreach (TeamSection teamSection in teamSections)
             {
-                if (teamSection.numLeaves > Constants.WIN_LEAF_NUM)
+                if (teamSection.numLeaves > maxLeaves)
                 {
-                    return teamSection.team;
+                    maxLeaves = teamSection.numLeaves;
+                    winningTeam = teamSection.team;
                 }
-
             }
+
+            if (matchTimer.Elapsed.Seconds > matchTime || maxLeaves > Constants.WIN_LEAF_NUM)
+            {
+                return winningTeam;
+            }
+
             return Team.NONE;
         }
 
@@ -204,6 +226,16 @@ namespace Shared
             // Return the string.
             return returnString;
 
+        }
+
+        /// <summary>
+        /// Starts a match with a given timeout.
+        /// </summary>
+        /// <param name="matchTime">The timeout on the match</param>
+        public void StartMatch(int matchTime)
+        {
+            this.matchTime = matchTime;
+            matchTimer.Start();
         }
     }
 }

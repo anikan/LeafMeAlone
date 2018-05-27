@@ -36,13 +36,13 @@ namespace Shared
         /// Sounds/Audio files
         /// </summary>
         public const string Bgm = @"../../Sound/song.wav";
-        public const string FlameThrowerStart = @"../../Sound/collision.wav";
-        public const string FlameThrowerLoop = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string FlameThrowerEnd = @"../../Sound/collision.wav";
+        public const string FlameThrowerStart = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string FlameThrowerLoop = @"../../Sound/collision.wav";
+        public const string FlameThrowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
 
-        public const string LeafBlowerStart = @"../../Sound/collision.wav";
-        public const string LeafBlowerLoop = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string LeafBlowerEnd = @"../../Sound/collision.wav";
+        public const string LeafBlowerStart = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string LeafBlowerLoop = @"../../Sound/collision.wav";
+        public const string LeafBlowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
 
         public const string LeafIgniting = @"../../Sound/collision.wav";
         public const string LeafBurning = @"../../Sound/burn.wav";

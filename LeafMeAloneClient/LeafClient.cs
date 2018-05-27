@@ -27,64 +27,49 @@ namespace Client
     /// </summary>
     class LeafClient : NetworkedGameObjectClient
     {
-        private int _audioLeaf;
-        private LeafState _leafState;
-        private bool _isPlaying;
+        private int _srcBurning;
 
         public LeafClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.LeafModel)
         {
-            _audioLeaf = -1;
-            _leafState = LeafState.Inactive;
-            _isPlaying = false;
+            _srcBurning = -1;
         }
 
-        /// <summary>
-        /// Update the audio states, and play the sounds if necessary
-        /// </summary>
-        /// <param name="audioPoolID"> the pool to use </param>
-        public void UpdateAudio(int audioPoolID)
+        public override void UpdateFromPacket(BasePacket packet)
         {
-            if (_isPlaying)
+            bool prevBurning = Burning;
+            base.UpdateFromPacket(packet);
+            bool currBurning = Burning;
+
+            // start burning audio
+            if (!prevBurning && currBurning)
             {
-                _leafState = (LeafState) AudioManager.EvaluateBurningObjectAudio(Burning, false, _audioLeaf, (byte) _leafState, 
-                    Constants.LeafIgniting, Constants.LeafBurning, Constants.LeafBurnup, Constants.LeafPutoff);
-                if (_leafState == LeafState.Inactive)
+                _srcBurning = AudioManager.UseNextPoolSource(GameClient.instance.leafAudioPoolId);
+                if (_srcBurning != -1)
                 {
-                    AudioManager.FreeSource(audioPoolID, _audioLeaf);
-                    _isPlaying = false;
+                    AudioManager.StopAudio(_srcBurning);
+                    AudioManager.QueueAudioToSource(_srcBurning, Constants.LeafIgniting, false);
+                    AudioManager.QueueAudioToSource(_srcBurning, Constants.LeafBurning, true);
                 }
             }
-            else if (Burning)
+            // start putoff audio
+            else if (prevBurning && !currBurning && _srcBurning != -1)
             {
-                _audioLeaf = AudioManager.UseNextPoolSource(audioPoolID, Constants.LeafIgniting, false);
-                if (_audioLeaf != -1)
-                {
-                    _leafState = LeafState.Ignite;
-                    _isPlaying = true;
-                }
+                AudioManager.RemoveSourceQueue(_srcBurning);
+                AudioManager.PlayPoolSourceThenFree(GameClient.instance.leafAudioPoolId, _srcBurning, Constants.LeafPutoff);
+                _srcBurning = -1;
             }
         }
 
-        /// <summary>
-        /// Play the burnup audio, making sure to free the resouce afterwards
-        /// </summary>
-        /// <param name="audioPoolID"> the audio source pool to use </param>
-        public void PlayBurnupAudio(int audioPoolID)
+        public override void Destroy()
         {
-            if (!_isPlaying)
+            base.Destroy();
+            if (_srcBurning != -1)
             {
-                _audioLeaf = AudioManager.UseNextPoolSource(audioPoolID, null, false);
-                _isPlaying = _audioLeaf != -1;
-            }
-
-            _leafState = LeafState.Burnup;
-            if (_audioLeaf != -1)
-            {
-                AudioManager.PlayAudioThenFree(audioPoolID, _audioLeaf, Constants.LeafBurnup);
+                AudioManager.RemoveSourceQueue(_srcBurning);
+                AudioManager.PlayPoolSourceThenFree(GameClient.instance.leafAudioPoolId, _srcBurning, Constants.LeafBurnup);
+                _srcBurning = -1;
             }
         }
-
-
     }
 }

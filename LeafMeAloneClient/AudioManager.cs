@@ -15,28 +15,13 @@ namespace Client
     public static class AudioManager
     {
         private static AudioSystem _audio;
-        
         private static List<AudioSourcePool> _allPools;
-
         private static List<int> _freeSourceAfterPlay;
         private static List<int> _freeSourcePoolAfterPlay;
-
         private static int _countPools = 0;
         private static int _srcBgm;
-        
-        public const byte GenericToolStart = 1;
-        public const byte GenericToolLoop = 2;
-        public const byte GenericToolEnd = 3;
-        public const byte GenericToolInactive = 4;
-
-        public const byte GenericLoopOnlyActiveState = 1;
-        public const byte GenericLoopOnlyInactiveState = 2;
-
-        public const byte GenericBurningObjectIgnite = 1;
-        public const byte GenericBurningObjectLoop = 2;
-        public const byte GenericBurningObjectBurnup = 3;
-        public const byte GenericBurningObjectPutoff = 4;
-        public const byte GenericBurningObjectInactive = 5;
+        private static Dictionary<int, Queue<string>> _allQueueFiles;
+        private static Dictionary<int, Queue<bool>> _allQueueRepeats;
 
         /// <summary>
         /// Initialize fields
@@ -48,248 +33,86 @@ namespace Client
             _allPools = new List<AudioSourcePool>();
             _freeSourcePoolAfterPlay = new List<int>();
             _freeSourceAfterPlay = new List<int>();
+            _allQueueFiles = new Dictionary<int, Queue<string>>();
+            _allQueueRepeats = new Dictionary<int, Queue<bool>>();
         }
 
         private const int MAX_FRAME_PER_UDPATE = 15;
 
+
         /// <summary>
-        /// Play an audio from a pool then free that source automatically
+        /// Check if the source is playing
         /// </summary>
-        /// <param name="poolId"> the ID of the pool </param>
-        /// <param name="src"> the source to play </param>
-        /// <param name="fileName"> the filename of the audio to play </param>
-        public static void PlayAudioThenFree(int poolId, int src, string fileName)
+        /// <param name="src"> the source to be checked </param>
+        /// <returns> true if the source is playing something, false otherwise </returns>
+        public static bool IsSourcePlaying(int src)
         {
-            ReusePoolSource(poolId, src, fileName, false);
-            _freeSourceAfterPlay.Add(src);
-            _freeSourcePoolAfterPlay.Add(poolId);
+            return _audio.IsPlaying(src);
         }
 
         /// <summary>
-        /// Used for evaluating burning object audio logic
+        /// Generate a new source to use
         /// </summary>
-        /// <param name="burning"> whether or not the object is burning </param>
-        /// <param name="burnup"> whether or not the object is burned up </param>
-        /// <param name="src"> the audio source to play the sound </param>
-        /// <param name="currentState"> the current state of the object </param>
-        /// <param name="igniteFile"> the audio file for ignition </param>
-        /// <param name="loopFile"> the audio file for looping/burning </param>
-        /// <param name="burnupFile"> the audio file for burned up </param>
-        /// <param name="putoffFile"> the audio file for putting off </param>
-        /// <returns> the next state </returns>
-        public static byte EvaluateBurningObjectAudio(bool burning, bool burnup, int src, byte currentState, 
-            string igniteFile, string loopFile, string burnupFile, string putoffFile)
+        /// <returns> the new source </returns>
+        public static int GetNewSource()
         {
-            byte nextState = currentState;
-            switch (currentState)
-            {
-                case GenericBurningObjectInactive:
-                {
-                    break;
-                }
-                case GenericBurningObjectIgnite: 
-                {
-                    if (!_audio.IsPlaying(src) )
-                    {
-                        if (loopFile != null)
-                        {
-                            _audio.Play(src, loopFile, true);
-                        }
-
-                        nextState = GenericBurningObjectLoop;
-                    }
-                    else if (burnup)
-                    {
-                        if (burnupFile != null)
-                        {
-                            _audio.Play(src, burnupFile, false);
-                        }
-
-                        nextState = GenericBurningObjectBurnup;
-                    }
-                    else if (!burning)
-                    {
-                        if (putoffFile != null)
-                        {
-                            _audio.Play(src, putoffFile, false);
-                        }
-
-                        nextState = GenericBurningObjectPutoff;
-                    }
-                    break;
-                }
-                case GenericBurningObjectLoop:
-                {
-                    if (burnup)
-                    {
-                        if (burnupFile != null)
-                        {
-                            _audio.Play(src, burnupFile, false);
-                        }
-
-                        nextState = GenericBurningObjectBurnup;
-                    }
-                    else if (!burning)
-                    {
-                        if (putoffFile != null)
-                        {
-                            _audio.Play(src, putoffFile, false);
-                        }
-
-                        nextState = GenericBurningObjectPutoff;
-                    }
-                    break;
-                }
-                case GenericBurningObjectPutoff:
-                {
-                    if (!_audio.IsPlaying(src))
-                    {
-                        nextState = GenericBurningObjectInactive;
-                    }
-                    break;
-                }
-                case GenericBurningObjectBurnup:
-                {
-                    if (!_audio.IsPlaying(src))
-                    {
-                        nextState = GenericBurningObjectBurnup;
-                    }
-            
-                    break;
-                }
-            }
-
-            return nextState;
-        }
-
-
-        /// <summary>
-        /// Used for evaluating looping audio logic
-        /// </summary>
-        /// <param name="looping"> Whether or not the looping music should be played </param>
-        /// <param name="src"> The source to play the looping music </param>
-        /// <param name="currentState"> The current state of the audio logic </param>
-        /// <param name="loopFile"> The looping audio filed to be played; null if not needed </param>
-        /// <returns> the next state </returns>
-        public static byte EvaluateLoopOnlyAudio(bool looping, int src, byte currentState, string loopFile)
-        {
-            byte nextState = currentState;
-            switch (currentState)
-            {
-                case GenericLoopOnlyInactiveState:
-                {
-                    if (looping)
-                    {
-                        nextState = GenericLoopOnlyActiveState;
-                        if (loopFile != null)
-                        {
-                            _audio.Play(src, loopFile, true);
-                        }
-                    }
-                    break;
-                }
-                case GenericLoopOnlyActiveState:
-                {
-                    if (!looping)
-                    {
-                        nextState = GenericLoopOnlyInactiveState;
-                        _audio.Stop( src );
-                    }
-                    break;
-                }
-            }
-
-            return nextState;
+            return _audio.GenSource();
         }
 
         /// <summary>
-        /// Used for evaluating tool audio, and playing them
+        /// Start playing some audio file
         /// </summary>
-        /// <param name="inUse"> whether the tool is being used or not </param>
-        /// <param name="src"> the audio source that is generated and stored </param>
-        /// <param name="currentState"> the current state </param>
-        /// <param name="startFile"> the audio file of the start sequence; null if no audio is to be played </param>
-        /// <param name="loopFile"> the audio file of the loop sequence; null if no audio is to be played </param>
-        /// <param name="endFile"> the audio file of the end sequence; null if no audio is to be played </param>
-        /// <returns> the evaluated state </returns>
-        /// <side_effect> audio file will be played accordingly </side_effect>
-        public static byte EvaluateToolAudio(bool inUse, int src, byte currentState, string startFile, string loopFile, string endFile)
+        /// <param name="source"> the source used for playing the clip </param>
+        /// <param name="fileName"> filepath to the clip </param>
+        /// <param name="repeat"> the audio should be repeated forever or not </param>
+        public static void PlayAudio(int source, string fileName, bool repeat = false)
         {
-            byte nextState = currentState;
+            _audio.Play(source, fileName, repeat);
+        }
 
-            switch (currentState)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"> the source used for playing the clip </param>
+        /// <param name="fileName"> the path to the clip to be queued </param>
+        /// <param name="repeat"> whether or not it should be repeated </param>
+        public static void QueueAudioToSource(int source, string fileName, bool repeat = false)
+        {
+            if (!_allQueueFiles.ContainsKey(source))
             {
-                case GenericToolInactive:
-                {
-                    if (inUse)
-                    {
-                        if (startFile != null)
-                        {
-                            _audio.Play(src, startFile, false);
-                        }
+                _allQueueFiles[source] = new Queue<string>();
+                _allQueueRepeats[source] = new Queue<bool>();
+            }
+            _allQueueFiles[source].Enqueue(fileName);
+            _allQueueRepeats[source].Enqueue(repeat);
+        }
 
-                        nextState = GenericToolStart;
-                    }
-                    break;
-                }
-                case GenericToolStart:
-                {
-                    if (inUse)
-                    {
-                        if (! _audio.IsPlaying( src ) )
-                        {
-                            if (loopFile != null)
-                            {
-                                _audio.Play(src, loopFile, true);
-                            }
-
-                            nextState = GenericToolLoop;
-                        }
-                    }
-                    else
-                    {
-                        if (endFile != null)
-                        {
-                            _audio.Play(src, endFile, false);
-                        }
-
-                        nextState = GenericToolEnd;
-                    }
-                    break;
-                }
-                case GenericToolLoop:
-                {
-                    if (!(inUse))
-                    {
-                        if (endFile != null)
-                        {
-                            _audio.Play(src, endFile, false);
-                        }
-
-                        nextState = GenericToolEnd;
-                    }
-                    break;
-                }
-                case GenericToolEnd:
-                {
-                    if (!_audio.IsPlaying( src ))
-                    {
-                        nextState = GenericToolInactive;
-                    }
-                    else if (inUse)
-                    {
-                        if (startFile != null)
-                        {
-                            _audio.Play(src, startFile, false);
-                        }
-
-                        nextState = GenericToolStart;
-                    }
-                    break;
-                }
+        /// <summary>
+        /// Remove the queue associated to this source
+        /// </summary>
+        /// <param name="source"> the source whose queue is to be removed </param>
+        /// <param name="stopPlaying"> whether or not to stop playing the source </param>
+        public static void RemoveSourceQueue(int source, bool stopPlaying = true)
+        {
+            if (stopPlaying)
+            {
+                _audio.Stop(source);
             }
 
-            return nextState;
+            if (_allQueueFiles.ContainsKey(source))
+            {
+                _allQueueFiles.Remove(source);
+                _allQueueRepeats.Remove(source);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        public static void StopAudio(int source)
+        {
+            _audio.Stop(source);
         }
 
         /// <summary>
@@ -312,25 +135,23 @@ namespace Client
                     i--;
                 }
             }
-        }
 
-        /// <summary>
-        /// Check if the source is playing
-        /// </summary>
-        /// <param name="src"> the source to be checked </param>
-        /// <returns> true if the source is playing something, false otherwise </returns>
-        public static bool IsSourcePlaying(int src)
-        {
-            return _audio.IsPlaying(src);
-        }
+            // Play all queues if needed
+            foreach (var queue in _allQueueFiles)
+            {
+                // quit if queue is empty
+                if (queue.Value.Count == 0) continue;
+                
+                // quit if still playing
+                if (IsSourcePlaying(queue.Key)) continue;
 
-        /// <summary>
-        /// Generate a new source to use
-        /// </summary>
-        /// <returns> the new source </returns>
-        public static int GetNewSource()
-        {
-            return _audio.GenSource();
+                int src = queue.Key;
+                string fileName = queue.Value.Dequeue();
+                bool repeat = _allQueueRepeats[src].Dequeue();
+
+                PlayAudio(src, fileName, repeat);
+            }
+            
         }
 
         /// <summary>
@@ -378,6 +199,19 @@ namespace Client
             
             _countPools++;
             return _countPools - 1;
+        }
+
+        /// <summary>
+        /// Play an audio from a pool then free that source automatically
+        /// </summary>
+        /// <param name="poolId"> the ID of the pool </param>
+        /// <param name="src"> the source to play </param>
+        /// <param name="fileName"> the filename of the audio to play </param>
+        public static void PlayPoolSourceThenFree(int poolId, int src, string fileName)
+        {
+            ReusePoolSource(poolId, src, fileName, false);
+            _freeSourceAfterPlay.Add(src);
+            _freeSourcePoolAfterPlay.Add(poolId);
         }
     }
 

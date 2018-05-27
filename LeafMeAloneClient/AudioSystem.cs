@@ -170,6 +170,51 @@ namespace Client
             AL.SourcePlay(soundSource);
         }
 
+        /// <summary>
+        /// Queue a buffer to the sound
+        /// </summary>
+        /// <param name="soundSource"> </param>
+        /// <param name="fileName"> </param>
+        public void QueneBufferToSource(int soundSource, string fileName, bool repeat = false)
+        {
+            // find the buffer
+            int buffer = -1;
+            if (!_audioBuffers.ContainsKey(fileName))
+            {
+                GenBuffer(fileName);
+                if (!_audioBuffers.ContainsKey(fileName))
+                {
+                    Console.WriteLine("Invalid Audio File: " + fileName);
+                    return;
+                }
+
+                buffer = _audioBuffers[fileName];
+            }
+            else
+            {
+                buffer = _audioBuffers[fileName];
+            }
+
+            // specify if the sound is repeating
+            AL.Source(soundSource, ALSourceb.Looping, repeat);
+
+            AL.SourceQueueBuffer(soundSource, buffer);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="soundSource"></param>
+        public void PlayQueue(int soundSource)
+        {
+            AL.SourcePlay(soundSource);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="soundSource"></param>
+        /// <param name="fileName"></param>
         public void BindBufferToSource(int soundSource, string fileName)
         {
             // find the buffer

@@ -44,6 +44,7 @@ namespace Client
             Transform.Position.X = objPacket.PositionX;
             Transform.Position.Z = objPacket.PositionZ;
             Transform.Rotation.Y = objPacket.Rotation;
+
             // Set the initial burning status.
             Burning = objPacket.Burning;
             var oldHealth = Health;

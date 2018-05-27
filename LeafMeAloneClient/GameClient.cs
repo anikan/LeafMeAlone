@@ -187,10 +187,10 @@ namespace Client
             {
                 NetworkedGameObjectClient gameObject = kv.Value;
 
-                if (gameObject is LeafClient leaf)
-                {
-                    leaf.UpdateAudio(leafAudioPoolId);
-                }
+//                if (gameObject is LeafClient leaf)
+//                {
+//                    leaf.UpdateAudio(leafAudioPoolId);
+//                }
 
                 // Update with delta in seconds
                 gameObject.Update(delta);
@@ -371,11 +371,11 @@ namespace Client
             if (gameObj is NetworkedGameObjectClient networkedObj)
             {
                 NetworkedGameObjects.Remove(networkedObj.Id);
-                if (gameObj is LeafClient leaf)
-                {
-                    // play the death audio sound
-                    leaf.PlayBurnupAudio(leafAudioPoolId);
-                }
+//                if (gameObj is LeafClient leaf)
+//                {
+//                    // play the death audio sound
+//                    leaf.PlayBurnupAudio(leafAudioPoolId);
+//                }
             }
             else if (gameObj is NonNetworkedGameObjectClient nonNetObj)
             {

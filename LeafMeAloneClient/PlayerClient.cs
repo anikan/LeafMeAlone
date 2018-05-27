@@ -9,37 +9,37 @@ using Shared.Packet;
 
 namespace Client
 {
-    /// <summary>
-    /// For controlling the flamethrower source
-    /// </summary>
-    public enum FlameThrowerState : Byte
-    {
-        Start = 1,
-        Loop = 2,
-        End = 3,
-        Inactive = 4
-    }
-
-    /// <summary>
-    /// For controlling the windblower source
-    /// </summary>
-    public enum LeafBlowerState
-    {
-        Start = 1,
-        Loop = 2,
-        End = 3,
-        Inactive = 4
-    }
-
-
-    /// <summary>
-    /// For controlling player footstep sound
-    /// </summary>
-    public enum WalkingState
-    {
-        Loop = 1,
-        Inactive = 2
-    }
+//    /// <summary>
+//    /// For controlling the flamethrower source
+//    /// </summary>
+//    public enum FlameThrowerState : Byte
+//    {
+//        Start = 1,
+//        Loop = 2,
+//        End = 3,
+//        Inactive = 4
+//    }
+//
+//    /// <summary>
+//    /// For controlling the windblower source
+//    /// </summary>
+//    public enum LeafBlowerState
+//    {
+//        Start = 1,
+//        Loop = 2,
+//        End = 3,
+//        Inactive = 4
+//    }
+//
+//
+//    /// <summary>
+//    /// For controlling player footstep sound
+//    /// </summary>
+//    public enum WalkingState
+//    {
+//        Loop = 1,
+//        Inactive = 2
+//    }
 
     public class PlayerClient : NetworkedGameObjectClient, IPlayer
     {
@@ -68,10 +68,7 @@ namespace Client
         private ParticleSystem FlameThrower,LeafBlower;
 
         // For the audio control
-        private int _audioFootstep, _audioFlame, _audioLeaf;
-        private FlameThrowerState _throwerState;
-        private LeafBlowerState _blowerState;
-        private WalkingState _footstepState;
+        private int _audioFootstep, _audioFlame, _audioWind;
 
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, Constants.PlayerModel)
@@ -83,11 +80,7 @@ namespace Client
 
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
-            _audioLeaf = AudioManager.GetNewSource();
-
-            _throwerState = FlameThrowerState.Inactive;
-            _blowerState = LeafBlowerState.Inactive;
-            _footstepState = WalkingState.Inactive;
+            _audioWind = AudioManager.GetNewSource();
         }
 
         public Team team { get; set; }
@@ -259,11 +252,62 @@ namespace Client
         /// <param name="packet">The packet to update from.</param>
         private void UpdateFromPacket(PlayerPacket packet)
         {
+            bool prevMoving = Moving;
+            bool prevUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
+            bool prevUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
+
             base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
+            
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;
+
+            bool currMoving = Moving;
+            bool currUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
+            bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
+
+            // footstep audio logic
+            // if start moving
+            if (!prevMoving && currMoving)
+            {
+                AudioManager.PlayAudio(_audioFootstep, Constants.PlayerFootstep, true);
+            }
+            // if stop moving
+            else if (prevMoving && !currMoving)
+            {
+                AudioManager.StopAudio(_audioFootstep);
+            }
+
+            // flamethrower audio logic
+            // if start using flame now
+            if (!prevUsingFlame && currUsingFlame)
+            {
+                AudioManager.StopAudio(_audioFlame);
+                AudioManager.QueueAudioToSource(_audioFlame, Constants.FlameThrowerStart, false);
+                AudioManager.QueueAudioToSource(_audioFlame, Constants.FlameThrowerLoop, true);
+            }
+            // if stop using flame now
+            else if (prevUsingFlame && !currUsingFlame)
+            {
+                AudioManager.RemoveSourceQueue(_audioFlame);
+                AudioManager.PlayAudio(_audioFlame, Constants.FlameThrowerEnd, false);
+            }
+
+            // windblower audio logic
+            // if start using wind now
+            if (!prevUsingWind && currUsingWind)
+            {
+                AudioManager.StopAudio(_audioWind);
+                AudioManager.QueueAudioToSource(_audioWind, Constants.LeafBlowerStart, false);
+                AudioManager.QueueAudioToSource(_audioWind, Constants.LeafBlowerLoop, true);
+            }
+            // if stop using wind now
+            else if (prevUsingWind && !currUsingWind)
+            {
+                AudioManager.RemoveSourceQueue(_audioWind);
+                AudioManager.PlayAudio(_audioWind, Constants.LeafBlowerEnd, false);
+            }
 
             switch (ActiveToolMode)
             {
@@ -312,21 +356,6 @@ namespace Client
             LeafBlower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             LeafBlower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             LeafBlower.Update(deltaTime);
-
-            _throwerState = (FlameThrowerState) AudioManager.EvaluateToolAudio(
-                ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY,     // flamethrower in use?
-                _audioFlame,                                                                // src that is generated by audiomanager
-                (byte) _throwerState,                                                       // current thrower state
-                Constants.FlameThrowerStart, Constants.FlameThrowerLoop, Constants.FlameThrowerEnd); // files to be played
-
-            _blowerState = (LeafBlowerState) AudioManager.EvaluateToolAudio(
-                ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY,      // leafblower in use?
-                _audioLeaf,                                                                 // src that is generated by audiomanager
-                (byte) _blowerState,                                                        // current blower state
-                Constants.LeafBlowerStart, Constants.LeafBlowerLoop, Constants.LeafBlowerEnd ); // files to be played
-
-            _footstepState = (WalkingState) AudioManager.EvaluateLoopOnlyAudio(Moving, _audioFootstep,
-                (byte) _footstepState, Constants.PlayerFootstep);
 
         }
 

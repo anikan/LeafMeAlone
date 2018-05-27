@@ -54,5 +54,7 @@ namespace Shared
         public const float TREE_FREQUENCY = 0.01f;
 
         public const bool PIVOT_DEBUG = false;
+
+        public const int DEATH_TIME = 3;
     }
 }

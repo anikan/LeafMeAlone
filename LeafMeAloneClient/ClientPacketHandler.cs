@@ -26,40 +26,62 @@ namespace Client
             this.client = client;
 
             // What to do during an update
-            void UpdateAction(BasePacket p)
+            void UpdateObjectAction(ObjectPacket p)
             {
-                NetworkedGameObjectClient packetObject = client.GetObjectFromPacket((IIdentifiable)p);
+                NetworkedGameObjectClient packetObject = client.GetObjectFromPacket(p);
                 packetObject.UpdateFromPacket(p);
             }
 
-            // What to do during a destroy
-            void DestroyAction(BasePacket p)
+            // what to do during an update to the playerpacket 
+            void UpdatePlayerAction(PlayerPacket p)
             {
-                NetworkedGameObjectClient packetObject = client.GetObjectFromPacket((IIdentifiable)p);
+                PlayerClient player = (PlayerClient)client.GetObjectFromPacket(p);
+                if (client.GetActivePlayer() == player && p.Dead)
+                {
+                    client.DoPlayerDeath();
+                }
+                player.UpdateFromPacket(p);
+            }
+
+            // What to do during a destroy
+            void DestroyAction(DestroyObjectPacket p)
+            {
+                NetworkedGameObjectClient packetObject = client.GetObjectFromPacket(p);
                 packetObject.Destroy();
             }
 
             // What to do when creating an object
-            void CreateObjectAction(BasePacket p)
+            GameObject CreateObjectAction(CreateObjectPacket p)
             {
-                client.CreateObjectFromPacket(((CreateObjectPacket)p));
+                return client.CreateObjectFromPacket(p);
             }
 
             // What to do when creating a player
-            void CreatePlayerAction(BasePacket p)
+            void CreatePlayerAction(CreatePlayerPacket p)
             {
-                CreatePlayerPacket toCreate = (CreatePlayerPacket)p;
-                PlayerClient player = (PlayerClient)client.CreateObjectFromPacket(toCreate.createPacket);
-                player.team = toCreate.team;
+                PlayerClient player = (PlayerClient)CreateObjectAction(p.createPacket);
+                player.team = p.team;
+            }
+
+            // What to do on game finish
+            void GameResultAction(ThePacketToEndAllPackets p)
+            {
+                if (client.GetPlayerTeam() == p.winningTeam)
+                {
+                    throw new Exception("YOU WIN!");
+                }
+
+                throw new Exception("YOU LOSE!");
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
                 {
-                    {PacketType.CreatePlayerPacket, CreatePlayerAction },
-                    {PacketType.CreateObjectPacket, CreateObjectAction },
-                    {PacketType.ObjectPacket, UpdateAction },
-                    {PacketType.PlayerPacket, UpdateAction },
-                    {PacketType.DestroyObjectPacket, DestroyAction},
+                    {PacketType.CreatePlayerPacket, (p) => CreatePlayerAction((CreatePlayerPacket) p)},
+                    {PacketType.CreateObjectPacket, (p) => CreateObjectAction((CreateObjectPacket) p) },
+                    {PacketType.ObjectPacket, (p) => UpdateObjectAction((ObjectPacket) p) },
+                    {PacketType.PlayerPacket, (p) => UpdatePlayerAction((PlayerPacket) p) },
+                    {PacketType.DestroyObjectPacket, (p) => DestroyAction((DestroyObjectPacket) p)},
+                    {PacketType.GameResultPacket, (p) => GameResultAction((ThePacketToEndAllPackets) p)},
                 };
         }
 

@@ -17,12 +17,13 @@ namespace Client
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 
+        // Whether the model is drawn
+        public bool Enabled = true;
+        
         public Vector3 Tint = new Vector3(1, 1, 1);
 
         // public float burningGeoColor;
-
         // public bool burningGeoColorEnabled;
-
         // active geometry and shader in use
         private Geometry m_ActiveGeo;
         private Shader m_ActiveShader;
@@ -136,20 +137,23 @@ namespace Client
         /// </summary>
         public void Draw()
         {
-            m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+            if (Enabled) {
+                m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+                if (CurrentAnimationIndex != -1)
+                {
+                    if (CurrentAnimationIndex != -1)
+                    {
+                        m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
+                        m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
+                        m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
+                        m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+                        m_ActiveGeo.UpdateAnimation();
+                    }
 
-
-            if (CurrentAnimationIndex != -1)
-            {
-                m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
-                m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
-                m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
-                m_ActiveGeo.RepeatAnimation = RepeatAnimation;
-                m_ActiveGeo.UpdateAnimation();
+                    m_ActiveShader.UseShader();
+                    m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                }
             }
-
-            m_ActiveShader.UseShader();
-            m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
         }
 
         /// <summary>

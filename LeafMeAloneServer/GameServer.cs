@@ -389,6 +389,12 @@ namespace Server
             return gameObjectDict.Values.ToList<GameObjectServer>();
         }
 
+        public Vector3 GetRandomSpawnPoint()
+        {
+            int index = new Random().Next(spawnPoints.Count);
+            return spawnPoints.ElementAt(index);
+        }
+      
         public List<GameObject> GetLeafListAsObjects()
         {
 

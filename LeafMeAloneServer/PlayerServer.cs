@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace Server
     {
 
         // Constant values of the player.
-        public const float PLAYER_HEALTH = 100.0f;
+        public const float PLAYER_HEALTH = 10.0f;
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 3.0f;
         public const float PLAYER_SPEED = 25.0f;
@@ -26,6 +27,8 @@ namespace Server
         public ToolMode ActiveToolMode { get; set; }
 
         public Vector3 moveRequest;
+
+        private Stopwatch deathClock = new Stopwatch();
 
         public PlayerServer(Team team) : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
         {
@@ -40,14 +43,26 @@ namespace Server
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
+            // Move the player in accordance with requests
             Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
 
+            Console.WriteLine(String.Format("Burning: {0}, Health: {1}", Burning, Health));
+            // if health is down, start the players death clock
+            if (Health < 0 && !Dead )
+            {
+                Dead = true;
+                Burning = false;
+                Health = PLAYER_HEALTH;
+                deathClock.Start();
+            // Once health is up, reset te death clock and player position
+            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME) {
+                deathClock.Reset();
+                newPlayerPos = GameServer.instance.GetRandomSpawnPoint();
+                Dead = false;
+            }
 
             TryMoveObject(newPlayerPos);
-
-            //  Console.WriteLine("Tool equipped is " + ToolEquipped.ToString() + " and mode is " + ActiveToolMode.ToString());
-
         }
 
         /// <summary>
@@ -92,6 +107,11 @@ namespace Server
             }
 
             ActiveToolMode = packet.ToolMode;
+
+            if (Dead)
+            {
+                ActiveToolMode = ToolMode.NONE;
+            }
         }
 
         /// <summary>
@@ -103,7 +123,10 @@ namespace Server
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
             base.HitByTool(playerPosition, toolType, toolMode);
-            // TODO
+        }
+
+        public override void Destroy()
+        {
         }
     }
 }

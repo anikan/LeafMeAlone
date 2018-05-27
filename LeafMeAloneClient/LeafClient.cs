@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using Shared;
 using Shared.Packet;
 using SlimDX;
@@ -16,8 +17,6 @@ namespace Client
     {
         public LeafClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.LeafModel)
-        {
-        
-        }
+        { }
     }
 }

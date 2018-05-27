@@ -14,7 +14,7 @@ namespace Server
     public class LeafServer : PhysicsObject
     {
         // Constants for leafs. 
-        public const float LEAF_HEALTH = 5.0f;
+        public const float LEAF_HEALTH = 10.0f;
         public const float LEAF_MASS = 0.1f;
         public const float LEAF_RADIUS = 0.0f;
         public const float LEAF_BOUNCIENESS = 3.0f;

@@ -18,7 +18,8 @@ namespace Shared
         CreatePlayerPacket,
         ObjectPacket,
         IdPacket,
-        RequestPacket
+        RequestPacket,
+        GameResultPacket
     }
 
     public static class PacketUtil

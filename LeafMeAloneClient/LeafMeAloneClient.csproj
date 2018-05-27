@@ -109,7 +109,7 @@
     <Compile Include="ClientBone.cs" />
     <Compile Include="ClientMaterial.cs" />
     <Compile Include="ClientMesh.cs" />
-    <Compile Include="UIFramesPersecond.cs" />
+    <Compile Include="UI\UIFramesPersecond.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="GraphicGameObject.cs" />
     <Compile Include="LeafClient.cs" />
@@ -129,8 +129,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClientPacketFactory.cs" />
     <Compile Include="Shader.cs" />
-    <Compile Include="UIManager.cs" />
-    <Compile Include="UITimer.cs" />
+    <Compile Include="UI\UIGameWLState.cs" />
+    <Compile Include="UI\UIManager.cs" />
+    <Compile Include="UI\UITeams.cs" />
+    <Compile Include="UI\UITimer.cs" />
     <Compile Include="VertexBoneData.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

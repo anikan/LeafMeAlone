@@ -179,6 +179,8 @@ namespace Client
             DeviceContext.Rasterizer.SetViewports(Viewport);
 
             Form.Resize += FormOnResize;
+            Form.KeyDown += FormOnKeyDown;
+            Form.MouseClick += FormOnMouseClick;
 
             ProjectionMatrix = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Viewport.Width / Viewport.Height, .1f, 1000.0f);
 
@@ -197,6 +199,16 @@ namespace Client
 
             BarContext = new Context(Tw.GraphicsAPI.D3D11, Device.ComPointer);
             BarContext.HandleResize(Form.ClientSize);
+        }
+
+        private static void FormOnMouseClick(object sender, MouseEventArgs e)
+        {
+           // BarContext.HandleMouseClick()
+        }
+
+        private static void FormOnKeyDown(object sender, KeyEventArgs e)
+        {
+
         }
 
         /// <summary>

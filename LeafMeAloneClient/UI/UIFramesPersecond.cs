@@ -30,6 +30,7 @@ namespace Client
                 Precision = 2,
                 Value = 0
             };
+            UIManager.ActiveUI["FPS"].Color = Color.Black;
         }
 
         public void Start()

@@ -9,6 +9,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using System.Net;
+using Client.UI;
 using Shared.Packet;
 
 namespace Client
@@ -47,6 +48,8 @@ namespace Client
         public Stopwatch FrameTimer;
         private UIFramesPersecond fps;
         private UITimer gameTimer;
+        private UITeams Teams;
+        private UIGameWLState GameWinLossState;
 
         private NetworkClient networkClient;
 
@@ -77,10 +80,11 @@ namespace Client
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += 
             // TestPlayerMovementWithoutNetworking;
-            Client.fps = new UIFramesPersecond(new Size(5, 30),
-                new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
-            Client.gameTimer =
-                new UITimer(60, new Size(225, 3), new Point(0, 0));
+            Client.fps = new UIFramesPersecond(new Size(5, 10), new Point(GraphicsRenderer.Form.ClientSize.Width - 100, 0));
+            Client.gameTimer = new UITimer(60, new Size(5, 10), new Point(0, 0));
+            Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
+            Client.GameWinLossState = new UIGameWLState(new Size(150,100),new Point(GraphicsRenderer.Form.ClientSize.Width/2, GraphicsRenderer.Form.ClientSize.Height/2));
+
 
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
@@ -243,6 +247,8 @@ namespace Client
             networkClient.PacketQueue.Clear();
         }
 
+
+        private bool hi = false;
         /// <summary>
         /// Creates a new object from a given packet, whether that be a leaf 
         /// or a player.
@@ -253,6 +259,8 @@ namespace Client
         {
 
             int objId = createPacket.ObjData.IdData.ObjectId;
+            
+
 
             // Create a new packet depending on it's type.
             switch (createPacket.ObjectType)
@@ -268,6 +276,11 @@ namespace Client
                 // Create a leaf.
                 case (ObjectType.LEAF):
                     NetworkedGameObjectClient leaf = new LeafClient(createPacket);
+                    if (!hi)
+                    {
+                        Teams.SetFollow(GraphicsManager.ActivePlayer,leaf);
+                        hi = true;
+                    }
                     NetworkedGameObjects.Add(objId, leaf);
                     return leaf;
                 case (ObjectType.TREE):

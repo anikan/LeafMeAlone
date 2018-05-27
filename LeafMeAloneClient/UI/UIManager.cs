@@ -16,7 +16,7 @@ namespace Client
             var b = new Bar(GraphicsRenderer.BarContext)
             {
                 Label = name,
-                Contained = true,
+                Contained = false,
                 Size = size,
                 Position = location,
             };

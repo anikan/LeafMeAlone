@@ -28,10 +28,11 @@ namespace Client
                 new FloatVariable(UIManager.Create("Timer", size, location))
                 {
                     ReadOnly = true,
-                    Label = "Time Remaining: ",
+                    Label = " ",
                     Precision = 2,
                     Value = timeToCountInSeconds
                 };
+            UIManager.ActiveUI["Timer"].Color = Color.Black;
         }
 
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)

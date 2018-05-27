@@ -9,15 +9,11 @@ namespace Client
 {
     static class AnimationManager
     {
-        private static List<PlayerClient> _players;
+        private static List<Model> _animationModels;
 
         public static void Init()
         {
-            _players = new List<PlayerClient>();
-
-            // preload animations
-            GraphicsManager.DictGeometry[Constants.PlayerIdleAnim] = new Geometry(Constants.PlayerIdleAnim, true);
-            GraphicsManager.DictGeometry[Constants.PlayerWalkAnim] = new Geometry(Constants.PlayerWalkAnim, true);
+            _animationModels = new List<Model>();
         }
 
         public static void Update()
@@ -25,9 +21,17 @@ namespace Client
 
         }
 
-        public static void AddPlayer( ref PlayerClient player )
+        public static int AddAnimation(string path)
         {
-            _players.Add(player);
+            _animationModels.Add( new Model( path, true ) );
+            return _animationModels.Count - 1;
+        }
+
+        public static Model SwitchAnimation(int Id, bool moonwalk = false)
+        {
+            _animationModels[Id].StopCurrentAnimation();
+            _animationModels[Id].StartAnimationSequenceByIndex(1, true);
+            return _animationModels[Id];
         }
     }
 }

@@ -214,6 +214,15 @@ namespace Client
         {
             base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
+
+            if (Dead)
+            {
+                model.Enabled = false;
+            } else
+            {
+                model.Enabled = true;
+            }
+            
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;

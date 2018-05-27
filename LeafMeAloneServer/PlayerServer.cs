@@ -49,14 +49,14 @@ namespace Server
 
             Console.WriteLine(String.Format("Burning: {0}, Health: {1}", Burning, Health));
             // if health is down, start the players death clock
-            if (Health < 0)
+            if (Health < 0 && !Dead )
             {
                 Dead = true;
+                Burning = false;
+                Health = PLAYER_HEALTH;
                 deathClock.Start();
-            }
-
             // Once health is up, reset te death clock and player position
-            if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME) {
+            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME) {
                 deathClock.Reset();
                 newPlayerPos = GameServer.instance.GetRandomSpawnPoint();
                 Dead = false;
@@ -107,6 +107,11 @@ namespace Server
             }
 
             ActiveToolMode = packet.ToolMode;
+
+            if (Dead)
+            {
+                ActiveToolMode = ToolMode.NONE;
+            }
         }
 
         /// <summary>

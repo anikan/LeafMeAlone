@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Shared;
+using SlimDX;
 
 namespace Client
 {
     static class AnimationManager
     {
         private static List<Model> _animationModels;
+        private static List<Vector3> _scaleFactors;
 
         public static void Init()
         {
@@ -21,16 +23,19 @@ namespace Client
 
         }
 
-        public static int AddAnimation(string path)
+        public static int AddAnimation(string path, Vector3 scale)
         {
             _animationModels.Add( new Model( path, true ) );
+            _scaleFactors.Add( scale );
             return _animationModels.Count - 1;
         }
 
-        public static Model SwitchAnimation(int Id, bool moonwalk = false)
+        public static Model SwitchAnimation(int Id, Transform transform, bool moonwalk = false)
         {
             _animationModels[Id].StopCurrentAnimation();
-            _animationModels[Id].StartAnimationSequenceByIndex(1, true);
+            _animationModels[Id].StartAnimationSequenceByIndex(0, true);
+            _animationModels[Id].m_Properties.CopyToThis(transform);
+            _animationModels[Id].m_Properties.Scale = _animationModels[Id].m_Properties.Scale * _scaleFactors[Id];
             return _animationModels[Id];
         }
     }

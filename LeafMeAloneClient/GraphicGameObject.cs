@@ -20,7 +20,7 @@ namespace Client
         public static ParticleSystem Fire;
 
         // Model that's associated with this object.
-        public Model model;
+        internal Model model;
 
         // Debug cube to find the pivots of objects.
         private NonNetworkedGameObjectClient PivotCube;

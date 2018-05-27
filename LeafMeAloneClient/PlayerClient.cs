@@ -9,38 +9,6 @@ using Shared.Packet;
 
 namespace Client
 {
-//    /// <summary>
-//    /// For controlling the flamethrower source
-//    /// </summary>
-//    public enum FlameThrowerState : Byte
-//    {
-//        Start = 1,
-//        Loop = 2,
-//        End = 3,
-//        Inactive = 4
-//    }
-//
-//    /// <summary>
-//    /// For controlling the windblower source
-//    /// </summary>
-//    public enum LeafBlowerState
-//    {
-//        Start = 1,
-//        Loop = 2,
-//        End = 3,
-//        Inactive = 4
-//    }
-//
-//
-//    /// <summary>
-//    /// For controlling player footstep sound
-//    /// </summary>
-//    public enum WalkingState
-//    {
-//        Loop = 1,
-//        Inactive = 2
-//    }
-
     public class PlayerClient : NetworkedGameObjectClient, IPlayer
     {
         // Small offset for floating point errors
@@ -232,7 +200,6 @@ namespace Client
         /// </summary>
         public void ResetRequests()
         {
-
             //  ToolType equippedTool = PlayerRequests.EquipToolRequest;
 
             // Reset the player requests struct to clear all info.
@@ -242,7 +209,6 @@ namespace Client
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
   
             // PlayerRequests.EquipToolRequest = equippedTool;
-
         }
 
 
@@ -258,6 +224,14 @@ namespace Client
 
             base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
+
+            if (Dead)
+            {
+                model.Enabled = false;
+            } else
+            {
+                model.Enabled = true;
+            }
             
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
@@ -266,6 +240,49 @@ namespace Client
             bool currMoving = Moving;
             bool currUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
+
+            EvaludateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind);
+
+            switch (ActiveToolMode)
+            {
+                case ToolMode.NONE:
+                    FlameThrower.EnableGeneration(false);
+                    LeafBlower.EnableGeneration(false);
+                    break;
+                case ToolMode.PRIMARY:
+                    switch (ToolEquipped)
+                    {
+                        case ToolType.BLOWER:
+                            FlameThrower.EnableGeneration(false);
+                            LeafBlower.EnableGeneration(true);
+                            break;
+                        case ToolType.THROWER:
+                            FlameThrower.EnableGeneration(true);
+                            LeafBlower.EnableGeneration(false);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case ToolMode.SECONDARY:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+        }
+
+        /// <summary>
+        /// Evaluate audio logic
+        /// </summary>
+        /// <param name="prevMoving"> moving previously? </param>
+        /// <param name="currMoving"> moving currently? </param>
+        /// <param name="prevUsingFlame"> using flamethrower previously? </param>
+        /// <param name="currUsingFlame">using flamethrower currently? </param>
+        /// <param name="prevUsingWind"> using windblower previously? </param>
+        /// <param name="currUsingWind"> using windblower currently? </param>
+        public void EvaludateAudio(bool prevMoving, bool currMoving, bool prevUsingFlame, bool currUsingFlame, bool prevUsingWind, bool currUsingWind)
+        {
 
             // footstep audio logic
             // if start moving
@@ -308,34 +325,6 @@ namespace Client
                 AudioManager.RemoveSourceQueue(_audioWind);
                 AudioManager.PlayAudio(_audioWind, Constants.LeafBlowerEnd, false);
             }
-
-            switch (ActiveToolMode)
-            {
-                case ToolMode.NONE:
-                    FlameThrower.EnableGeneration(false);
-                    LeafBlower.EnableGeneration(false);
-                    break;
-                case ToolMode.PRIMARY:
-                    switch (ToolEquipped)
-                    {
-                        case ToolType.BLOWER:
-                            FlameThrower.EnableGeneration(false);
-                            LeafBlower.EnableGeneration(true);
-                            break;
-                        case ToolType.THROWER:
-                            FlameThrower.EnableGeneration(true);
-                            LeafBlower.EnableGeneration(false);
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case ToolMode.SECONDARY:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
         }
 
         public override void Update(float deltaTime)

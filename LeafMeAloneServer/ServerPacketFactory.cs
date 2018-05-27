@@ -24,6 +24,11 @@ namespace Server
                 return NewObjectPacket(serverObject);
         }
 
+        internal static ThePacketToEndAllPackets NewGameResultPacket(Team winningTeam)
+        {
+            return new ThePacketToEndAllPackets(winningTeam);
+        }
+
         internal static CreatePlayerPacket NewCreatePacket(PlayerServer player)
         {
             CreateObjectPacket createPacket = NewCreatePacket((GameObject) player);

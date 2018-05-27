@@ -40,6 +40,16 @@ namespace Client
         // All leaves in the scene. 
         public List<LeafClient> leaves;
 
+        internal PlayerClient GetActivePlayer()
+        {
+            return ActivePlayer;
+        }
+
+        internal void DoPlayerDeath()
+        {
+            Console.WriteLine("Player Died");
+        }
+
         /// <summary>
         /// The ID of the audio pool to be used by all the leaves collectively
         /// </summary>
@@ -96,6 +106,10 @@ namespace Client
 
         }
 
+        internal Team GetPlayerTeam()
+        {
+            return ActivePlayer.team;
+        }
 
         private void DoGameLoop()
         {
@@ -186,11 +200,6 @@ namespace Client
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in NetworkedGameObjects.AsEnumerable())
             {
                 NetworkedGameObjectClient gameObject = kv.Value;
-
-//                if (gameObject is LeafClient leaf)
-//                {
-//                    leaf.UpdateAudio(leafAudioPoolId);
-//                }
 
                 // Update with delta in seconds
                 gameObject.Update(delta);
@@ -371,11 +380,6 @@ namespace Client
             if (gameObj is NetworkedGameObjectClient networkedObj)
             {
                 NetworkedGameObjects.Remove(networkedObj.Id);
-//                if (gameObj is LeafClient leaf)
-//                {
-//                    // play the death audio sound
-//                    leaf.PlayBurnupAudio(leafAudioPoolId);
-//                }
             }
             else if (gameObj is NonNetworkedGameObjectClient nonNetObj)
             {

@@ -107,9 +107,9 @@ namespace Client
         }
 
         /// <summary>
-        /// 
+        /// stop playing the audio associated to the source
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="source"> the source whose sound need to be stopped </param>
         public static void StopAudio(int source)
         {
             _audio.Stop(source);

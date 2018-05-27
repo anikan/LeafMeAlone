@@ -60,6 +60,9 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// Play the deathcry sound
+        /// </summary>
         public void PlayBurnupAudio()
         {
             if (_audioBurning != -1)

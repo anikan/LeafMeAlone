@@ -194,7 +194,7 @@ namespace Server
             BasePacket donePacket = new ThePacketToEndAllPackets(winningTeam);
             networkServer.SendAll(PacketUtil.Serialize(donePacket));
             matchOver = true;
-            GetLeafListAsObjects().ForEach(l => l.Destroy());
+            GetLeafListAsObjects().ForEach(l => l.Burning = true);
         }
 
         public PlayerServer CreateNewPlayer()

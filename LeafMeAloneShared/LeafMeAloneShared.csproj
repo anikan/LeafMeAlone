@@ -101,6 +101,7 @@
     <Compile Include="Packet\CreatePlayerPacket.cs" />
     <Compile Include="Packet\DestroyObjectPacket.cs" />
     <Compile Include="ILeaf.cs" />
+    <Compile Include="Match.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="IPlayer.cs" />
     <Compile Include="Packet\IdPacket.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Packet\RequestPacket.cs" />
     <Compile Include="Packet\ThePacketToEndAllPackets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TeamSection.cs" />
     <Compile Include="Tool.cs" />
     <Compile Include="Transform.cs" />
     <Compile Include="Utility.cs" />

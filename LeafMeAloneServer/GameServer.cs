@@ -38,6 +38,8 @@ namespace Server
 
         private Random rnd;
 
+        private Match activeMatch = Match.DefaultMatch;
+
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
         
@@ -69,7 +71,6 @@ namespace Server
 
             // Create the leaves for the game.
             CreateRandomLeaves(Constants.NUM_LEAVES);
-
             //CreateLeaves(100, -10, 10, -10, 10);
         }
 
@@ -158,6 +159,24 @@ namespace Server
             // Add the effects of the player tools.
             AddPlayerToolEffects();
 
+            activeMatch.CountObjectsOnSides(GetLeafListAsObjects());
+
+            // If game done, tell everyone the game is done
+            Team winningTeam = activeMatch.GameOver();
+            if (winningTeam != Team.NONE)
+            {
+                BasePacket donePacket = new ThePacketToEndAllPackets(winningTeam);
+                networkServer.SendAll(PacketUtil.Serialize(donePacket));
+            }
+
+          //  Console.WriteLine(defaultMatch);
+
+            if (playerServerList.Count > 0)
+            {
+           //     Console.WriteLine(playerServerList[0].Transform.Position);
+
+            }
+
         }
 
         public PlayerServer CreateNewPlayer()
@@ -166,11 +185,11 @@ namespace Server
             int id = gameObjectDict.Count();
 
             //Create two players, one to send as an active player to client. Other to keep track of on server.
-            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
+            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1);
             newPlayer.Register();
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
+            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1);
             newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
             newActivePlayer.Id = newPlayer.Id;
 
@@ -291,10 +310,10 @@ namespace Server
             float HalfWidth = Constants.MAP_WIDTH / 2.0f;
             float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
 
-            float minX = -HalfWidth + Constants.BORDER_MARGIN;
-            float maxX = HalfWidth - Constants.BORDER_MARGIN;
-            float minZ = -HalfHeight + Constants.BORDER_MARGIN;
-            float maxZ = HalfHeight - Constants.BORDER_MARGIN;
+            float minX = activeMatch.NoMansLand.leftX;
+            float maxX = activeMatch.NoMansLand.rightX;
+            float minZ = activeMatch.NoMansLand.downZ;
+            float maxZ = activeMatch.NoMansLand.upZ;
 
             // Get random doubles for position.
             double randX = rnd.NextDouble();
@@ -340,7 +359,7 @@ namespace Server
                 PlayerServer player = playerServerList[i];
 
                 // Affect all objects within range of the player.
-                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList<GameObjectServer>());
+                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList());
 
             }
         }
@@ -376,13 +395,36 @@ namespace Server
         public List<GameObjectServer> GetGameObjectList()
         {
             // Turn the game objects to a value list.
-            return gameObjectDict.Values.ToList<GameObjectServer>();
+            return gameObjectDict.Values.ToList();
         }
 
+        /// <summary>
+        /// Gets a new random spawn point for the player.
+        /// </summary>
+        /// <returns>A vector 3 of the spawn point</returns>
         public Vector3 GetRandomSpawnPoint()
         {
             int index = new Random().Next(spawnPoints.Count);
             return spawnPoints.ElementAt(index);
+        }
+
+        public List<GameObject> GetLeafListAsObjects()
+        {
+
+            List<GameObjectServer> gameObjects = GetGameObjectList();
+            List<GameObject> leaves = new List<GameObject>();
+
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                
+                if (gameObjects[i] is LeafServer)
+                {
+                    leaves.Add(gameObjects[i]);
+                }
+
+            }
+
+            return leaves;
         }
     }
 }

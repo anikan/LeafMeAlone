@@ -25,6 +25,8 @@ namespace Client
 
         private List<MapTile> MapTiles;
 
+        private Match activeMatch;
+
         /// <summary>
         /// Creates a new map with a map model.
         /// </summary>
@@ -32,32 +34,78 @@ namespace Client
         public MapClient() : base()
         {
 
+            // Random number generator, to be used for y offsets. 
             Random rnd = new Random();
+            activeMatch = Match.DefaultMatch;
 
             MapTiles = new List<MapTile>();
 
+            // Iterate through the height of tiles.
             for (float y = -(NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y < (NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y += TILE_HEIGHT - 0.2f)
             {
 
+                // Iterate through the width of tiles.
                 for (float x = -(NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x < (NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x +=TILE_WIDTH - 0.2f)
                 {
 
+                    //Create a new tile.
                     MapTile newTile = new MapTile();
 
+                    // Set the position of the tile
                     newTile.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT - 1.0f, y);
+
+                    // Scale the tile to the correct size.
                     newTile.Transform.Scale = new Vector3(TILE_WIDTH, 1.0f, TILE_HEIGHT);
 
+                    // Get a random offset.
                     float random = (float) rnd.NextDouble();
 
+                    // Apply the random offset to mitigate z fighting
                     float yOffset = (random * (0.1f - (-0.1f))) + (-0.1f);
 
-
+                    // Add the new tile to the tile list
                     MapTiles.Add(newTile);
 
                 }
             }
 
+            CreateDistinctTeamSections(activeMatch);
 
+        }
+
+        /// <summary>
+        /// Assign specific tiles to sections of the map.
+        /// </summary>
+        /// <param name="currentMatch">The current active match.</param>
+        public void CreateDistinctTeamSections(Match currentMatch)
+        {
+
+            // Iterate through all the map tiles.
+            for (int i = 0; i < MapTiles.Count; i++)
+            {
+
+                // Iterate through all the team sections.
+                for (int j = 0; j < currentMatch.teamSections.Count; j++)
+                {
+
+                    // If the current tile is in the bounds of the section.
+                    if (currentMatch.teamSections[j].IsInBounds(MapTiles[i].Transform.Position))
+                    {
+
+                        // Tint the tile.
+                        MapTiles[i].CurrentTint = currentMatch.teamSections[j].sectionColor;
+
+                    }
+                }
+
+                if (currentMatch.NoMansLand.IsInBounds(MapTiles[i].Transform.Position))
+                {
+
+                    MapTiles[i].CurrentTint = currentMatch.NoMansLand.sectionColor;
+
+                }
+
+            }
         }
 
         public override void Update(float deltaTime)
@@ -68,7 +116,6 @@ namespace Client
             {
                 obj.Update(deltaTime);
             }
-
         }
 
         public override void Draw()
@@ -78,7 +125,6 @@ namespace Client
             {
                 obj.Draw();
             }
-
         }
     }
 }

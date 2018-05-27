@@ -14,15 +14,14 @@ namespace Server
     /// </summary>
     public abstract class GameObjectServer : GameObject
     {
+       
+        // Is the object being actively burned this frame?
+        private bool BurningThisFrame = false;
 
         // Rate (in seconds) that health decrements if an object is on fire.
         public const float HEALTH_DECREMENT_RATE = 1.0f;
 
-        // Timer for how long this object has been burning.
-        private Stopwatch BurnTimer;
-
-        // Timer to keep track of when health should decrement.
-        private Stopwatch HealthDecrementTimer;
+        public const float BURNING_RAMP_RATE = 1.0f;
 
         /// <summary>
         /// Constructor for a GameObject that's on the server, with default instantiation position.
@@ -55,8 +54,7 @@ namespace Server
         {
             ObjectType = objectType;
             Health = health;
-            BurnTimer = new Stopwatch();
-            HealthDecrementTimer = new Stopwatch();
+
         }
 
         /// <summary>
@@ -66,24 +64,34 @@ namespace Server
         public override void Update(float deltaTime)
         {
 
-
             // If this object is burning.
-            if (Burning)
+            if (Burning || BurningThisFrame)
             {
-                // Check if the health decrement rate has been passed and if so, decrement health.
-                if (HealthDecrementTimer.ElapsedMilliseconds / 1000.0f >= HEALTH_DECREMENT_RATE)
+
+                // If it is being actively burned this frame.
+                if (BurningThisFrame)
                 {
+                    // Increase the frames this object is burning.
+                    burnFrames++;
 
-                    // Get fire damage from the flamethrower.
-                    float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
-
-                    // Decrease health by burn damage.
-                    Health -= fireDamage;
-
-                    // Restart the decrement timer.
-                    HealthDecrementTimer.Restart();
-
+                    // No longer burning next frame
+                    BurningThisFrame = false;
                 }
+
+                // If not actively being burned this frame, set burn frames to just 1.
+                else
+                {
+                    // Set to 1.
+                    burnFrames = 1;
+                }
+
+                // Get fire damage from the flamethrower.
+                float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
+
+                // Decrease health by burn damage.
+                Health -= fireDamage * deltaTime * Math.Min(burnFrames * BURNING_RAMP_RATE, 10);
+
+//                Console.WriteLine("Health is " + Health);
 
                 // If health goes negative, destroy the object.
                 if (Health <= 0)
@@ -99,10 +107,7 @@ namespace Server
         /// </summary>
         public void CatchFire()
         {
-
-            Burning = true;
-            BurnTimer.Restart();
-            HealthDecrementTimer.Restart();
+            burnFrames++;
         }
 
         /// <summary>
@@ -110,9 +115,7 @@ namespace Server
         /// </summary>
         public void Extinguish()
         {
-            Burning = false;
-            BurnTimer.Stop();
-            BurnTimer.Reset();
+            burnFrames = 0;
         }
 
         /// <summary>
@@ -134,25 +137,20 @@ namespace Server
                 if (toolMode == ToolMode.PRIMARY)
                 {
 
-                    // If it's not already burning.
-                    if (!Burning)
-                    {
-                        // Set the object on fire.
-                        CatchFire();
-                    }
+                    BurningThisFrame = true;
+
                 }
             }
 
-            // If this is a blower.
-            else if (toolType == ToolType.BLOWER)
+            if (toolType == ToolType.BLOWER)
             {
-
+            
                 // If this is the primary function of the blower.
                 if (toolMode == ToolMode.PRIMARY)
                 {
 
-                    // Extinguish the leaf.
-                    Burning = false;
+                    Extinguish();
+
                 }
             }
         }

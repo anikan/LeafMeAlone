@@ -61,6 +61,9 @@ namespace Client
 
         public void CreateTile(float x, float z)
         {
+
+            Console.WriteLine("Creating tile");
+
             //Create a new tile.
             MapTile newTile = new MapTile();
 

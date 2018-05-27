@@ -194,7 +194,6 @@ namespace Client
         /// </summary>
         public void ResetRequests()
         {
-
             //  ToolType equippedTool = PlayerRequests.EquipToolRequest;
 
             // Reset the player requests struct to clear all info.
@@ -204,7 +203,6 @@ namespace Client
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
   
             // PlayerRequests.EquipToolRequest = equippedTool;
-
         }
 
 
@@ -216,6 +214,15 @@ namespace Client
         {
             base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
+
+            if (Dead)
+            {
+                model.Enabled = false;
+            } else
+            {
+                model.Enabled = true;
+            }
+            
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;

@@ -37,6 +37,19 @@ namespace Client
 
         private ClientPacketHandler clientPacketHandler;
 
+        // All leaves in the scene. 
+        public List<LeafClient> leaves;
+
+        internal PlayerClient GetActivePlayer()
+        {
+            return ActivePlayer;
+        }
+
+        internal void DoPlayerDeath()
+        {
+            Console.WriteLine("Player Died");
+        }
+
         // The active camera in the scene.
         private Camera Camera => GraphicsManager.ActiveCamera;
 
@@ -89,6 +102,10 @@ namespace Client
             GraphicsRenderer.Dispose();
         }
 
+        internal Team GetPlayerTeam()
+        {
+            return ActivePlayer.team;
+        }
 
         private void DoGameLoop()
         {

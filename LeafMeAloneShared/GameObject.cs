@@ -23,8 +23,19 @@ namespace Shared
     /// </summary>
     public abstract class GameObject : IObject
     {
+        protected int burnFrames = 0;
 
-        public bool Burning;
+        public bool Burning
+        {
+            get
+            {
+                return burnFrames > 0;
+            }
+            set
+            {
+                burnFrames = (value == true) ? 1 : 0;
+            }
+        }
         public float Health;
 
         public ObjectType ObjectType;

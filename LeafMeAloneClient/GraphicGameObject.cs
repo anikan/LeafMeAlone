@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Assimp;
 using Shared;
 using SlimDX;
 
@@ -19,7 +20,29 @@ namespace Client
         public static ParticleSystem Fire;
 
         // Model that's associated with this object.
-        private Model model;
+        internal Model model;
+
+        // Debug cube to find the pivots of objects.
+        private NonNetworkedGameObjectClient PivotCube;
+
+
+        private float minCap = .3f;
+        public Vector3 CurrentTint
+        {
+            get => model.Tint;
+            set
+            {
+                if(model.Tint.X > minCap)
+                    model.Tint.X = value.X;
+                if (model.Tint.Y > minCap)
+                    model.Tint.Y = value.Y;
+                if (model.Tint.Z > minCap)
+                    model.Tint.Z = value.Z;
+            }
+            
+        }
+
+
 
 
         /// <summary>
@@ -48,6 +71,17 @@ namespace Client
         /// </summary>
         protected GraphicGameObject() : base()
         {
+
+            // Check if debug mode is on and this isn't a particle system or another cube.
+            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            {
+                // Create a new cube at the pivot.
+                PivotCube = new MapTile();
+                PivotCube.Transform.Scale.Y = 20.0f;
+
+            }
+
+
         }
 
         /// <summary>
@@ -58,6 +92,17 @@ namespace Client
         {
             SetModel(modelPath);
             InitializeBurning();
+
+            // Check if debug mode is on and this isn't a particle system or another cube.
+            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            {
+
+                // Create a new cube at the pivot.
+                PivotCube = new MapTile();
+                PivotCube.Transform.Scale.Y = 20.0f;
+
+            }
+
         }
 
         /// <summary>
@@ -66,10 +111,18 @@ namespace Client
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
-            if (model == null)
-                return;
-            model.m_Properties = Transform;
-            model.Update(deltaTime);
+            if (model != null)
+            {
+                model.m_Properties = Transform;
+                model.Update(deltaTime);
+            }
+
+            // If we're debugging, move the pivot cube.
+            if (PivotCube != null)
+            {
+                PivotCube.Transform.Position = Transform.Position;
+                PivotCube.Update(deltaTime);
+            }
         }
 
         /// <summary>
@@ -85,6 +138,12 @@ namespace Client
                 Transform t = new Transform {Position = Transform.Position,Scale =  new Vector3(1,1,1)};
                 Fire?.DrawTransform(t);
             }
+
+            // If we're debugging, draw the pivot cube.
+            if (PivotCube != null)
+            {
+                PivotCube.Draw();
+            }
         }
 
         /// <summary>
@@ -94,7 +153,7 @@ namespace Client
         public void SetModel(string filePath)
         {
             //Console.WriteLine(File.Exists(filePath));
-            model = new Model(filePath);
+            model = new Model(filePath,false,true);
             Name = filePath.Split('.')[0];
         }
 

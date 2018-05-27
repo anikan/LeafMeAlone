@@ -17,6 +17,13 @@ namespace Client
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 
+        // Whether the model is drawn
+        public bool Enabled = true;
+        
+        public Vector3 Tint = new Vector3(1, 1, 1);
+
+        // public float burningGeoColor;
+        // public bool burningGeoColorEnabled;
         // active geometry and shader in use
         private Geometry m_ActiveGeo;
         private Shader m_ActiveShader;
@@ -37,7 +44,7 @@ namespace Client
         /// </summary>
         /// <param name="filePath"> the file path of the model to be loaded </param>
         /// <param name="enableRigging"> specify if rigging is enabled or not </param>
-        public Model(string filePath, bool enableRigging = false)
+        public Model(string filePath, bool enableRigging = false, bool burningEnabled = false)
         {
             //confirm the file exists
             System.Diagnostics.Debug.Assert(File.Exists(filePath));
@@ -45,16 +52,18 @@ namespace Client
             Load(filePath, enableRigging);
             m_ModelMatrix = Matrix.Identity;
 
-            m_Properties.Rotation = new Vector3(0, 0, 0);
-            m_Properties.Position = new Vector3(0, 0, 0);
-            m_Properties.Scale = new Vector3(1, 1, 1);
+            m_Properties = new Transform();
+            m_PrevProperties = new Transform();
 
             m_PrevProperties.Rotation = new Vector3(0, 0, 0);
             m_PrevProperties.Position = new Vector3(0, 0, 0);
-            m_PrevProperties.Scale = new Vector3(1,1,1);
+            m_PrevProperties.Scale = new Vector3(1, 1, 1);
             Update(0);
 
+            //burningGeoColorEnabled = burningEnabled;
             setShader(Constants.DefaultShader);
+
+            m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
         }
 
         /// <summary>
@@ -128,17 +137,22 @@ namespace Client
         /// </summary>
         public void Draw()
         {
-            if (CurrentAnimationIndex != -1)
-            {
-                m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
-                m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
-                m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
-                m_ActiveGeo.RepeatAnimation = RepeatAnimation;
-                m_ActiveGeo.UpdateAnimation();
-            }
+            if (Enabled) {
+                m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+                if (CurrentAnimationIndex != -1)
+                {
 
-            m_ActiveShader.UseShader();
-            m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                    m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
+                    m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
+                    m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
+                    m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+                    m_ActiveGeo.UpdateAnimation();
+                }
+
+                m_ActiveShader.UseShader();
+                m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                
+            }
         }
 
         /// <summary>
@@ -158,9 +172,9 @@ namespace Client
                 m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
 
                 // set the rotation based on the three directions
-                m_ModelMatrix = m_ModelMatrix * Matrix.RotationX(m_Properties.Rotation.X) * 
-                                Matrix.RotationY(m_Properties.Rotation.Y) * 
-                                Matrix.RotationZ(m_Properties.Rotation.Z) ;
+                m_ModelMatrix = m_ModelMatrix * Matrix.RotationX(m_Properties.Rotation.X) *
+                                Matrix.RotationY(m_Properties.Rotation.Y) *
+                                Matrix.RotationZ(m_Properties.Rotation.Z);
 
                 // set the translation based on the position
                 m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);

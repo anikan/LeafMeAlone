@@ -12,6 +12,10 @@ uniform int animationIndex;
 // some material properties
 uniform float4 Diffuse, Specular, Ambient, Emissive;
 
+
+//the tint of the object
+uniform float4 Tint;
+
 // Camera Position in object coordinates
 uniform float4 CamPosObj;
 
@@ -206,7 +210,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		retColor = retColor * tex_diffuse.Sample(MeshTextureSampler, iTex);
 	}
 
-	return float4( retColor.xyz, Opacity );
+	return float4( retColor.xyz * Tint, Opacity );
 }
 
 technique10 ColorTech

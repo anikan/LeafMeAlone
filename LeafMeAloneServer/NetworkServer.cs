@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Shared;
+using Shared.Packet;
 
 namespace Server
 {
@@ -39,7 +40,7 @@ namespace Server
         private List<Socket> clientSockets;
 
         //List of packets for Game to process.
-        public List<PlayerPacket> PlayerPackets = new List<PlayerPacket>();
+        public List<RequestPacket> PlayerPackets = new List<RequestPacket>();
 
         private bool networked;
         private List<byte> ByteReceivedQueue = new List<byte>();
@@ -157,9 +158,8 @@ namespace Server
         {
             foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
             {
-                CreateObjectPacket packetToSend =
-                    new CreateObjectPacket(pair.Value);
-                clientSocket.Send(packetToSend.Serialize());
+                CreateObjectPacket packetToSend = PacketFactory.NewCreatePacket(pair.Value);
+                clientSocket.Send(PacketUtil.Serialize(packetToSend));
             }
         }
 
@@ -168,23 +168,21 @@ namespace Server
             List<GameObjectServer> gameObjects = GameServer.instance.gameObjectDict.Values.ToList();
             for (int i = 0; i < gameObjects.Count; i++)
             {
-                Packet packetToSend = ServerPacketFactory.CreatePacket(gameObjects[i]);
-
-                SendAll(packetToSend.Serialize());
+                BasePacket packetToSend = ServerPacketFactory.CreateUpdatePacket(gameObjects[i]);
+                SendAll(PacketUtil.Serialize(packetToSend));
             }
 
             foreach (var gameObj in GameServer.instance.toDestroyQueue)
             {
-                Packet packet =
-                    ServerPacketFactory.CreateDestroyPacket(gameObj);
-                SendAll(packet.Serialize());
+                BasePacket packet = PacketFactory.NewDestroyPacket(gameObj);
+                SendAll(PacketUtil.Serialize(packet));
             }
         }
 
         public void SendNewObjectToAll(GameObjectServer newObject)
         {
-            Packet packetToSend = new CreateObjectPacket(newObject);
-            SendAll(packetToSend.Serialize());
+            BasePacket packetToSend = PacketFactory.NewCreatePacket(newObject);
+            SendAll(PacketUtil.Serialize(packetToSend));
         }
 
         /// <summary>
@@ -197,16 +195,10 @@ namespace Server
         /// </param>
         private void ProcessNewPlayer(Socket clientSocket)
         {
-            GameObject player = GameServer.instance.CreateNewPlayer();
-
-            //TODO Add new player's id to the dict.
-
-            CreateObjectPacket setPlayerPacket =
-                new CreateObjectPacket(player);
-
+            PlayerServer player = GameServer.instance.CreateNewPlayer();
+            CreatePlayerPacket createPlayPack = ServerPacketFactory.NewCreatePacket(player);
             // Create createObjectPacket, send to client
-            byte[] data = setPlayerPacket.Serialize();
-            Packet.Deserialize(data);
+            byte[] data = PacketUtil.Serialize(createPlayPack);
             Send(clientSocket, data);
         }
 
@@ -258,31 +250,31 @@ namespace Server
             while (ByteReceivedQueue.Count > 0)
             {
                 // If there is not enough data left to read the size of the next packet, do other game updates
-                if (ByteReceivedQueue.Count < Packet.PACK_HEAD_SIZE)
+                if (ByteReceivedQueue.Count < PacketUtil.PACK_HEAD_SIZE)
                 {
                     break;
                 }
 
                 // Get packet size
-                byte[] headerByteBuf = ByteReceivedQueue.GetRange(0, Packet.PACK_HEAD_SIZE).ToArray();
+                byte[] headerByteBuf = ByteReceivedQueue.GetRange(0, PacketUtil.PACK_HEAD_SIZE).ToArray();
                 int packetSize = BitConverter.ToInt32(headerByteBuf, 1);
 
                 // If there is not enough data left to read the next packet, do other game updates
-                if (ByteReceivedQueue.Count < packetSize + Packet.PACK_HEAD_SIZE)
+                if (ByteReceivedQueue.Count < packetSize + PacketUtil.PACK_HEAD_SIZE)
                 {
                     break;
                 }
 
                 // Get full packet and add it to the queue 
-                byte[] packetData = ByteReceivedQueue.GetRange(Packet.PACK_HEAD_SIZE, packetSize).ToArray();
+                byte[] packetData = ByteReceivedQueue.GetRange(PacketUtil.PACK_HEAD_SIZE, packetSize).ToArray();
                 byte[] fullPacket = headerByteBuf.Concat(packetData).ToArray();
-                Packet packet = Packet.Deserialize(fullPacket);
-                PlayerPackets.Add((PlayerPacket)packet);
+                BasePacket packet = PacketUtil.Deserialize(fullPacket);
+                PlayerPackets.Add((RequestPacket)packet);
 
                 // Remove the read data 
                 lock (ByteReceivedQueue)
                 {
-                    ByteReceivedQueue.RemoveRange(0, packetSize + Packet.PACK_HEAD_SIZE);
+                    ByteReceivedQueue.RemoveRange(0, packetSize + PacketUtil.PACK_HEAD_SIZE);
                 }
             }
         }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
 using Shared;
+using Shared.Packet;
 
 namespace Client
 {
@@ -43,6 +44,7 @@ namespace Client
             GraphicsManager.ParticleSystems.Add(LeafBlower);
         }
 
+        public Team team { get; set; }
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
@@ -192,7 +194,6 @@ namespace Client
         /// </summary>
         public void ResetRequests()
         {
-
             //  ToolType equippedTool = PlayerRequests.EquipToolRequest;
 
             // Reset the player requests struct to clear all info.
@@ -202,7 +203,6 @@ namespace Client
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
   
             // PlayerRequests.EquipToolRequest = equippedTool;
-
         }
 
 
@@ -210,16 +210,22 @@ namespace Client
         /// Updates the player's values based on a received packet.
         /// </summary>
         /// <param name="packet">The packet to update from.</param>
-        public void UpdateFromPacket(PlayerPacket packet)
+        private void UpdateFromPacket(PlayerPacket packet)
         {
+            base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
 
+            if (Dead)
+            {
+                model.Enabled = false;
+            } else
+            {
+                model.Enabled = true;
+            }
+            
             ToolEquipped = packet.ToolEquipped;
-
             ActiveToolMode = packet.ActiveToolMode;
-            Transform.Position.X = packet.MovementX;
-            Transform.Position.Z = packet.MovementZ;
-            Transform.Rotation.Y = packet.Rotation;
+            Transform.Position.Y = Constants.FLOOR_HEIGHT;
 
             switch (ActiveToolMode)
             {
@@ -276,7 +282,7 @@ namespace Client
         /// </summary>
         /// <param name="packet">Abstract packet which gets casted to an actual 
         /// object type</param>
-        public override void UpdateFromPacket(Packet packet)
+        public override void UpdateFromPacket(BasePacket packet)
         {
             UpdateFromPacket(packet as PlayerPacket);
         }

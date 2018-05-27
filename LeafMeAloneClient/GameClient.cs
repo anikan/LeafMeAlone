@@ -9,6 +9,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using System.Net;
+using Shared.Packet;
 
 namespace Client
 {
@@ -31,10 +32,23 @@ namespace Client
 
         // Dictionary of all game objects in the game.
         private Dictionary<int, NetworkedGameObjectClient> NetworkedGameObjects;
+
         private List<NonNetworkedGameObjectClient> NonNetworkedGameObjects;
+
+        private ClientPacketHandler clientPacketHandler;
 
         // All leaves in the scene. 
         public List<LeafClient> leaves;
+
+        internal PlayerClient GetActivePlayer()
+        {
+            return ActivePlayer;
+        }
+
+        internal void DoPlayerDeath()
+        {
+            Console.WriteLine("Player Died");
+        }
 
         // The active camera in the scene.
         private Camera Camera => GraphicsManager.ActiveCamera;
@@ -84,6 +98,10 @@ namespace Client
             GraphicsRenderer.Dispose();
         }
 
+        internal Team GetPlayerTeam()
+        {
+            return ActivePlayer.team;
+        }
 
         private void DoGameLoop()
         {
@@ -130,6 +148,8 @@ namespace Client
 
             this.networkClient = networkClient;
             networkClient.StartClient();
+
+            this.clientPacketHandler = new ClientPacketHandler(this);
 
             // Initialize frame timer
             FrameTimer = new Stopwatch();
@@ -223,7 +243,7 @@ namespace Client
             networkClient.Receive();
 
             // Iterate through every packet received.
-            foreach (Packet packet in networkClient.PacketQueue)
+            foreach (BasePacket packet in networkClient.PacketQueue)
             {
                 // If this is a packet to create a new object, create the object.
                 if (packet == null)
@@ -231,37 +251,7 @@ namespace Client
                     continue;
                 }
 
-                if (packet is CreateObjectPacket)
-                {
-                    // Create the new object.
-                    CreateObjectFromPacket(packet as CreateObjectPacket);
-                }
-                // Otherwise, if this is not a create packet.
-                else
-                {
-                    // Get the object ID so we can update the object.
-                    NetworkedGameObjects.TryGetValue(
-                        packet.ObjectId,
-                        out NetworkedGameObjectClient packetObject);
-
-                    // If we didn't get an object, object doesn't exist 
-                    // and something is wrong.
-                    if (packetObject == null)
-                    {
-                        Console.WriteLine(
-                            BAD_PACKET_REF);
-                    }
-
-                    if (packet is ObjectPacket || packet is PlayerPacket)
-                    {
-                        // Update the packet we found.
-                        packetObject.UpdateFromPacket(packet);
-                    }
-                    else if (packet is DestroyObjectPacket)
-                    {
-                        packetObject.Destroy();
-                    }
-                }
+                clientPacketHandler.HandlePacket(packet);
             }
             // Clear the queue of packets.
             networkClient.PacketQueue.Clear();
@@ -272,38 +262,39 @@ namespace Client
         /// or a player.
         /// </summary>
         /// <param name="createPacket"></param>
-        private void CreateObjectFromPacket(CreateObjectPacket createPacket)
+        /// <returns>The object which was created</returns>
+        public GameObject CreateObjectFromPacket(CreateObjectPacket createPacket)
         {
 
+            int objId = createPacket.ObjData.IdData.ObjectId;
+
             // Create a new packet depending on it's type.
-            switch (createPacket.objectType)
+            switch (createPacket.ObjectType)
             {
                 // Create an active player
                 case (ObjectType.ACTIVE_PLAYER):
-                    InitializeUserPlayerAndMovement(createPacket);
-                    break;
-
+                    return InitializeUserPlayerAndMovement(createPacket);
                 // Create an other player
                 case (ObjectType.PLAYER):
-                    NetworkedGameObjects.Add(
-                        createPacket.ObjectId, new PlayerClient(createPacket)
-                        );
-                    break;
-
+                    NetworkedGameObjectClient player = new PlayerClient(createPacket);
+                    NetworkedGameObjects.Add(objId, player);
+                    return player;
                 // Create a leaf.
                 case (ObjectType.LEAF):
-                    NetworkedGameObjects.Add(
-                        createPacket.ObjectId, new LeafClient(createPacket)
-
-                        );
-                    break;
-
+                    NetworkedGameObjectClient leaf = new LeafClient(createPacket);
+                    NetworkedGameObjects.Add(objId, leaf);
+                    return leaf;
                 case (ObjectType.TREE):
                     Transform startTransform = new Transform();
-                    startTransform.Position = new Vector3(createPacket.InitialX, createPacket.InitialY, createPacket.InitialZ);
-                    NetworkedGameObjects.Add(createPacket.ObjectId, new TreeClient(createPacket));
-                    break;
+                    float initX = createPacket.ObjData.PositionX;
+                    float initY = createPacket.ObjData.PositionY;
+                    float initZ = createPacket.ObjData.PositionZ;
+                    startTransform.Position = new Vector3(initX, initY, initZ);
+                    NetworkedGameObjectClient tree = new TreeClient(createPacket);
+                    NetworkedGameObjects.Add(objId, tree);
+                    return tree;
             }
+            return null;
         }
 
         /// <summary>
@@ -312,7 +303,8 @@ namespace Client
         /// </summary>
         /// <param name="createPacket">The createPacket that holds info 
         /// on intitial pos, etc</param>
-        private void InitializeUserPlayerAndMovement(
+        /// <returns>the created player</returns>
+        private GameObject InitializeUserPlayerAndMovement(
             CreateObjectPacket createPacket
             )
         {
@@ -329,6 +321,8 @@ namespace Client
             SetupInputManager(ActivePlayer);
 
             CreateMap();
+
+            return ActivePlayer;
         }
 
         /// <summary>
@@ -338,9 +332,9 @@ namespace Client
         private void SendPackets()
         {
             // Create a new player packet, and fill it with player info.
-            PlayerPacket toSend =
-                ClientPacketFactory.CreatePacket(ActivePlayer);
-            byte[] data = toSend.Serialize();
+            RequestPacket toSend =
+                ClientPacketFactory.CreateRequestPacket(ActivePlayer);
+            byte[] data = PacketUtil.Serialize(toSend);
             networkClient.Send(data);
 
             // Reset the player's requested movement after the packet is sent.
@@ -379,6 +373,13 @@ namespace Client
             {
                 NonNetworkedGameObjects.Remove(nonNetObj);
             }
+        }
+
+        internal NetworkedGameObjectClient GetObjectFromPacket(IIdentifiable p)
+        {
+            int id = p.GetId();
+            NetworkedGameObjects.TryGetValue(id, out NetworkedGameObjectClient packetObject);
+            return packetObject;
         }
     }
 }

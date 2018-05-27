@@ -212,13 +212,20 @@ namespace Server
             // Create the map with a width and height.
             MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
+            float startX = (-newMap.Width / 2.0f) + TreeServer.TREE_RADIUS;
+            float startY = -newMap.Height / 2.0f;
+            float endX = newMap.Width / 2.0f;
+            float endY = newMap.Height / 2.0f;
+
+
+
             // Spawn trees around the border of the map!
             // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
-            for (float y = -newMap.Height / 2.0f; y < newMap.Height / 2.0f; y+= TreeServer.TREE_RADIUS)
+            for (float y = startY; y < endY; y+= TreeServer.TREE_RADIUS)
             {
 
                 // Iterate through the width of the map, centered on origin and increase by radius of a tree.
-                for (float x = -newMap.Width / 2.0f; x < newMap.Width / 2.0f; x+= TreeServer.TREE_RADIUS)
+                for (float x = startX; x < endX; x+= TreeServer.TREE_RADIUS)
                 {
 
                     float random = (float)rnd.NextDouble();
@@ -238,7 +245,7 @@ namespace Server
                     }
 
                     // If this is a top or bottom row, create trees.
-                    if (y <= -newMap.Height / 2.0f || (newMap.Height / 2.0f) <= y + TreeServer.TREE_RADIUS)
+                    if (y <= startY || endY <= (y + TreeServer.TREE_RADIUS))
                     {
 
                         // Make a new tree.
@@ -253,7 +260,7 @@ namespace Server
                     }
 
                     // If this is the far left or right columns, create a tree.
-                    else if (x <= -newMap.Width / 2.0f || (newMap.Width / 2.0f) <= x + TreeServer.TREE_RADIUS)
+                    else if (x <= startX || endX <= (x + TreeServer.TREE_RADIUS))
                     {
 
                         // Make a new tree.
@@ -297,14 +304,10 @@ namespace Server
             double minY = Constants.FLOOR_HEIGHT;
             double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
-            // Variables for determining leaf spawn locations.
-            float HalfWidth = Constants.MAP_WIDTH / 2.0f;
-            float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
-
             float minX = activeMatch.NoMansLand.leftX;
             float maxX = activeMatch.NoMansLand.rightX;
-            float minZ = activeMatch.NoMansLand.downZ;
-            float maxZ = activeMatch.NoMansLand.upZ;
+            float minZ = activeMatch.NoMansLand.downZ + (2 * TreeServer.TREE_RADIUS);
+            float maxZ = activeMatch.NoMansLand.upZ - (2 * TreeServer.TREE_RADIUS);
 
             // Get random doubles for position.
             double randX = rnd.NextDouble();

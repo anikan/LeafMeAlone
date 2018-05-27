@@ -14,14 +14,14 @@ namespace Client
     public class MapClient : NonNetworkedGameObjectClient
     {
 
-        // Tile width/height information.
-        private const float TILE_WIDTH = 10.0f;
-        private const float TILE_HEIGHT = 10.0f;
+        private Random rnd;
 
         // Number of tiles beyond the treeline (so player can't see blue).
         private const int BORDER_TILES = 10;
 
-        private const int NUM_TILES_PER_SIDE = (int)(Constants.MAP_WIDTH / TILE_WIDTH) + BORDER_TILES;
+        private const int NUM_TILES_WIDTH = (int)(Constants.MAP_WIDTH / Constants.TILE_SIZE) + BORDER_TILES;
+        private const int NUM_TILES_HEIGHT = (int)(Constants.MAP_HEIGHT / Constants.TILE_SIZE) + BORDER_TILES;
+
 
         private List<MapTile> MapTiles;
 
@@ -35,42 +35,49 @@ namespace Client
         {
 
             // Random number generator, to be used for y offsets. 
-            Random rnd = new Random();
+            rnd = new Random();
             activeMatch = Match.DefaultMatch;
 
             MapTiles = new List<MapTile>();
 
+
             // Iterate through the height of tiles.
-            for (float y = -(NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y < (NUM_TILES_PER_SIDE * TILE_HEIGHT) / 2.0f; y += TILE_HEIGHT - 0.2f)
+            for (float y = -(NUM_TILES_HEIGHT * Constants.TILE_SIZE) / 2.0f; y < (NUM_TILES_HEIGHT * Constants.TILE_SIZE) / 2.0f; y += Constants.TILE_SIZE - 0.01f)
             {
 
                 // Iterate through the width of tiles.
-                for (float x = -(NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x < (NUM_TILES_PER_SIDE * TILE_WIDTH) / 2.0f; x +=TILE_WIDTH - 0.2f)
+                for (float x = -(NUM_TILES_WIDTH * Constants.TILE_SIZE) / 2.0f; x < (NUM_TILES_WIDTH * Constants.TILE_SIZE) / 2.0f; x += Constants.TILE_SIZE - 0.01f)
                 {
 
-                    //Create a new tile.
-                    MapTile newTile = new MapTile();
-
-                    // Set the position of the tile
-                    newTile.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT - 1.0f, y);
-
-                    // Scale the tile to the correct size.
-                    newTile.Transform.Scale = new Vector3(TILE_WIDTH, 1.0f, TILE_HEIGHT);
-
-                    // Get a random offset.
-                    float random = (float) rnd.NextDouble();
-
-                    // Apply the random offset to mitigate z fighting
-                    float yOffset = (random * (0.1f - (-0.1f))) + (-0.1f);
-
-                    // Add the new tile to the tile list
-                    MapTiles.Add(newTile);
+                    CreateTile(x, y);
 
                 }
             }
 
+            // Assign tiles to sections of the map
             CreateDistinctTeamSections(activeMatch);
 
+        }
+
+        public void CreateTile(float x, float z)
+        {
+            //Create a new tile.
+            MapTile newTile = new MapTile();
+
+            // Set the position of the tile
+            newTile.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT - 1.0f, z);
+
+            // Scale the tile to the correct size.
+            newTile.Transform.Scale = new Vector3(Constants.TILE_SIZE, 1.0f, Constants.TILE_SIZE);
+
+            // Get a random offset.
+            float random = (float)rnd.NextDouble();
+
+            // Apply the random offset to mitigate z fighting
+            float yOffset = (random * (0.1f - (-0.1f))) + (-0.1f);
+
+            // Add the new tile to the tile list
+            MapTiles.Add(newTile);
         }
 
         /// <summary>
@@ -97,10 +104,12 @@ namespace Client
 
                     }
                 }
-
+                
+                // Check if this tile is in no man's land.
                 if (currentMatch.NoMansLand.IsInBounds(MapTiles[i].Transform.Position))
                 {
 
+                    // Tint the tile.
                     MapTiles[i].CurrentTint = currentMatch.NoMansLand.sectionColor;
 
                 }

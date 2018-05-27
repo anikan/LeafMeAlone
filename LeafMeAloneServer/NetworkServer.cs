@@ -168,8 +168,15 @@ namespace Server
             List<GameObjectServer> gameObjects = GameServer.instance.gameObjectDict.Values.ToList();
             for (int i = 0; i < gameObjects.Count; i++)
             {
-                BasePacket packetToSend = ServerPacketFactory.CreateUpdatePacket(gameObjects[i]);
-                SendAll(PacketUtil.Serialize(packetToSend));
+                GameObjectServer objectToSend = gameObjects[i];
+
+                //Send an update if the object is not a leaf or if the leaf has been modified.
+                if (!(objectToSend is LeafServer) || objectToSend.Modified)
+                {
+                    objectToSend.Modified = false;
+                    BasePacket packetToSend = ServerPacketFactory.CreateUpdatePacket(gameObjects[i]);
+                    SendAll(PacketUtil.Serialize(packetToSend));
+                }
             }
 
             foreach (var gameObj in GameServer.instance.toDestroyQueue)

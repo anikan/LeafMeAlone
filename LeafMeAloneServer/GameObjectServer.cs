@@ -24,6 +24,10 @@ namespace Server
         // Timer to keep track of when health should decrement.
         private Stopwatch HealthDecrementTimer;
 
+        //True if this object has been changed since the last update and needs to be sent to all clients.
+        //Set when burning or when it moves.
+        public bool Modified;
+
         /// <summary>
         /// Constructor for a GameObject that's on the server, with default instantiation position.
         /// </summary>
@@ -65,14 +69,14 @@ namespace Server
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
-
-
             // If this object is burning.
             if (Burning)
             {
                 // Check if the health decrement rate has been passed and if so, decrement health.
                 if (HealthDecrementTimer.ElapsedMilliseconds / 1000.0f >= HEALTH_DECREMENT_RATE)
                 {
+                    //The object took damage, it's been modified.
+                    Modified = true;
 
                     // Get fire damage from the flamethrower.
                     float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
@@ -99,7 +103,9 @@ namespace Server
         /// </summary>
         public void CatchFire()
         {
-
+            //The object started burning, it's been modified.
+            Modified = true;
+            
             Burning = true;
             BurnTimer.Restart();
             HealthDecrementTimer.Restart();
@@ -110,6 +116,9 @@ namespace Server
         /// </summary>
         public void Extinguish()
         {
+            //The object stopped burning, it's been modified.
+            Modified = true;
+
             Burning = false;
             BurnTimer.Stop();
             BurnTimer.Reset();
@@ -123,7 +132,6 @@ namespace Server
         /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
         public virtual void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
-
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
 

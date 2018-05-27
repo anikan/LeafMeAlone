@@ -57,6 +57,7 @@ namespace Shared
                 {
                     // Increase the number of leaves.
                     numLeaves++;
+
                 //    Console.WriteLine("Num objects is now " + numLeaves);
                 }
             }

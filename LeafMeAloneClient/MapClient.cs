@@ -73,22 +73,38 @@ namespace Client
 
         }
 
+        /// <summary>
+        /// Assign specific tiles to sections of the map.
+        /// </summary>
+        /// <param name="currentMatch">The current active match.</param>
         public void CreateDistinctTeamSections(Match currentMatch)
         {
 
+            // Iterate through all the map tiles.
             for (int i = 0; i < MapTiles.Count; i++)
             {
 
+                // Iterate through all the team sections.
                 for (int j = 0; j < currentMatch.teamSections.Count; j++)
                 {
 
+                    // If the current tile is in the bounds of the section.
                     if (currentMatch.teamSections[j].IsInBounds(MapTiles[i].Transform.Position))
                     {
 
-                        MapTiles[i].Transform.Position.Y += currentMatch.teamSections[j].sectionColor.X;
+                        // Tint the tile.
+                        MapTiles[i].CurrentTint = currentMatch.teamSections[j].sectionColor;
 
                     }
                 }
+
+                if (currentMatch.NoMansLand.IsInBounds(MapTiles[i].Transform.Position))
+                {
+
+                    MapTiles[i].CurrentTint = currentMatch.NoMansLand.sectionColor;
+
+                }
+
             }
         }
 

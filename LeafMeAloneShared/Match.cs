@@ -42,7 +42,7 @@ namespace Shared
         public List<TeamSection> teamSections;
 
         // Area that doesn't belong to any teams.
-        private TeamSection NoMansLand;
+        public TeamSection NoMansLand;
 
         public Match()
         {
@@ -76,7 +76,7 @@ namespace Shared
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
 
                 // Color should be gray (or normal? idk).
-                sectionColor = new Vector3(0.0f, 0.0f, 0.0f)
+                sectionColor = new Vector3(1.0f, 1.0f, 1.0f)
             };
 
             // Create a new list of team sections.
@@ -91,7 +91,7 @@ namespace Shared
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
 
                 // Make the section red
-                sectionColor = new Vector3(1.0f, 0.0f, 0.0f)
+                sectionColor = new Vector3(1.5f, 1.0f, 1.0f)
 
             });
 
@@ -104,7 +104,7 @@ namespace Shared
                 downZ = -Constants.MAP_HEIGHT / 2.0f,
 
                 // Make the section blue.
-                sectionColor = new Vector3(0.0f, 0.0f, 1.0f)
+                sectionColor = new Vector3(1.0f, 1.0f, 1.5f)
             });
 
             // Print out the bounds of the match.

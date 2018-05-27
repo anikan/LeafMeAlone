@@ -38,7 +38,7 @@ namespace Server
 
         private Random rnd;
 
-        private Match defaultMatch = Match.DefaultMatch;
+        private Match activeMatch = Match.DefaultMatch;
 
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
@@ -159,7 +159,7 @@ namespace Server
             // Add the effects of the player tools.
             AddPlayerToolEffects();
 
-            defaultMatch.CountObjectsOnSides(GetLeafListAsObjects());
+            activeMatch.CountObjectsOnSides(GetLeafListAsObjects());
           //  Console.WriteLine(defaultMatch);
 
             if (playerServerList.Count > 0)
@@ -301,10 +301,10 @@ namespace Server
             float HalfWidth = Constants.MAP_WIDTH / 2.0f;
             float HalfHeight = Constants.MAP_HEIGHT / 2.0f;
 
-            float minX = -HalfWidth + Constants.BORDER_MARGIN;
-            float maxX = HalfWidth - Constants.BORDER_MARGIN;
-            float minZ = -HalfHeight + Constants.BORDER_MARGIN;
-            float maxZ = HalfHeight - Constants.BORDER_MARGIN;
+            float minX = activeMatch.NoMansLand.leftX;
+            float maxX = activeMatch.NoMansLand.rightX;
+            float minZ = activeMatch.NoMansLand.downZ;
+            float maxZ = activeMatch.NoMansLand.upZ;
 
             // Get random doubles for position.
             double randX = rnd.NextDouble();

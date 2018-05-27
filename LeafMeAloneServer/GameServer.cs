@@ -77,7 +77,10 @@ namespace Server
             CreateRandomLeaves(Constants.NUM_LEAVES);
             //CreateLeaves(100, -10, 10, -10, 10);
 
-            activeMatch.StartMatch(int.MaxValue);
+            if (development)
+            {
+                activeMatch.StartMatch(int.MaxValue);
+            }
         }
 
         public static int Main(String[] args)
@@ -113,8 +116,8 @@ namespace Server
                 networkServer.Receive();
 
                 //Update the server players based on received packets.
-                if (activeMatch.Started())
-                {
+                //if (activeMatch.Started())
+                //{
                     for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
                     {
                         RequestPacket packet = networkServer.PlayerPackets[i];
@@ -128,7 +131,7 @@ namespace Server
                         }
                     }
 
-                }
+                //}
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
@@ -422,7 +425,7 @@ namespace Server
             int index = new Random().Next(spawnPoints.Count);
             return spawnPoints.ElementAt(index);
         }
-
+      
         public List<GameObject> GetLeafListAsObjects()
         {
 
@@ -431,12 +434,10 @@ namespace Server
 
             for (int i = 0; i < gameObjects.Count; i++)
             {
-
                 if (gameObjects[i] is LeafServer)
                 {
                     leaves.Add(gameObjects[i]);
                 }
-
             }
 
             return leaves;

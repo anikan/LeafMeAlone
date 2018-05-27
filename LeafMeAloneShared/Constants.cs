@@ -39,6 +39,8 @@ namespace Shared
         public const float MAP_WIDTH = 150.0f;
         public const float MAP_HEIGHT = 150.0f;
 
+        public const float NO_MANS_LAND_PERCENT = 0.1f;
+
         // Margin around the map. Leaves won't spawn in these margins.
         public const float BORDER_MARGIN = 5.0f;
 

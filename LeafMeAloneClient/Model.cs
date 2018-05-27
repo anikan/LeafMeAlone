@@ -141,18 +141,17 @@ namespace Client
                 m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
                 if (CurrentAnimationIndex != -1)
                 {
-                    if (CurrentAnimationIndex != -1)
-                    {
-                        m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
-                        m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
-                        m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
-                        m_ActiveGeo.RepeatAnimation = RepeatAnimation;
-                        m_ActiveGeo.UpdateAnimation();
-                    }
 
-                    m_ActiveShader.UseShader();
-                    m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                    m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
+                    m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
+                    m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
+                    m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+                    m_ActiveGeo.UpdateAnimation();
                 }
+
+                m_ActiveShader.UseShader();
+                m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                
             }
         }
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Assimp;
 using Shared;
 using SlimDX;
 
@@ -24,7 +25,24 @@ namespace Client
         // Debug cube to find the pivots of objects.
         private NonNetworkedGameObjectClient PivotCube;
 
-        public Vector3 CurrentTint = new Vector3(1,1,1);
+
+        private float minCap = .3f;
+        public Vector3 CurrentTint
+        {
+            get => model.Tint;
+            set
+            {
+                if(model.Tint.X > minCap)
+                    model.Tint.X = value.X;
+                if (model.Tint.Y > minCap)
+                    model.Tint.Y = value.Y;
+                if (model.Tint.Z > minCap)
+                    model.Tint.Z = value.Z;
+            }
+            
+        }
+
+
 
 
         /// <summary>
@@ -45,16 +63,6 @@ namespace Client
                 Fire.Transform.Rotation.X = 90f.ToRadians();
                 Fire.SetOrigin(Vector3.Zero);
             }
-        }
-
-        /// <summary>
-        /// Set the tint of the object.
-        /// </summary>
-        /// <param name="tint"></param>
-        private void SetTint(Vector3 tint)
-        {
-            if(model != null)
-                model.Tint = tint;
         }
 
         /// <summary>
@@ -115,9 +123,6 @@ namespace Client
                 PivotCube.Transform.Position = Transform.Position;
                 PivotCube.Update(deltaTime);
             }
-
-            SetTint(CurrentTint);
-
         }
 
         /// <summary>

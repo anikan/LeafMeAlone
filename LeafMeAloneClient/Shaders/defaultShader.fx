@@ -210,10 +210,6 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		retColor = retColor * tex_diffuse.Sample(MeshTextureSampler, iTex);
 	}
 
-	/*if (slowBurnEnabled == 1) 
-	{
-		retColor.x = slowBurnColor;
-	}*/
 	return float4( retColor.xyz * Tint, Opacity );
 }
 

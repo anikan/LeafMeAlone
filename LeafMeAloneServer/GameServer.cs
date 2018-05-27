@@ -45,6 +45,7 @@ namespace Server
 
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
+        private bool matchOver = false;
 
         public GameServer(bool networked)
         {
@@ -172,24 +173,28 @@ namespace Server
             // Add the effects of the player tools.
             AddPlayerToolEffects();
 
-            activeMatch.CountObjectsOnSides(GetLeafListAsObjects());
-
-            // If game done, tell everyone the game is done
-            Team winningTeam = activeMatch.GameOver();
-            if (winningTeam != Team.NONE)
+            if (!matchOver)
             {
-                BasePacket donePacket = new ThePacketToEndAllPackets(winningTeam);
-                networkServer.SendAll(PacketUtil.Serialize(donePacket));
+                activeMatch.CountObjectsOnSides(GetLeafListAsObjects());
+                Team winningTeam = activeMatch.GameOver();
+                if (winningTeam != Team.NONE)
+                {
+                    DoMatchFinish(winningTeam);
+                }
             }
+        }
 
-            //  Console.WriteLine(defaultMatch);
-
-            if (playerServerList.Count > 0)
-            {
-                //     Console.WriteLine(playerServerList[0].Transform.Position);
-
-            }
-
+        /// <summary>
+        /// Handles the match over code, sends the win/lose to each player, 
+        /// sets the match as over, resets leaves
+        /// </summary>
+        /// <param name="winningTeam">The team which should win</param>
+        private void DoMatchFinish(Team winningTeam)
+        {
+            BasePacket donePacket = new ThePacketToEndAllPackets(winningTeam);
+            networkServer.SendAll(PacketUtil.Serialize(donePacket));
+            matchOver = true;
+            GetLeafListAsObjects().ForEach(l => l.Destroy());
         }
 
         public PlayerServer CreateNewPlayer()

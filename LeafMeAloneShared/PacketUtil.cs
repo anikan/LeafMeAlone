@@ -33,6 +33,7 @@ namespace Shared
             { PacketType.ObjectPacket, typeof(ObjectPacket) },
             { PacketType.IdPacket, typeof(IdPacket) },
             { PacketType.RequestPacket, typeof(RequestPacket) },
+            { PacketType.GameResultPacket, typeof(ThePacketToEndAllPackets) },
         };
 
         public const int PACK_HEAD_SIZE = 5;
@@ -100,7 +101,7 @@ namespace Shared
             packetClassMap.TryGetValue((PacketType)data[0], out Type packetType);
             if (packetType == null)
             {
-                throw new Exception("PacketType not recognized by deserializer!");
+                throw new Exception("Please add the new packet type to the packet class map!");
             }
             return (BasePacket) Serializer.Deserialize(packetType, new MemoryStream(objectData));
         }

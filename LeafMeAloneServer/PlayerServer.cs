@@ -47,7 +47,6 @@ namespace Server
             Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
 
-            Console.WriteLine(String.Format("Burning: {0}, Health: {1}", Burning, Health));
             // if health is down, start the players death clock
             if (Health < 0 && !Dead )
             {

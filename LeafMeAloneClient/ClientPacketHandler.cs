@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Client
 {
@@ -68,10 +69,9 @@ namespace Client
             {
                 if (client.GetPlayerTeam() == p.winningTeam)
                 {
-                    throw new Exception("YOU WIN!");
+                    Console.WriteLine("You Win!");
                 }
-
-                throw new Exception("YOU LOSE!");
+                Console.WriteLine("You Lose!");
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()

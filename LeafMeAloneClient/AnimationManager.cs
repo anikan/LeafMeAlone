@@ -35,7 +35,11 @@ namespace Client
             _animationModels[Id].StopCurrentAnimation();
             _animationModels[Id].StartAnimationSequenceByIndex(0, true);
             _animationModels[Id].m_Properties.CopyToThis(transform);
-            _animationModels[Id].m_Properties.Scale = _animationModels[Id].m_Properties.Scale * _scaleFactors[Id];
+
+            _animationModels[Id].m_Properties.Scale.X *= _scaleFactors[Id].X;
+            _animationModels[Id].m_Properties.Scale.Y *= _scaleFactors[Id].Y;
+            _animationModels[Id].m_Properties.Scale.Z *= _scaleFactors[Id].Z;
+
             return _animationModels[Id];
         }
     }

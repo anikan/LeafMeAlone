@@ -241,7 +241,7 @@ namespace Client
             bool currUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
 
-            EvaludateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind);
+            EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind);
 
             switch (ActiveToolMode)
             {
@@ -281,7 +281,7 @@ namespace Client
         /// <param name="currUsingFlame">using flamethrower currently? </param>
         /// <param name="prevUsingWind"> using windblower previously? </param>
         /// <param name="currUsingWind"> using windblower currently? </param>
-        public void EvaludateAudio(bool prevMoving, bool currMoving, bool prevUsingFlame, bool currUsingFlame, bool prevUsingWind, bool currUsingWind)
+        public void EvaluateAudio(bool prevMoving, bool currMoving, bool prevUsingFlame, bool currUsingFlame, bool prevUsingWind, bool currUsingWind)
         {
 
             // footstep audio logic

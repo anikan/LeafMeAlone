@@ -19,7 +19,6 @@ namespace Client
         private static List<int> _freeSourceAfterPlay;
         private static List<int> _freeSourcePoolAfterPlay;
         private static int _countPools = 0;
-        private static int _srcBgm;
         private static Dictionary<int, Queue<string>> _allQueueFiles;
         private static Dictionary<int, Queue<bool>> _allQueueRepeats;
 
@@ -29,7 +28,6 @@ namespace Client
         public static void Init()
         {
             _audio = new AudioSystem();
-            _srcBgm = _audio.GenSource();
             _allPools = new List<AudioSourcePool>();
             _freeSourcePoolAfterPlay = new List<int>();
             _freeSourceAfterPlay = new List<int>();
@@ -37,8 +35,14 @@ namespace Client
             _allQueueRepeats = new Dictionary<int, Queue<bool>>();
         }
 
-        private const int MAX_FRAME_PER_UDPATE = 15;
-
+        /// <summary>
+        /// Set the volume of the sound the player hears
+        /// </summary>
+        /// <param name="vol"> volume </param>
+        public static void SetListenerVolume(float vol)
+        {
+            _audio.SetListenerGain(vol);
+        }
 
         /// <summary>
         /// Check if the source is playing
@@ -68,6 +72,16 @@ namespace Client
         public static void PlayAudio(int source, string fileName, bool repeat = false)
         {
             _audio.Play(source, fileName, repeat);
+        }
+
+        /// <summary>
+        /// Update the world coordinates of the souce
+        /// </summary>
+        /// <param name="source"> id of the souce </param>
+        /// <param name="location"> location to place the souce </param>
+        public static void UpdateSourceLocation(int source, Vector3 location)
+        {
+            _audio.UpdateSourcePosition(source, location);
         }
 
         /// <summary>

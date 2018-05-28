@@ -283,6 +283,9 @@ namespace Client
         /// <param name="currUsingWind"> using windblower currently? </param>
         public void EvaluateAudio(bool prevMoving, bool currMoving, bool prevUsingFlame, bool currUsingFlame, bool prevUsingWind, bool currUsingWind)
         {
+            AudioManager.UpdateSourceLocation(_audioFlame, Transform.Position);
+            AudioManager.UpdateSourceLocation(_audioWind, Transform.Position);
+            AudioManager.UpdateSourceLocation(_audioFootstep, Transform.Position);
 
             // footstep audio logic
             // if start moving

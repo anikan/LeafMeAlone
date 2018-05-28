@@ -66,6 +66,8 @@ namespace Client
 
         private NetworkClient networkClient;
 
+        private int _audioBGM;
+
         public static GameClient instance;
 
         private static void Main(String[] args)
@@ -87,6 +89,7 @@ namespace Client
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
+            AudioManager.SetListenerVolume(2.0f);
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
@@ -171,6 +174,9 @@ namespace Client
 
             leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
 
+            _audioBGM = AudioManager.GetNewSource();
+            AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
+
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
 
@@ -217,6 +223,7 @@ namespace Client
             // Restart the frame timer.
             FrameTimer.Restart();
 
+            //AudioManager.UpdateSourceLocation(_audioBGM, Camera.CameraPosition);
         }
 
         /// <summary>

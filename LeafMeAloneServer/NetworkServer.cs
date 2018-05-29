@@ -70,7 +70,6 @@ namespace Server
                 ipAddress = ipHostInfo.AddressList[0];
             }
 
-
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);
 
             // Create a TCP/IP socket.  
@@ -190,12 +189,16 @@ namespace Server
         /// and then sends that active player to the clientSocket that is 
         /// specified
         /// </summary>
-        /// <param name="clientSocket">
+        /// <param name="clientSocket"> 
         /// The socket that needs an active player
         /// </param>
         private void ProcessNewPlayer(Socket clientSocket)
         {
             PlayerServer player = GameServer.instance.CreateNewPlayer();
+
+            //Associate player's id with with the socket. 
+            playerDictionary.Add(clientSocket, player.Id);
+
             CreatePlayerPacket createPlayPack = ServerPacketFactory.NewCreatePacket(player);
             // Create createObjectPacket, send to client
             byte[] data = PacketUtil.Serialize(createPlayPack);
@@ -218,7 +221,6 @@ namespace Server
                 // Read data from the client socket.   
                 int bytesReceived = handler.EndReceive(ar);
 
-
                 // There might be more data, so store the data received so far.  
                 lock (ByteReceivedQueue)
                 {
@@ -237,9 +239,8 @@ namespace Server
 
             catch (SocketException e)
             {
-                Console.WriteLine("Player Disconnected");
+                HandlePlayerDisconnect(handler);
 
-                clientSockets.Remove(handler);
                 return;
             }
         }
@@ -320,10 +321,8 @@ namespace Server
 
                 catch (SocketException e)
                 {
-                    //Console.WriteLine(e.Message);
-                    Console.WriteLine("Player Disconnected");
+                    HandlePlayerDisconnect(socket);
 
-                    clientSockets.Remove(socket);
                     i -= 1;
                 }
             }
@@ -347,9 +346,26 @@ namespace Server
             }
             catch (SocketException e)
             {
-                Console.WriteLine("Player Disconnected");
+                HandlePlayerDisconnect(handler);
+            }
+        }
 
-                clientSockets.Remove(handler);
+        void HandlePlayerDisconnect(Socket disconnectingSocket)
+        {
+            Console.WriteLine("Player Disconnected");
+
+            clientSockets.Remove(disconnectingSocket);
+
+            int playerId;
+
+            //Destroy the player. This removes from server and will next frame send a packet to the remaining clients.
+            if (playerDictionary.TryGetValue(disconnectingSocket, out playerId))
+            {
+                GameObjectServer player;
+                if (GameServer.instance.gameObjectDict.TryGetValue(playerId, out player))
+                {
+                    GameServer.instance.Destroy(player);
+                }
             }
         }
     }

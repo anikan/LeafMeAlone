@@ -81,7 +81,7 @@ namespace Client
         public static Shader ActiveShader;
 
         public static Light ActiveLightSystem;
-
+        
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
 
@@ -95,6 +95,7 @@ namespace Client
                     ActivePlayer.Transform.Position);
             }
             LeafClient.Fire?.Update(delta_t);
+
         }
 
         public static void Draw()
@@ -149,6 +150,7 @@ namespace Client
             LoadAllShaders();
 
             ParticleSystems = new List<ParticleSystem>();
+
         }
 
         /// <summary>

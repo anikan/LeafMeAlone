@@ -24,15 +24,22 @@ namespace Shared
     public abstract class GameObject : IObject
     {
 
+        // Can this object be burned?
         public bool Burnable = false;
+
+        // How many frames this object has consistently been burning for.
         protected int burnFrames = 0;
 
+        // Is this object burning?
         public bool Burning
         {
+            // Just see if burn frames is more than zero.
             get
             {
                 return burnFrames > 0;
             }
+            
+            // To set burning, just set the burn frames to 1 or 0.
             set
             {
                 if (Burnable)

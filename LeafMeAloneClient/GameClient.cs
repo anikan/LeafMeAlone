@@ -50,6 +50,12 @@ namespace Client
             Console.WriteLine("Player Died");
         }
 
+        /// <summary>
+        /// The ID of the audio pool to be used by all the leaves collectively
+        /// </summary>
+        public int leafAudioPoolId;
+        public const int LeafAudioCapacity = 50;
+
         // The active camera in the scene.
         private Camera Camera => GraphicsManager.ActiveCamera;
 
@@ -84,6 +90,7 @@ namespace Client
             // Initialize graphics classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
+            AudioManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
@@ -95,11 +102,12 @@ namespace Client
                 new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
             Client.gameTimer =
                 new UITimer(60, new Size(225, 3), new Point(0, 0));
-
+            
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
+
         }
 
         internal Team GetPlayerTeam()
@@ -139,6 +147,8 @@ namespace Client
             GraphicsRenderer.BarContext.Draw();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
+
+            AudioManager.Update();
         }
 
         // Start the networked client (connect to server).
@@ -162,6 +172,8 @@ namespace Client
             // Initialize game object lists.
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
+
+            leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);

@@ -20,6 +20,7 @@ namespace Client
 
         private double totalFrames = 0.0f;
         private double totalTime = 0.0f;
+        private DrawableTexture t;
 
         public UIFramesPersecond()
         {
@@ -28,8 +29,8 @@ namespace Client
             fps = UIManagerSpriteRenderer.DrawTextContinuous("0", UIManagerSpriteRenderer.TextType.BOLD,
                 new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), TextAlignment.Right | TextAlignment.Top, Color.Red);
 
-            var t = UIManagerSpriteRenderer.DrawTextureContinuous(Constants.Arrow, new Vector2(100, 100),
-                new Vector2(75, 75));
+            t = UIManagerSpriteRenderer.DrawTextureContinuous(Constants.Arrow, new Vector2(100, 100),
+               new Vector2(75, 75),0);
         }
 
         public void Start()
@@ -56,6 +57,8 @@ namespace Client
             }
 
             fps.Text = CurrentFps.ToString();
+            t.Position.X = (float)CurrentFps * 20;
+            t.Rotation = ((float)CurrentFps).ToRadians();
             stopwatch.Reset();
         }
     }

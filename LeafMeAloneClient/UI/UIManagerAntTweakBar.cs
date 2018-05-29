@@ -46,7 +46,7 @@ namespace Client
         }
     }
 
-    
+
 
     public class DrawableString
     {
@@ -71,12 +71,14 @@ namespace Client
     {
         public string View;
         public Vector2 Position, Size;
+        public double Rotation;
 
-        public DrawableTexture(string view, Vector2 position, Vector2 size)
+        public DrawableTexture(string view, Vector2 position, Vector2 size, double rotation)
         {
             View = view;
             Position = position;
             Size = size;
+            Rotation = rotation;
         }
     }
 
@@ -101,8 +103,8 @@ namespace Client
         {
 
             SpriteRenderer = new SpriteRenderer(GraphicsRenderer.Device);
-         }
-#region Text
+        }
+        #region Text
         public static void DrawText(string text, TextType type, Vector2 position, Color color)
         {
             EnsureTypeExists(type);
@@ -117,7 +119,7 @@ namespace Client
 
         public static DrawableString DrawTextContinuous(string text, TextType type, RectangleF pos, SpriteTextRenderer.TextAlignment alignment, Color color)
         {
-            DrawableString d = new DrawableString(text, type, pos,alignment, color);
+            DrawableString d = new DrawableString(text, type, pos, alignment, color);
             textPerFrame.Add(d);
             return d;
         }
@@ -129,24 +131,24 @@ namespace Client
         #endregion
         #region Textures
 
-        public static void DrawTexture(string texture, Vector2 pos, Vector2 size)
+        public static void DrawTexture(string texture, Vector2 pos, Vector2 size, double rotationAngle)
         {
             if (!DrawableImages.ContainsKey(texture))
             {
                 var sdxTexture = Texture2D.FromFile(GraphicsRenderer.Device, texture);
                 DrawableImages[texture] = new ShaderResourceView(GraphicsRenderer.Device, sdxTexture);
             }
-            SpriteRenderer.Draw(DrawableImages[texture],pos,size,CoordinateType.Absolute);
+            SpriteRenderer.Draw(DrawableImages[texture], pos, size, Vector2.Zero,rotationAngle, CoordinateType.Absolute);
         }
 
-        public static DrawableTexture DrawTextureContinuous(string texture, Vector2 pos, Vector2 size)
+        public static DrawableTexture DrawTextureContinuous(string texture, Vector2 pos, Vector2 size, double rotationAngle)
         {
             if (!DrawableImages.ContainsKey(texture))
             {
                 var sdxTexture = Texture2D.FromFile(GraphicsRenderer.Device, texture);
                 DrawableImages[texture] = new ShaderResourceView(GraphicsRenderer.Device, sdxTexture);
             }
-            texturesPerFrame.Add(new DrawableTexture(texture, pos, size));
+            texturesPerFrame.Add(new DrawableTexture(texture, pos, size, rotationAngle));
             return texturesPerFrame.Last();
         }
 
@@ -160,7 +162,7 @@ namespace Client
             }
             foreach (DrawableTexture tex in texturesPerFrame)
             {
-                DrawTexture(tex.View,tex.Position,tex.Size);
+                DrawTexture(tex.View, tex.Position, tex.Size, tex.Rotation);
             }
         }
 

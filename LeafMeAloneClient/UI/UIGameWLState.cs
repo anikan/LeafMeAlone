@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AntTweakBar;
 using Shared;
+using SlimDX;
 
 namespace Client.UI
 {
@@ -17,39 +18,30 @@ namespace Client.UI
     }
     class UIGameWLState
     {
-        private State CurrState = State.None;
+        private State CurrState = State.Win;
 
-        public StringVariable StateText;
-        public UIGameWLState(Size size, Point location)
+        public DrawableString StateText;
+        public UIGameWLState(Vector2 position)
         {
-            StateText = new StringVariable(UIManager.Create(" ",size,location))
-            {
-                ReadOnly = true,
-                Label = " "
-            };
-            SetState(State.None);
+            StateText = UIManager2.DrawTextContinuous("", UIManager2.TextType.MASSIVE, position, Color.Transparent);
+            SetState(State.Win);
         }
 
         public void SetState(State s)
         {
             CurrState = s;
-            switch (s)
+            switch (CurrState)
             {
                 case State.Win:
-                    StateText.Value = Constants.WinText;
-                    UIManager.ActiveUI[" "].Color = Color.Green;
-                    UIManager.ActiveUI[" "].Visible = true;
+                    StateText.Text = Constants.WinText;
+                    StateText.Color = Color.Green;
                     break;
                 case State.Lose:
-                    StateText.Value = Constants.LoseText;
-                    UIManager.ActiveUI[" "].Color = Color.Red;
-                    UIManager.ActiveUI[" "].Visible = true;
-                    StateText.Visible = true;
+                    StateText.Text = Constants.LoseText;
+                    StateText.Color = Color.Red;
                     break;
                 case State.None:
-                    StateText.Value = String.Empty;
-                    StateText.Visible = false;
-                    UIManager.ActiveUI[" "].Visible = false;
+                    StateText.Text = String.Empty;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(s), s, null);

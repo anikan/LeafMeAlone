@@ -104,7 +104,7 @@ namespace Client
             Client.fps = new UIFramesPersecond(new Size(5, 10), new Point(GraphicsRenderer.Form.ClientSize.Width - 100, 0));
             Client.gameTimer = new UITimer(60, new Size(5, 10), new Point(0, 0));
             Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
-            Client.GameWinLossState = new UIGameWLState(new Size(150,100),new Point(GraphicsRenderer.Form.ClientSize.Width/2, GraphicsRenderer.Form.ClientSize.Height/2));
+            Client.GameWinLossState = new UIGameWLState(new Vector2(GraphicsRenderer.Form.ClientSize.Width/2, GraphicsRenderer.Form.ClientSize.Height/2));
 
 
 

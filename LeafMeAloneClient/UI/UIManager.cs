@@ -74,7 +74,8 @@ namespace Client
         {
             BOLD,
             NORMAL,
-            COMIC_SANS
+            COMIC_SANS,
+            MASSIVE
         }
 
         public static SpriteRenderer SpriteRenderer;
@@ -105,6 +106,9 @@ namespace Client
                         break;
                     case TextType.COMIC_SANS:
                         TextRenderers[type] = new TextBlockRenderer(SpriteRenderer, "Comic Sans", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+                        break;
+                    case TextType.MASSIVE:
+                        TextRenderers[type] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(type), type, null);

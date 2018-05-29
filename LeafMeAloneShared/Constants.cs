@@ -10,7 +10,6 @@ namespace Shared
         public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 3.85f, 3.0f);
 
 
-
         /// <summary>
         /// Shaders
         /// </summary>

@@ -10,6 +10,9 @@ using SlimDX.DXGI;
 using SlimDX.Windows;
 using System.Net;
 using Shared.Packet;
+using SlimDX.DirectWrite;
+using SpriteTextRenderer;
+using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
 
 namespace Client
 {
@@ -63,7 +66,7 @@ namespace Client
         public Stopwatch FrameTimer;
         private UIFramesPersecond fps;
         private UITimer gameTimer;
-        private UITexture test;
+        
 
         private NetworkClient networkClient;
 
@@ -100,8 +103,6 @@ namespace Client
             Client.gameTimer =
                 new UITimer(60, new Size(225, 3), new Point(0, 0));
             
-            Client.test = new UITexture(Constants.FireTexture);
-
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
@@ -112,7 +113,7 @@ namespace Client
         {
             return ActivePlayer.team;
         }
-
+        
         private void DoGameLoop()
         {
             fps.Start();
@@ -121,10 +122,9 @@ namespace Client
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(
                 GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth,
                 1.0f, 0);
-
+            
             // Receive any packets from the server.
             ReceivePackets();
-
             // If there's an active player right now.
             if (ActivePlayer != null)
             {
@@ -135,14 +135,21 @@ namespace Client
                 SendPackets();
             }
 
+
+            UIManager2.DrawText("Hello", UIManager2.TextType.COMIC_SANS, new Vector2(100, 100), Color.Pink);
+            UIManager2.DrawText("Hello", UIManager2.TextType.NORMAL, new Vector2(100, 120), Color.Green);
+            UIManager2.DrawText("Hello", UIManager2.TextType.BOLD, new Vector2(100, 140), Color.Red);
+
             // Update all objects.
             Update();
 
             // Draw everythhing.
             Render();
-
+            
 
             GraphicsRenderer.BarContext.Draw();
+            UIManager2.Update();
+            UIManager2.SpriteRenderer.Flush();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
 
@@ -212,8 +219,7 @@ namespace Client
             {
                 obj.Update(delta);
             }
-
-            test.Update();
+            
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);
@@ -228,7 +234,6 @@ namespace Client
         /// </summary>
         private void Render()
         {
-            test.Draw();
             // Iterate through all networked game objects and draw them.
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in
                 NetworkedGameObjects.AsEnumerable())

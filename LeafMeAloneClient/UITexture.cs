@@ -41,12 +41,12 @@ namespace Client
             Tex.Write(new Vector3(0f, 1f, 0f));
             Tex.Write(new Vector3(1f, 0f, 0f));
 
-            Faces.Write((uint)4);
-            Faces.Write((uint)(4 + 2));
-            Faces.Write((uint)(4 + 1));
-            Faces.Write((uint)4);
-            Faces.Write((uint)(4 + 1));
-            Faces.Write((uint)(4 + 3));
+            Faces.Write((uint)0);
+            Faces.Write((uint)(0 + 2));
+            Faces.Write((uint)(0 + 1));
+            Faces.Write((uint)0);
+            Faces.Write((uint)(0 + 1));
+            Faces.Write((uint)(0 + 3));
 
             Faces.Position = 0;
             Tex.Position = 0;
@@ -61,7 +61,7 @@ namespace Client
         {
             var vertBox = GraphicsRenderer.DeviceContext.MapSubresource(VBO_Verts, 0, MapMode.WriteDiscard, MapFlags.None);
 
-            float objSize = 1.0f;
+            float objSize = 2;
             Vector3 posVal = Vector3.Zero;
             Vector3 topLeft_Both = new Vector3(posVal.X - objSize, posVal.Y + objSize, posVal.Z);
             Vector3 bottomRight_Both = new Vector3(posVal.X + objSize, posVal.Y - objSize, posVal.Z);
@@ -78,7 +78,11 @@ namespace Client
 
         public void Draw()
         {
-
+            if (GraphicsManager.ActiveCamera != null)
+                modelMatrix.Position = GraphicsManager.ActiveCamera.CameraPosition - new Vector3(0,10,10);
+            //modelMatrix.Position.Y = 10;
+            modelMatrix.Rotation.X = 90f.ToRadians();
+            modelMatrix.Position.Z = 0;
             GraphicsRenderer.DeviceContext.InputAssembler.InputLayout = UITextureManager.InputLayout;
             GraphicsRenderer.DeviceContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             GraphicsRenderer.DeviceContext.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(VBO_Verts, Vector3.SizeInBytes, 0));

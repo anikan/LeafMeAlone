@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AntTweakBar;
+using SlimDX;
 
 namespace Client
 {
@@ -13,23 +14,17 @@ namespace Client
     {
         public double CurrentFps;
         private readonly Stopwatch stopwatch;
-        private readonly DoubleVariable fps;
+        private readonly DrawableString fps;
 
-
-        private double totalFrames = 0;
+        private double totalFrames = 0.0f;
         private double totalTime = 0.0f;
 
         public UIFramesPersecond(Size size, Point location)
         {
-            CurrentFps = 0;
+            CurrentFps = 0.0f;
             stopwatch = Stopwatch.StartNew();
-            fps = new DoubleVariable(UIManager.Create("FPS", size, location))
-            {
-                ReadOnly = true,
-                Label = "FPS",
-                Precision = 2,
-                Value = 0
-            };
+            fps = UIManager2.DrawTextContinuous("0", UIManager2.TextType.BOLD,
+                new Vector2(GraphicsRenderer.Form.Width-40, 0), Color.Red);
         }
 
         public void Start()
@@ -45,7 +40,7 @@ namespace Client
             if (stopwatch.ElapsedMilliseconds > 1)
             {
                 totalFrames++;
-                totalTime+= stopwatch.ElapsedMilliseconds / 1000.0;
+                totalTime+= (double)stopwatch.ElapsedMilliseconds / 1000.0;
                 if (totalTime > 1.0f)
                 {
                     CurrentFps = totalFrames;
@@ -55,7 +50,7 @@ namespace Client
 
             }
 
-            fps.Value = CurrentFps;
+            fps.Text = CurrentFps.ToString();
             stopwatch.Reset();
         }
     }

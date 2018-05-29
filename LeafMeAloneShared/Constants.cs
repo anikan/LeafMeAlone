@@ -36,18 +36,18 @@ namespace Shared
         /// Sounds/Audio files
         /// </summary>
         public const string Bgm = @"../../Sound/OptionalForestAmbient.wav";
-        public const string FlameThrowerStart = @"../../Sound/collision.wav";
-        public const string FlameThrowerLoop = @"../../Sound/Flamethrower.wav";
-        public const string FlameThrowerEnd = @"../../Sound/collision.wav";
+        public const string FlameThrowerStart = @"../../Sound/FlameThrower_Start.wav";
+        public const string FlameThrowerLoop = @"../../Sound/FlameThrower_Loop.wav";
+        public const string FlameThrowerEnd = @"../../Sound/FlameThrower_End.wav";
 
-        public const string LeafBlowerStart = @"../../Sound/collision.wav";
-        public const string LeafBlowerLoop = @"../../Sound/Leafblower.wav";
-        public const string LeafBlowerEnd = @"../../Sound/collision.wav";
+        public const string LeafBlowerStart = @"../../Sound/LeafBlower_Start.wav";
+        public const string LeafBlowerLoop = @"../../Sound/LeafBlower_Loop.wav";
+        public const string LeafBlowerEnd = @"../../Sound/LeafBlower_End.wav";
 
-        public const string LeafIgniting = @"../../Sound/collision.wav";
-        public const string LeafBurning = @"../../Sound/Fire Burning.wav";
-        public const string LeafBurnup = @"../../Sound/collision.wav";
-        public const string LeafPutoff = @"../../Sound/collision.wav";
+        public const string LeafIgniting = @"../../Sound/Leaf_Igniting.wav";
+        public const string LeafBurning = @"../../Sound/Leaf_Burning.wav";
+        public const string LeafBurnup = @"../../Sound/Leaf_Burnup.wav";
+        public const string LeafPutoff = @"../../Sound/Leaf_Putoff.wav";
 
         public const string PlayerFootstep = @"../../Sound/Footsteps.wav";
 

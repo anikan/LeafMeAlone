@@ -13,16 +13,10 @@ namespace Server
     /// </summary>
     public class LeafServer : PhysicsObject
     {
-        // Constants for leafs. 
-        public const float LEAF_HEALTH = 10.0f;
-        public const float LEAF_MASS = 0.1f;
-        public const float LEAF_RADIUS = 0.0f;
-        public const float LEAF_BOUNCIENESS = 3.0f;
-
         /// <summary>
         /// Create a new leaf on the server.
         /// </summary>
-        public LeafServer() : base(ObjectType.LEAF, LEAF_HEALTH, LEAF_MASS, LEAF_RADIUS, LEAF_BOUNCIENESS)
+        public LeafServer() : base(ObjectType.LEAF, Constants.LEAF_HEALTH, Constants.LEAF_MASS, Constants.LEAF_RADIUS, Constants.LEAF_BOUNCIENESS)
         {
             Burnable = true;
         }

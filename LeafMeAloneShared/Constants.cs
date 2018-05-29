@@ -83,5 +83,11 @@ namespace Shared
         public const bool PIVOT_DEBUG = false;
 
         public const int DEATH_TIME = 3;
+
+        // Constants for leafs. 
+        public const float LEAF_HEALTH = 10.0f;
+        public const float LEAF_MASS = 0.1f;
+        public const float LEAF_RADIUS = 0.0f;
+        public const float LEAF_BOUNCIENESS = 3.0f;
     }
 }

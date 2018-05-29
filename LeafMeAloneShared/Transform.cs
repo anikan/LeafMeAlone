@@ -74,11 +74,6 @@ namespace Shared
             return new Vector2(Position.X, Position.Z);
         }
 
-        public override string ToString()
-        {
-            return base.ToString();
-        }
-
         public override int GetHashCode()
         {
             return base.GetHashCode();

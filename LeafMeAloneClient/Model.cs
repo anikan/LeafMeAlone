@@ -59,8 +59,7 @@ namespace Client
             m_PrevProperties.Position = new Vector3(0, 0, 0);
             m_PrevProperties.Scale = new Vector3(1, 1, 1);
             Update(0);
-
-            //burningGeoColorEnabled = burningEnabled;
+            
             setShader(Constants.DefaultShader);
 
             m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
@@ -120,6 +119,7 @@ namespace Client
             {
                 m_ActiveGeo = new Geometry(filePath, enableRigging);
                 GraphicsManager.DictGeometry[filePath] = m_ActiveGeo;
+                Console.WriteLine($"New model: + {filePath}");
             }
         }
 
@@ -138,7 +138,7 @@ namespace Client
         public void Draw()
         {
             if (Enabled) {
-                m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+                
                 if (CurrentAnimationIndex != -1)
                 {
 
@@ -150,6 +150,7 @@ namespace Client
                 }
 
                 m_ActiveShader.UseShader();
+                m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
                 m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
                 
             }
@@ -169,15 +170,7 @@ namespace Client
                 // prev properties = current properties
                 m_PrevProperties.CopyToThis(m_Properties);
 
-                m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
-
-                // set the rotation based on the three directions
-                m_ModelMatrix = m_ModelMatrix * Matrix.RotationX(m_Properties.Rotation.X) *
-                                Matrix.RotationY(m_Properties.Rotation.Y) *
-                                Matrix.RotationZ(m_Properties.Rotation.Z);
-
-                // set the translation based on the position
-                m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);
+                m_ModelMatrix = m_Properties.AsMatrix();
             }
 
             if (!PauseAnimation && CurrentAnimationIndex != -1)
@@ -186,6 +179,8 @@ namespace Client
             }
         }
 
+
+        #region Animation
         /// <summary>
         /// start playing the animation sequence as specified by its name
         /// </summary>
@@ -273,5 +268,7 @@ namespace Client
         {
             return PauseAnimation;
         }
+
+        #endregion
     }
 }

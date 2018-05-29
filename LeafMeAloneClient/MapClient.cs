@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Shared;
 using SlimDX;
+using SlimDX.Direct3D11;
+using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace Client
 {
@@ -14,6 +16,23 @@ namespace Client
     public class MapClient : NonNetworkedGameObjectClient
     {
 
+
+        #region Graphics
+        //create buffers
+        private SlimDX.Direct3D11.Buffer VBO_Verts, VBO_Tex, VBO_Origin;
+        private Buffer EBO;
+        private DataStream Tex, Faces;
+
+
+        //create texture
+        private ShaderResourceView TexSRV;
+        #endregion
+
+
+
+
+
+
         private Random rnd;
 
         // Number of tiles beyond the treeline (so player can't see blue).
@@ -21,6 +40,9 @@ namespace Client
 
         private const int NUM_TILES_WIDTH = (int)(Constants.MAP_WIDTH / Constants.TILE_SIZE) + BORDER_TILES;
         private const int NUM_TILES_HEIGHT = (int)(Constants.MAP_HEIGHT / Constants.TILE_SIZE) + BORDER_TILES;
+
+
+
 
 
         private List<MapTile> MapTiles;
@@ -62,7 +84,7 @@ namespace Client
         public void CreateTile(float x, float z)
         {
 
-            Console.WriteLine("Creating tile");
+           // Console.WriteLine("Creating tile");
 
             //Create a new tile.
             MapTile newTile = new MapTile();
@@ -129,7 +151,7 @@ namespace Client
                 obj.Update(deltaTime);
             }
         }
-
+         
         public override void Draw()
         {
             base.Draw();

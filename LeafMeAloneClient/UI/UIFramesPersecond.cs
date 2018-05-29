@@ -6,7 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AntTweakBar;
+using Shared;
 using SlimDX;
+using SpriteTextRenderer;
 
 namespace Client
 {
@@ -18,13 +20,17 @@ namespace Client
 
         private double totalFrames = 0.0f;
         private double totalTime = 0.0f;
+        private DrawableTexture t;
 
-        public UIFramesPersecond(Size size, Point location)
+        public UIFramesPersecond()
         {
             CurrentFps = 0.0f;
             stopwatch = Stopwatch.StartNew();
-            fps = UIManager2.DrawTextContinuous("0", UIManager2.TextType.BOLD,
-                new Vector2(GraphicsRenderer.Form.Width-UIManager2.GetTextWidth("0",UIManager2.TextType.BOLD).X, 0), Color.Red);
+            fps = UIManagerSpriteRenderer.DrawTextContinuous("0", UIManagerSpriteRenderer.TextType.BOLD,
+                new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), TextAlignment.Right | TextAlignment.Top, Color.Red);
+
+            t = UIManagerSpriteRenderer.DrawTextureContinuous(Constants.Arrow, new Vector2(100, 100),
+               new Vector2(75, 75),0);
         }
 
         public void Start()
@@ -40,7 +46,7 @@ namespace Client
             if (stopwatch.ElapsedMilliseconds > 1)
             {
                 totalFrames++;
-                totalTime+= (double)stopwatch.ElapsedMilliseconds / 1000.0;
+                totalTime += (double)stopwatch.ElapsedMilliseconds / 1000.0;
                 if (totalTime > 1.0f)
                 {
                     CurrentFps = totalFrames;
@@ -51,9 +57,8 @@ namespace Client
             }
 
             fps.Text = CurrentFps.ToString();
-            Console.WriteLine(UIManager2.GetTextWidth("0", UIManager2.TextType.BOLD).X);
-            fps.Position =
-                new Vector2(GraphicsRenderer.Form.Width - UIManager2.GetTextWidth("0", UIManager2.TextType.BOLD).X, 0);
+            t.Position.X = (float)CurrentFps * 20;
+            t.Rotation = ((float)CurrentFps).ToRadians();
             stopwatch.Reset();
         }
     }

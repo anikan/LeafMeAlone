@@ -147,7 +147,8 @@
     <Compile Include="ClientPacketFactory.cs" />
     <Compile Include="Shader.cs" />
     <Compile Include="UI\UIGameWLState.cs" />
-    <Compile Include="UI\UIManager.cs" />
+    <Compile Include="UI\UIManagerAntTweakBar.cs" />
+    <Compile Include="UI\UIManagerSpriteRenderer.cs" />
     <Compile Include="UI\UITeams.cs" />
     <Compile Include="UI\UITimer.cs" />
     <Compile Include="UITexture.cs" />

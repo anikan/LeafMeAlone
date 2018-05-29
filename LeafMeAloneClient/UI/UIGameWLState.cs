@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AntTweakBar;
 using Shared;
 using SlimDX;
+using SpriteTextRenderer;
 
 namespace Client.UI
 {
@@ -21,9 +22,10 @@ namespace Client.UI
         private State CurrState = State.Win;
 
         public DrawableString StateText;
-        public UIGameWLState(Vector2 position)
+        public UIGameWLState()
         {
-            StateText = UIManager2.DrawTextContinuous("", UIManager2.TextType.MASSIVE, position, Color.Transparent);
+            StateText = UIManagerSpriteRenderer.DrawTextContinuous("", UIManagerSpriteRenderer.TextType.MASSIVE, 
+                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter, Color.Transparent);
             SetState(State.None);
         }
 

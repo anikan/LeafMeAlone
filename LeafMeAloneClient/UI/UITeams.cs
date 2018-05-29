@@ -22,22 +22,22 @@ namespace Client.UI
 
             Size size_new = new Size(size.Width / 2, size.Height / 2);
             Console.WriteLine(size_new);
-            Team1_Leaves = new IntVariable(UIManager.Create("Team1", size_new,new Point(location.X - 120, location.Y)))
+            Team1_Leaves = new IntVariable(UIManagerAntTweakBar.Create("Team1", size_new,new Point(location.X - 120, location.Y)))
             {
                 ReadOnly = true,
                 Label = " ",
                 Value = 0
             };
-            UIManager.ActiveUI["Team1"].Color = Color.Red;
+            UIManagerAntTweakBar.ActiveUI["Team1"].Color = Color.Red;
 
 
-            Team2_Leaves = new IntVariable(UIManager.Create("Team2", size_new, new Point(location.X, location.Y)))
+            Team2_Leaves = new IntVariable(UIManagerAntTweakBar.Create("Team2", size_new, new Point(location.X, location.Y)))
             {
                 ReadOnly = true,
                 Label = " ",
                 Value = 0
             };
-            UIManager.ActiveUI["Team2"].Color = Color.Blue;
+            UIManagerAntTweakBar.ActiveUI["Team2"].Color = Color.Blue;
 
             
             
@@ -61,7 +61,7 @@ namespace Client.UI
             if(TeammateDirectionVar == null)
             {
                 TeammateDirectionVar =
-                    new VectorVariable(UIManager.Create("Team_" + obj.Id, new Size(250, 250), new Point(50, 50)))
+                    new VectorVariable(UIManagerAntTweakBar.Create("Team_" + obj.Id, new Size(250, 250), new Point(50, 50)))
                     {
                         Label = " ",
                         ShowValue = false

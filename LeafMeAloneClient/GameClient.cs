@@ -101,10 +101,10 @@ namespace Client
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
             
-            Client.fps = new UIFramesPersecond(new Size(5, 10), new Point(GraphicsRenderer.Form.ClientSize.Width - 100, 0));
-            Client.gameTimer = new UITimer(60, new Size(5, 10), new Point(0, 0));
+            Client.fps = new UIFramesPersecond();
+            Client.gameTimer = new UITimer(60);
             Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
-            Client.GameWinLossState = new UIGameWLState(new Vector2(GraphicsRenderer.Form.ClientSize.Width/2, GraphicsRenderer.Form.ClientSize.Height/2));
+            Client.GameWinLossState = new UIGameWLState();
 
 
 
@@ -149,8 +149,8 @@ namespace Client
             
 
             GraphicsRenderer.BarContext.Draw();
-            UIManager2.Update();
-            UIManager2.SpriteRenderer.Flush();
+            UIManagerSpriteRenderer.Update();
+            UIManagerSpriteRenderer.SpriteRenderer.Flush();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
 

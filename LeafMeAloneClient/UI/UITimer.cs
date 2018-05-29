@@ -25,7 +25,7 @@ namespace Client
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
-            uiElem = UIManager2.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManager2.TextType.NORMAL, Vector2.Zero, Color.Black);
+            uiElem = UIManager2.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManager2.TextType.NORMAL, Vector2.Zero, Color.White);
         }
 
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)

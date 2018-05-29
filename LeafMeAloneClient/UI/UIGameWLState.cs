@@ -24,7 +24,7 @@ namespace Client.UI
         public UIGameWLState(Vector2 position)
         {
             StateText = UIManager2.DrawTextContinuous("", UIManager2.TextType.MASSIVE, position, Color.Transparent);
-            SetState(State.Win);
+            SetState(State.None);
         }
 
         public void SetState(State s)

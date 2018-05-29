@@ -141,10 +141,6 @@ namespace Client
             }
 
 
-            UIManager2.DrawText("Hello", UIManager2.TextType.COMIC_SANS, new Vector2(100, 100), Color.Pink);
-            UIManager2.DrawText("Hello", UIManager2.TextType.NORMAL, new Vector2(100, 120), Color.Green);
-            UIManager2.DrawText("Hello", UIManager2.TextType.BOLD, new Vector2(100, 140), Color.Red);
-
             // Update all objects.
             Update();
 

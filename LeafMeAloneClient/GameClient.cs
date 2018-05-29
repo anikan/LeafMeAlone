@@ -69,6 +69,7 @@ namespace Client
         private UITimer gameTimer;
         private UITeams Teams;
         private UIGameWLState GameWinLossState;
+        private DrawableTexture testTextureUI;
 
         private NetworkClient networkClient;
 
@@ -105,7 +106,8 @@ namespace Client
             Client.gameTimer = new UITimer(60);
             Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
             Client.GameWinLossState = new UIGameWLState();
-
+            Client.testTextureUI = UIManagerSpriteRenderer.DrawTextureContinuous(Constants.Arrow, new Vector2(100, 100),
+                new Vector2(75, 75), 0);
 
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
@@ -251,7 +253,6 @@ namespace Client
                 NonNetworkedGameObjectClient obj in NonNetworkedGameObjects
                 )
             {
-
                 obj.Draw();
             }
 
@@ -411,18 +412,20 @@ namespace Client
             return packetObject;
         }
 
+        private static LeafClient l;
         /// <summary>
         /// Tint all the leaves in the game.
         /// </summary>
         public void TintLeaves()
         {
-
             // Get a list of all leaves.
             List<LeafClient> leaves = GetLeafList();
 
             // Itereate through the leaves.
             foreach (LeafClient leaf in leaves)
             {
+                if (l == null)
+                    l = leaf;
                 // Iterate through all team sections.
                 for (int index = 0; index < activeMatch.teamSections.Count; index++)
                 {
@@ -441,6 +444,9 @@ namespace Client
                     // Tint the leaf.
                     leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
                 }
+
+                l.CurrentTint = new Vector3(10,.1f,.1f);
+                testTextureUI.Position = GraphicsManager.WorldToScreenPoint(l.Transform.Position);
             }
         }
 

@@ -126,7 +126,7 @@ namespace Shared
 
         public static Vector4 Mult(this Matrix m, Vector4 multBy)
         {
-            return Vector4.Transform(multBy, Matrix.Transpose(m));
+            return Vector4.Transform(multBy, m);
         }
 
         /// <summary>

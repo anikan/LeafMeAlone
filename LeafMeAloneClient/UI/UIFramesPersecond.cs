@@ -29,8 +29,7 @@ namespace Client
             fps = UIManagerSpriteRenderer.DrawTextContinuous("0", UIManagerSpriteRenderer.TextType.BOLD,
                 new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), TextAlignment.Right | TextAlignment.Top, Color.Red);
 
-            t = UIManagerSpriteRenderer.DrawTextureContinuous(Constants.Arrow, new Vector2(100, 100),
-               new Vector2(75, 75),0);
+           
         }
 
         public void Start()
@@ -57,8 +56,8 @@ namespace Client
             }
 
             fps.Text = CurrentFps.ToString();
-            t.Position.X = (float)CurrentFps * 20;
-            t.Rotation = ((float)CurrentFps).ToRadians();
+            //t.Position.X = (float)CurrentFps * 20;
+            //t.Rotation = ((float)CurrentFps).ToRadians();
             stopwatch.Reset();
         }
     }

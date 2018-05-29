@@ -33,7 +33,7 @@ namespace Client
         /// ActiveCamera contains the currently active camera.
         /// </summary>
         public static Camera ActiveCamera;
-        
+
         // Current player.
         public static PlayerClient ActivePlayer;
 
@@ -58,8 +58,8 @@ namespace Client
             float winZ = 1.0f;
 
             // Calculate vector arguments for final vector
-            args[0] = (2.0f * ((float)(screenPos.X - 0) / (GraphicsRenderer.Form.Width - 0))) - 1.0f;
-            args[1] = 1.0f - (2.0f * ((float)(screenPos.Y - 0) / (GraphicsRenderer.Form.Height - 0)));
+            args[0] = (2.0f * ((float)(screenPos.X - 0) / (GraphicsRenderer.Form.ClientSize.Width - 0))) - 1.0f;
+            args[1] = 1.0f - (2.0f * ((float)(screenPos.Y - 0) / (GraphicsRenderer.Form.ClientSize.Height - 0)));
             args[2] = 2.0f * winZ - 1.0f;
             args[3] = 1.0f;
 
@@ -77,11 +77,30 @@ namespace Client
             // Return final position in world space.
             return new Vector3(pos.X, pos.Y, pos.Z);
         }
+        public static Vector2 WorldToScreenPoint(Vector3 worldPos)
+        {
+
+            // Get the view and projection matrices
+            Matrix viewMat = ActiveCamera.m_ViewMatrix;
+            Matrix projectMat = GraphicsRenderer.ProjectionMatrix;
+
+            //multiply view,proj,and world pos to get the clip space pos
+            Vector4 clipSpace = (viewMat * projectMat).Mult(new Vector4(worldPos, 1.0f));
+
+            //normalize the clip space by dividing by w
+            Vector3 normalDeviceCoordSpace = new Vector3(clipSpace.X / clipSpace.W, clipSpace.Y / clipSpace.W, clipSpace.Z / clipSpace.W);
+
+            //transform into screen space by mult by window size.
+            Vector2 screenSpace = new Vector2((normalDeviceCoordSpace.X + 1.0f) / 2.0f * GraphicsRenderer.Form.ClientSize.Width,
+                (1.0f - normalDeviceCoordSpace.Y) / 2.0f * GraphicsRenderer.Form.ClientSize.Height);
+
+            return screenSpace;
+        }
 
         public static Shader ActiveShader;
 
         public static Light ActiveLightSystem;
-        
+
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
 
@@ -118,12 +137,12 @@ namespace Client
             UITextureManager.Init();
             UIManagerSpriteRenderer.Init();
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
-            ActiveLightSystem = new Light(20);  
-            
+            ActiveLightSystem = new Light(20);
+
             {
                 LightParameters light0 = ActiveLightSystem.GetLightParameters(0);
                 light0.UseDirectionalPreset();
-                light0.intensities = new Vector4(1.3f,1.2f,1.0f,0);
+                light0.intensities = new Vector4(1.3f, 1.2f, 1.0f, 0);
                 light0.status = LightParameters.STATUS_ON;
                 light0.position = Vector4.Normalize(new Vector4(-1, 0, 0, 0));
             }
@@ -131,8 +150,8 @@ namespace Client
                 LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
                 light1.UseDirectionalPreset();
                 light1.status = LightParameters.STATUS_ON;
-                light1.intensities = new Vector4(0.8f,0.8f,0.8f,0);
-                light1.position = Vector4.Normalize(new Vector4(0,-1,0,0));
+                light1.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
+                light1.position = Vector4.Normalize(new Vector4(0, -1, 0, 0));
             }
             {
                 LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
@@ -161,20 +180,20 @@ namespace Client
         private static void LoadAllShaders()
         {
             // add more argument to each list as needed
-            List <string> allShaderPaths = new List<string>( new string[]
+            List<string> allShaderPaths = new List<string>(new string[]
             {
                 Constants.DefaultShader
-            } );
+            });
 
-            List <string> allShaderVSName = new List<string>(new string[]
+            List<string> allShaderVSName = new List<string>(new string[]
             {
                 "VS"
-            } );
+            });
 
             List<string> allShaderPSName = new List<string>(new string[]
             {
                 "PS"
-            } );
+            });
 
             List<InputElement[]> allShaderElements = new List<InputElement[]>();
             allShaderElements.Add(new[] {

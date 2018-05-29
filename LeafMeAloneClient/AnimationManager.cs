@@ -8,6 +8,9 @@ using SlimDX;
 
 namespace Client
 {
+    /// <summary>
+    /// An descriptor attached to a model for animation
+    /// </summary>
     public class AnimationDescriptor
     {
         public Model AnimModel;
@@ -21,6 +24,10 @@ namespace Client
             Acceleration = acceleration;
         }
     }
+
+    /// <summary>
+    /// Animation manager to help keep track of the various states of animation
+    /// </summary>
     static class AnimationManager
     {
         private static List<AnimationDescriptor> _animationModels;

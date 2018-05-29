@@ -27,7 +27,7 @@ namespace Client.UI
                 ReadOnly = true,
                 Label = " "
             };
-            SetState(State.Win);
+            SetState(State.None);
         }
 
         public void SetState(State s)

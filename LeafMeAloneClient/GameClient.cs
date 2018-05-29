@@ -76,10 +76,7 @@ namespace Client
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
-
-            //TODO FOR TESTING ONLY
-            //GraphicsRenderer.Form.KeyDown += 
-            // TestPlayerMovementWithoutNetworking;
+            
             Client.fps = new UIFramesPersecond(new Size(5, 10), new Point(GraphicsRenderer.Form.ClientSize.Width - 100, 0));
             Client.gameTimer = new UITimer(60, new Size(5, 10), new Point(0, 0));
             Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
@@ -247,8 +244,7 @@ namespace Client
             networkClient.PacketQueue.Clear();
         }
 
-
-        private bool hi = false;
+        
         /// <summary>
         /// Creates a new object from a given packet, whether that be a leaf 
         /// or a player.
@@ -276,11 +272,6 @@ namespace Client
                 // Create a leaf.
                 case (ObjectType.LEAF):
                     NetworkedGameObjectClient leaf = new LeafClient(createPacket);
-                    if (!hi)
-                    {
-                        Teams.SetFollow(GraphicsManager.ActivePlayer,leaf);
-                        hi = true;
-                    }
                     NetworkedGameObjects.Add(objId, leaf);
                     return leaf;
                 case (ObjectType.TREE):

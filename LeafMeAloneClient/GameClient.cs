@@ -250,7 +250,7 @@ namespace Client
             }
             GraphicsManager.Draw();
         }
-
+         
 
         /// <summary>
         /// Recieves packets from the server, updates objects or creates 

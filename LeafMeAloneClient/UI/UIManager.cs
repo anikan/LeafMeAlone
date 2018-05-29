@@ -76,11 +76,10 @@ namespace Client
         private SpriteTextRenderer.TextAlignment alignment;
         public Color Color;
 
-        public DrawableString2(string text, UIManager2.TextType type, Vector2 position, Color color, Rectangle pos, TextAlignment alignment)
+        public DrawableString2(string text, UIManager2.TextType type, Color color, Rectangle pos, TextAlignment alignment)
         {
             this.Text = text;
             this.Type = type;
-            this.Position = position;
             this.Color = color;
             this.pos = pos;
             this.alignment = alignment;
@@ -128,9 +127,9 @@ namespace Client
             textPerFrame.Add(d);
             return d;
         }
-        public static DrawableString DrawTextContinuous(string text, TextType type, Rectangle pos, SpriteTextRenderer.TextAlignment alignment, Color color)
+        public static DrawableString2 DrawTextContinuous(string text, TextType type, Rectangle pos, SpriteTextRenderer.TextAlignment alignment, Color color)
         {
-            DrawableString d = new DrawableString(text, type, position, color);
+            DrawableString2 d = new DrawableString2(text, type, pos,alignment, color);
             textPerFrame.Add(d);
             return d;
         }

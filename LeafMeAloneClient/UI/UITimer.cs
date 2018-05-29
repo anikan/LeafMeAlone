@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Timers;
 using AntTweakBar;
+using SlimDX;
 
 namespace Client
 {
@@ -15,35 +16,26 @@ namespace Client
         //Time remaining (in seconds)
         public float TimeRemaining { get; private set; }
 
-        private System.Timers.Timer t;
+        private readonly Timer t;
 
-        public FloatVariable TimeRemaining_UI;
+        private readonly DrawableString uiElem;
 
         public UITimer(float timeToCountInSeconds, Size size, Point location)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
-            TimeRemaining_UI =
-                new FloatVariable(UIManager.Create("Timer", size, location))
-                {
-                    ReadOnly = true,
-                    Label = " ",
-                    Precision = 2,
-                    Value = timeToCountInSeconds
-                };
-            UIManager.ActiveUI["Timer"].Color = Color.Black;
+            uiElem = UIManager2.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManager2.TextType.NORMAL, Vector2.Zero, Color.Black);
         }
 
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)
         {
             TimeRemaining -= tickDelta;
-            TimeRemaining_UI.Value = TimeRemaining;
+            uiElem.Text = "Time Remaining:" + TimeRemaining;
 
             if (TimeRemaining < 0.0f)
             {
                 t.Stop();
-                TimeRemaining_UI.Value = 0;
                 OnTimerCompleted?.Invoke();
             }
         }
@@ -51,7 +43,6 @@ namespace Client
         public void Restart(float timetoCountInSeconds)
         {
             TimeRemaining = timetoCountInSeconds;
-            TimeRemaining_UI.Value = timetoCountInSeconds;
             t.Start();
         }
 
@@ -60,7 +51,7 @@ namespace Client
             t.AutoReset = true;
             t.Enabled = true;
             TimeRemaining = timeToCountInSeconds;
-            TimeRemaining_UI.Value = timeToCountInSeconds;
+            uiElem.Text = "Time Remaining:" + TimeRemaining;
             t.Start();
         }
 

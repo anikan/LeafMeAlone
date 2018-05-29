@@ -115,6 +115,8 @@ namespace Client
         {
             ActiveCamera = activeCamera;
             ParticleSystemManager.Init();
+            UITextureManager.Init();
+            UIManager2.Init();
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);  
             

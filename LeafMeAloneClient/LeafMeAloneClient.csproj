@@ -94,6 +94,12 @@
     <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=x86">
       <HintPath>..\packages\SlimDX.4.0.13.44\lib\NET40\SlimDX.dll</HintPath>
     </Reference>
+    <Reference Include="SpriteTextRenderer">
+      <HintPath>..\libs\SpriteTextRenderer.dll</HintPath>
+    </Reference>
+    <Reference Include="SpriteTextRenderer.SlimDX">
+      <HintPath>..\libs\SpriteTextRenderer.SlimDX.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -144,6 +150,7 @@
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="UI\UITeams.cs" />
     <Compile Include="UI\UITimer.cs" />
+    <Compile Include="UITexture.cs" />
     <Compile Include="VertexBoneData.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -179,6 +186,7 @@
   <ItemGroup>
     <Content Include="Shaders\defaultShader.fx" />
     <Content Include="Shaders\particle.fx" />
+    <Content Include="Shaders\ui.fx" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -191,4 +199,7 @@
     <Error Condition="!Exists('..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets'))" />
   </Target>
   <Import Project="..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets" Condition="Exists('..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /f /y "$(SolutionDir)libs\*.dll" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

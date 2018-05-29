@@ -83,10 +83,11 @@ namespace Client
             Camera activeCamera =
                 new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
 
-            // Initialize graphics classes
+            // Initialize static classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
+            AnimationManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
@@ -144,7 +145,6 @@ namespace Client
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
 
-            AudioManager.Update();
         }
 
         // Start the networked client (connect to server).
@@ -213,6 +213,8 @@ namespace Client
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);
+            AudioManager.Update();
+            AnimationManager.Update(delta);
 
             // Restart the frame timer.
             FrameTimer.Restart();

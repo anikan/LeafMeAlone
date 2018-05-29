@@ -37,6 +37,8 @@ namespace Client
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind;
+        private int _animWalk, _animIdle;
+        private float _animAcceleration;
 
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, Constants.PlayerModel)
@@ -49,6 +51,27 @@ namespace Client
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
             _audioWind = AudioManager.GetNewSource();
+
+            // Create new animations
+            float scale = .05f;
+            _animWalk = AnimationManager.AddAnimation(Constants.PlayerWalkAnim, new Vector3(scale), 5.2f);
+            _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), 5.2f);
+            AnimationManager.SetAltColor(_animIdle, new Color3(1f, 0.6f, 0.6f));
+            AnimationManager.SetAltColor(_animWalk, new Color3(0.6f, 0.6f, 1f));
+
+            // set to idle animation by default
+            SwitchAnimation(_animIdle);
+        }
+
+        /// <summary>
+        /// Get the animation variables out and set the fields
+        /// </summary>
+        /// <param name="animId"> ID of the animation </param>
+        private void SwitchAnimation(int animId)
+        {
+            model = AnimationManager.SwitchAnimation(animId, true);
+            Transform.Scale = AnimationManager.GetScale(animId);
+            _animAcceleration = AnimationManager.GetAcceleration(animId);
         }
 
         public Team team { get; set; }
@@ -242,7 +265,7 @@ namespace Client
             bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
 
             EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind);
-
+            EvaluateAnimation(prevMoving, currMoving);
 
             switch (ActiveToolMode)
             {
@@ -273,7 +296,19 @@ namespace Client
 
         }
 
-        
+        private void EvaluateAnimation(bool prevMoving, bool currMoving)
+        {
+            if (prevMoving && !currMoving)
+            {
+                SwitchAnimation(_animIdle);
+            }
+            else if (!prevMoving && currMoving)
+            {
+                SwitchAnimation(_animWalk);
+            }
+        }
+
+
 
         /// <summary>
         /// Evaluate audio logic
@@ -332,7 +367,19 @@ namespace Client
 
         public override void Update(float deltaTime)
         {
-            base.Update(deltaTime);
+            if (model != null)
+            {
+                model.m_Properties = Transform;
+                model.Update(_animAcceleration * deltaTime);
+            }
+
+            // If we're debugging, move the pivot cube.
+            if (PivotCube != null)
+            {
+                PivotCube.Transform.Position = Transform.Position;
+                PivotCube.Update(deltaTime);
+            }
+
             Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
                          Matrix.RotationY(Transform.Rotation.Y) *
                          Matrix.RotationZ(Transform.Rotation.Z);

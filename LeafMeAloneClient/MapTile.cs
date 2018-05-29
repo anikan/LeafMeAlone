@@ -18,8 +18,6 @@ namespace Client
         public MapTile() : base(Constants.DefaultMapModel)
         {
 
-
-
         }
     }
 }

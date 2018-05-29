@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Linq;
 using Shared;
 using SlimDX;
@@ -55,6 +56,9 @@ namespace Client
 
         // Timer to calculate time between frames.
         public Stopwatch FrameTimer;
+
+        public Stopwatch DebugTimer = new Stopwatch();
+
         private UIFramesPersecond fps;
         private UITimer gameTimer;
 
@@ -68,6 +72,7 @@ namespace Client
 
         private static void Main(String[] args)
         {
+            
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
 
             IPAddress ipAddress = IPAddress.Loopback;
@@ -86,7 +91,7 @@ namespace Client
             GraphicsManager.Init(activeCamera);
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
-
+            Client.DebugTimer.Start();
 
             //TODO FOR TESTING ONLY
             //GraphicsRenderer.Form.KeyDown += 
@@ -109,6 +114,8 @@ namespace Client
 
         private void DoGameLoop()
         {
+            DebugTimer.Restart();
+
             fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(
                 GraphicsRenderer.RenderTarget, new Color4(0.0f, .4f, 0.0f));
@@ -127,6 +134,8 @@ namespace Client
 
                 // Send any packets to the server.
                 SendPackets();
+
+
             }
 
             // Update all objects.
@@ -135,6 +144,8 @@ namespace Client
             // Draw everythhing.
             Render();
 
+            Console.WriteLine(String.Format("Rendering took {0} ms", DebugTimer.ElapsedMilliseconds));
+            DebugTimer.Restart();
 
             GraphicsRenderer.BarContext.Draw();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
@@ -219,13 +230,17 @@ namespace Client
         /// </summary>
         private void Render()
         {
-
+            DebugTimer.Restart();
             // Iterate through all networked game objects and draw them.
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in
                 NetworkedGameObjects.AsEnumerable())
             {
+
                 NetworkedGameObjectClient gameObject = kv.Value;
                 gameObject.Draw();
+
+                Console.WriteLine(String.Format("Rendering {0} took {1} ms", gameObject.Transform.Position, DebugTimer.ElapsedMilliseconds));
+                DebugTimer.Restart();
             }
 
             // iterate through all the non-networked objects and draw them.
@@ -235,6 +250,9 @@ namespace Client
             {
 
                 obj.Draw();
+
+                Console.WriteLine(String.Format("Rendering nonNetworked {0} took {1} ms", obj.Transform.Position, DebugTimer.ElapsedMilliseconds));
+                DebugTimer.Restart();
             }
             GraphicsManager.Draw();
         }

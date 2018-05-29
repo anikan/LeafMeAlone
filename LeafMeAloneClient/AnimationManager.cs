@@ -16,6 +16,7 @@ namespace Client
         public static void Init()
         {
             _animationModels = new List<Model>();
+            _scaleFactors = new List<Vector3>();
         }
 
         public static void Update()

@@ -42,6 +42,7 @@ namespace Client
             LeafBlower = new LeafBlowerParticleSystem();
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
+            Burnable = true;
         }
 
         public Team team { get; set; }

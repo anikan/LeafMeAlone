@@ -24,7 +24,7 @@ namespace Server
         /// </summary>
         public LeafServer() : base(ObjectType.LEAF, LEAF_HEALTH, LEAF_MASS, LEAF_RADIUS, LEAF_BOUNCIENESS)
         {
-
+            Burnable = true;
         }
 
     }

@@ -40,9 +40,9 @@ namespace Shared
         public const float MAP_HEIGHT = 80.0f;
 
         // Map tile size information.
-        public const float TILE_SIZE = 5.0f;
+        public const float TILE_SIZE = 8.0f;
 
-        public const float NO_MANS_LAND_PERCENT = 0.2f;
+        public const float NO_MANS_LAND_PERCENT = 0.25f;
 
         // Margin around the map. Leaves won't spawn in these margins.
         public const float BORDER_MARGIN = 5.0f;

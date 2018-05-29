@@ -73,17 +73,24 @@ namespace Shared
             // Create a new match.
             Match newMatch = new Match();
 
-            float tileOffset = Constants.TILE_SIZE;
+            // Total size of no man's land.
+            float NoMansLandSize = Constants.MAP_WIDTH * Constants.NO_MANS_LAND_PERCENT;
+
+            // Number of tiles that will make up no man's land.
+            int NoMansLandTiles = (int)(NoMansLandSize / Constants.TILE_SIZE);
+
+            // Number of tiles on each side of the center tile, for no man's land.
+            int NoMansLandTilesOnEachSide = NoMansLandTiles / 2 - 1;
 
             // Set up no man's land information.
             newMatch.NoMansLand = new TeamSection
             {
 
                 // Left bound is slightly offset from the map center, to the left. 
-                leftX = (float)Math.Round((-(Constants.MAP_WIDTH * Constants.NO_MANS_LAND_PERCENT) / 2.0f) / tileOffset) * tileOffset,
+                leftX = (0.0f - (Constants.TILE_SIZE / 2.0f)) - (NoMansLandTilesOnEachSide * Constants.TILE_SIZE),
 
                 // Right bound is slightly offset from the map center, to the right.
-                rightX = (float)Math.Round(((Constants.MAP_WIDTH * Constants.NO_MANS_LAND_PERCENT) / 2.0f) / tileOffset) * tileOffset,
+                rightX = (0.0f + (Constants.TILE_SIZE / 2.0f)) + (NoMansLandTilesOnEachSide * Constants.TILE_SIZE),
 
                 // Upper bound is at the top of the map.
                 upZ = (Constants.MAP_HEIGHT / 2.0f),

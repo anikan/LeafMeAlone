@@ -107,7 +107,10 @@ namespace Server
         /// </summary>
         public void CatchFire()
         {
-            burnFrames++;
+            if (Burnable)
+            {
+                BurningThisFrame = true;
+            }
         }
 
         /// <summary>
@@ -136,8 +139,7 @@ namespace Server
                 // If it's the primary flamethrower function
                 if (toolMode == ToolMode.PRIMARY)
                 {
-
-                    BurningThisFrame = true;
+                    CatchFire();
 
                 }
             }

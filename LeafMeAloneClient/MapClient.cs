@@ -16,15 +16,19 @@ namespace Client
 
         private Random rnd;
 
-        // Number of tiles beyond the treeline (so player can't see blue).
+        // Number of tiles beyond the treeline (so player can't see skybox).
         private const int BORDER_TILES = 10;
 
-        private const int NUM_TILES_WIDTH = (int)(Constants.MAP_WIDTH / Constants.TILE_SIZE) + BORDER_TILES;
-        private const int NUM_TILES_HEIGHT = (int)(Constants.MAP_HEIGHT / Constants.TILE_SIZE) + BORDER_TILES;
+        // Number of tiles that make up the width and height of the map, not including border tiles.
+        private const int NUM_TILES_WIDTH = (int)(Constants.MAP_WIDTH / Constants.TILE_SIZE);
+        private const int NUM_TILES_HEIGHT = (int)(Constants.MAP_HEIGHT / Constants.TILE_SIZE);
 
+        // List of all map tiles in the game.
+        private List<MapTile> AllMapTiles;
 
-        private List<MapTile> MapTiles;
+        private List<List<MapTile>> TeamTiles;
 
+        // Active match information.
         private Match activeMatch;
 
         /// <summary>
@@ -36,33 +40,118 @@ namespace Client
 
             // Random number generator, to be used for y offsets. 
             rnd = new Random();
+
+            // Just use the default match for now.
             activeMatch = Match.DefaultMatch;
 
-            MapTiles = new List<MapTile>();
 
-
-            // Iterate through the height of tiles.
-            for (float y = -(NUM_TILES_HEIGHT * Constants.TILE_SIZE) / 2.0f; y < (NUM_TILES_HEIGHT * Constants.TILE_SIZE) / 2.0f; y += Constants.TILE_SIZE - 0.01f)
-            {
-
-                // Iterate through the width of tiles.
-                for (float x = -(NUM_TILES_WIDTH * Constants.TILE_SIZE) / 2.0f; x < (NUM_TILES_WIDTH * Constants.TILE_SIZE) / 2.0f; x += Constants.TILE_SIZE - 0.01f)
-                {
-
-                    CreateTile(x, y);
-
-                }
-            }
-
+            // Create the map tiles.
+            CreateMapTiles();
+       
             // Assign tiles to sections of the map
             CreateDistinctTeamSections(activeMatch);
 
         }
 
-        public void CreateTile(float x, float z)
+        /// <summary>
+        /// Create all the tiles on the map.
+        /// </summary>
+        public void CreateMapTiles()
         {
 
-            Console.WriteLine("Creating tile");
+            // List of all map tiles.
+            AllMapTiles = new List<MapTile>();
+
+
+            // Start in the middle, to make sure all sides are even.
+            float y = 0.0f;
+
+            // Calculate number of tiles on each side of middle column.
+            int tilesOnEachSide = (NUM_TILES_HEIGHT / 2) - 1 + BORDER_TILES;
+
+            // Create the middle column.
+            CreateRow(y);
+
+            // Create all tiles to the right of the middle column.
+            for (int tileCount = 0; tileCount < tilesOnEachSide; tileCount++)
+            {
+
+                // Increase y by the tile size.
+                y += Constants.TILE_SIZE;
+
+                // Create the row.
+                CreateRow(y);
+
+            }
+
+            // Reset y to the middle column.
+            y = 0.0f;
+
+            // Create all tiles to the left of the middle column.
+            for (int tileCount = 0; tileCount < tilesOnEachSide; tileCount++)
+            {
+
+                // Decrease y by the tile size.
+                y -= Constants.TILE_SIZE;
+
+                // Create the row.
+                CreateRow(y);
+
+            }
+
+        }
+
+        /// <summary>
+        /// Create an entire row of tiles at a specified y position.
+        /// </summary>
+        /// <param name="y">Y position (column)</param>
+        public void CreateRow(float y)
+        {
+
+            // Start at the middle of the row.
+            float x = 0.0f;
+
+            // Calculate tiles on each side of the center.
+            int tilesOnEachSide = (NUM_TILES_WIDTH / 2) - 1 + BORDER_TILES;
+
+            // Create the middle tile of the row.
+            CreateTile(x, y);
+
+            // Create all tiles to the right of the center.
+            for (int tileCount = 0; tileCount < tilesOnEachSide; tileCount++)
+            {
+
+                // Increment x by the tile size.
+                x += Constants.TILE_SIZE;
+
+                // Create the tile.
+                CreateTile(x, y);
+
+            }
+
+            // Reset x to the center.
+            x = 0.0f;
+
+            // Create all tiles to the left of the center.
+            for (int tileCount = 0; tileCount < tilesOnEachSide; tileCount++)
+            {
+
+                // Decrement x by the tile size.
+                x -= Constants.TILE_SIZE;
+
+                // Create the tile.
+                CreateTile(x, y);
+
+            }
+        }
+
+        /// <summary>
+        /// Create a tile at the specified x and y position.
+        /// </summary>
+        /// <param name="x">X position</param>
+        /// <param name="z">Z position (y in 2D) </param>
+        public void CreateTile(float x, float z)
+        {
 
             //Create a new tile.
             MapTile newTile = new MapTile();
@@ -80,7 +169,7 @@ namespace Client
             float yOffset = (random * (0.1f - (-0.1f))) + (-0.1f);
 
             // Add the new tile to the tile list
-            MapTiles.Add(newTile);
+            AllMapTiles.Add(newTile);
         }
 
         /// <summary>
@@ -90,30 +179,42 @@ namespace Client
         public void CreateDistinctTeamSections(Match currentMatch)
         {
 
+            TeamTiles = new List<List<MapTile>>();
+
             // Iterate through all the map tiles.
-            for (int i = 0; i < MapTiles.Count; i++)
+            for (int i = 0; i < AllMapTiles.Count; i++)
             {
 
                 // Iterate through all the team sections.
                 for (int j = 0; j < currentMatch.teamSections.Count; j++)
                 {
 
+                    // Create a new list for this team.
+                    List<MapTile> ThisTeamTiles = new List<MapTile>();
+
                     // If the current tile is in the bounds of the section.
-                    if (currentMatch.teamSections[j].IsInBounds(MapTiles[i].Transform.Position))
+                    if (currentMatch.teamSections[j].IsInBounds(AllMapTiles[i].Transform.Position))
                     {
 
                         // Tint the tile.
-                        MapTiles[i].CurrentTint = currentMatch.teamSections[j].sectionColor;
+                        AllMapTiles[i].CurrentTint = currentMatch.teamSections[j].sectionColor;
+
+                        // Add the tile to the tiles for this team.
+                        ThisTeamTiles.Add(AllMapTiles[i]);
 
                     }
+
+                    // Add the tiles for this team to the list of team tiles.
+                    TeamTiles.Add(ThisTeamTiles);
+
                 }
                 
                 // Check if this tile is in no man's land.
-                if (currentMatch.NoMansLand.IsInBounds(MapTiles[i].Transform.Position))
+                if (currentMatch.NoMansLand.IsInBounds(AllMapTiles[i].Transform.Position))
                 {
 
                     // Tint the tile.
-                    MapTiles[i].CurrentTint = currentMatch.NoMansLand.sectionColor;
+                    AllMapTiles[i].CurrentTint = currentMatch.NoMansLand.sectionColor;
 
                 }
 
@@ -124,7 +225,7 @@ namespace Client
         {
             base.Update(deltaTime);
 
-            foreach (MapTile obj in MapTiles)
+            foreach (MapTile obj in AllMapTiles)
             {
                 obj.Update(deltaTime);
             }
@@ -133,7 +234,7 @@ namespace Client
         public override void Draw()
         {
             base.Draw();
-            foreach (MapTile obj in MapTiles)
+            foreach (MapTile obj in AllMapTiles)
             {
                 obj.Draw();
             }

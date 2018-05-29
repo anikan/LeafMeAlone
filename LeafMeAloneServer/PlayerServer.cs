@@ -34,6 +34,7 @@ namespace Server
         {
             Team = team;
             ToolEquipped = ToolType.BLOWER;
+            Burnable = true;
         }
 
         /// <summary>

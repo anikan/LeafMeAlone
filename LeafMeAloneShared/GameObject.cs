@@ -23,6 +23,8 @@ namespace Shared
     /// </summary>
     public abstract class GameObject : IObject
     {
+
+        public bool Burnable = false;
         protected int burnFrames = 0;
 
         public bool Burning
@@ -33,7 +35,14 @@ namespace Shared
             }
             set
             {
-                burnFrames = (value == true) ? 1 : 0;
+                if (Burnable)
+                {
+                    burnFrames = (value == true) ? 1 : 0;
+                }
+                else
+                {
+                    burnFrames = 0;
+                }
             }
         }
         public float Health;

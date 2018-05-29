@@ -237,7 +237,9 @@ namespace Server
 
             catch (SocketException e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Player Disconnected");
+
+                clientSockets.Remove(handler);
                 return;
             }
         }
@@ -318,7 +320,7 @@ namespace Server
 
                 catch (SocketException e)
                 {
-                    Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.Message);
                     Console.WriteLine("Player Disconnected");
 
                     clientSockets.Remove(socket);
@@ -333,11 +335,11 @@ namespace Server
         /// <param name="ar">Stores socket and buffer data</param>
         private void SendCallback(IAsyncResult ar)
         {
+            // Retrieve the socket from the state object.  
+            Socket handler = (Socket)ar.AsyncState;
+
             try
             {
-                // Retrieve the socket from the state object.  
-                Socket handler = (Socket)ar.AsyncState;
-
                 // Complete sending the data to the remote device.  
                 int bytesSent = handler.EndSend(ar);
 
@@ -345,7 +347,9 @@ namespace Server
             }
             catch (SocketException e)
             {
-                Console.WriteLine(e.ToString());
+                Console.WriteLine("Player Disconnected");
+
+                clientSockets.Remove(handler);
             }
         }
     }

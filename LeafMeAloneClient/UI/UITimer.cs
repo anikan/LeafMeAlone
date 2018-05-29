@@ -2,6 +2,7 @@
 using System.Timers;
 using AntTweakBar;
 using SlimDX;
+using SpriteTextRenderer;
 
 namespace Client
 {
@@ -20,12 +21,13 @@ namespace Client
 
         private readonly DrawableString uiElem;
 
-        public UITimer(float timeToCountInSeconds, Size size, Point location)
+        public UITimer(float timeToCountInSeconds)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
-            uiElem = UIManager2.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManager2.TextType.NORMAL, Vector2.Zero, Color.White);
+            uiElem = UIManagerSpriteRenderer.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManagerSpriteRenderer.TextType.NORMAL, 
+                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White);
         }
 
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)

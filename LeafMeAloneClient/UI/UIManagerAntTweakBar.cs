@@ -15,7 +15,7 @@ using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
 
 namespace Client
 {
-    public class UIManager
+    public class UIManagerAntTweakBar
     {
 
 
@@ -40,55 +40,47 @@ namespace Client
             return b;
         }
 
-        public UIManager()
+        public UIManagerAntTweakBar()
         {
 
         }
     }
 
-
-    public class Tex
-    {
-        public Texture2D SdxTexture;
-        public ShaderResourceView SrvTexture;
-    }
+    
 
     public class DrawableString
     {
         public string Text;
-        public UIManager2.TextType Type;
-        public Vector2 Position;
+        public UIManagerSpriteRenderer.TextType Type;
+        //public Vector2 Position;
         public Color Color;
+        public RectangleF Position;
+        public TextAlignment Alignment;
 
-        public DrawableString(string text, UIManager2.TextType type, Vector2 position, Color color)
+        public DrawableString(string text, UIManagerSpriteRenderer.TextType type, RectangleF position, TextAlignment alignment, Color color)
         {
             this.Text = text;
             this.Type = type;
-            this.Position = position;
             this.Color = color;
+            this.Position = position;
+            this.Alignment = alignment;
         }
     }
-    public class DrawableString2
+
+    public class DrawableTexture
     {
-        public string Text;
-        public UIManager2.TextType Type;
-        private Rectangle pos;
-        private SpriteTextRenderer.TextAlignment alignment;
-        public Color Color;
+        public string View;
+        public Vector2 Position, Size;
 
-        public DrawableString2(string text, UIManager2.TextType type, Vector2 position, Color color, Rectangle pos, TextAlignment alignment)
+        public DrawableTexture(string view, Vector2 position, Vector2 size)
         {
-            this.Text = text;
-            this.Type = type;
-            this.Position = position;
-            this.Color = color;
-            this.pos = pos;
-            this.alignment = alignment;
+            View = view;
+            Position = position;
+            Size = size;
         }
     }
 
-
-    public static class UIManager2
+    public static class UIManagerSpriteRenderer
     {
         public enum TextType
         {
@@ -100,57 +92,75 @@ namespace Client
 
         public static SpriteRenderer SpriteRenderer;
         public static Dictionary<TextType, TextBlockRenderer> TextRenderers = new Dictionary<TextType, TextBlockRenderer>();
-        public static Dictionary<string, Tex> DrawableImages = new Dictionary<string, Tex>();
+        public static Dictionary<string, ShaderResourceView> DrawableImages = new Dictionary<string, ShaderResourceView>();
 
         private static List<DrawableString> textPerFrame = new List<DrawableString>();
+        private static List<DrawableTexture> texturesPerFrame = new List<DrawableTexture>();
 
         public static void Init()
         {
 
             SpriteRenderer = new SpriteRenderer(GraphicsRenderer.Device);
          }
-
+#region Text
         public static void DrawText(string text, TextType type, Vector2 position, Color color)
         {
             EnsureTypeExists(type);
             TextRenderers[type].DrawString(text, position, new Color4(color));
         }
 
-        public static void DrawText(string text, TextType type, Rectangle pos, SpriteTextRenderer.TextAlignment alignment, Color color)
+        public static void DrawText(string text, TextType type, RectangleF pos, TextAlignment alignment, Color color)
         {
             EnsureTypeExists(type);
             TextRenderers[type].DrawString(text, pos, alignment, new Color4(color));
         }
 
-        public static DrawableString DrawTextContinuous(string text, TextType type, Vector2 position, Color color)
+        public static DrawableString DrawTextContinuous(string text, TextType type, RectangleF pos, SpriteTextRenderer.TextAlignment alignment, Color color)
         {
-            DrawableString d = new DrawableString(text, type, position, color);
+            DrawableString d = new DrawableString(text, type, pos,alignment, color);
             textPerFrame.Add(d);
             return d;
         }
-        public static DrawableString DrawTextContinuous(string text, TextType type, Rectangle pos, SpriteTextRenderer.TextAlignment alignment, Color color)
-        {
-            DrawableString d = new DrawableString(text, type, position, color);
-            textPerFrame.Add(d);
-            return d;
-        }
-
         public static void RemoveTextContinuous(DrawableString d)
         {
             textPerFrame.Remove(d);
         }
 
-        public static Vector2 GetTextWidth(string text, TextType type)
+        #endregion
+        #region Textures
+
+        public static void DrawTexture(string texture, Vector2 pos, Vector2 size)
         {
-            EnsureTypeExists(type);
-            return TextRenderers[type].MeasureString(text).Size.ToVector();
+            if (!DrawableImages.ContainsKey(texture))
+            {
+                var sdxTexture = Texture2D.FromFile(GraphicsRenderer.Device, texture);
+                DrawableImages[texture] = new ShaderResourceView(GraphicsRenderer.Device, sdxTexture);
+            }
+            SpriteRenderer.Draw(DrawableImages[texture],pos,size,CoordinateType.Absolute);
         }
+
+        public static DrawableTexture DrawTextureContinuous(string texture, Vector2 pos, Vector2 size)
+        {
+            if (!DrawableImages.ContainsKey(texture))
+            {
+                var sdxTexture = Texture2D.FromFile(GraphicsRenderer.Device, texture);
+                DrawableImages[texture] = new ShaderResourceView(GraphicsRenderer.Device, sdxTexture);
+            }
+            texturesPerFrame.Add(new DrawableTexture(texture, pos, size));
+            return texturesPerFrame.Last();
+        }
+
+        #endregion
 
         public static void Update()
         {
             foreach (DrawableString str in textPerFrame)
             {
-                DrawText(str.Text, str.Type, str.Position, str.Color);
+                DrawText(str.Text, str.Type, str.Position, str.Alignment, str.Color);
+            }
+            foreach (DrawableTexture tex in texturesPerFrame)
+            {
+                DrawTexture(tex.View,tex.Position,tex.Size);
             }
         }
 

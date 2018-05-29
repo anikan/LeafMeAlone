@@ -24,7 +24,7 @@ namespace Client
             CurrentFps = 0.0f;
             stopwatch = Stopwatch.StartNew();
             fps = UIManager2.DrawTextContinuous("0", UIManager2.TextType.BOLD,
-                new Vector2(GraphicsRenderer.Form.Width-40, 0), Color.Red);
+                new Vector2(GraphicsRenderer.Form.Width-UIManager2.GetTextWidth("0",UIManager2.TextType.BOLD).X, 0), Color.Red);
         }
 
         public void Start()
@@ -51,6 +51,9 @@ namespace Client
             }
 
             fps.Text = CurrentFps.ToString();
+            Console.WriteLine(UIManager2.GetTextWidth("0", UIManager2.TextType.BOLD).X);
+            fps.Position =
+                new Vector2(GraphicsRenderer.Form.Width - UIManager2.GetTextWidth("0", UIManager2.TextType.BOLD).X, 0);
             stopwatch.Reset();
         }
     }

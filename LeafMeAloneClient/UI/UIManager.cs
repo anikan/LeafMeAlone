@@ -8,7 +8,9 @@ using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DirectWrite;
 using SpriteTextRenderer;
+using SpriteTextRenderer.SlimDX;
 using SpriteRenderer = SpriteTextRenderer.SlimDX.SpriteRenderer;
+using TextAlignment = SpriteTextRenderer.TextAlignment;
 using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
 
 namespace Client
@@ -66,6 +68,24 @@ namespace Client
             this.Color = color;
         }
     }
+    public class DrawableString2
+    {
+        public string Text;
+        public UIManager2.TextType Type;
+        private Rectangle pos;
+        private SpriteTextRenderer.TextAlignment alignment;
+        public Color Color;
+
+        public DrawableString2(string text, UIManager2.TextType type, Vector2 position, Color color, Rectangle pos, TextAlignment alignment)
+        {
+            this.Text = text;
+            this.Type = type;
+            this.Position = position;
+            this.Color = color;
+            this.pos = pos;
+            this.alignment = alignment;
+        }
+    }
 
 
     public static class UIManager2
@@ -88,39 +108,29 @@ namespace Client
         {
 
             SpriteRenderer = new SpriteRenderer(GraphicsRenderer.Device);
-            //new SpriteTextRenderer.SlimDX.TextBlockRenderer(Client.sprite, "Arial", FontWeight.Bold, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+         }
 
+        public static void DrawText(string text, TextType type, Vector2 position, Color color)
+        {
+            EnsureTypeExists(type);
+            TextRenderers[type].DrawString(text, position, new Color4(color));
         }
 
-        public static void DrawText(string text, TextType type,Vector2 position,Color color)
+        public static void DrawText(string text, TextType type, Rectangle pos, SpriteTextRenderer.TextAlignment alignment, Color color)
         {
-            if (!TextRenderers.ContainsKey(type))
-            {
-                switch (type)
-                {
-                    case TextType.BOLD:
-                        TextRenderers[type] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Bold, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
-                        break;
-                    case TextType.NORMAL:
-                        TextRenderers[type] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
-                        break;
-                    case TextType.COMIC_SANS:
-                        TextRenderers[type] = new TextBlockRenderer(SpriteRenderer, "Comic Sans", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
-                        break;
-                    case TextType.MASSIVE:
-                        TextRenderers[type] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(type), type, null);
-                }
-            }
-            TextRenderers[type].DrawString(text, position, new Color4(color));
-            //sprite.Draw(srvTexture, new Vector2(300, 170), new Vector2(150, 150), new Vector2(75, 75), new Radians(0 / 1000.0), CoordinateType.Absolute);
+            EnsureTypeExists(type);
+            TextRenderers[type].DrawString(text, pos, alignment, new Color4(color));
         }
 
         public static DrawableString DrawTextContinuous(string text, TextType type, Vector2 position, Color color)
         {
-            DrawableString d = new DrawableString(text,type,position,color);
+            DrawableString d = new DrawableString(text, type, position, color);
+            textPerFrame.Add(d);
+            return d;
+        }
+        public static DrawableString DrawTextContinuous(string text, TextType type, Rectangle pos, SpriteTextRenderer.TextAlignment alignment, Color color)
+        {
+            DrawableString d = new DrawableString(text, type, position, color);
             textPerFrame.Add(d);
             return d;
         }
@@ -130,16 +140,42 @@ namespace Client
             textPerFrame.Remove(d);
         }
 
+        public static Vector2 GetTextWidth(string text, TextType type)
+        {
+            EnsureTypeExists(type);
+            return TextRenderers[type].MeasureString(text).Size.ToVector();
+        }
 
         public static void Update()
         {
             foreach (DrawableString str in textPerFrame)
             {
-                DrawText(str.Text,str.Type,str.Position,str.Color);
+                DrawText(str.Text, str.Type, str.Position, str.Color);
             }
         }
 
+        private static void EnsureTypeExists(TextType t)
+        {
+            if (TextRenderers.ContainsKey(t)) return;
 
+            switch (t)
+            {
+                case TextType.BOLD:
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Bold, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+                    break;
+                case TextType.NORMAL:
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+                    break;
+                case TextType.COMIC_SANS:
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Comic Sans", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+                    break;
+                case TextType.MASSIVE:
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(t), t, null);
+            }
+        }
     }
 
 

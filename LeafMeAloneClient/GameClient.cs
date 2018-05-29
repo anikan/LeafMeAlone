@@ -63,6 +63,7 @@ namespace Client
         public Stopwatch FrameTimer;
         private UIFramesPersecond fps;
         private UITimer gameTimer;
+        private UITexture test;
 
         private NetworkClient networkClient;
 
@@ -99,6 +100,7 @@ namespace Client
             Client.gameTimer =
                 new UITimer(60, new Size(225, 3), new Point(0, 0));
             
+            Client.test = new UITexture(Constants.FireTexture);
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -211,6 +213,8 @@ namespace Client
                 obj.Update(delta);
             }
 
+            test.Update();
+
             // Update the graphics manager.
             GraphicsManager.Update(delta);
 
@@ -224,7 +228,7 @@ namespace Client
         /// </summary>
         private void Render()
         {
-
+            test.Draw();
             // Iterate through all networked game objects and draw them.
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in
                 NetworkedGameObjects.AsEnumerable())
@@ -241,6 +245,7 @@ namespace Client
 
                 obj.Draw();
             }
+
             GraphicsManager.Draw();
         }
 

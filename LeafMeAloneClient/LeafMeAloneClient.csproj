@@ -141,6 +141,7 @@
     <Compile Include="ClientPacketFactory.cs" />
     <Compile Include="Shader.cs" />
     <Compile Include="UIManager.cs" />
+    <Compile Include="UITexture.cs" />
     <Compile Include="UITimer.cs" />
     <Compile Include="VertexBoneData.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -177,6 +178,7 @@
   <ItemGroup>
     <Content Include="Shaders\defaultShader.fx" />
     <Content Include="Shaders\particle.fx" />
+    <Content Include="Shaders\ui.fx" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

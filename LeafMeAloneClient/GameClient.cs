@@ -206,6 +206,7 @@ namespace Client
 
             // Tint all of the leaves based on their sections.
             TintLeaves();
+            CountLeaves();
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);
@@ -405,18 +406,15 @@ namespace Client
             // Itereate through the leaves.
             foreach (LeafClient leaf in leaves)
             {
-
                 // Iterate through all team sections.
-                foreach (TeamSection section in activeMatch.teamSections)
+                for (int index = 0; index < activeMatch.teamSections.Count; index++)
                 {
-
+                    TeamSection section = activeMatch.teamSections[index];
                     // If this leaf is in this team section.
                     if (section.IsInBounds(leaf.Transform.Position))
                     {
-
                         // Tint the leaf to section.
                         leaf.CurrentTint = section.sectionColor;
-
                     }
                 }
 
@@ -427,6 +425,29 @@ namespace Client
                     leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
                 }
             }
+        }
+
+        public void CountLeaves()
+        {
+
+            for (int index = 0; index < activeMatch.teamSections.Count; index++)
+            {
+
+                TeamSection section = activeMatch.teamSections[index];
+
+                int leafCount = activeMatch.GetTeamLeaves(index, GetLeafListAsGameObjects());
+
+                if (index == 0)
+                {
+                    Teams.Team1_Leaves.Value = leafCount;
+                }
+                else
+                {
+                    Teams.Team2_Leaves.Value = leafCount;
+                }
+            }
+
+
         }
 
         /// <summary>
@@ -455,6 +476,14 @@ namespace Client
 
             // Return all the leaves.
             return allLeaves;
+        }
+
+        public List<GameObject> GetLeafListAsGameObjects()
+        {
+
+            GameObject[] leaves = GetLeafList().ToArray();
+            return leaves.ToList<GameObject>();
+
         }
     }
 }

@@ -54,6 +54,13 @@ namespace Client
             t.Start();
         }
 
+        public void Reset()
+        {
+            TimeRemaining = 0;
+            TimeRemaining_UI.Value = 0;
+            t.Stop();
+        }
+
         public void Start(float timeToCountInSeconds)
         {
             t.AutoReset = true;

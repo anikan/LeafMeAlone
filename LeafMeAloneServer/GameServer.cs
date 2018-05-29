@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Shared;
 using Shared.Packet;
@@ -46,6 +47,8 @@ namespace Server
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
         private bool matchOver = false;
+        private Stopwatch matchResetTimer;
+        private Stopwatch matchStartTimer;
 
         public GameServer(bool networked)
         {
@@ -56,6 +59,8 @@ namespace Server
 
             instance = this;
             development = !networked;
+            matchResetTimer = new Stopwatch();
+            matchStartTimer = new Stopwatch();
 
             timer = new Stopwatch();
             testTimer = new Stopwatch();
@@ -78,10 +83,12 @@ namespace Server
             CreateRandomLeaves(Constants.NUM_LEAVES);
             //CreateLeaves(100, -10, 10, -10, 10);
 
-            if (development)
-            {
-                activeMatch.StartMatch(int.MaxValue);
-            }
+        }
+
+        private void StartMatch(int time)
+        {
+            activeMatch.StartMatch(time);
+            networkServer.SendAll(PacketUtil.Serialize(new MatchStartPacket(time)));
         }
 
         public static int Main(String[] args)
@@ -117,22 +124,14 @@ namespace Server
                 networkServer.Receive();
 
                 //Update the server players based on received packets.
-                //if (activeMatch.Started())
-                //{
-                    for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
-                    {
-                        RequestPacket packet = networkServer.PlayerPackets[i];
-                        int playerId = packet.GetId();
-                        gameObjectDict.TryGetValue(playerId, out GameObjectServer playerGameObject);
-
-                        if (packet != null && playerGameObject != null)
-                        {
-                            PlayerServer player = (PlayerServer)playerGameObject;
-                            player.UpdateFromPacket(networkServer.PlayerPackets[i]);
-                        }
-                    }
-
-                //}
+                if (!matchStartTimer.IsRunning || !activeMatch.Started())
+                {
+                    HandleIncomingPackets();
+                } else if (matchStartTimer.Elapsed.Seconds > 3)
+                {
+                    matchStartTimer.Reset();
+                    networkServer.SendAll(PacketUtil.Serialize(new MatchStartPacket(Constants.MATCH_TIME)));
+                }
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
@@ -152,6 +151,22 @@ namespace Server
 
                 //Sleep for the rest of this tick.
                 System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
+            }
+        }
+
+        private void HandleIncomingPackets()
+        {
+            for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
+            {
+                RequestPacket packet = networkServer.PlayerPackets[i];
+                int playerId = packet.GetId();
+                gameObjectDict.TryGetValue(playerId, out GameObjectServer playerGameObject);
+
+                if (packet != null && playerGameObject != null)
+                {
+                    PlayerServer player = (PlayerServer)playerGameObject;
+                    player.UpdateFromPacket(networkServer.PlayerPackets[i]);
+                }
             }
         }
 
@@ -182,6 +197,10 @@ namespace Server
                     DoMatchFinish(winningTeam);
                 }
             }
+            else if (matchResetTimer.Elapsed.Seconds > Constants.MATCH_RESET_TIME)
+            {
+                ResetMatch();
+            }
         }
 
         /// <summary>
@@ -193,8 +212,45 @@ namespace Server
         {
             BasePacket donePacket = new ThePacketToEndAllPackets(winningTeam);
             networkServer.SendAll(PacketUtil.Serialize(donePacket));
-            matchOver = true;
             GetLeafListAsObjects().ForEach(l => l.Burning = true);
+            matchOver = true;
+            matchResetTimer.Start();
+        }
+
+        /// <summary>
+        /// Checks conditions for match start and then trys to start the match rather than just 
+        /// starting it
+        /// </summary>
+        internal void TryStartMatch()
+        {
+            if ((development && playerServerList.Count == 1) || 
+                (!development && playerServerList.Count == Constants.NUM_PLAYERS))
+            {
+                StartMatch(Constants.MATCH_TIME);
+            }
+        }
+
+        /// <summary>
+        /// Resets the match, destroys all the leaves, resets the players, 
+        /// restarts the match timer.
+        /// </summary>
+        private void ResetMatch()
+        {
+            GetLeafListAsObjects().ForEach(l => l.Destroy());
+            playerServerList.ForEach(p => p.Reset(NextSpawnPoint()));
+            matchOver = false;
+            activeMatch.Reset();
+            matchResetTimer.Reset();
+            matchStartTimer.Start();
+        }
+
+        /// <summary>
+        /// Gets the next spawn point of the player spawn index
+        /// </summary>
+        /// <returns>The vector 3 of the next spawn point</returns>
+        private Vector3 NextSpawnPoint()
+        {
+            return spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
         }
 
         public PlayerServer CreateNewPlayer()
@@ -207,13 +263,15 @@ namespace Server
             newPlayer.Register();
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1);
-            newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
-            newActivePlayer.Id = newPlayer.Id;
+            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1)
+            {
+                ObjectType = ObjectType.ACTIVE_PLAYER,
+                Id = newPlayer.Id
+            };
 
             playerServerList.Add(newPlayer);
 
-            Vector3 nextSpawnPoint = spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
+            Vector3 nextSpawnPoint = NextSpawnPoint();
 
             //Note currently assuming players get ids 0-3
             newActivePlayer.Transform.Position = nextSpawnPoint;
@@ -223,11 +281,6 @@ namespace Server
 
             // Sending this new packet before the new client joins. 
             networkServer.SendAll(PacketUtil.Serialize(objPacket));
-
-            if (!development && playerServerList.Count == Constants.NUM_PLAYERS)
-            {
-                activeMatch.StartMatch(Constants.MATCH_TIME);
-            }
 
             return newActivePlayer;
         }
@@ -253,11 +306,11 @@ namespace Server
 
             // Spawn trees around the border of the map!
             // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
-            for (float y = startY; y < endY; y+= TreeServer.TREE_RADIUS)
+            for (float y = startY; y < endY; y += TreeServer.TREE_RADIUS)
             {
 
                 // Iterate through the width of the map, centered on origin and increase by radius of a tree.
-                for (float x = startX; x < endX; x+= TreeServer.TREE_RADIUS)
+                for (float x = startX; x < endX; x += TreeServer.TREE_RADIUS)
                 {
 
                     float random = (float)rnd.NextDouble();
@@ -433,7 +486,7 @@ namespace Server
             int index = new Random().Next(spawnPoints.Count);
             return spawnPoints.ElementAt(index);
         }
-      
+
         public List<GameObject> GetLeafListAsObjects()
         {
 

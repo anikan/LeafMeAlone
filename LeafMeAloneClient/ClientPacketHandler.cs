@@ -67,11 +67,11 @@ namespace Client
             // What to do on game finish
             void GameResultAction(ThePacketToEndAllPackets p)
             {
+                client.ResetGameTimer();
                 if (client.GetPlayerTeam() == p.winningTeam)
                 {
-                    Console.WriteLine("You Win!");
-                }
-                Console.WriteLine("You Lose!");
+                } 
+                // TODO: Remove this, make it so that the player stops moving when box pops up
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
@@ -82,6 +82,7 @@ namespace Client
                     {PacketType.PlayerPacket, (p) => UpdatePlayerAction((PlayerPacket) p) },
                     {PacketType.DestroyObjectPacket, (p) => DestroyAction((DestroyObjectPacket) p)},
                     {PacketType.GameResultPacket, (p) => GameResultAction((ThePacketToEndAllPackets) p)},
+                    {PacketType.MatchStartPacket, (p) => client.StartMatchTimer(((MatchStartPacket)p).gameTime)},
                 };
         }
 

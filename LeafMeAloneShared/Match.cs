@@ -187,6 +187,11 @@ namespace Shared
             return teamSections[teamIndex].numLeaves;
         }
 
+        public void Reset()
+        {
+            matchTimer.Reset();
+        }
+
         /// <summary>
         /// Determines whether the game is over, either by the number of leaves 
         /// on each side or whether the stopwatch for match time is beyond 

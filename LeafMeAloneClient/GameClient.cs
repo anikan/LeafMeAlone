@@ -102,6 +102,11 @@ namespace Client
             GraphicsRenderer.Dispose();
         }
 
+        internal void ResetGameTimer()
+        {
+            gameTimer.Reset();
+        }
+
         internal Team GetPlayerTeam()
         {
             return ActivePlayer.team;
@@ -139,6 +144,11 @@ namespace Client
             GraphicsRenderer.BarContext.Draw();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
+        }
+
+        internal void StartMatchTimer(float gameTime)
+        {
+            gameTimer.Start(gameTime);
         }
 
         // Start the networked client (connect to server).

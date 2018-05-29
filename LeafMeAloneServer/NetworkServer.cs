@@ -145,6 +145,7 @@ namespace Server
                 new AsyncCallback(AcceptCallback),
                 listener);
 
+            GameServer.instance.TryStartMatch();
         }
 
         /// <summary>

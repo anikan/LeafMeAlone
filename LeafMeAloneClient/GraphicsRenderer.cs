@@ -198,7 +198,6 @@ namespace Client
             BarContext = new Context(Tw.GraphicsAPI.D3D11, Device.ComPointer);
             BarContext.HandleResize(Form.ClientSize);
         }
-
         /// <summary>
         /// Method called when the form is resized by the user.
         /// </summary>

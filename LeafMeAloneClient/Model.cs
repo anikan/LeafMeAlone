@@ -13,7 +13,7 @@ namespace Client
 {
     // A wrapper of the Geometry class; used to manage the mesh that is used for rendering
     // Also manages the Model class
-    class Model
+    public class Model
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 

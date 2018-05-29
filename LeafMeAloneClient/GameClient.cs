@@ -9,6 +9,7 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using System.Net;
+using Client.UI;
 using Shared.Packet;
 
 namespace Client
@@ -50,6 +51,12 @@ namespace Client
             Console.WriteLine("Player Died");
         }
 
+        /// <summary>
+        /// The ID of the audio pool to be used by all the leaves collectively
+        /// </summary>
+        public int leafAudioPoolId;
+        public const int LeafAudioCapacity = 50;
+
         // The active camera in the scene.
         private Camera Camera => GraphicsManager.ActiveCamera;
 
@@ -57,6 +64,8 @@ namespace Client
         public Stopwatch FrameTimer;
         private UIFramesPersecond fps;
         private UITimer gameTimer;
+        private UITeams Teams;
+        private UIGameWLState GameWinLossState;
 
         private NetworkClient networkClient;
 
@@ -84,22 +93,22 @@ namespace Client
             // Initialize graphics classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
+            AudioManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
+            
+            Client.fps = new UIFramesPersecond(new Size(5, 10), new Point(GraphicsRenderer.Form.ClientSize.Width - 100, 0));
+            Client.gameTimer = new UITimer(60, new Size(5, 10), new Point(0, 0));
+            Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
+            Client.GameWinLossState = new UIGameWLState(new Size(150,100),new Point(GraphicsRenderer.Form.ClientSize.Width/2, GraphicsRenderer.Form.ClientSize.Height/2));
 
-            //TODO FOR TESTING ONLY
-            //GraphicsRenderer.Form.KeyDown += 
-            // TestPlayerMovementWithoutNetworking;
-            Client.fps = new UIFramesPersecond(new Size(5, 30),
-                new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
-            Client.gameTimer =
-                new UITimer(60, new Size(225, 3), new Point(0, 0));
 
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
+
         }
 
         internal void ResetGameTimer()
@@ -144,6 +153,8 @@ namespace Client
             GraphicsRenderer.BarContext.Draw();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
+
+            AudioManager.Update();
         }
 
         internal void StartMatchTimer(float gameTime)
@@ -172,6 +183,8 @@ namespace Client
             // Initialize game object lists.
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
+
+            leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -215,6 +228,7 @@ namespace Client
 
             // Tint all of the leaves based on their sections.
             TintLeaves();
+            CountLeaves();
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);
@@ -274,6 +288,7 @@ namespace Client
             networkClient.PacketQueue.Clear();
         }
 
+        
         /// <summary>
         /// Creates a new object from a given packet, whether that be a leaf 
         /// or a player.
@@ -284,6 +299,8 @@ namespace Client
         {
 
             int objId = createPacket.ObjData.IdData.ObjectId;
+            
+
 
             // Create a new packet depending on it's type.
             switch (createPacket.ObjectType)
@@ -411,18 +428,15 @@ namespace Client
             // Itereate through the leaves.
             foreach (LeafClient leaf in leaves)
             {
-
                 // Iterate through all team sections.
-                foreach (TeamSection section in activeMatch.teamSections)
+                for (int index = 0; index < activeMatch.teamSections.Count; index++)
                 {
-
+                    TeamSection section = activeMatch.teamSections[index];
                     // If this leaf is in this team section.
                     if (section.IsInBounds(leaf.Transform.Position))
                     {
-
                         // Tint the leaf to section.
                         leaf.CurrentTint = section.sectionColor;
-
                     }
                 }
 
@@ -433,6 +447,29 @@ namespace Client
                     leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
                 }
             }
+        }
+
+        public void CountLeaves()
+        {
+
+            for (int index = 0; index < activeMatch.teamSections.Count; index++)
+            {
+
+                TeamSection section = activeMatch.teamSections[index];
+
+                int leafCount = activeMatch.GetTeamLeaves(index, GetLeafListAsGameObjects());
+
+                if (index == 0)
+                {
+                    Teams.Team1_Leaves.Value = leafCount;
+                }
+                else
+                {
+                    Teams.Team2_Leaves.Value = leafCount;
+                }
+            }
+
+
         }
 
         /// <summary>
@@ -461,6 +498,14 @@ namespace Client
 
             // Return all the leaves.
             return allLeaves;
+        }
+
+        public List<GameObject> GetLeafListAsGameObjects()
+        {
+
+            GameObject[] leaves = GetLeafList().ToArray();
+            return leaves.ToList<GameObject>();
+
         }
     }
 }

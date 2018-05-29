@@ -49,6 +49,8 @@ namespace Client
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
             _audioWind = AudioManager.GetNewSource();
+
+            Burnable = true;
         }
 
         public Team team { get; set; }

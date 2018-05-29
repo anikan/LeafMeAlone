@@ -29,7 +29,7 @@ namespace Shared
         {
 
             // Is it in bounds? If so, return true.
-            if (position.X > leftX && position.X < rightX && position.Z < upZ && position.Z > downZ)
+            if (position.X >= leftX && position.X <= rightX && position.Z <= upZ && position.Z >= downZ)
             {
                 return true;
             }

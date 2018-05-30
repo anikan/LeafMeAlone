@@ -35,6 +35,9 @@ namespace Client
 
         private ParticleSystem FlameThrower,LeafBlower;
 
+        // For the audio control
+        private int _audioFootstep, _audioFlame, _audioWind;
+
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, Constants.PlayerModel)
         {
@@ -42,6 +45,12 @@ namespace Client
             LeafBlower = new LeafBlowerParticleSystem();
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
+
+            _audioFootstep = AudioManager.GetNewSource();
+            _audioFlame = AudioManager.GetNewSource();
+            _audioWind = AudioManager.GetNewSource();
+
+            Burnable = true;
         }
 
         public Team team { get; set; }
@@ -49,7 +58,6 @@ namespace Client
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
         public ToolMode ActiveToolMode { get; set; }
-
 
         /// <summary>
         /// Moves the player in a specified direction (NESW)
@@ -212,6 +220,10 @@ namespace Client
         /// <param name="packet">The packet to update from.</param>
         private void UpdateFromPacket(PlayerPacket packet)
         {
+            bool prevMoving = Moving;
+            bool prevUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
+            bool prevUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
+
             base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
 
@@ -226,6 +238,12 @@ namespace Client
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;
+
+            bool currMoving = Moving;
+            bool currUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
+            bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
+
+            EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind);
 
             switch (ActiveToolMode)
             {
@@ -256,6 +274,61 @@ namespace Client
 
         }
 
+        /// <summary>
+        /// Evaluate audio logic
+        /// </summary>
+        /// <param name="prevMoving"> moving previously? </param>
+        /// <param name="currMoving"> moving currently? </param>
+        /// <param name="prevUsingFlame"> using flamethrower previously? </param>
+        /// <param name="currUsingFlame">using flamethrower currently? </param>
+        /// <param name="prevUsingWind"> using windblower previously? </param>
+        /// <param name="currUsingWind"> using windblower currently? </param>
+        public void EvaluateAudio(bool prevMoving, bool currMoving, bool prevUsingFlame, bool currUsingFlame, bool prevUsingWind, bool currUsingWind)
+        {
+
+            // footstep audio logic
+            // if start moving
+            if (!prevMoving && currMoving)
+            {
+                AudioManager.PlayAudio(_audioFootstep, Constants.PlayerFootstep, true);
+            }
+            // if stop moving
+            else if (prevMoving && !currMoving)
+            {
+                AudioManager.StopAudio(_audioFootstep);
+            }
+
+            // flamethrower audio logic
+            // if start using flame now
+            if (!prevUsingFlame && currUsingFlame)
+            {
+                AudioManager.StopAudio(_audioFlame);
+                AudioManager.QueueAudioToSource(_audioFlame, Constants.FlameThrowerStart, false);
+                AudioManager.QueueAudioToSource(_audioFlame, Constants.FlameThrowerLoop, true);
+            }
+            // if stop using flame now
+            else if (prevUsingFlame && !currUsingFlame)
+            {
+                AudioManager.RemoveSourceQueue(_audioFlame);
+                AudioManager.PlayAudio(_audioFlame, Constants.FlameThrowerEnd, false);
+            }
+
+            // windblower audio logic
+            // if start using wind now
+            if (!prevUsingWind && currUsingWind)
+            {
+                AudioManager.StopAudio(_audioWind);
+                AudioManager.QueueAudioToSource(_audioWind, Constants.LeafBlowerStart, false);
+                AudioManager.QueueAudioToSource(_audioWind, Constants.LeafBlowerLoop, true);
+            }
+            // if stop using wind now
+            else if (prevUsingWind && !currUsingWind)
+            {
+                AudioManager.RemoveSourceQueue(_audioWind);
+                AudioManager.PlayAudio(_audioWind, Constants.LeafBlowerEnd, false);
+            }
+        }
+
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
@@ -274,6 +347,7 @@ namespace Client
             LeafBlower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             LeafBlower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             LeafBlower.Update(deltaTime);
+
         }
 
         /// <summary>
@@ -285,14 +359,6 @@ namespace Client
         public override void UpdateFromPacket(BasePacket packet)
         {
             UpdateFromPacket(packet as PlayerPacket);
-        }
-
-        /// <summary>
-        /// "Kills" the player and forces a respawn.
-        /// </summary>
-        public override void Destroy()
-        {
-            // You can't destroy a player silly. Do something else here instead.
         }
     }
 }

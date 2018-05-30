@@ -32,14 +32,36 @@ namespace Shared
         public const string DefaultMapModel = @"../../Models/Terrain.fbx";
         public const string TreeModel = @"../../Models/TreeAttempt.fbx";
 
+        /// <summary>
+        /// Sounds/Audio files
+        /// </summary>
+        public const string Bgm = @"../../Sound/song.wav";
+        public const string FlameThrowerStart = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string FlameThrowerLoop = @"../../Sound/collision.wav";
+        public const string FlameThrowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
+
+        public const string LeafBlowerStart = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string LeafBlowerLoop = @"../../Sound/collision.wav";
+        public const string LeafBlowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
+
+        public const string LeafIgniting = @"../../Sound/collision.wav";
+        public const string LeafBurning = @"../../Sound/burn.wav";
+        public const string LeafBurnup = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string LeafPutoff = @"../../Sound/Crash-Cymbal-1.wav";
+
+        public const string PlayerFootstep = @"../../Sound/running.wav";
+
         // Height of the world floor.
         public const float FLOOR_HEIGHT = -10.0f;
 
         // Width/height of the map.
         public const float MAP_WIDTH = 150.0f;
-        public const float MAP_HEIGHT = 150.0f;
+        public const float MAP_HEIGHT = 80.0f;
 
-        public const float NO_MANS_LAND_PERCENT = 0.1f;
+        // Map tile size information.
+        public const float TILE_SIZE = 8.0f;
+
+        public const float NO_MANS_LAND_PERCENT = 0.25f;
 
         // Margin around the map. Leaves won't spawn in these margins.
         public const float BORDER_MARGIN = 5.0f;
@@ -56,5 +78,11 @@ namespace Shared
         public const bool PIVOT_DEBUG = false;
 
         public const int DEATH_TIME = 3;
+
+        // Constants for leafs. 
+        public const float LEAF_HEALTH = 10.0f;
+        public const float LEAF_MASS = 0.1f;
+        public const float LEAF_RADIUS = 0.0f;
+        public const float LEAF_BOUNCIENESS = 3.0f;
     }
 }

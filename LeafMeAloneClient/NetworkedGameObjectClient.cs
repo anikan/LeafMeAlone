@@ -14,7 +14,7 @@ namespace Client
     /// </summary>
     public abstract class NetworkedGameObjectClient : GraphicGameObject
     {
-
+        public bool Moving = false;
 
         /// <summary>
         /// Constructs a new local GameObject with a model at the specified path and a specified position.
@@ -38,7 +38,11 @@ namespace Client
         public virtual void UpdateFromPacket(BasePacket packet)
         {
             ObjectPacket objPacket = packet as ObjectPacket;
+
             // Set the initial positions of the object.
+            Moving = !(Transform.Position.X == objPacket.PositionX 
+                       && Transform.Position.Z == objPacket.PositionZ);
+
             Transform.Position.X = objPacket.PositionX;
             Transform.Position.Z = objPacket.PositionZ;
 
@@ -54,8 +58,7 @@ namespace Client
             {
                 //change of health
                 var deltaHealth = oldHealth - Health;
-                var maxHealth = 5.0f;
-                CurrentTint -= new Vector3((deltaHealth / maxHealth), (deltaHealth / maxHealth), (deltaHealth / maxHealth));
+                CurrentTint -= new Vector3((deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH));
 
             }
         }

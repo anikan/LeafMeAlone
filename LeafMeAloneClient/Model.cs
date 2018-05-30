@@ -13,7 +13,7 @@ namespace Client
 {
     // A wrapper of the Geometry class; used to manage the mesh that is used for rendering
     // Also manages the Model class
-    class Model
+    public class Model
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 
@@ -141,18 +141,17 @@ namespace Client
                 m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
                 if (CurrentAnimationIndex != -1)
                 {
-                    if (CurrentAnimationIndex != -1)
-                    {
-                        m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
-                        m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
-                        m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
-                        m_ActiveGeo.RepeatAnimation = RepeatAnimation;
-                        m_ActiveGeo.UpdateAnimation();
-                    }
 
-                    m_ActiveShader.UseShader();
-                    m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                    m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
+                    m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
+                    m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
+                    m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+                    m_ActiveGeo.UpdateAnimation();
                 }
+
+                m_ActiveShader.UseShader();
+                m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
+                
             }
         }
 

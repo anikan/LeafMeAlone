@@ -34,6 +34,7 @@ namespace Server
         {
             Team = team;
             ToolEquipped = ToolType.BLOWER;
+            Burnable = true;
         }
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace Server
             Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
 
-            Console.WriteLine(String.Format("Burning: {0}, Health: {1}", Burning, Health));
+            //Console.WriteLine(String.Format("Burning: {0}, Health: {1}", Burning, Health));
             // if health is down, start the players death clock
             if (Health < 0 && !Dead )
             {
@@ -55,7 +56,7 @@ namespace Server
                 Burning = false;
                 Health = PLAYER_HEALTH;
                 deathClock.Start();
-            // Once health is up, reset te death clock and player position
+            // Once health is up, reset the death clock and player position
             } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME) {
                 deathClock.Reset();
                 newPlayerPos = GameServer.instance.GetRandomSpawnPoint();
@@ -72,7 +73,7 @@ namespace Server
         public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
         {
 
-            // Itereate through all objects.
+            // Iterate through all objects.
             for (int j = 0; j < allObjects.Count; j++)
             {
 

@@ -50,6 +50,12 @@ namespace Client
             Console.WriteLine("Player Died");
         }
 
+        /// <summary>
+        /// The ID of the audio pool to be used by all the leaves collectively
+        /// </summary>
+        public int leafAudioPoolId;
+        public const int LeafAudioCapacity = 50;
+
         // The active camera in the scene.
         private Camera Camera => GraphicsManager.ActiveCamera;
 
@@ -60,7 +66,11 @@ namespace Client
 
         private NetworkClient networkClient;
 
+        private Match activeMatch = Match.DefaultMatch;
+
         public static GameClient instance;
+
+
 
         private static void Main(String[] args)
         {
@@ -80,6 +90,7 @@ namespace Client
             // Initialize graphics classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
+            AudioManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
 
@@ -91,11 +102,12 @@ namespace Client
                 new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
             Client.gameTimer =
                 new UITimer(60, new Size(225, 3), new Point(0, 0));
-
+            
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
+
         }
 
         internal Team GetPlayerTeam()
@@ -135,6 +147,8 @@ namespace Client
             GraphicsRenderer.BarContext.Draw();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
+
+            AudioManager.Update();
         }
 
         // Start the networked client (connect to server).
@@ -158,6 +172,8 @@ namespace Client
             // Initialize game object lists.
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
+
+            leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -199,6 +215,9 @@ namespace Client
                 obj.Update(delta);
             }
 
+            // Tint all of the leaves based on their sections.
+            TintLeaves();
+
             // Update the graphics manager.
             GraphicsManager.Update(delta);
 
@@ -231,7 +250,7 @@ namespace Client
             }
             GraphicsManager.Draw();
         }
-
+         
 
         /// <summary>
         /// Recieves packets from the server, updates objects or creates 
@@ -380,6 +399,70 @@ namespace Client
             int id = p.GetId();
             NetworkedGameObjects.TryGetValue(id, out NetworkedGameObjectClient packetObject);
             return packetObject;
+        }
+
+        /// <summary>
+        /// Tint all the leaves in the game.
+        /// </summary>
+        public void TintLeaves()
+        {
+
+            // Get a list of all leaves.
+            List<LeafClient> leaves = GetLeafList();
+
+            // Itereate through the leaves.
+            foreach (LeafClient leaf in leaves)
+            {
+
+                // Iterate through all team sections.
+                foreach (TeamSection section in activeMatch.teamSections)
+                {
+
+                    // If this leaf is in this team section.
+                    if (section.IsInBounds(leaf.Transform.Position))
+                    {
+
+                        // Tint the leaf to section.
+                        leaf.CurrentTint = section.sectionColor;
+
+                    }
+                }
+
+                // Check if this leaf is in no mans land.
+                if (activeMatch.NoMansLand.IsInBounds(leaf.Transform.Position))
+                {
+                    // Tint the leaf.
+                    leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get a list of all leaves from the game object list.
+        /// </summary>
+        /// <returns>List of all leaves.</returns>
+        public List<LeafClient> GetLeafList()
+        {
+            // List to return.
+            List<LeafClient> allLeaves = new List<LeafClient>();
+
+            // Get all object values from the game object dictionary.
+            List<NetworkedGameObjectClient> allObjects = NetworkedGameObjects.Values.ToList<NetworkedGameObjectClient>();
+
+            // Iterate through all objects.
+            foreach (NetworkedGameObjectClient obj in allObjects)
+            {
+
+                // If it's a leaf.
+                if (obj is LeafClient leaf)
+                {
+                    // Add it to the leaf list.
+                    allLeaves.Add(leaf);
+                }
+            }
+
+            // Return all the leaves.
+            return allLeaves;
         }
     }
 }

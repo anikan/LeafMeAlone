@@ -17,7 +17,8 @@ namespace Client.UI
         Lose,
         None
     }
-    class UIGameWLState
+
+    public class UIGameWLState
     {
         private State CurrState = State.Win;
 

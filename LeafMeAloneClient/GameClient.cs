@@ -67,13 +67,6 @@ namespace Client
 
         // Timer to calculate time between frames.
         public Stopwatch FrameTimer;
-        private UIFramesPersecond fps;
-        private UITimer gameTimer;
-        private UITeams Teams;
-        private UIGameWLState GameWinLossState;
-        private UICulled Culled;
-        private UIFindTeammate TeammateUI;
-
         private NetworkClient networkClient;
 
         private Match activeMatch = Match.DefaultMatch;
@@ -103,15 +96,8 @@ namespace Client
             AudioManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
-
             
-            Client.fps = new UIFramesPersecond();
-            Client.gameTimer = new UITimer(60);
-            Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
-            Client.GameWinLossState = new UIGameWLState();
-            Client.Culled = new UICulled();
-            Client.TeammateUI = new UIFindTeammate();
-
+            GlobalUIManager.Init();
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -126,7 +112,7 @@ namespace Client
         
         private void DoGameLoop()
         {
-            fps.Start();
+            GlobalUIManager.fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(
                 GraphicsRenderer.RenderTarget, new Color4(0.0f, .4f, 0.0f));
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(
@@ -154,15 +140,12 @@ namespace Client
             
 
             GraphicsRenderer.BarContext.Draw();
-            Culled.Update();
-            TeammateUI.Update();
+            GlobalUIManager.Update();
             UIManagerSpriteRenderer.Update();
             UIManagerSpriteRenderer.SpriteRenderer.Flush();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
-            fps.StopAndCalculateFps();
+            GlobalUIManager.fps.StopAndCalculateFps();
             UICulled.Culled = 0;
-           
-            //Debug.Log("Fps is: " + fps.CurrentFps);
             AudioManager.Update();
         }
 
@@ -464,11 +447,11 @@ namespace Client
 
                 if (index == 0)
                 {
-                    Teams.Team1_Leaves.Value = leafCount;
+                    GlobalUIManager.Teams.Team1_Leaves.Value = leafCount;
                 }
                 else
                 {
-                    Teams.Team2_Leaves.Value = leafCount;
+                    GlobalUIManager.Teams.Team2_Leaves.Value = leafCount;
                 }
             }
 

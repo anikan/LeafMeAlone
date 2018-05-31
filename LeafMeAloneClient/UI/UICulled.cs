@@ -9,7 +9,7 @@ using SpriteTextRenderer;
 
 namespace Client.UI
 {
-    class UICulled
+    public class UICulled
     {
         public static int Culled = 0;
         private readonly DrawableString CulledUI;

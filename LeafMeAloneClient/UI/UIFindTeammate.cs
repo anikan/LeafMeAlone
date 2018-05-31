@@ -8,7 +8,7 @@ using SlimDX;
 
 namespace Client.UI
 {
-    class UIFindTeammate
+    public class UIFindTeammate
     {
         public PlayerClient Teammate;
         private readonly DrawableTexture teammateFinder;
@@ -30,40 +30,40 @@ namespace Client.UI
 
         Vector2 IntersectScreenEdge(Vector2 vectorToTeammate)
         {
-            Plane p = new Plane(Vector3.Zero,new Vector3(GraphicsRenderer.Form.ClientSize.Width,0,0),new Vector3(0, GraphicsRenderer.Form.ClientSize.Height,0));
-            p.Normalize();
-            Vector3 intersectionPoint;
-            if(Plane.Intersects(p, new Vector3(vectorToTeammate, 0), new Vector3(vectorToTeammate, 0) * 1000,
-                out intersectionPoint))
-                Debug.Log("Found!");
-            else
-            {
-                Debug.Log("Not Found!");
-            }
-            return new Vector2(intersectionPoint.X,intersectionPoint.Y);
-
-            //Vector2[] screenpts = { Vector2.UnitX * GraphicsRenderer.Form.ClientSize.Width, Vector2.UnitY * GraphicsRenderer.Form.ClientSize.Height };
-
-
-            //Vector2 intersection = Vector2.Zero;
-            //foreach (Vector2 pt in screenpts)
+            //Plane p = new Plane(Vector3.Zero,new Vector3(GraphicsRenderer.Form.ClientSize.Width,0,0),new Vector3(0, GraphicsRenderer.Form.ClientSize.Height,0));
+            //p.Normalize();
+            //Vector3 intersectionPoint;
+            //if(Plane.Intersects(p, new Vector3(vectorToTeammate, 0), new Vector3(vectorToTeammate, 0) * 1000,
+            //    out intersectionPoint))
+            //    Debug.Log("Found!");
+            //else
             //{
-            //    intersection = vectorToTeammate.IntersectionPoint(pt);
-            //    if (float.IsNaN(intersection.X) || float.IsNaN(intersection.Y) || float.IsInfinity(intersection.Y) ||
-            //        float.IsInfinity(intersection.X))
-            //        intersection = Vector2.Zero;
-            //    else
-            //        return intersection;
-
-            //    intersection = -vectorToTeammate.IntersectionPoint(pt);
-            //    if (float.IsNaN(intersection.X) || float.IsNaN(intersection.Y) || float.IsInfinity(intersection.Y) ||
-            //        float.IsInfinity(intersection.X))
-            //        intersection = Vector2.Zero;
-            //    else
-            //        return intersection;
-
+            //    Debug.Log("Not Found!");
             //}
-            //return intersection;
+            //return new Vector2(intersectionPoint.X,intersectionPoint.Y);
+
+            Vector2[] screenpts = { Vector2.UnitX * GraphicsRenderer.Form.ClientSize.Width, Vector2.UnitY * GraphicsRenderer.Form.ClientSize.Height };
+
+
+            Vector2 intersection = Vector2.Zero;
+            foreach (Vector2 pt in screenpts)
+            {
+                intersection = vectorToTeammate.IntersectionPoint(pt);
+                if (float.IsNaN(intersection.X) || float.IsNaN(intersection.Y) || float.IsInfinity(intersection.Y) ||
+                    float.IsInfinity(intersection.X))
+                    intersection = Vector2.Zero;
+                else
+                    return intersection;
+
+                intersection = -vectorToTeammate.IntersectionPoint(pt);
+                if (float.IsNaN(intersection.X) || float.IsNaN(intersection.Y) || float.IsInfinity(intersection.Y) ||
+                    float.IsInfinity(intersection.X))
+                    intersection = Vector2.Zero;
+                else
+                    return intersection;
+
+            }
+            return intersection;
         }
 
         public void Update()

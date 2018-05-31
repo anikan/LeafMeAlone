@@ -31,7 +31,6 @@ namespace Client
 
         public static void Init()
         {
-
             SpriteRenderer = new SpriteRenderer(GraphicsRenderer.Device);
         }
         #region Text

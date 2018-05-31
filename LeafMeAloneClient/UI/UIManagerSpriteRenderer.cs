@@ -92,7 +92,8 @@ namespace Client
             }
             foreach (DrawableTexture tex in texturesPerFrame)
             {
-                DrawTexture(tex.View, tex.Position, tex.Size, tex.Rotation);
+                if (tex.Enabled)
+                    DrawTexture(tex.View, tex.Position, tex.Size, tex.Rotation);
             }
         }
 

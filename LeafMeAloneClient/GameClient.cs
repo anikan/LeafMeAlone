@@ -44,6 +44,8 @@ namespace Client
         // All leaves in the scene. 
         public List<LeafClient> leaves;
 
+        public List<PlayerClient> playerClients = new List<PlayerClient>();
+
         internal PlayerClient GetActivePlayer()
         {
             return ActivePlayer;
@@ -69,7 +71,8 @@ namespace Client
         private UITimer gameTimer;
         private UITeams Teams;
         private UIGameWLState GameWinLossState;
-        private DrawableTexture testTextureUI;
+        private UICulled Culled;
+        private UIFindTeammate TeammateUI;
 
         private NetworkClient networkClient;
 
@@ -106,8 +109,8 @@ namespace Client
             Client.gameTimer = new UITimer(60);
             Client.Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width/2,0));
             Client.GameWinLossState = new UIGameWLState();
-            Client.testTextureUI = UIManagerSpriteRenderer.DrawTextureContinuous(Constants.Arrow, new Vector2(100, 100),
-                new Vector2(75, 75), 0);
+            Client.Culled = new UICulled();
+            Client.TeammateUI = new UIFindTeammate();
 
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
@@ -151,11 +154,15 @@ namespace Client
             
 
             GraphicsRenderer.BarContext.Draw();
+            Culled.Update();
+            TeammateUI.Update();
             UIManagerSpriteRenderer.Update();
             UIManagerSpriteRenderer.SpriteRenderer.Flush();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             fps.StopAndCalculateFps();
-
+            UICulled.Culled = 0;
+           
+            //Debug.Log("Fps is: " + fps.CurrentFps);
             AudioManager.Update();
         }
 
@@ -297,16 +304,19 @@ namespace Client
             int objId = createPacket.ObjData.IdData.ObjectId;
             
 
-
+            
             // Create a new packet depending on it's type.
             switch (createPacket.ObjectType)
             {
                 // Create an active player
                 case (ObjectType.ACTIVE_PLAYER):
-                    return InitializeUserPlayerAndMovement(createPacket);
+                    var newPlayer = InitializeUserPlayerAndMovement(createPacket) as PlayerClient;
+                    playerClients.Add(newPlayer);
+                    return newPlayer;
                 // Create an other player
                 case (ObjectType.PLAYER):
                     NetworkedGameObjectClient player = new PlayerClient(createPacket);
+                    playerClients.Add((PlayerClient) player);
                     NetworkedGameObjects.Add(objId, player);
                     return player;
                 // Create a leaf.
@@ -411,8 +421,6 @@ namespace Client
             NetworkedGameObjects.TryGetValue(id, out NetworkedGameObjectClient packetObject);
             return packetObject;
         }
-
-        private static LeafClient l;
         /// <summary>
         /// Tint all the leaves in the game.
         /// </summary>
@@ -424,8 +432,6 @@ namespace Client
             // Itereate through the leaves.
             foreach (LeafClient leaf in leaves)
             {
-                if (l == null)
-                    l = leaf;
                 // Iterate through all team sections.
                 for (int index = 0; index < activeMatch.teamSections.Count; index++)
                 {
@@ -437,16 +443,12 @@ namespace Client
                         leaf.CurrentTint = section.sectionColor;
                     }
                 }
-
                 // Check if this leaf is in no mans land.
                 if (activeMatch.NoMansLand.IsInBounds(leaf.Transform.Position))
                 {
                     // Tint the leaf.
                     leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
                 }
-
-                l.CurrentTint = new Vector3(10,.1f,.1f);
-                testTextureUI.Position = GraphicsManager.WorldToScreenPoint(l.Transform.Position);
             }
         }
 

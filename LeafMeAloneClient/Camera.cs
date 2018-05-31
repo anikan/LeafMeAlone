@@ -15,7 +15,10 @@ namespace Client
     /// </summary>
     class Camera
     {
+        public ViewFrustum Frustum;
+
         private Vector3 m_CameraUp;
+
         public Vector3 CameraUp {
             get
             {
@@ -79,6 +82,7 @@ namespace Client
         public void UpdateCameraView()
         {
             m_ViewMatrix = Matrix.LookAtLH(m_CameraPosition, m_CameraLookAt, m_CameraUp);
+            Frustum = new ViewFrustum(m_ViewMatrix,GraphicsRenderer.ProjectionMatrix);
         }
 
         /// <summary>

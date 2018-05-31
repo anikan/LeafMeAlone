@@ -18,6 +18,8 @@ namespace Client
         /// </summary>
         public static RenderForm Form;
 
+        public static Form DebugForm;
+
         /// <summary>
         /// Device is an adapter used to render.
         /// </summary>
@@ -186,6 +188,17 @@ namespace Client
             using (var factory = SwapChain.GetParent<Factory>())
                 factory.SetWindowAssociation(Form.Handle, WindowAssociationFlags.IgnoreAltEnter);
 
+
+            TextBox debugTextbox = new TextBox { Multiline = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical };
+            DebugForm = new Form();
+            DebugForm.Controls.Add(debugTextbox);
+            DebugForm.Closing += (sender, args) =>
+            {
+                args.Cancel = true;
+                DebugForm.Hide();
+            };
+            Debug.Init(debugTextbox);
+
             // handle alt+enter ourselves
             Form.KeyDown += (o, e) =>
             {
@@ -193,10 +206,14 @@ namespace Client
                     SwapChain.IsFullScreen = !SwapChain.IsFullScreen;
                 if (e.KeyCode == Keys.Escape)
                     Application.Exit();
+                if (e.Control && e.KeyCode == Keys.Enter)
+                    DebugForm.Show();
             };
 
             BarContext = new Context(Tw.GraphicsAPI.D3D11, Device.ComPointer);
             BarContext.HandleResize(Form.ClientSize);
+
+
         }
         /// <summary>
         /// Method called when the form is resized by the user.

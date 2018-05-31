@@ -23,6 +23,8 @@ namespace Client {
     {
         public const int VertexLoc = 0, NormalLoc = 1, TexLoc = 2, BoneIdLoc = 3, BoneWeightLoc = 4;
 
+        public List<BoundingBox> BoundingBoxes { get; private set; } = new List<BoundingBox>();
+
         /// <summary>
         /// Store information on all the meshes
         /// </summary>
@@ -234,7 +236,7 @@ namespace Client {
                 PostProcessSteps.JoinIdenticalVertices | PostProcessSteps.SortByPrimitiveType |
                 PostProcessSteps.GenerateUVCoords | PostProcessSteps.FlipUVs |
                 PostProcessSteps.LimitBoneWeights | PostProcessSteps.ValidateDataStructure );
-
+            
             //make sure scene not null
             if (scene == null)
                 throw new FileNotFoundException();
@@ -368,12 +370,18 @@ namespace Client {
 
                 // create a new material
                 mesh.Materials = new ClientMaterial();
-
+                var min = new Vector3(float.MaxValue);
+                var max = new Vector3(float.MinValue);
                 // copy the buffers
                 scene.Meshes[idx].Vertices.ForEach(vertex =>
                 {
                     mesh.Vertices.Write(vertex.ToVector3());
+                    min = Vector3.Minimize(min, vertex.ToVector3());
+                    max = Vector3.Maximize(max, vertex.ToVector3());
                 });
+                BoundingBoxes.Add(new BoundingBox(min,max));
+
+
                 scene.Meshes[idx].Normals.ForEach(normal =>
                 {
                     mesh.Normals.Write(normal.ToVector3());
@@ -382,7 +390,7 @@ namespace Client {
                 {
                     mesh.Faces.WriteRange(face.Indices.ToArray());
                 });
-
+                
                 // check if the mesh has texture coordinates
                 if (scene.Meshes[idx].HasTextureCoords(0))
                 {

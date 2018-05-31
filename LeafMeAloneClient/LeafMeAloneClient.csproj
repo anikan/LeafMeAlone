@@ -117,7 +117,9 @@
     <Compile Include="AudioSystem.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="ClientPacketHandler.cs" />
+    <Compile Include="Debug.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
+    <Compile Include="Frustum.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
     <Compile Include="MapTile.cs" />
     <Compile Include="ParticleSystemManager.cs" />
@@ -126,6 +128,8 @@
     <Compile Include="ClientBone.cs" />
     <Compile Include="ClientMaterial.cs" />
     <Compile Include="ClientMesh.cs" />
+    <Compile Include="UI\UICulled.cs" />
+    <Compile Include="UI\UIFindTeammate.cs" />
     <Compile Include="UI\UIFramesPersecond.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="GraphicGameObject.cs" />
@@ -147,6 +151,7 @@
     <Compile Include="ClientPacketFactory.cs" />
     <Compile Include="Shader.cs" />
     <Compile Include="UI\UIGameWLState.cs" />
+    <Compile Include="UI\UIHealth.cs" />
     <Compile Include="UI\UIManagerAntTweakBar.cs" />
     <Compile Include="UI\UIManagerSpriteRenderer.cs" />
     <Compile Include="UI\UITeams.cs" />

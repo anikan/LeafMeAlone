@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Client.UI;
 using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
@@ -17,8 +18,13 @@ namespace Client
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 
+        private readonly List<BoundingBox> ModelBoundingBoxes = new List<BoundingBox>();
+
+
         // Whether the model is drawn
         public bool Enabled = true;
+
+        public bool IsCulled = false;
         
         public Vector3 Tint = new Vector3(1, 1, 1);
 
@@ -137,6 +143,17 @@ namespace Client
         /// </summary>
         public void Draw()
         {
+            foreach (BoundingBox boundingBox in ModelBoundingBoxes)
+            {
+                if (GraphicsManager.ActiveCamera.Frustum.Intersect(boundingBox) == 0)
+                {
+                    IsCulled = true;
+                    UICulled.Culled++;
+                    return;
+                }
+            }
+            IsCulled = false;
+
             if (Enabled) {
                 m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
                 if (CurrentAnimationIndex != -1)
@@ -163,21 +180,21 @@ namespace Client
         /// <param name="delta_time"> the time advanced since the previous frame </param>
         public void Update(float delta_time)
         {
+
             // update the matrix only if the properties has changes
             if (!m_Properties.Equals(m_PrevProperties))
             {
                 // prev properties = current properties
                 m_PrevProperties.CopyToThis(m_Properties);
 
-                m_ModelMatrix = Matrix.Scaling(m_Properties.Scale); // set the scaling of the model
+                m_ModelMatrix = m_Properties.AsMatrix();
 
-                // set the rotation based on the three directions
-                m_ModelMatrix = m_ModelMatrix * Matrix.RotationX(m_Properties.Rotation.X) *
-                                Matrix.RotationY(m_Properties.Rotation.Y) *
-                                Matrix.RotationZ(m_Properties.Rotation.Z);
-
-                // set the translation based on the position
-                m_ModelMatrix = m_ModelMatrix * Matrix.Translation(m_Properties.Position);
+                ModelBoundingBoxes.Clear();
+                foreach (BoundingBox boundingBox in m_ActiveGeo.BoundingBoxes)
+                {
+                    ModelBoundingBoxes.Add(new BoundingBox(Vector3.TransformCoordinate(boundingBox.Minimum,m_ModelMatrix),
+                                                           Vector3.TransformCoordinate(boundingBox.Maximum,m_ModelMatrix)));
+                }
             }
 
             if (!PauseAnimation && CurrentAnimationIndex != -1)

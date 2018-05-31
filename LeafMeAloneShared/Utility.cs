@@ -65,8 +65,16 @@ namespace Shared
 
         public static float ToRadians(this float degrees)
         {
-            return degrees * ((float) Math.PI / 180.0f);
+            return degrees * ((float)Math.PI / 180.0f);
         }
+
+        public static Vector2 IntersectionPoint(this Vector2 a, Vector2 b)
+        {
+            Vector2 c = b - a;
+            float t = Vector2.Dot(b,c) / Vector2.Dot(a,b);
+            return a + (a * t);
+        }
+
 
         public static void Copy(this Vector4 dest, Vector4 src)
         {

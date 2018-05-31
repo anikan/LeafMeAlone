@@ -39,5 +39,18 @@ namespace Shared.Packet
         {
             return IdData.ObjectId;
         }
+
+        public static bool operator ==(RequestPacket thisPacket, RequestPacket otherPacket)
+        {
+            return (thisPacket.DeltaX == otherPacket.DeltaX) && (thisPacket.DeltaZ == otherPacket.DeltaZ) &&
+                   (thisPacket.DeltaRot == otherPacket.DeltaRot) && (thisPacket.IdData == otherPacket.IdData) &&
+                   (thisPacket.ToolRequest == otherPacket.ToolRequest) && (thisPacket.ToolMode == otherPacket.ToolMode);
+        }
+
+        public static bool operator !=(RequestPacket thisPacket, RequestPacket otherPacket)
+        {
+            return !(thisPacket == otherPacket);
+        }
+
     }
 }

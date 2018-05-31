@@ -24,5 +24,16 @@ namespace Shared.Packet
         {
             ObjectId = objectId;
         }
+
+        public static bool operator ==(IdPacket thisPacket, IdPacket otherPacket)
+        {
+            return thisPacket.ObjectId == otherPacket.ObjectId;
+        }
+
+        public static bool operator !=(IdPacket thisPacket, IdPacket otherPacket)
+        {
+            return !(thisPacket == otherPacket);
+        }
+
     }
 }

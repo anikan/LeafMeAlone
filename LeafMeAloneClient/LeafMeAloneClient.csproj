@@ -128,6 +128,7 @@
     <Compile Include="ClientBone.cs" />
     <Compile Include="ClientMaterial.cs" />
     <Compile Include="ClientMesh.cs" />
+    <Compile Include="UI\GlobalUIManager.cs" />
     <Compile Include="UI\UICulled.cs" />
     <Compile Include="UI\UIFindTeammate.cs" />
     <Compile Include="UI\UIFramesPersecond.cs" />
@@ -156,7 +157,6 @@
     <Compile Include="UI\UIManagerSpriteRenderer.cs" />
     <Compile Include="UI\UITeams.cs" />
     <Compile Include="UI\UITimer.cs" />
-    <Compile Include="UITexture.cs" />
     <Compile Include="VertexBoneData.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

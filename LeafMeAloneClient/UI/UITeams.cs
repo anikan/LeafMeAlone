@@ -9,7 +9,7 @@ using Shared;
 
 namespace Client.UI
 {
-    class UITeams
+    public class UITeams
     {
         public IntVariable Team1_Leaves, Team2_Leaves;
         public VectorVariable TeammateDirectionVar;

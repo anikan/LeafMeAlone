@@ -20,7 +20,6 @@ namespace Shared
         /// </summary>
         public const string DefaultShader = @"../../Shaders/defaultShader.fx";
         public const string ParticleShader = @"../../Shaders/particle.fx";
-        public const string UIShader = @"../../Shaders/ui.fx";
 
         /// <summary>
         /// Textures

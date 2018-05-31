@@ -143,14 +143,19 @@ namespace Client
         /// </summary>
         public void Draw()
         {
+            int meshesOffScreen = 0;
             foreach (BoundingBox boundingBox in ModelBoundingBoxes)
             {
                 if (GraphicsManager.ActiveCamera.Frustum.Intersect(boundingBox) == 0)
                 {
-                    IsCulled = true;
-                    UICulled.Culled++;
-                    return;
+                    meshesOffScreen++;
                 }
+            }
+            if (meshesOffScreen == ModelBoundingBoxes.Count)
+            {
+                IsCulled = true;
+                UICulled.Culled++;
+                return;
             }
             IsCulled = false;
 

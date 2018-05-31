@@ -102,7 +102,7 @@ namespace Client
         public static Light ActiveLightSystem;
 
         // the offset of the camera from the player. Can be changed anytime to update the camera
-        public static Vector3 PlayerToCamOffset = new Vector3(0, 50, -30);
+        public static Vector3 PlayerToCamOffset = GameClient.CAMERA_OFFSET;
 
         public static void Update(float delta_t)
         {

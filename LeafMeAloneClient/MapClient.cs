@@ -197,7 +197,7 @@ namespace Client
                     {
 
                         // Tint the tile.
-                        AllMapTiles[i].CurrentTint = currentMatch.teamSections[j].sectionColor;
+                        AllMapTiles[i].CurrentHue = currentMatch.teamSections[j].sectionColor;
 
                         // Add the tile to the tiles for this team.
                         ThisTeamTiles.Add(AllMapTiles[i]);
@@ -214,7 +214,7 @@ namespace Client
                 {
 
                     // Tint the tile.
-                    AllMapTiles[i].CurrentTint = currentMatch.NoMansLand.sectionColor;
+                    AllMapTiles[i].CurrentHue = currentMatch.NoMansLand.sectionColor;
 
                 }
 

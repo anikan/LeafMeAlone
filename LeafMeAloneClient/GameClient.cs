@@ -71,6 +71,8 @@ namespace Client
 
         private Match activeMatch = Match.DefaultMatch;
 
+        private int _audioBGM;
+
         public static GameClient instance;
 
 
@@ -94,6 +96,7 @@ namespace Client
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
+            AudioManager.SetListenerVolume(8.0f);
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
             
@@ -173,6 +176,10 @@ namespace Client
 
             leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
 
+            _audioBGM = AudioManager.GetNewSource();
+            AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
+            AudioManager.SetSourceVolume(_audioBGM, 0.01f);
+
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
 
@@ -223,6 +230,7 @@ namespace Client
             // Restart the frame timer.
             FrameTimer.Restart();
 
+            //AudioManager.UpdateSourceLocation(_audioBGM, Camera.CameraPosition);
         }
 
         /// <summary>

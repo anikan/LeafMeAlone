@@ -96,7 +96,7 @@ namespace Client
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
-            AudioManager.SetListenerVolume(4.0f);
+            AudioManager.SetListenerVolume(8.0f);
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
             

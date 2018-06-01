@@ -708,7 +708,7 @@ namespace Client {
                 if (mat.GetMaterialTexture(TextureType.Diffuse, 0, out tex))
                 {
                     ShaderResourceView temp;
-                    myMat.setDiffuseTexture( temp = CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)) );
+                    myMat.setDiffuseTexture( temp = CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), Path.GetFileName(tex.FilePath))) );
                     myMat.setTexCount( temp == null ? 0 : 1);
                 }
                 else

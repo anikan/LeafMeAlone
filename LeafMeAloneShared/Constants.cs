@@ -12,8 +12,8 @@ namespace Shared
         /// <summary>
         /// animation files
         /// </summary>
-        public const string PlayerWalkAnim = @"../../Models/Animations/Final_Walk.dae";
-        public const string PlayerIdleAnim = @"../../Models/Animations/Tail_Wag.dae";
+        public const string PlayerWalkAnim = @"../../Models/PlayerModel/Final_Walk.dae";
+        public const string PlayerIdleAnim = @"../../Models/PlayerModel/Tail_Wag.dae";
 
         /// <summary>
         /// Shaders
@@ -31,10 +31,10 @@ namespace Shared
         /// <summary>
         /// Models
         /// </summary>
-        public const string LeafModel = @"../../Models/05.13.18_Leaf.fbx";
-        public const string PlayerModel = @"../../Models/05.03.18_Version2.fbx";
-        public const string DefaultMapModel = @"../../Models/Terrain.fbx";
-        public const string TreeModel = @"../../Models/TreeAttempt.fbx";
+        public const string LeafModel = @"../../Models/LeafModel/05.13.18_Leaf.fbx";
+        public const string PlayerModel = @"../../Models/PlayerModel/05.03.18_Version2.fbx";
+        public const string DefaultMapModel = @"../../Models/Terrain/Terrain.fbx";
+        public const string TreeModel = @"../../Models/Tree/TreeAttempt.fbx";
 
         /// <summary>
         /// Sounds/Audio files

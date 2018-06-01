@@ -39,16 +39,12 @@ namespace Server
 
         private Random rnd;
 
-        private Match activeMatch = Match.DefaultMatch;
-
         // Whether game is running on net or not
         private bool development;
 
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
-        private bool matchOver = false;
-        private Stopwatch matchResetTimer;
-        private Stopwatch matchStartTimer;
+        private MatchHandler matchHandler;
 
         public GameServer(bool networked)
         {
@@ -59,8 +55,6 @@ namespace Server
 
             instance = this;
             development = !networked;
-            matchResetTimer = new Stopwatch();
-            matchStartTimer = new Stopwatch();
 
             timer = new Stopwatch();
             testTimer = new Stopwatch();
@@ -75,6 +69,7 @@ namespace Server
             spawnPoints.Add(new Vector3(10, 0, 10));
 
             networkServer = new NetworkServer(networked);
+            matchHandler = new MatchHandler(Match.DefaultMatch, networkServer, this);
 
             // Create the initial game map.
             CreateMap();
@@ -83,12 +78,6 @@ namespace Server
             CreateRandomLeaves(Constants.NUM_LEAVES);
             //CreateLeaves(100, -10, 10, -10, 10);
 
-        }
-
-        private void StartMatch(int time)
-        {
-            activeMatch.StartMatch(time);
-            networkServer.SendAll(PacketUtil.Serialize(new MatchStartPacket(time)));
         }
 
         public static int Main(String[] args)
@@ -124,14 +113,12 @@ namespace Server
                 networkServer.Receive();
 
                 //Update the server players based on received packets.
-                if (!matchStartTimer.IsRunning || !activeMatch.Started())
+                if (!matchHandler.MatchInitializing())
                 {
                     HandleIncomingPackets();
-                } else if (matchStartTimer.Elapsed.Seconds > 3)
-                {
-                    matchStartTimer.Reset();
-                    networkServer.SendAll(PacketUtil.Serialize(new MatchStartPacket(Constants.MATCH_TIME)));
                 }
+
+                matchHandler.DoMatchStatusUpdates();
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
@@ -171,6 +158,16 @@ namespace Server
         }
 
         /// <summary>
+        /// Handles what to do once a new client socket is connected
+        /// </summary>
+        internal void ConnectCallback()
+        {
+            if ((development && playerServerList.Count == 1) || (!development && playerServerList.Count == 4)) {
+                matchHandler.StartMatch();
+            }
+        }
+
+        /// <summary>
         /// Call Update() on all objects in the object dict.
         /// </summary>
         /// <param name="deltaTime"></param>
@@ -188,67 +185,14 @@ namespace Server
             // Add the effects of the player tools.
             AddPlayerToolEffects();
 
-            if (!matchOver)
-            {
-                activeMatch.CountObjectsOnSides(GetLeafListAsObjects());
-                Team winningTeam = activeMatch.GameOver();
-                if (winningTeam != Team.NONE)
-                {
-                    DoMatchFinish(winningTeam);
-                }
-            }
-            else if (matchResetTimer.Elapsed.Seconds > Constants.MATCH_RESET_TIME)
-            {
-                ResetMatch();
-            }
         }
 
-        /// <summary>
-        /// Handles the match over code, sends the win/lose to each player, 
-        /// sets the match as over, resets leaves
-        /// </summary>
-        /// <param name="winningTeam">The team which should win</param>
-        private void DoMatchFinish(Team winningTeam)
-        {
-            BasePacket donePacket = new ThePacketToEndAllPackets(winningTeam);
-            networkServer.SendAll(PacketUtil.Serialize(donePacket));
-            GetLeafListAsObjects().ForEach(l => l.Burning = true);
-            matchOver = true;
-            matchResetTimer.Start();
-        }
-
-        /// <summary>
-        /// Checks conditions for match start and then trys to start the match rather than just 
-        /// starting it
-        /// </summary>
-        internal void TryStartMatch()
-        {
-            if ((development && playerServerList.Count == 1) || 
-                (!development && playerServerList.Count == Constants.NUM_PLAYERS))
-            {
-                StartMatch(Constants.MATCH_TIME);
-            }
-        }
-
-        /// <summary>
-        /// Resets the match, destroys all the leaves, resets the players, 
-        /// restarts the match timer.
-        /// </summary>
-        private void ResetMatch()
-        {
-            GetLeafListAsObjects().ForEach(l => l.Destroy());
-            playerServerList.ForEach(p => p.Reset(NextSpawnPoint()));
-            matchOver = false;
-            activeMatch.Reset();
-            matchResetTimer.Reset();
-            matchStartTimer.Start();
-        }
 
         /// <summary>
         /// Gets the next spawn point of the player spawn index
         /// </summary>
         /// <returns>The vector 3 of the next spawn point</returns>
-        private Vector3 NextSpawnPoint()
+        public Vector3 NextSpawnPoint()
         {
             return spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
         }
@@ -389,10 +333,10 @@ namespace Server
             double minY = Constants.FLOOR_HEIGHT;
             double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
-            float minX = activeMatch.NoMansLand.leftX;
-            float maxX = activeMatch.NoMansLand.rightX;
-            float minZ = activeMatch.NoMansLand.downZ + (2 * TreeServer.TREE_RADIUS);
-            float maxZ = activeMatch.NoMansLand.upZ - (2 * TreeServer.TREE_RADIUS);
+            float minX = matchHandler.GetMatch().NoMansLand.leftX;
+            float maxX = matchHandler.GetMatch().NoMansLand.rightX;
+            float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * TreeServer.TREE_RADIUS);
+            float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * TreeServer.TREE_RADIUS);
 
             // Get random doubles for position.
             double randX = rnd.NextDouble();

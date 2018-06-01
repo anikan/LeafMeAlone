@@ -75,7 +75,8 @@ namespace Shared
         // Number of leaves to win a reg match
         public const int WIN_LEAF_NUM = 200;
         // Reg match time
-        public const int MATCH_TIME = 300;
+        public const int MATCH_INIT_TIME = 3;
+        public const int MATCH_TIME = 300 + MATCH_INIT_TIME;
         public const int MATCH_RESET_TIME = 10;
 
         public const float PUSH_FACTOR = 3.0f;

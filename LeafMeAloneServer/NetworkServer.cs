@@ -134,6 +134,8 @@ namespace Server
             // Add the new socket to the list of sockets recieving updates
             clientSockets.Add(clientSocket);
 
+            GameServer.instance.ConnectCallback();
+
             // Create the state object.  
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
@@ -144,8 +146,6 @@ namespace Server
             listener.BeginAccept(
                 new AsyncCallback(AcceptCallback),
                 listener);
-
-            GameServer.instance.TryStartMatch();
         }
 
         /// <summary>

@@ -148,6 +148,15 @@ namespace Shared
         }
 
         /// <summary>
+        /// Gets the elapsed match time
+        /// </summary>
+        /// <returns>the timespan</returns>
+        public TimeSpan GetTimeElapsed()
+        {
+            return matchTimer.Elapsed;
+        }
+
+        /// <summary>
         /// Whether the current match is active or not
         /// </summary>
         /// <returns>Whether the match is running</returns>
@@ -194,18 +203,13 @@ namespace Shared
             return teamSections[teamIndex].numLeaves;
         }
 
-        public void Reset()
-        {
-            matchTimer.Reset();
-        }
-
         /// <summary>
         /// Determines whether the game is over, either by the number of leaves 
         /// on each side or whether the stopwatch for match time is beyond 
         /// threshold. 
         /// </summary>
         /// <returns>The winning team or null on not game over.</returns>
-        public Team GameOver()
+        public Team TryGameOver()
         {
             Team winningTeam = Team.NONE;
 
@@ -221,6 +225,7 @@ namespace Shared
 
             if (matchTimer.Elapsed.Seconds > matchTime || maxLeaves > Constants.WIN_LEAF_NUM)
             {
+                matchTimer.Reset();
                 return winningTeam;
             }
 

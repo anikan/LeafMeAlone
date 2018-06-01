@@ -27,7 +27,8 @@ namespace Client
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
-            uiElem = UIManagerSpriteRenderer.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManagerSpriteRenderer.TextType.NORMAL, 
+            var time = TimeSpan.FromSeconds(TimeRemaining);
+            uiElem = UIManagerSpriteRenderer.DrawTextContinuous(time.ToString("g"), UIManagerSpriteRenderer.TextType.NORMAL, 
                 new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White);
         }
 
@@ -35,7 +36,8 @@ namespace Client
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)
         {
             TimeRemaining -= tickDelta;
-            uiElem.Text = "Time Remaining:" + TimeRemaining;
+            var time = TimeSpan.FromSeconds(TimeRemaining);
+            uiElem.Text = time.ToString("g");
 
             if (TimeRemaining < 0.0f)
             {

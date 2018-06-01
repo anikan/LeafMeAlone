@@ -23,7 +23,6 @@ namespace Client.UI
 
 
             Size size_new = new Size(size.Width / 2, size.Height / 2);
-            Console.WriteLine(size_new);
             Team1_Leaves = new IntVariable(UIManagerAntTweakBar.Create("Team1", size_new,new Point(location.X - 120, location.Y)))
             {
                 ReadOnly = true,

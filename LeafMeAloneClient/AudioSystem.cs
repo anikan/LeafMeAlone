@@ -170,9 +170,23 @@ namespace Client
             AL.SourcePlay(soundSource);
         }
 
-        public void SetListenerGain(float gain)
+        /// <summary>
+        /// Adjust listener volume
+        /// </summary>
+        /// <param name="gain"></param>
+        public void SetListenerVolume(float gain)
         {
             AL.Listener(ALListenerf.Gain, gain);
+        }
+
+        /// <summary>
+        /// Adjust source volume
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="gain"></param>
+        public void SetSourceVolume(int source, float gain)
+        {
+            AL.Source(source, ALSourcef.Gain, gain);
         }
 
         /// <summary>

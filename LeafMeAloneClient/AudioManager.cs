@@ -41,7 +41,17 @@ namespace Client
         /// <param name="vol"> volume </param>
         public static void SetListenerVolume(float vol)
         {
-            _audio.SetListenerGain(vol);
+            _audio.SetListenerVolume(vol);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="vol"></param>
+        public static void SetSourceVolume(int source, float vol)
+        {
+            _audio.SetSourceVolume(source, vol);
         }
 
         /// <summary>
@@ -108,11 +118,6 @@ namespace Client
         /// <param name="stopPlaying"> whether or not to stop playing the source </param>
         public static void RemoveSourceQueue(int source, bool stopPlaying = true)
         {
-            if (stopPlaying)
-            {
-                _audio.Stop(source);
-            }
-
             if (_allQueueFiles.ContainsKey(source))
             {
                 _allQueueFiles.Remove(source);
@@ -127,6 +132,7 @@ namespace Client
         public static void StopAudio(int source)
         {
             _audio.Stop(source);
+            RemoveSourceQueue(source, true);
         }
 
         /// <summary>

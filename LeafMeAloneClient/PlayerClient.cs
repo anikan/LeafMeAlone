@@ -296,6 +296,7 @@ namespace Client
             AudioManager.UpdateSourceLocation(_audioFlame, Transform.Position);
             AudioManager.UpdateSourceLocation(_audioWind, Transform.Position);
             AudioManager.UpdateSourceLocation(_audioFootstep, Transform.Position);
+            AudioManager.UpdateSourceLocation(_audioSuction, Transform.Position);
 
             // footstep audio logic
             // if start moving

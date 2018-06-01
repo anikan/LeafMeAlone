@@ -70,13 +70,12 @@ namespace Server
             // If this object is burning.
             if (Burning || BurningThisFrame)
             {
+                //The object took damage, it's been modified.
+                Modified = true;
 
                 // If it is being actively burned this frame.
                 if (BurningThisFrame)
                 {
-                    //The object took damage, it's been modified.
-                    Modified = true;
-
                     // Increase the frames this object is burning.
                     burnFrames++;
 

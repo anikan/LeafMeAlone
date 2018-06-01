@@ -2,21 +2,24 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
 using AntTweakBar;
+using SpriteTextRenderer.SlimDX;
 
 namespace Client
 {
-    public class UIManager
+    public class UIManagerAntTweakBar
     {
+
+        //Manage active UI.
         public static Dictionary<string, Bar> ActiveUI = new Dictionary<string, Bar>();
 
+        //Create bar.
         public static Bar Create(string name, Size size, Point location)
         {
             var b = new Bar(GraphicsRenderer.BarContext)
             {
                 Label = name,
-                Contained = true,
+                Contained = false,
                 Size = size,
                 Position = location,
             };
@@ -28,11 +31,6 @@ namespace Client
 
             ActiveUI[name] = b;
             return b;
-        }
-
-        public UIManager()
-        {
-
         }
     }
 }

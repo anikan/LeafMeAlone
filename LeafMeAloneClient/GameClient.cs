@@ -9,7 +9,11 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using System.Net;
+using Client.UI;
 using Shared.Packet;
+using SlimDX.DirectWrite;
+using SpriteTextRenderer;
+using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
 
 namespace Client
 {
@@ -40,6 +44,8 @@ namespace Client
         // All leaves in the scene. 
         public List<LeafClient> leaves;
 
+        public List<PlayerClient> playerClients = new List<PlayerClient>();
+
         internal PlayerClient GetActivePlayer()
         {
             return ActivePlayer;
@@ -62,11 +68,11 @@ namespace Client
         // Timer to calculate time between frames.
         public Stopwatch FrameTimer;
         private UIFramesPersecond fps;
-        private UITimer gameTimer;
-
         private NetworkClient networkClient;
 
         private Match activeMatch = Match.DefaultMatch;
+
+        private int _audioBGM;
 
         public static GameClient instance;
 
@@ -91,19 +97,12 @@ namespace Client
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
+            AudioManager.SetListenerVolume(8.0f);
             AnimationManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
-
-
-            //TODO FOR TESTING ONLY
-            //GraphicsRenderer.Form.KeyDown += 
-            // TestPlayerMovementWithoutNetworking;
-            Client.fps = new UIFramesPersecond(new Size(5, 30),
-                new Point(GraphicsRenderer.Form.ClientSize.Width - 30, 0));
-            Client.gameTimer =
-                new UITimer(60, new Size(225, 3), new Point(0, 0));
             
+            GlobalUIManager.Init();
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
@@ -115,19 +114,18 @@ namespace Client
         {
             return ActivePlayer.team;
         }
-
+        
         private void DoGameLoop()
         {
-            fps.Start();
+            GlobalUIManager.fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(
                 GraphicsRenderer.RenderTarget, new Color4(0.0f, .4f, 0.0f));
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(
                 GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth,
                 1.0f, 0);
-
+            
             // Receive any packets from the server.
             ReceivePackets();
-
             // If there's an active player right now.
             if (ActivePlayer != null)
             {
@@ -138,15 +136,22 @@ namespace Client
                 SendPackets();
             }
 
+
             // Update all objects.
             Update();
 
             // Draw everythhing.
             Render();
-
+            
 
             GraphicsRenderer.BarContext.Draw();
+            GlobalUIManager.Update();
+            UIManagerSpriteRenderer.Update();
+            UIManagerSpriteRenderer.SpriteRenderer.Flush();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
+            GlobalUIManager.fps.StopAndCalculateFps();
+            UICulled.Culled = 0;
+            AudioManager.Update();
             fps.StopAndCalculateFps();
 
         }
@@ -174,6 +179,10 @@ namespace Client
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
 
             leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
+
+            _audioBGM = AudioManager.GetNewSource();
+            AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
+            AudioManager.SetSourceVolume(_audioBGM, 0.01f);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -217,6 +226,7 @@ namespace Client
 
             // Tint all of the leaves based on their sections.
             TintLeaves();
+            CountLeaves();
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);
@@ -226,6 +236,7 @@ namespace Client
             // Restart the frame timer.
             FrameTimer.Restart();
 
+            //AudioManager.UpdateSourceLocation(_audioBGM, Camera.CameraPosition);
         }
 
         /// <summary>
@@ -233,7 +244,6 @@ namespace Client
         /// </summary>
         private void Render()
         {
-
             // Iterate through all networked game objects and draw them.
             foreach (KeyValuePair<int, NetworkedGameObjectClient> kv in
                 NetworkedGameObjects.AsEnumerable())
@@ -247,9 +257,9 @@ namespace Client
                 NonNetworkedGameObjectClient obj in NonNetworkedGameObjects
                 )
             {
-
                 obj.Draw();
             }
+
             GraphicsManager.Draw();
         }
          
@@ -278,6 +288,7 @@ namespace Client
             networkClient.PacketQueue.Clear();
         }
 
+        
         /// <summary>
         /// Creates a new object from a given packet, whether that be a leaf 
         /// or a player.
@@ -288,16 +299,21 @@ namespace Client
         {
 
             int objId = createPacket.ObjData.IdData.ObjectId;
+            
 
+            
             // Create a new packet depending on it's type.
             switch (createPacket.ObjectType)
             {
                 // Create an active player
                 case (ObjectType.ACTIVE_PLAYER):
-                    return InitializeUserPlayerAndMovement(createPacket);
+                    var newPlayer = InitializeUserPlayerAndMovement(createPacket) as PlayerClient;
+                    playerClients.Add(newPlayer);
+                    return newPlayer;
                 // Create an other player
                 case (ObjectType.PLAYER):
                     NetworkedGameObjectClient player = new PlayerClient(createPacket);
+                    playerClients.Add((PlayerClient) player);
                     NetworkedGameObjects.Add(objId, player);
                     return player;
                 // Create a leaf.
@@ -402,41 +418,61 @@ namespace Client
             NetworkedGameObjects.TryGetValue(id, out NetworkedGameObjectClient packetObject);
             return packetObject;
         }
-
         /// <summary>
         /// Tint all the leaves in the game.
         /// </summary>
         public void TintLeaves()
         {
-
             // Get a list of all leaves.
             List<LeafClient> leaves = GetLeafList();
 
             // Itereate through the leaves.
             foreach (LeafClient leaf in leaves)
             {
-
                 // Iterate through all team sections.
-                foreach (TeamSection section in activeMatch.teamSections)
+                for (int index = 0; index < activeMatch.teamSections.Count; index++)
                 {
-
+                    TeamSection section = activeMatch.teamSections[index];
                     // If this leaf is in this team section.
                     if (section.IsInBounds(leaf.Transform.Position))
                     {
-
                         // Tint the leaf to section.
-                        leaf.CurrentTint = section.sectionColor;
-
+                        leaf.CurrentHue = section.sectionColor;
                     }
                 }
-
                 // Check if this leaf is in no mans land.
                 if (activeMatch.NoMansLand.IsInBounds(leaf.Transform.Position))
                 {
                     // Tint the leaf.
-                    leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
+                    leaf.CurrentHue = activeMatch.NoMansLand.sectionColor;
                 }
             }
+        }
+
+        /// <summary>
+        /// Count the number of leaves on each side and set the UI to the correct value.
+        /// </summary>
+        public void CountLeaves()
+        {
+
+            for (int index = 0; index < activeMatch.teamSections.Count; index++)
+            {
+
+                TeamSection section = activeMatch.teamSections[index];
+
+                int leafCount = activeMatch.GetTeamLeaves(index, GetLeafListAsGameObjects());
+
+                if (index == 0)
+                {
+                    GlobalUIManager.Teams.Team1_Leaves.Value = leafCount;
+                }
+                else
+                {
+                    GlobalUIManager.Teams.Team2_Leaves.Value = leafCount;
+                }
+            }
+
+
         }
 
         /// <summary>
@@ -465,6 +501,14 @@ namespace Client
 
             // Return all the leaves.
             return allLeaves;
+        }
+
+        public List<GameObject> GetLeafListAsGameObjects()
+        {
+
+            GameObject[] leaves = GetLeafList().ToArray();
+            return leaves.ToList<GameObject>();
+
         }
     }
 }

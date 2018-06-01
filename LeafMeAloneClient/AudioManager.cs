@@ -19,7 +19,6 @@ namespace Client
         private static List<int> _freeSourceAfterPlay;
         private static List<int> _freeSourcePoolAfterPlay;
         private static int _countPools = 0;
-        private static int _srcBgm;
         private static Dictionary<int, Queue<string>> _allQueueFiles;
         private static Dictionary<int, Queue<bool>> _allQueueRepeats;
 
@@ -29,14 +28,32 @@ namespace Client
         public static void Init()
         {
             _audio = new AudioSystem();
-            _srcBgm = _audio.GenSource();
             _allPools = new List<AudioSourcePool>();
             _freeSourcePoolAfterPlay = new List<int>();
             _freeSourceAfterPlay = new List<int>();
             _allQueueFiles = new Dictionary<int, Queue<string>>();
             _allQueueRepeats = new Dictionary<int, Queue<bool>>();
         }
-        
+
+        /// <summary>
+        /// Set the volume of the sound the player hears
+        /// </summary>
+        /// <param name="vol"> volume </param>
+        public static void SetListenerVolume(float vol)
+        {
+            _audio.SetListenerVolume(vol);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="vol"></param>
+        public static void SetSourceVolume(int source, float vol)
+        {
+            _audio.SetSourceVolume(source, vol);
+        }
+
         /// <summary>
         /// Check if the source is playing
         /// </summary>
@@ -68,6 +85,16 @@ namespace Client
         }
 
         /// <summary>
+        /// Update the world coordinates of the souce
+        /// </summary>
+        /// <param name="source"> id of the souce </param>
+        /// <param name="location"> location to place the souce </param>
+        public static void UpdateSourceLocation(int source, Vector3 location)
+        {
+            _audio.UpdateSourcePosition(source, location);
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="source"> the source used for playing the clip </param>
@@ -91,11 +118,6 @@ namespace Client
         /// <param name="stopPlaying"> whether or not to stop playing the source </param>
         public static void RemoveSourceQueue(int source, bool stopPlaying = true)
         {
-            if (stopPlaying)
-            {
-                _audio.Stop(source);
-            }
-
             if (_allQueueFiles.ContainsKey(source))
             {
                 _allQueueFiles.Remove(source);
@@ -110,6 +132,7 @@ namespace Client
         public static void StopAudio(int source)
         {
             _audio.Stop(source);
+            RemoveSourceQueue(source, true);
         }
 
         /// <summary>

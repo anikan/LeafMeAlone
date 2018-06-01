@@ -36,7 +36,7 @@ namespace Client
         private ParticleSystem FlameThrower,LeafBlower;
 
         // For the audio control
-        private int _audioFootstep, _audioFlame, _audioWind;
+        private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
         private int _animWalk, _animIdle;
         private float _animAcceleration;
 
@@ -51,6 +51,7 @@ namespace Client
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
             _audioWind = AudioManager.GetNewSource();
+            _audioSuction = AudioManager.GetNewSource();
 
             // Create new animations
             float scale = .07f;
@@ -251,6 +252,7 @@ namespace Client
             bool prevMoving = Moving;
             bool prevUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool prevUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
+            bool prevUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
 
             base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
@@ -270,9 +272,10 @@ namespace Client
             bool currMoving = Moving;
             bool currUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
-
-            EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind);
+            bool currUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
+            
             EvaluateAnimation(prevMoving, currMoving);
+            EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction);
 
             switch (ActiveToolMode)
             {
@@ -326,8 +329,17 @@ namespace Client
         /// <param name="currUsingFlame">using flamethrower currently? </param>
         /// <param name="prevUsingWind"> using windblower previously? </param>
         /// <param name="currUsingWind"> using windblower currently? </param>
-        public void EvaluateAudio(bool prevMoving, bool currMoving, bool prevUsingFlame, bool currUsingFlame, bool prevUsingWind, bool currUsingWind)
+        /// <param name="prevUsingSuction"> using suction previously? </param>
+        /// <param name="currUsingSuction"> using suction currently? </param>
+        public void EvaluateAudio(bool prevMoving, bool currMoving, 
+            bool prevUsingFlame, bool currUsingFlame, 
+            bool prevUsingWind, bool currUsingWind,
+            bool prevUsingSuction, bool currUsingSuction)
         {
+            AudioManager.UpdateSourceLocation(_audioFlame, Transform.Position);
+            AudioManager.UpdateSourceLocation(_audioWind, Transform.Position);
+            AudioManager.UpdateSourceLocation(_audioFootstep, Transform.Position);
+            AudioManager.UpdateSourceLocation(_audioSuction, Transform.Position);
 
             // footstep audio logic
             // if start moving
@@ -352,7 +364,7 @@ namespace Client
             // if stop using flame now
             else if (prevUsingFlame && !currUsingFlame)
             {
-                AudioManager.RemoveSourceQueue(_audioFlame);
+                AudioManager.StopAudio(_audioFlame);
                 AudioManager.PlayAudio(_audioFlame, Constants.FlameThrowerEnd, false);
             }
 
@@ -367,8 +379,21 @@ namespace Client
             // if stop using wind now
             else if (prevUsingWind && !currUsingWind)
             {
-                AudioManager.RemoveSourceQueue(_audioWind);
+                AudioManager.StopAudio(_audioWind);
                 AudioManager.PlayAudio(_audioWind, Constants.LeafBlowerEnd, false);
+            }
+
+            // suction audio logic
+            if (!prevUsingSuction && currUsingSuction)
+            {
+                AudioManager.StopAudio(_audioSuction);
+                AudioManager.QueueAudioToSource(_audioSuction, Constants.SuctionStart, false);
+                AudioManager.QueueAudioToSource(_audioSuction, Constants.SuctionLoop, true);
+            }
+            else if (prevUsingSuction && !currUsingSuction)
+            {
+                AudioManager.StopAudio(_audioSuction);
+                AudioManager.PlayAudio(_audioSuction, Constants.SuctionEnd, false);
             }
         }
 

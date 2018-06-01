@@ -112,14 +112,13 @@ namespace Server
                     if (obj != this && IsColliding(obj))
                     {
                         //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
-
+                        
+                        // Set the object back to it's original position.
+                        Transform.Position = OriginalPosition;
 
                         // If this is a physics object
                         if (this is PhysicsObject me)
                         {
-
-                            // Set the object back to it's original position.
-                            Transform.Position = OriginalPosition;
 
                             // If the other object is also a physics object.
                             if (obj is PhysicsObject other)
@@ -131,11 +130,6 @@ namespace Server
 
                             // Bounce off the other object.
                             me.Bounce(obj);
-
-                        }
-                        else
-                        {
-
 
                         }
 

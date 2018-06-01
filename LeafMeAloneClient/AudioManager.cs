@@ -36,10 +36,7 @@ namespace Client
             _allQueueFiles = new Dictionary<int, Queue<string>>();
             _allQueueRepeats = new Dictionary<int, Queue<bool>>();
         }
-
-        private const int MAX_FRAME_PER_UDPATE = 15;
-
-
+        
         /// <summary>
         /// Check if the source is playing
         /// </summary>

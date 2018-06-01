@@ -53,11 +53,9 @@ namespace Client
             _audioWind = AudioManager.GetNewSource();
 
             // Create new animations
-            float scale = .05f;
-            _animWalk = AnimationManager.AddAnimation(Constants.PlayerWalkAnim, new Vector3(scale), 5.2f);
-            _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), 5.2f);
-            AnimationManager.SetAltColor(_animIdle, new Color3(1f, 0.6f, 0.6f));
-            AnimationManager.SetAltColor(_animWalk, new Color3(0.6f, 0.6f, 1f));
+            float scale = .07f;
+            _animWalk = AnimationManager.AddAnimation(Constants.PlayerWalkAnim, new Vector3(scale), 6f);
+            _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), 6f);
 
             // set to idle animation by default
             SwitchAnimation(_animIdle);
@@ -72,6 +70,15 @@ namespace Client
             model = AnimationManager.SwitchAnimation(animId, true);
             Transform.Scale = AnimationManager.GetScale(animId);
             _animAcceleration = AnimationManager.GetAcceleration(animId);
+
+            if (team == Team.BLUE)
+            {
+                model.UseAltColor(new Color3(.4f,.4f,1.2f));
+            }
+            else if (team == Team.RED)
+            {
+                model.UseAltColor(new Color3(1.2f, .4f, .4f));
+            }
         }
 
         public Team team { get; set; }

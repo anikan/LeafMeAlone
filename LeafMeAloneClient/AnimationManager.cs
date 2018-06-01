@@ -56,7 +56,7 @@ namespace Client
         /// <param name="scale"></param>
         /// <param name="animationAcceleration"></param>
         /// <returns></returns>
-        public static int AddAnimation(string path, Vector3 scale, float animationAcceleration = 0)
+        public static int AddAnimation(string path, Vector3 scale, float animationAcceleration = 1.0f)
         {
             Model m;
             _animationModels.Add( new AnimationDescriptor( m = new Model(path, true, true), scale, animationAcceleration) );

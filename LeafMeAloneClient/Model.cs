@@ -62,8 +62,7 @@ namespace Client
 
             //burningGeoColorEnabled = burningEnabled;
             setShader(Constants.DefaultShader);
-
-            m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+            
         }
 
         /// <summary>

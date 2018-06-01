@@ -27,8 +27,9 @@ namespace Client
 
         //is the object culled.
         public bool IsCulled = false;
-        
+
         public Vector3 Tint = new Vector3(1, 1, 1);
+        public Vector3 Hue = new Vector3(1, 1, 1);
 
         // public float burningGeoColor;
         // public bool burningGeoColorEnabled;
@@ -72,6 +73,7 @@ namespace Client
             setShader(Constants.DefaultShader);
 
             m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+            m_ActiveShader.ShaderEffect.GetVariableByName("Hue").AsVector().Set(Hue);
         }
 
         /// <summary>
@@ -163,8 +165,10 @@ namespace Client
             }
             IsCulled = false;
 
-            if (Enabled) {
+            if (Enabled)
+            {
                 m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+                m_ActiveShader.ShaderEffect.GetVariableByName("Hue").AsVector().Set(Hue);
                 if (CurrentAnimationIndex != -1)
                 {
 

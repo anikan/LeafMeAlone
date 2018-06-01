@@ -41,10 +41,6 @@ namespace Client
 
             InputLayout = new InputLayout(GraphicsRenderer.Device, sig, Elements);
         }
-
         
-
-
-
-}
+    }
 }

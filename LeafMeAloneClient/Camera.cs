@@ -15,7 +15,11 @@ namespace Client
     /// </summary>
     class Camera
     {
+        //Added frustum to camera, because we need to recalculate view frustum every time we change the view.
+        public ViewFrustum Frustum;
+
         private Vector3 m_CameraUp;
+
         public Vector3 CameraUp {
             get
             {
@@ -79,6 +83,9 @@ namespace Client
         public void UpdateCameraView()
         {
             m_ViewMatrix = Matrix.LookAtLH(m_CameraPosition, m_CameraLookAt, m_CameraUp);
+
+            //every time the cam view is updated, refresh the view frustum.
+            Frustum = new ViewFrustum(m_ViewMatrix,GraphicsRenderer.ProjectionMatrix);
         }
 
         /// <summary>

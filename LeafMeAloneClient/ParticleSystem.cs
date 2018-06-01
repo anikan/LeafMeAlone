@@ -157,7 +157,7 @@ namespace Client
             VBO_Tex = new Buffer(GraphicsRenderer.Device, Tex, Particles.Count * size, ResourceUsage.Immutable, BindFlags.VertexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
             EBO = new Buffer(GraphicsRenderer.Device, Faces, Particles.Count * 6 * sizeof(uint), ResourceUsage.Immutable, BindFlags.IndexBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 
-            TexSRV = CreateTexture(TexturePath);
+            TexSRV = Utility.CreateTexture(TexturePath,GraphicsRenderer.Device);
             ResetSystem();
         }
 
@@ -321,15 +321,6 @@ namespace Client
             //Console.WriteLine(Num_CurrentlyActiveParticles);
         }
 
-        /// <summary>
-        /// Create new texture.
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        private ShaderResourceView CreateTexture(string fileName)
-        {
-            return File.Exists(fileName) ? ShaderResourceView.FromFile(GraphicsRenderer.Device, fileName) : null;
-        }
 
         /// <summary>
         /// Reset the particle system so that the particles are reset to the origin

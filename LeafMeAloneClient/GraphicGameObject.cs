@@ -23,7 +23,7 @@ namespace Client
         internal Model model;
 
         // Debug cube to find the pivots of objects.
-        private NonNetworkedGameObjectClient PivotCube;
+        public NonNetworkedGameObjectClient PivotCube;
 
 
         private float minCap = .3f;

@@ -15,6 +15,16 @@ namespace Shared
             return new Vector3(vector.X, vector.Y, vector.Z);
         }
 
+        public static Vector4 ScalarMultiply(this Vector4 me, Vector4 other)
+        {
+            Vector4 newVec = new Vector4();
+            newVec.X = me.X * other.X;
+            newVec.Y = me.Y * other.Y;
+            newVec.Z = me.Z * other.Z;
+            newVec.W = me.W * other.W;
+            return newVec;
+        }
+
         public static SlimDX.Quaternion ToQuaternion(this Assimp.Quaternion q)
         {
             SlimDX.Quaternion ret = new SlimDX.Quaternion();

@@ -92,11 +92,12 @@ namespace Client
             Camera activeCamera =
                 new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
 
-            // Initialize graphics classes
+            // Initialize static classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
             AudioManager.SetListenerVolume(8.0f);
+            AnimationManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
             
@@ -155,6 +156,7 @@ namespace Client
             GlobalUIManager.fps.StopAndCalculateFps();
             UICulled.Culled = 0;
             AudioManager.Update();
+
         }
 
         internal void StartMatchTimer(float gameTime)
@@ -236,6 +238,8 @@ namespace Client
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);
+            AudioManager.Update();
+            AnimationManager.Update(delta);
 
             // Restart the frame timer.
             FrameTimer.Restart();

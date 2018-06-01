@@ -360,5 +360,11 @@ namespace Client
         {
             UpdateFromPacket(packet as PlayerPacket);
         }
+
+        public override void Destroy()
+        {
+            GameClient.instance.playerClients.Remove(this);
+            base.Destroy();
+        }
     }
 }

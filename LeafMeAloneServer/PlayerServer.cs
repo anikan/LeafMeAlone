@@ -80,11 +80,16 @@ namespace Server
                 //Get the current object.
                 GameObjectServer gameObject = allObjects[j];
 
-                // Check if it's within tool range, and that it's not the current player.
-                if (gameObject != this && gameObject.IsInPlayerToolRange(this))
+                if (ActiveToolMode == ToolMode.PRIMARY || ActiveToolMode == ToolMode.SECONDARY)
                 {
-                    // Hit the object.
-                    gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
+                    // Check if it's within tool range, and that it's not the current player.
+                    if (gameObject != this && gameObject.IsInPlayerToolRange(this))
+                    {
+                        // Hit the object.
+                        gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
+
+                    }
+
 
                 }
             }

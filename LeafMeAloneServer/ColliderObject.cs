@@ -112,13 +112,14 @@ namespace Server
                     if (obj != this && IsColliding(obj))
                     {
                         //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
-                        
-                        // Set the object back to it's original position.
-                        Transform.Position = OriginalPosition;
+
 
                         // If this is a physics object
                         if (this is PhysicsObject me)
                         {
+
+                            // Get the vector from the object to me.
+                            Vector3 objToMe = me.Transform.Position - obj.Transform.Position;
 
                             // If the other object is also a physics object.
                             if (obj is PhysicsObject other)
@@ -132,6 +133,11 @@ namespace Server
                             me.Bounce(obj);
 
                         }
+                        else
+                        {
+                            // Set the object back to it's original position.
+                            Transform.Position = OriginalPosition;
+                        }
 
                         // couldn't move
                         return false;
@@ -141,6 +147,23 @@ namespace Server
 
             // Moved!
             return true;
+        }
+
+
+        /// <summary>
+        /// Checks if a vector's values are less than a specified minimum. If so, sets that value to zero.
+        /// </summary>
+        /// <param name="vector">Vector to check.</param>
+        /// <param name="minBeforeZero">Minimum value before it's set to zero.</param>
+        /// <returns>Vector with any values rounded to zero, if applicable.</returns>
+        public Vector3 RoundVectorToZero(Vector3 vector, float minBeforeZero)
+        {
+            // Checks each value and sets to zero if less than minimum.
+            if (Math.Abs(vector.X) < minBeforeZero) vector.X = 0.0f;
+            if (Math.Abs(vector.Y) < minBeforeZero) vector.Y = 0.0f;
+            if (Math.Abs(vector.Z) < minBeforeZero) vector.Z = 0.0f;
+
+            return vector;
         }
     }
 }

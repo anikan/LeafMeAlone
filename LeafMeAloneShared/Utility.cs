@@ -8,6 +8,9 @@ namespace Shared
 {
     public static class Utility
     {
+
+        private static Random rnd;
+
         public static Vector3 ToVector3(this Vector3D vector)
         {
             return new Vector3(vector.X, vector.Y, vector.Z);
@@ -125,6 +128,23 @@ namespace Shared
         public static Vector4 Mult(this Matrix m, Vector4 multBy)
         {
             return Vector4.Transform(multBy, Matrix.Transpose(m));
+        }
+
+
+        public static float RandomInRange(float low, float high)
+        {
+            if (rnd == null)
+            {
+                rnd = new Random();
+            }
+
+            float random = rnd.NextFloat();
+
+            random = (random * (high - low)) + low;
+
+            return random;
+
+
         }
     }
 }

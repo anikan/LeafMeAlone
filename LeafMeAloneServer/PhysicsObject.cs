@@ -113,21 +113,7 @@ namespace Server
 
         }
 
-        /// <summary>
-        /// Checks if a vector's values are less than a specified minimum. If so, sets that value to zero.
-        /// </summary>
-        /// <param name="vector">Vector to check.</param>
-        /// <param name="minBeforeZero">Minimum value before it's set to zero.</param>
-        /// <returns>Vector with any values rounded to zero, if applicable.</returns>
-        private Vector3 RoundVectorToZero(Vector3 vector, float minBeforeZero)
-        {
-            // Checks each value and sets to zero if less than minimum.
-            if (Math.Abs(vector.X) < minBeforeZero) vector.X = 0.0f;
-            if (Math.Abs(vector.Y) < minBeforeZero) vector.Y = 0.0f;
-            if (Math.Abs(vector.Z) < minBeforeZero) vector.Z = 0.0f;
 
-            return vector;
-        }
 
         /// <summary>
         /// Bounce off of another object.

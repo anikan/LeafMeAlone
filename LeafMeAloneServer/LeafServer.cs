@@ -21,5 +21,19 @@ namespace Server
             Burnable = true;
         }
 
+        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        {
+            base.HitByTool(playerPosition, toolType, toolMode);
+
+
+            if (toolType == ToolType.BLOWER)
+            {
+
+
+                Transform.Rotation.Y += Utility.RandomInRange(-0.1f, 0.1f);
+
+
+            }
+        }
     }
 }

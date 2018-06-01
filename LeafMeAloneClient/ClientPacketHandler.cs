@@ -70,8 +70,18 @@ namespace Client
                 client.ResetGameTimer();
                 if (client.GetPlayerTeam() == p.winningTeam)
                 {
-                } 
-                // TODO: Remove this, make it so that the player stops moving when box pops up
+                    GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Win);
+                }
+                else
+                {
+                    GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Lose);
+                }
+            }
+
+            void GameStartAction(MatchStartPacket p)
+            {
+                client.StartMatchTimer(p.gameTime);
+                GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
@@ -82,7 +92,7 @@ namespace Client
                     {PacketType.PlayerPacket, (p) => UpdatePlayerAction((PlayerPacket) p) },
                     {PacketType.DestroyObjectPacket, (p) => DestroyAction((DestroyObjectPacket) p)},
                     {PacketType.GameResultPacket, (p) => GameResultAction((MatchResultPacket) p)},
-                    {PacketType.MatchStartPacket, (p) => client.StartMatchTimer(((MatchStartPacket)p).gameTime)},
+                    {PacketType.MatchStartPacket, (p) => GameStartAction((MatchStartPacket)p)},
                 };
         }
 

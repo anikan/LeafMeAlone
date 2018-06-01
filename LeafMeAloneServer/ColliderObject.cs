@@ -14,7 +14,7 @@ namespace Server
     /// </summary>
     public class ColliderObject : GameObjectServer
     {
-
+        public bool Collidable = true;
         // Radius of this object for basic n00b collisions.
         public float Radius = 1.0f;
 
@@ -45,7 +45,10 @@ namespace Server
         /// <param name="toolMode"></param>
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(playerPosition, toolType, toolMode);
+            if (Collidable)
+            {
+                base.HitByTool(playerPosition, toolType, toolMode);
+            }
         }
 
         /// <summary>
@@ -65,6 +68,11 @@ namespace Server
         /// <returns>True if colliding, false otherwise.</returns>
         public bool IsColliding(ColliderObject other)
         {
+            if (!Collidable)
+            {
+                return false;
+            }
+
             // Get this position and the position of the other object, and make 2D.
             Vector3 colliderPos = Transform.Position;
             Vector3 otherPos = other.Transform.Position;

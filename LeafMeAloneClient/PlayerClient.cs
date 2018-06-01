@@ -29,16 +29,16 @@ namespace Client
 
             public ToolType EquipToolRequest;
         };
-        
+
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
-        private ParticleSystem FlameThrower,LeafBlower;
+        private ParticleSystem FlameThrower, LeafBlower;
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
 
-        public PlayerClient(CreateObjectPacket createPacket) : 
+        public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
         {
             FlameThrower = new FlameThrowerParticleSystem();
@@ -136,7 +136,7 @@ namespace Client
             {
                 angle = -angle;
             }
-       
+
             Transform.Rotation = new Vector3(Transform.Rotation.X, angle, Transform.Rotation.Z);
 
         }
@@ -210,7 +210,7 @@ namespace Client
             // Set rotation initially to the rotation of the player
 
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
-  
+
             // PlayerRequests.EquipToolRequest = equippedTool;
         }
 
@@ -227,16 +227,21 @@ namespace Client
             bool prevUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
 
             base.UpdateFromPacket(packet.ObjData);
+
+            if (Dead != packet.Dead)
+            {
+                if (packet.Dead)
+                {
+                    model.Enabled = false;
+                }
+                else
+                {
+                    CurrentTint = new Vector3(1, 1, 1);
+                    model.Enabled = true;
+                }
+            }
             Dead = packet.Dead;
 
-            if (Dead)
-            {
-                model.Enabled = false;
-            } else
-            {
-                model.Enabled = true;
-            }
-            
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;
@@ -288,8 +293,8 @@ namespace Client
         /// <param name="currUsingWind"> using windblower currently? </param>
         /// <param name="prevUsingSuction"> using suction previously? </param>
         /// <param name="currUsingSuction"> using suction currently? </param>
-        public void EvaluateAudio(bool prevMoving, bool currMoving, 
-            bool prevUsingFlame, bool currUsingFlame, 
+        public void EvaluateAudio(bool prevMoving, bool currMoving,
+            bool prevUsingFlame, bool currUsingFlame,
             bool prevUsingWind, bool currUsingWind,
             bool prevUsingSuction, bool currUsingSuction)
         {

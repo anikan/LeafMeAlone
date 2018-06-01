@@ -14,7 +14,10 @@ namespace Client
 {
     public class UIFramesPersecond
     {
+        //Current FPS
         public double CurrentFps;
+
+        //Stopwatch for counting.
         private readonly Stopwatch stopwatch;
         private readonly DrawableString fps;
 
@@ -22,6 +25,9 @@ namespace Client
         private double totalTime = 0.0f;
         private DrawableTexture t;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public UIFramesPersecond()
         {
             CurrentFps = 0.0f;
@@ -32,12 +38,17 @@ namespace Client
            
         }
 
+        /// <summary>
+        /// Start Timing.
+        /// </summary>
         public void Start()
         {
             stopwatch.Start();
         }
 
-
+        /// <summary>
+        /// Stop Timing.
+        /// </summary>
         public void StopAndCalculateFps()
         {
             stopwatch.Stop();
@@ -56,8 +67,6 @@ namespace Client
             }
 
             fps.Text = CurrentFps.ToString();
-            //t.Position.X = (float)CurrentFps * 20;
-            //t.Rotation = ((float)CurrentFps).ToRadians();
             stopwatch.Reset();
         }
     }

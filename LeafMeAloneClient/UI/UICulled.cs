@@ -11,9 +11,15 @@ namespace Client.UI
 {
     public class UICulled
     {
+        //how many culled objects are there?
         public static int Culled = 0;
+
+        //UI Element.
         private readonly DrawableString CulledUI;
 
+        /// <summary>
+        /// Create UI.
+        /// </summary>
         public UICulled()
         {
             CulledUI = UIManagerSpriteRenderer.DrawTextContinuous("", UIManagerSpriteRenderer.TextType.BOLD,
@@ -21,6 +27,9 @@ namespace Client.UI
 
         }
 
+        /// <summary>
+        /// Update every frame.
+        /// </summary>
         public void Update()
         {
             CulledUI.Text = "Objects Culled This Frame: " + Culled;

@@ -9,9 +9,12 @@ namespace Shared
     {
         public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 3.85f, 3.0f);
 
-
+        //arrow for following player.
         public const string Arrow = @"../../Textures/Arrow.png";
 
+        /// <summary>
+        /// Win/loss text.
+        /// </summary>
         public const string WinText = "You Win!";
         public const string LoseText = "You Lose!";
 

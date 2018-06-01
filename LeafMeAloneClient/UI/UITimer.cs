@@ -31,6 +31,7 @@ namespace Client
                 new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White);
         }
 
+        //Tick every 100 milliseconds.
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)
         {
             TimeRemaining -= tickDelta;
@@ -42,13 +43,14 @@ namespace Client
                 OnTimerCompleted?.Invoke();
             }
         }
-
+        //Restart timer.
         public void Restart(float timetoCountInSeconds)
         {
             TimeRemaining = timetoCountInSeconds;
             t.Start();
         }
 
+        //Start timer.
         public void Start(float timeToCountInSeconds)
         {
             t.AutoReset = true;

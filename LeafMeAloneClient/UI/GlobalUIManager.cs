@@ -5,6 +5,8 @@ namespace Client
 {
     public static class GlobalUIManager
     {
+
+        //All the different UI.
         public static UIFramesPersecond fps;
         public static UITimer gameTimer;
         public static UITeams Teams;
@@ -12,7 +14,9 @@ namespace Client
         public static UICulled Culled;
         public static UIFindTeammate TeammateUI;
 
-
+        /// <summary>
+        /// Initialize UI Elements.
+        /// </summary>
         public static void Init()
         {
             fps = new UIFramesPersecond();
@@ -23,6 +27,9 @@ namespace Client
             TeammateUI = new UIFindTeammate();
         }
 
+        /// <summary>
+        /// Call update for those UI which need it.
+        /// </summary>
         public static void Update()
         {
             Culled.Update();

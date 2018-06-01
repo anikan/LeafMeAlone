@@ -435,6 +435,9 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// Count the number of leaves on each side and set the UI to the correct value.
+        /// </summary>
         public void CountLeaves()
         {
 

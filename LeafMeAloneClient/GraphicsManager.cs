@@ -77,6 +77,12 @@ namespace Client
             // Return final position in world space.
             return new Vector3(pos.X, pos.Y, pos.Z);
         }
+
+        /// <summary>
+        /// Converts a world point to a screen position.
+        /// </summary>
+        /// <param name="worldPos"></param>
+        /// <returns></returns>
         public static Vector2 WorldToScreenPoint(Vector3 worldPos)
         {
 
@@ -134,7 +140,6 @@ namespace Client
         {
             ActiveCamera = activeCamera;
             ParticleSystemManager.Init();
-            UITextureManager.Init();
             UIManagerSpriteRenderer.Init();
             // initialize with 20 lights; to change the number of lights, need to change it in the shader manually too
             ActiveLightSystem = new Light(20);

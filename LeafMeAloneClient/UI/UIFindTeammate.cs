@@ -30,18 +30,6 @@ namespace Client.UI
 
         Vector2 IntersectScreenEdge(Vector2 vectorToTeammate)
         {
-            //Plane p = new Plane(Vector3.Zero,new Vector3(GraphicsRenderer.Form.ClientSize.Width,0,0),new Vector3(0, GraphicsRenderer.Form.ClientSize.Height,0));
-            //p.Normalize();
-            //Vector3 intersectionPoint;
-            //if(Plane.Intersects(p, new Vector3(vectorToTeammate, 0), new Vector3(vectorToTeammate, 0) * 1000,
-            //    out intersectionPoint))
-            //    Debug.Log("Found!");
-            //else
-            //{
-            //    Debug.Log("Not Found!");
-            //}
-            //return new Vector2(intersectionPoint.X,intersectionPoint.Y);
-
             Vector2[] screenpts = { Vector2.UnitX * GraphicsRenderer.Form.ClientSize.Width, Vector2.UnitY * GraphicsRenderer.Form.ClientSize.Height };
 
 

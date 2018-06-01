@@ -23,6 +23,7 @@ namespace Client {
     {
         public const int VertexLoc = 0, NormalLoc = 1, TexLoc = 2, BoneIdLoc = 3, BoneWeightLoc = 4;
 
+        //Bounding boxes for all the meshes.
         public List<BoundingBox> BoundingBoxes { get; private set; } = new List<BoundingBox>();
 
         /// <summary>
@@ -370,12 +371,16 @@ namespace Client {
 
                 // create a new material
                 mesh.Materials = new ClientMaterial();
+
+                //min and max bounds
                 var min = new Vector3(float.MaxValue);
                 var max = new Vector3(float.MinValue);
                 // copy the buffers
                 scene.Meshes[idx].Vertices.ForEach(vertex =>
                 {
                     mesh.Vertices.Write(vertex.ToVector3());
+
+                    //keep track of min and max for obj boundaries.
                     min = Vector3.Minimize(min, vertex.ToVector3());
                     max = Vector3.Maximize(max, vertex.ToVector3());
                 });

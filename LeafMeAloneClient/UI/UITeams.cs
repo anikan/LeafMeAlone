@@ -11,6 +11,8 @@ namespace Client.UI
 {
     public class UITeams
     {
+
+        //UI for team leaves.
         public IntVariable Team1_Leaves, Team2_Leaves;
         public VectorVariable TeammateDirectionVar;
         private GameObject followedGameObject;

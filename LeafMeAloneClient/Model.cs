@@ -18,12 +18,14 @@ namespace Client
     {
         private static Vector3 defaultDirection = new Vector3(0, 0, 0);
 
-        private readonly List<BoundingBox> ModelBoundingBoxes = new List<BoundingBox>();
+        //Bounding boxes for the model.
+        private readonly List<BoundingBox> modelBoundingBoxes = new List<BoundingBox>();
 
 
         // Whether the model is drawn
         public bool Enabled = true;
 
+        //is the object culled.
         public bool IsCulled = false;
         
         public Vector3 Tint = new Vector3(1, 1, 1);
@@ -143,15 +145,17 @@ namespace Client
         /// </summary>
         public void Draw()
         {
+
+            //Check if we need to cull.
             int meshesOffScreen = 0;
-            foreach (BoundingBox boundingBox in ModelBoundingBoxes)
+            foreach (BoundingBox boundingBox in modelBoundingBoxes)
             {
                 if (GraphicsManager.ActiveCamera.Frustum.Intersect(boundingBox) == 0)
                 {
                     meshesOffScreen++;
                 }
             }
-            if (meshesOffScreen == ModelBoundingBoxes.Count)
+            if (meshesOffScreen == modelBoundingBoxes.Count)
             {
                 IsCulled = true;
                 UICulled.Culled++;
@@ -194,10 +198,10 @@ namespace Client
 
                 m_ModelMatrix = m_Properties.AsMatrix();
 
-                ModelBoundingBoxes.Clear();
+                modelBoundingBoxes.Clear();
                 foreach (BoundingBox boundingBox in m_ActiveGeo.BoundingBoxes)
                 {
-                    ModelBoundingBoxes.Add(new BoundingBox(Vector3.TransformCoordinate(boundingBox.Minimum,m_ModelMatrix),
+                    modelBoundingBoxes.Add(new BoundingBox(Vector3.TransformCoordinate(boundingBox.Minimum,m_ModelMatrix),
                                                            Vector3.TransformCoordinate(boundingBox.Maximum,m_ModelMatrix)));
                 }
             }

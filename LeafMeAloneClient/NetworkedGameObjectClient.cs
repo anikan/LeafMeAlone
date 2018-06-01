@@ -55,8 +55,7 @@ namespace Client
             {
                 //change of health
                 var deltaHealth = oldHealth - Health;
-                var maxHealth = 5.0f;
-                CurrentTint -= new Vector3((deltaHealth / maxHealth), (deltaHealth / maxHealth), (deltaHealth / maxHealth));
+                CurrentTint -= new Vector3((deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH));
 
             }
         }

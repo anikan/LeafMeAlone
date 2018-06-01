@@ -60,9 +60,12 @@ namespace Shared
 
         // Width/height of the map.
         public const float MAP_WIDTH = 150.0f;
-        public const float MAP_HEIGHT = 150.0f;
+        public const float MAP_HEIGHT = 80.0f;
 
-        public const float NO_MANS_LAND_PERCENT = 0.1f;
+        // Map tile size information.
+        public const float TILE_SIZE = 8.0f;
+
+        public const float NO_MANS_LAND_PERCENT = 0.25f;
 
         // Margin around the map. Leaves won't spawn in these margins.
         public const float BORDER_MARGIN = 5.0f;
@@ -79,5 +82,11 @@ namespace Shared
         public const bool PIVOT_DEBUG = false;
 
         public const int DEATH_TIME = 3;
+
+        // Constants for leafs. 
+        public const float LEAF_HEALTH = 10.0f;
+        public const float LEAF_MASS = 0.1f;
+        public const float LEAF_RADIUS = 0.0f;
+        public const float LEAF_BOUNCIENESS = 3.0f;
     }
 }

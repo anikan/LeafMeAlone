@@ -18,10 +18,10 @@ namespace Client
     {
         private int _audioBurning;
 
-        public LeafClient(CreateObjectPacket createPacket) :
-            base(createPacket, Constants.LeafModel)
+        public LeafClient(CreateObjectPacket createPacket) : base(createPacket, Constants.LeafModel)
         {
             _audioBurning = -1;
+            Burnable = true;
         }
 
         public override void UpdateFromPacket(BasePacket packet)

@@ -9,6 +9,17 @@ using Shared;
 
 namespace Shared
 {
+
+    // Enum for different match types and versions that we want to have.
+    public enum MatchType
+    {
+        // Team match, version 1.
+        TEAMS_1,
+
+        // Free for all, version 1.
+        FFA_1
+    }
+
     /// <summary>
     /// Match information.
     /// </summary>
@@ -42,7 +53,10 @@ namespace Shared
         public List<TeamSection> teamSections;
 
         // Area that doesn't belong to any teams.
-        private TeamSection NoMansLand;
+        public TeamSection NoMansLand;
+
+        // Type of this match.
+        public MatchType matchType;
 
         public Match()
         {
@@ -59,15 +73,24 @@ namespace Shared
             // Create a new match.
             Match newMatch = new Match();
 
+            // Total size of no man's land.
+            float NoMansLandSize = Constants.MAP_WIDTH * Constants.NO_MANS_LAND_PERCENT;
+
+            // Number of tiles that will make up no man's land.
+            int NoMansLandTiles = (int)(NoMansLandSize / Constants.TILE_SIZE);
+
+            // Number of tiles on each side of the center tile, for no man's land.
+            int NoMansLandTilesOnEachSide = NoMansLandTiles / 2 - 1;
+
             // Set up no man's land information.
             newMatch.NoMansLand = new TeamSection
             {
 
                 // Left bound is slightly offset from the map center, to the left. 
-                leftX = -(Constants.MAP_WIDTH * Constants.NO_MANS_LAND_PERCENT) / 2.0f,
+                leftX = (0.0f - (Constants.TILE_SIZE / 2.0f)) - (NoMansLandTilesOnEachSide * Constants.TILE_SIZE),
 
                 // Right bound is slightly offset from the map center, to the right.
-                rightX = (Constants.MAP_WIDTH * Constants.NO_MANS_LAND_PERCENT) / 2.0f,
+                rightX = (0.0f + (Constants.TILE_SIZE / 2.0f)) + (NoMansLandTilesOnEachSide * Constants.TILE_SIZE),
 
                 // Upper bound is at the top of the map.
                 upZ = (Constants.MAP_HEIGHT / 2.0f),
@@ -76,7 +99,7 @@ namespace Shared
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
 
                 // Color should be gray (or normal? idk).
-                sectionColor = new Vector3(0.0f, 0.0f, 0.0f)
+                sectionColor = new Vector3(0.7f, 0.7f, 0.7f)
             };
 
             // Create a new list of team sections.
@@ -91,7 +114,7 @@ namespace Shared
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
 
                 // Make the section red
-                sectionColor = new Vector3(1.0f, 0.0f, 0.0f)
+                sectionColor = new Vector3(1.8f, 1.0f, 1.0f)
 
             });
 
@@ -104,13 +127,15 @@ namespace Shared
                 downZ = -Constants.MAP_HEIGHT / 2.0f,
 
                 // Make the section blue.
-                sectionColor = new Vector3(0.0f, 0.0f, 1.0f)
+                sectionColor = new Vector3(1.0f, 1.0f, 1.8f)
             });
 
             // Print out the bounds of the match.
             Console.WriteLine(newMatch.teamSections[0]);
             Console.WriteLine(newMatch.teamSections[1]);
             Console.WriteLine(newMatch.NoMansLand);
+
+            newMatch.matchType = MatchType.TEAMS_1;
 
             // Set the default match and return it.
             _DefaultMatch = newMatch;

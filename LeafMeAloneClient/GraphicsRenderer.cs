@@ -18,6 +18,8 @@ namespace Client
         /// </summary>
         public static RenderForm Form;
 
+        public static Form DebugForm;
+
         /// <summary>
         /// Device is an adapter used to render.
         /// </summary>
@@ -186,6 +188,17 @@ namespace Client
             using (var factory = SwapChain.GetParent<Factory>())
                 factory.SetWindowAssociation(Form.Handle, WindowAssociationFlags.IgnoreAltEnter);
 
+
+            TextBox debugTextbox = new TextBox { Multiline = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical };
+            DebugForm = new Form();
+            DebugForm.Controls.Add(debugTextbox);
+            DebugForm.Closing += (sender, args) =>
+            {
+                args.Cancel = true;
+                DebugForm.Hide();
+            };
+            Debug.Init(debugTextbox);
+
             // handle alt+enter ourselves
             Form.KeyDown += (o, e) =>
             {
@@ -193,10 +206,14 @@ namespace Client
                     SwapChain.IsFullScreen = !SwapChain.IsFullScreen;
                 if (e.KeyCode == Keys.Escape)
                     Application.Exit();
+                if (e.Control && e.KeyCode == Keys.Enter)
+                    DebugForm.Show();
             };
 
             BarContext = new Context(Tw.GraphicsAPI.D3D11, Device.ComPointer);
             BarContext.HandleResize(Form.ClientSize);
+
+
         }
         /// <summary>
         /// Method called when the form is resized by the user.
@@ -214,8 +231,8 @@ namespace Client
 
             DeviceContext.Rasterizer.State = RasterizerState.FromDescription(Device, Rasterizer);
 
-            depthBufferDesc.Width = Form.Width;
-            depthBufferDesc.Height = Form.Height;
+            depthBufferDesc.Width = Form.ClientSize.Width;
+            depthBufferDesc.Height = Form.ClientSize.Height;
 
 
             depthBuffer = new Texture2D(Device, depthBufferDesc);
@@ -227,7 +244,7 @@ namespace Client
 
 
 
-            SwapChain.ResizeBuffers(2, Form.Width, Form.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
+            SwapChain.ResizeBuffers(2, Form.ClientSize.Width, Form.ClientSize.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
             using (var resource = Resource.FromSwapChain<Texture2D>(SwapChain, 0))
                 RenderTarget = new RenderTargetView(Device, resource);
 
@@ -238,6 +255,9 @@ namespace Client
             DeviceContext.Rasterizer.SetViewports(Viewport);
             ProjectionMatrix = Matrix.PerspectiveFovLH((float)Math.PI / 4.0f, Viewport.Width / Viewport.Height, .1f, 1000.0f);
             BarContext.HandleResize(Form.ClientSize);
+
+            UIManagerSpriteRenderer.SpriteRenderer?.RefreshViewport();
+
         }
 
 

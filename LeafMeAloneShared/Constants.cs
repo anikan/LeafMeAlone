@@ -9,7 +9,12 @@ namespace Shared
     {
         public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 3.85f, 3.0f);
 
+        //arrow for following player.
+        public const string Arrow = @"../../Textures/Arrow.png";
 
+        /// <summary>
+        /// Win/loss text.
+        /// </summary>
         public const string WinText = "You Win!";
         public const string LoseText = "You Lose!";
 
@@ -37,22 +42,30 @@ namespace Shared
         /// <summary>
         /// Sounds/Audio files
         /// </summary>
-        public const string Bgm = @"../../Sound/song.wav";
-        public const string FlameThrowerStart = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string FlameThrowerLoop = @"../../Sound/collision.wav";
-        public const string FlameThrowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string Bgm = @"../../Sound/OptionalForestAmbient.wav";
+        public const string FlameThrowerStart = @"../../Sound/FlameThrower_Start.wav";
+        public const string FlameThrowerLoop = @"../../Sound/FlameThrower_Loop.wav";
+        public const string FlameThrowerEnd = @"../../Sound/FlameThrower_End.wav";
 
-        public const string LeafBlowerStart = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string LeafBlowerLoop = @"../../Sound/collision.wav";
-        public const string LeafBlowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string LeafBlowerStart = @"../../Sound/LeafBlower_Start.wav";
+        public const string LeafBlowerLoop = @"../../Sound/LeafBlower_Loop.wav";
+        public const string LeafBlowerEnd = @"../../Sound/LeafBlower_End.wav";
 
-        public const string LeafIgniting = @"../../Sound/collision.wav";
-        public const string LeafBurning = @"../../Sound/burn.wav";
-        public const string LeafBurnup = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string LeafPutoff = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string SuctionStart = @"../../Sound/Suction_Start.wav";
+        public const string SuctionLoop = @"../../Sound/Suction_Loop.wav";
+        public const string SuctionEnd = @"../../Sound/Suction_End.wav";
 
-        public const string PlayerFootstep = @"../../Sound/running.wav";
+        public const string LeafIgniting = @"../../Sound/Leaf_Igniting.wav";
+        public const string LeafBurning = @"../../Sound/Leaf_Burning.wav";
+        public const string LeafBurnup = @"../../Sound/Leaf_Burnup.wav";
+        public const string LeafPutoff = @"../../Sound/Leaf_Putoff.wav";
 
+        public const string PlayerFootstep = @"../../Sound/Footsteps.wav";
+
+        /// <summary>
+        /// Map Constants
+        /// </summary>
+        
         // Height of the world floor.
         public const float FLOOR_HEIGHT = -10.0f;
 
@@ -63,9 +76,13 @@ namespace Shared
         // Map tile size information.
         public const float TILE_SIZE = 8.0f;
 
+        // Percent of the map that's no man's land. Will be rounded to tile size.
         public const float NO_MANS_LAND_PERCENT = 0.25f;
 
-        // Margin around the map. Leaves won't spawn in these margins.
+        // Size of the map outside the treeline (to prevent players from seeing skybox).
+        public const float OUTER_BORDER_SIZE = 40.0f;
+
+        // Margin around the map for leaf spawning (within treeline). Leaves won't spawn in these margins.
         public const float BORDER_MARGIN = 5.0f;
 
         // Total number of leaves in the game.
@@ -89,5 +106,11 @@ namespace Shared
         public const bool PIVOT_DEBUG = false;
 
         public const int DEATH_TIME = 3;
+
+        // Constants for leafs. 
+        public const float LEAF_HEALTH = 10.0f;
+        public const float LEAF_MASS = 0.1f;
+        public const float LEAF_RADIUS = 0.0f;
+        public const float LEAF_BOUNCIENESS = 3.0f;
     }
 }

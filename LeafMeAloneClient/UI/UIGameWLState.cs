@@ -6,50 +6,56 @@ using System.Text;
 using System.Threading.Tasks;
 using AntTweakBar;
 using Shared;
+using SlimDX;
+using SpriteTextRenderer;
 
 namespace Client.UI
 {
-    public enum State
+    public class UIGameWLState
     {
-        Win,
-        Lose,
-        None
-    }
-    class UIGameWLState
-    {
-        private State CurrState = State.None;
-
-        public StringVariable StateText;
-        public UIGameWLState(Size size, Point location)
+        /// <summary>
+        /// Winning or losing state.
+        /// </summary>
+        public enum WinLoseState
         {
-            StateText = new StringVariable(UIManager.Create(" ",size,location))
-            {
-                ReadOnly = true,
-                Label = " "
-            };
-            SetState(State.None);
+            None,
+            Win,
+            Lose
         }
 
-        public void SetState(State s)
+        /// <summary>
+        /// Win or Lose or None.
+        /// </summary>
+        private WinLoseState currWinLoseState = WinLoseState.None;
+
+        public DrawableString StateText;
+        public UIGameWLState()
         {
-            CurrState = s;
-            switch (s)
+            StateText = UIManagerSpriteRenderer.DrawTextContinuous("", UIManagerSpriteRenderer.TextType.MASSIVE, 
+                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter, Color.Transparent);
+            SetState(WinLoseState.None);
+        }
+
+
+        /// <summary>
+        /// Set whether the player has won, lost, or not yet.
+        /// </summary>
+        /// <param name="s"></param>
+        public void SetState(WinLoseState s)
+        {
+            currWinLoseState = s;
+            switch (currWinLoseState)
             {
-                case State.Win:
-                    StateText.Value = Constants.WinText;
-                    UIManager.ActiveUI[" "].Color = Color.Green;
-                    UIManager.ActiveUI[" "].Visible = true;
+                case WinLoseState.Win:
+                    StateText.Text = Constants.WinText;
+                    StateText.Color = Color.Green;
                     break;
-                case State.Lose:
-                    StateText.Value = Constants.LoseText;
-                    UIManager.ActiveUI[" "].Color = Color.Red;
-                    UIManager.ActiveUI[" "].Visible = true;
-                    StateText.Visible = true;
+                case WinLoseState.Lose:
+                    StateText.Text = Constants.LoseText;
+                    StateText.Color = Color.Red;
                     break;
-                case State.None:
-                    StateText.Value = String.Empty;
-                    StateText.Visible = false;
-                    UIManager.ActiveUI[" "].Visible = false;
+                case WinLoseState.None:
+                    StateText.Text = String.Empty;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(s), s, null);

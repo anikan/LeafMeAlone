@@ -94,6 +94,12 @@
     <Reference Include="SlimDX, Version=4.0.13.43, Culture=neutral, PublicKeyToken=b1b0c32fd1ffe4f9, processorArchitecture=x86">
       <HintPath>..\packages\SlimDX.4.0.13.44\lib\NET40\SlimDX.dll</HintPath>
     </Reference>
+    <Reference Include="SpriteTextRenderer">
+      <HintPath>..\libs\SpriteTextRenderer.dll</HintPath>
+    </Reference>
+    <Reference Include="SpriteTextRenderer.SlimDX">
+      <HintPath>..\libs\SpriteTextRenderer.SlimDX.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -111,7 +117,9 @@
     <Compile Include="AudioSystem.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="ClientPacketHandler.cs" />
+    <Compile Include="Debug.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
+    <Compile Include="Frustum.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
     <Compile Include="MapTile.cs" />
     <Compile Include="ParticleSystemManager.cs" />
@@ -120,6 +128,11 @@
     <Compile Include="ClientBone.cs" />
     <Compile Include="ClientMaterial.cs" />
     <Compile Include="ClientMesh.cs" />
+    <Compile Include="UI\DrawableString.cs" />
+    <Compile Include="UI\DrawableTexture.cs" />
+    <Compile Include="UI\GlobalUIManager.cs" />
+    <Compile Include="UI\UICulled.cs" />
+    <Compile Include="UI\UIFindTeammate.cs" />
     <Compile Include="UI\UIFramesPersecond.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="GraphicGameObject.cs" />
@@ -141,7 +154,9 @@
     <Compile Include="ClientPacketFactory.cs" />
     <Compile Include="Shader.cs" />
     <Compile Include="UI\UIGameWLState.cs" />
-    <Compile Include="UI\UIManager.cs" />
+    <Compile Include="UI\UIHealth.cs" />
+    <Compile Include="UI\UIManagerAntTweakBar.cs" />
+    <Compile Include="UI\UIManagerSpriteRenderer.cs" />
     <Compile Include="UI\UITeams.cs" />
     <Compile Include="UI\UITimer.cs" />
     <Compile Include="VertexBoneData.cs" />
@@ -179,6 +194,7 @@
   <ItemGroup>
     <Content Include="Shaders\defaultShader.fx" />
     <Content Include="Shaders\particle.fx" />
+    <Content Include="Shaders\ui.fx" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -191,4 +207,7 @@
     <Error Condition="!Exists('..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets'))" />
   </Target>
   <Import Project="..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets" Condition="Exists('..\packages\libsndfile.NET.Native.1.0.0\build\libsndfile.NET.Native.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /f /y "$(SolutionDir)libs\*.dll" "$(TargetDir)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -30,6 +30,7 @@ namespace Client
             base.UpdateFromPacket(packet);
             bool currBurning = Burning;
 
+            if (_audioBurning != -1) AudioManager.UpdateSourceLocation(_audioBurning, Transform.Position);
             EvaluateAudio(prevBurning, currBurning);
         }
 

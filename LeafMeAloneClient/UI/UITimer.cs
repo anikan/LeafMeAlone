@@ -1,6 +1,9 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Timers;
 using AntTweakBar;
+using SlimDX;
+using SpriteTextRenderer;
 
 namespace Client
 {
@@ -15,59 +18,58 @@ namespace Client
         //Time remaining (in seconds)
         public float TimeRemaining { get; private set; }
 
-        private System.Timers.Timer t;
+        private readonly Timer t;
 
-        public FloatVariable TimeRemaining_UI;
+        private readonly DrawableString uiElem;
 
-        public UITimer(float timeToCountInSeconds, Size size, Point location)
+        public UITimer(float timeToCountInSeconds)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
-            TimeRemaining_UI =
-                new FloatVariable(UIManager.Create("Timer", size, location))
-                {
-                    ReadOnly = true,
-                    Label = " ",
-                    Precision = 2,
-                    Value = timeToCountInSeconds
-                };
-            UIManager.ActiveUI["Timer"].Color = Color.Black;
+            uiElem = UIManagerSpriteRenderer.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManagerSpriteRenderer.TextType.NORMAL, 
+                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White);
         }
 
+        //Tick every 100 milliseconds.
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)
         {
             TimeRemaining -= tickDelta;
-            TimeRemaining_UI.Value = TimeRemaining;
+            uiElem.Text = "Time Remaining:" + TimeRemaining;
 
             if (TimeRemaining < 0.0f)
             {
                 t.Stop();
-                TimeRemaining_UI.Value = 0;
                 OnTimerCompleted?.Invoke();
             }
         }
-
+        //Restart timer.
         public void Restart(float timetoCountInSeconds)
         {
             TimeRemaining = timetoCountInSeconds;
-            TimeRemaining_UI.Value = timetoCountInSeconds;
             t.Start();
         }
 
-        public void Reset()
+        /// <summary>
+        /// Reset the timer
+        /// </summary>
+        public void End()
         {
             TimeRemaining = 0;
-            TimeRemaining_UI.Value = 0;
+            uiElem.Text = "Match Over";
             t.Stop();
         }
 
+        /// <summary>
+        /// Start the timer
+        /// </summary>
+        /// <param name="timeToCountInSeconds">Amount to start at</param>
         public void Start(float timeToCountInSeconds)
         {
             t.AutoReset = true;
             t.Enabled = true;
             TimeRemaining = timeToCountInSeconds;
-            TimeRemaining_UI.Value = timeToCountInSeconds;
+            uiElem.Text = "Time Remaining:" + TimeRemaining;
             t.Start();
         }
 

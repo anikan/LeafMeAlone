@@ -6,39 +6,49 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AntTweakBar;
+using Shared;
+using SlimDX;
+using SpriteTextRenderer;
 
 namespace Client
 {
     public class UIFramesPersecond
     {
+        //Current FPS
         public double CurrentFps;
+
+        //Stopwatch for counting.
         private readonly Stopwatch stopwatch;
-        private readonly DoubleVariable fps;
+        private readonly DrawableString fps;
 
-
-        private double totalFrames = 0;
+        private double totalFrames = 0.0f;
         private double totalTime = 0.0f;
+        private DrawableTexture t;
 
-        public UIFramesPersecond(Size size, Point location)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public UIFramesPersecond()
         {
-            CurrentFps = 0;
+            CurrentFps = 0.0f;
             stopwatch = Stopwatch.StartNew();
-            fps = new DoubleVariable(UIManager.Create("FPS", size, location))
-            {
-                ReadOnly = true,
-                Label = "FPS",
-                Precision = 2,
-                Value = 0
-            };
-            UIManager.ActiveUI["FPS"].Color = Color.Black;
+            fps = UIManagerSpriteRenderer.DrawTextContinuous("0", UIManagerSpriteRenderer.TextType.BOLD,
+                new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), TextAlignment.Right | TextAlignment.Top, Color.Red);
+
+           
         }
 
+        /// <summary>
+        /// Start Timing.
+        /// </summary>
         public void Start()
         {
             stopwatch.Start();
         }
 
-
+        /// <summary>
+        /// Stop Timing.
+        /// </summary>
         public void StopAndCalculateFps()
         {
             stopwatch.Stop();
@@ -46,7 +56,7 @@ namespace Client
             if (stopwatch.ElapsedMilliseconds > 1)
             {
                 totalFrames++;
-                totalTime+= stopwatch.ElapsedMilliseconds / 1000.0;
+                totalTime += (double)stopwatch.ElapsedMilliseconds / 1000.0;
                 if (totalTime > 1.0f)
                 {
                     CurrentFps = totalFrames;
@@ -56,7 +66,7 @@ namespace Client
 
             }
 
-            fps.Value = CurrentFps;
+            fps.Text = CurrentFps.ToString();
             stopwatch.Reset();
         }
     }

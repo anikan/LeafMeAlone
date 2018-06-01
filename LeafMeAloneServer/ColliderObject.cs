@@ -139,7 +139,10 @@ namespace Server
                 }
             }
 
-            // Moved!
+            // Moved! 
+            //The object moved, it's been modified.
+            Modified = true;
+
             return true;
         }
 

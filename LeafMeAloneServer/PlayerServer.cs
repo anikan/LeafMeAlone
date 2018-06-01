@@ -47,23 +47,23 @@ namespace Server
             // Move the player in accordance with requests
             Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
+            TryMoveObject(newPlayerPos);
 
-            //Console.WriteLine(String.Format("Burning: {0}, Health: {1}", Burning, Health));
             // if health is down, start the players death clock
-            if (Health < 0 && !Dead )
+            if (Health < 0 && !Dead)
             {
                 Dead = true;
                 Burning = false;
                 Health = PLAYER_HEALTH;
                 deathClock.Start();
             // Once health is up, reset te death clock and player position
-            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME) {
+            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
+            {
                 deathClock.Reset();
-                newPlayerPos = GameServer.instance.GetRandomSpawnPoint();
+                Transform.Position = GameServer.instance.GetRandomSpawnPoint();
                 Dead = false;
             }
 
-            TryMoveObject(newPlayerPos);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace Server
         public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
         {
 
-            // Itereate through all objects.
+            // Iterate through all objects.
             for (int j = 0; j < allObjects.Count; j++)
             {
 
@@ -139,11 +139,25 @@ namespace Server
         /// <param name="toolMode">Tool mode hit by.</param>
         public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(toolTransform, toolType, toolMode);
+
+            if (!Dead)
+            {
+                base.HitByTool(toolTransform, toolType, toolMode);
+            }
         }
 
         public override void Destroy()
         {
+        }
+
+        internal void Reset(Vector3 pos)
+        {
+            Velocity = new Vector3();
+            moveRequest = new Vector3();
+            Transform.Position = pos;
+            Health = Constants.PLAYER_HEALTH;
+            Burning = false;
+            ActiveToolMode = ToolMode.NONE;
         }
     }
 }

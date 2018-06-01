@@ -27,6 +27,8 @@ namespace Client
             Transform.Position.X = createPacket.ObjData.PositionX;
             Transform.Position.Y = createPacket.ObjData.PositionY;
             Transform.Position.Z = createPacket.ObjData.PositionZ;
+
+            Transform.Rotation.Y = createPacket.ObjData.Rotation;
         }
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace Client
 
             Transform.Position.X = objPacket.PositionX;
             Transform.Position.Z = objPacket.PositionZ;
+
             Transform.Rotation.Y = objPacket.Rotation;
 
             // Set the initial burning status.

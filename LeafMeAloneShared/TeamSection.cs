@@ -23,6 +23,7 @@ namespace Shared
 
         // Color of the section.
         public Vector3 sectionColor;
+        internal Team team;
 
         // Checks if a position is in the bounds.
         public bool IsInBounds(Vector3 position)

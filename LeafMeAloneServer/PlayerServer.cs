@@ -47,23 +47,23 @@ namespace Server
             // Move the player in accordance with requests
             Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
+            TryMoveObject(newPlayerPos);
 
-            //Console.WriteLine(String.Format("Burning: {0}, Health: {1}", Burning, Health));
             // if health is down, start the players death clock
-            if (Health < 0 && !Dead )
+            if (Health < 0 && !Dead)
             {
                 Dead = true;
                 Burning = false;
                 Health = PLAYER_HEALTH;
                 deathClock.Start();
-            // Once health is up, reset the death clock and player position
-            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME) {
+            // Once health is up, reset te death clock and player position
+            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
+            {
                 deathClock.Reset();
-                newPlayerPos = GameServer.instance.GetRandomSpawnPoint();
+                Transform.Position = GameServer.instance.GetRandomSpawnPoint();
                 Dead = false;
             }
 
-            TryMoveObject(newPlayerPos);
         }
 
         /// <summary>
@@ -123,11 +123,24 @@ namespace Server
         /// <param name="toolMode">Tool mode hit by.</param>
         public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(playerPosition, toolType, toolMode);
+            if (!Dead)
+            {
+                base.HitByTool(playerPosition, toolType, toolMode);
+            }
         }
 
         public override void Destroy()
         {
+        }
+
+        internal void Reset(Vector3 pos)
+        {
+            Velocity = new Vector3();
+            moveRequest = new Vector3();
+            Transform.Position = pos;
+            Health = Constants.PLAYER_HEALTH;
+            Burning = false;
+            ActiveToolMode = ToolMode.NONE;
         }
     }
 }

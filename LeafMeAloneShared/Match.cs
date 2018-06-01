@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SlimDX;
 using Shared;
+using System.Diagnostics;
 
 namespace Shared
 {
@@ -52,8 +53,11 @@ namespace Shared
         // Sections of the map that belong to teams.
         public List<TeamSection> teamSections;
 
+        private Stopwatch matchTimer = new Stopwatch();
+
         // Area that doesn't belong to any teams.
         public TeamSection NoMansLand;
+        private int matchTime;
 
         // Type of this match.
         public MatchType matchType;
@@ -112,7 +116,7 @@ namespace Shared
                 rightX = newMatch.NoMansLand.leftX,
                 upZ = (Constants.MAP_HEIGHT / 2.0f),
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
-
+                team = Team.RED,
                 // Make the section red
                 sectionColor = new Vector3(1.8f, 1.0f, 1.0f)
 
@@ -125,6 +129,7 @@ namespace Shared
                 rightX = Constants.MAP_WIDTH / 2.0f,
                 upZ = Constants.MAP_HEIGHT / 2.0f,
                 downZ = -Constants.MAP_HEIGHT / 2.0f,
+                team = Team.BLUE,
 
                 // Make the section blue.
                 sectionColor = new Vector3(1.0f, 1.0f, 1.8f)
@@ -140,6 +145,24 @@ namespace Shared
             // Set the default match and return it.
             _DefaultMatch = newMatch;
             return newMatch;
+        }
+
+        /// <summary>
+        /// Gets the elapsed match time
+        /// </summary>
+        /// <returns>the timespan</returns>
+        public TimeSpan GetTimeElapsed()
+        {
+            return matchTimer.Elapsed;
+        }
+
+        /// <summary>
+        /// Whether the current match is active or not
+        /// </summary>
+        /// <returns>Whether the match is running</returns>
+        public bool Started()
+        {
+            return matchTimer.IsRunning;
         }
 
         /// <summary>
@@ -181,6 +204,35 @@ namespace Shared
         }
 
         /// <summary>
+        /// Determines whether the game is over, either by the number of leaves 
+        /// on each side or whether the stopwatch for match time is beyond 
+        /// threshold. 
+        /// </summary>
+        /// <returns>The winning team or null on not game over.</returns>
+        public Team TryGameOver()
+        {
+            Team winningTeam = Team.NONE;
+
+            int maxLeaves = 0;
+            foreach (TeamSection teamSection in teamSections)
+            {
+                if (teamSection.numLeaves > maxLeaves)
+                {
+                    maxLeaves = teamSection.numLeaves;
+                    winningTeam = teamSection.team;
+                }
+            }
+
+            if (matchTimer.Elapsed.Seconds > matchTime || maxLeaves > Constants.WIN_LEAF_NUM)
+            {
+                matchTimer.Reset();
+                return winningTeam;
+            }
+
+            return Team.NONE;
+        }
+
+        /// <summary>
         /// Get a match string.
         /// </summary>
         /// <returns>A string version of this match.</returns>
@@ -209,6 +261,16 @@ namespace Shared
             // Return the string.
             return returnString;
 
+        }
+
+        /// <summary>
+        /// Starts a match with a given timeout.
+        /// </summary>
+        /// <param name="matchTime">The timeout on the match</param>
+        public void StartMatch(int matchTime)
+        {
+            this.matchTime = matchTime;
+            matchTimer.Start();
         }
     }
 }

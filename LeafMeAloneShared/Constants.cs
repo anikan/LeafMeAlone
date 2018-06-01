@@ -87,8 +87,17 @@ namespace Shared
 
         // Total number of leaves in the game.
         public const int NUM_LEAVES = 300;
+        // Number of players in a regular match 
+        public const int NUM_PLAYERS = 4;
+        // Number of leaves to win a reg match
+        public const int WIN_LEAF_NUM = 200;
+        // Reg match time
+        public const int MATCH_INIT_TIME = 3;
+        public const int MATCH_TIME = 300 + MATCH_INIT_TIME;
+        public const int MATCH_RESET_TIME = 10;
 
         public const float PUSH_FACTOR = 3.0f;
+        public const float PLAYER_HEALTH = 10.0f;
 
         public const float BLOWER_DISTANCE_SCALER = 2.0f;
 

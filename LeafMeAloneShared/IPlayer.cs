@@ -9,6 +9,7 @@ namespace Shared
 {
     public enum Team
     {
+        NONE,
         RED,
         BLUE
     };

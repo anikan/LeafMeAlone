@@ -147,7 +147,6 @@ namespace Client
         /// </summary>
         public void Draw()
         {
-
             //Check if we need to cull.
             int meshesOffScreen = 0;
             foreach (BoundingBox boundingBox in modelBoundingBoxes)
@@ -164,14 +163,12 @@ namespace Client
                 return;
             }
             IsCulled = false;
-
             if (Enabled)
             {
                 m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
                 m_ActiveShader.ShaderEffect.GetVariableByName("Hue").AsVector().Set(Hue);
                 if (CurrentAnimationIndex != -1)
                 {
-
                     m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
                     m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
                     m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
@@ -181,7 +178,6 @@ namespace Client
 
                 m_ActiveShader.UseShader();
                 m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
-                
             }
         }
 

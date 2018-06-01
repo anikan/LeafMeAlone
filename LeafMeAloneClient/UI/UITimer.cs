@@ -50,7 +50,20 @@ namespace Client
             t.Start();
         }
 
-        //Start timer.
+        /// <summary>
+        /// Reset the timer
+        /// </summary>
+        public void End()
+        {
+            TimeRemaining = 0;
+            uiElem.Text = "Match Over";
+            t.Stop();
+        }
+
+        /// <summary>
+        /// Start the timer
+        /// </summary>
+        /// <param name="timeToCountInSeconds">Amount to start at</param>
         public void Start(float timeToCountInSeconds)
         {
             t.AutoReset = true;

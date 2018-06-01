@@ -108,6 +108,11 @@ namespace Client
 
         }
 
+        internal void ResetGameTimer()
+        {
+            GlobalUIManager.gameTimer.End();
+        }
+
         internal Team GetPlayerTeam()
         {
             return ActivePlayer.team;
@@ -150,6 +155,11 @@ namespace Client
             GlobalUIManager.fps.StopAndCalculateFps();
             UICulled.Culled = 0;
             AudioManager.Update();
+        }
+
+        internal void StartMatchTimer(float gameTime)
+        {
+            GlobalUIManager.gameTimer.Start(gameTime);
         }
 
         // Start the networked client (connect to server).

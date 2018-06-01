@@ -86,13 +86,19 @@ namespace Server
                     if (gameObject != this && gameObject.IsInPlayerToolRange(this))
                     {
                         // Hit the object.
-                        gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
+                        gameObject.HitByTool(GetToolTransform(), ToolEquipped, ActiveToolMode);
 
                     }
-
-
                 }
             }
+        }
+
+        public Transform GetToolTransform()
+        {
+
+            // TODO: Make this the actual tool transform.
+            return Transform;
+
         }
 
         /// <summary>
@@ -123,12 +129,12 @@ namespace Server
         /// <summary>
         /// Function that determines what happens when the player is hit by another player's tool.
         /// </summary>
-        /// <param name="playerPosition">Position of the other player.</param>
+        /// <param name="toolTransform">Position of the other player.</param>
         /// <param name="toolType">Type of tool hit by.</param>
         /// <param name="toolMode">Tool mode hit by.</param>
-        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(playerPosition, toolType, toolMode);
+            base.HitByTool(toolTransform, toolType, toolMode);
         }
 
         public override void Destroy()

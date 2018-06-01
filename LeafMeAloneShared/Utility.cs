@@ -166,5 +166,20 @@ namespace Shared
 
 
         }
+
+        public static float AngleBetweenVectors(Vector3 a, Vector3 b)
+        {
+
+            a.Y = 0.0f;
+            b.Y = 0.0f;
+
+            float angle = (float)( Math.Atan2(b.Z, b.X) - Math.Atan2(a.Z, a.X));
+
+            angle *= (180.0f / (float)Math.PI);
+
+            return angle;
+
+
+        }
     }
 }

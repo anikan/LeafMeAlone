@@ -40,12 +40,12 @@ namespace Server
         /// <summary>
         /// What happens when this object is hit by a tool.
         /// </summary>
-        /// <param name="playerPosition"></param>
+        /// <param name="toolTransform"></param>
         /// <param name="toolType"></param>
         /// <param name="toolMode"></param>
-        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(playerPosition, toolType, toolMode);
+            base.HitByTool(toolTransform, toolType, toolMode);
         }
 
         /// <summary>
@@ -118,8 +118,8 @@ namespace Server
                         if (this is PhysicsObject me)
                         {
 
-                            // Get the vector from the object to me.
-                            Vector3 objToMe = me.Transform.Position - obj.Transform.Position;
+                            // Set the object back to it's original position.
+                            Transform.Position = OriginalPosition;
 
                             // If the other object is also a physics object.
                             if (obj is PhysicsObject other)
@@ -135,8 +135,8 @@ namespace Server
                         }
                         else
                         {
-                            // Set the object back to it's original position.
-                            Transform.Position = OriginalPosition;
+
+
                         }
 
                         // couldn't move

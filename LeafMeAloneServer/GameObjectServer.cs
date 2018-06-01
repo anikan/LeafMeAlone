@@ -124,10 +124,10 @@ namespace Server
         /// <summary>
         /// Function called when this object is hit by the player's active tool (in range)
         /// </summary>
-        /// <param name="playerPosition">Position of the player. </param>
+        /// <param name="toolTransform">Position of the player. </param>
         /// <param name="toolType">Type of the tool hit by.</param>
         /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
-        public virtual void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public virtual void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
 
             // Get information about the tool that was used on this object.

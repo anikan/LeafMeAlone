@@ -21,19 +21,64 @@ namespace Server
             Burnable = true;
         }
 
-        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        /// <summary>
+        /// Leaf was hit by tool.
+        /// </summary>
+        /// <param name="toolTransform">Transform of the tool.</param>
+        /// <param name="toolType">Type of tool equipped.</param>
+        /// <param name="toolMode">Mode of current tool.</param>
+        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(playerPosition, toolType, toolMode);
+            // Call the base hit by tool.
+            base.HitByTool(toolTransform, toolType, toolMode);
 
-
+            // If this is a leaf blower.
             if (toolType == ToolType.BLOWER)
             {
 
+                // Get the forward of the tool.
+                Vector3 toolForward = toolTransform.Forward;
 
-                Transform.Rotation.Y += Utility.RandomInRange(-0.1f, 0.1f);
+                // Get the vector from the tool to the lefa.
+                Vector3 toolToObj = Transform.Position - toolTransform.Position;
 
+                // Get the angle between the two vectors.
+                float angleBetween = Utility.AngleBetweenVectors(toolForward, toolToObj);
+
+                // If the angle is negative, rotate the leaf left.
+                if (angleBetween < 0.0f)
+                {
+
+                    RandomRotateLeft();
+                }
+
+                // If the angle is postiive, rotate the leaf right.
+                else
+                {
+                    RandomRotateRight();
+                }
 
             }
+        }
+
+        /// <summary>
+        /// Randomly rotate the leaf to the left.
+        /// </summary>
+        public void RandomRotateLeft()
+        {
+            Transform.Rotation.Y += Utility.RandomInRange(0.0f, Constants.LEAF_ROTATE_SPEED);
+
+        }
+
+        /// <summary>
+        /// Randomly rotate the leaf to the right.
+        /// </summary>
+        public void RandomRotateRight()
+        {
+
+            Transform.Rotation.Y -= Utility.RandomInRange(0.0f, Constants.LEAF_ROTATE_SPEED);
+
+
         }
     }
 }

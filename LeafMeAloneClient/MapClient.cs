@@ -17,11 +17,12 @@ namespace Client
         private Random rnd;
 
         // Number of tiles beyond the treeline (so player can't see skybox).
-        private const int BORDER_TILES = 10;
 
         // Number of tiles that make up the width and height of the map, not including border tiles.
         private const int NUM_TILES_WIDTH = (int)(Constants.MAP_WIDTH / Constants.TILE_SIZE);
         private const int NUM_TILES_HEIGHT = (int)(Constants.MAP_HEIGHT / Constants.TILE_SIZE);
+
+        private static int NUM_BORDER_TILES = (int)Math.Ceiling(Constants.OUTER_BORDER_SIZE / Constants.TILE_SIZE);
 
         // List of all map tiles in the game.
         private List<MapTile> AllMapTiles;
@@ -67,7 +68,7 @@ namespace Client
             float y = 0.0f;
 
             // Calculate number of tiles on each side of middle column.
-            int tilesOnEachSide = (NUM_TILES_HEIGHT / 2) - 1 + BORDER_TILES;
+            int tilesOnEachSide = (NUM_TILES_HEIGHT / 2) - 1 + NUM_BORDER_TILES;
 
             // Create the middle column.
             CreateRow(y);
@@ -112,7 +113,7 @@ namespace Client
             float x = 0.0f;
 
             // Calculate tiles on each side of the center.
-            int tilesOnEachSide = (NUM_TILES_WIDTH / 2) - 1 + BORDER_TILES;
+            int tilesOnEachSide = (NUM_TILES_WIDTH / 2) - 1 + NUM_BORDER_TILES;
 
             // Create the middle tile of the row.
             CreateTile(x, y);

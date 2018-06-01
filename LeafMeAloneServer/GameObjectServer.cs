@@ -23,6 +23,10 @@ namespace Server
 
         public const float BURNING_RAMP_RATE = 1.0f;
 
+        //True if this object has been changed since the last update and needs to be sent to all clients.
+        //Set when burning or when it moves.
+        public bool Modified;
+
         /// <summary>
         /// Constructor for a GameObject that's on the server, with default instantiation position.
         /// </summary>
@@ -63,10 +67,11 @@ namespace Server
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
-
             // If this object is burning.
             if (Burning || FlamethrowerActivelyBurning)
             {
+                //The object took damage, it's been modified.
+                Modified = true;
 
                 // If it is being actively burned this frame.
                 if (FlamethrowerActivelyBurning)
@@ -118,6 +123,9 @@ namespace Server
         /// </summary>
         public void Extinguish()
         {
+            //The object stopped burning, it's been modified.
+            Modified = true;
+
             burnFrames = 0;
         }
 
@@ -129,7 +137,6 @@ namespace Server
         /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
         public virtual void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
         {
-
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
 

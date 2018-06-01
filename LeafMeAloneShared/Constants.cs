@@ -15,8 +15,13 @@ namespace Shared
         /// <summary>
         /// Player animation paths
         /// </summary>
-        public const string PlayerWalkAnim = @"../../Models/PlayerModel/Final_Walk.dae";
-        public const string PlayerIdleAnim = @"../../Models/PlayerModel/Tail_Wag.dae";
+        public const string PlayerWalkBlowerAnim = @"../../Models/PlayerModel/Walk_Leafblower.dae";
+        public const string PlayerWalkThrowerAnim = @"../../Models/PlayerModel/Walk_Heavy_Flamethrower.dae";
+        public const string PlayerIdleAnim = @"../../Models/PlayerModel/Tail_Wag_Idle.dae";
+        public const string PlayerVictoryAnim = @"../../Models/PlayerModel/Victory.dae";
+        public const string PlayerDefeatAnim = @"../../Models/PlayerModel/Defeat.dae";
+        public const string PlayerHurtAnim = @"../../Models/PlayerModel/Hurt.dae";
+
 
         /// <summary>
         /// Win/loss text.

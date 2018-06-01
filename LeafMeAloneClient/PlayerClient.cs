@@ -37,8 +37,8 @@ namespace Client
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
-        private int _animWalk, _animIdle;
-        private float _animAcceleration;
+        private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
+        private int _currAnim, _overridedAnim;
 
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, Constants.PlayerModel)
@@ -55,8 +55,13 @@ namespace Client
 
             // Create new animations
             float scale = .07f;
-            _animWalk = AnimationManager.AddAnimation(Constants.PlayerWalkAnim, new Vector3(scale), 6f);
-            _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), 6f);
+            float timeScale = 3f;
+            _animWalkBlower = AnimationManager.AddAnimation(Constants.PlayerWalkBlowerAnim, new Vector3(scale), timeScale);
+            _animWalkThrower = AnimationManager.AddAnimation(Constants.PlayerWalkThrowerAnim, new Vector3(scale), timeScale);
+            _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), timeScale);
+            _animVictory = AnimationManager.AddAnimation(Constants.PlayerVictoryAnim, new Vector3(scale), timeScale);
+            _animLose = AnimationManager.AddAnimation(Constants.PlayerDefeatAnim, new Vector3(scale), timeScale);
+            _animHurt = AnimationManager.AddAnimation(Constants.PlayerHurtAnim, new Vector3(scale), timeScale);
 
             // set to idle animation by default
             SwitchAnimation(_animIdle);
@@ -66,23 +71,54 @@ namespace Client
         /// Get the animation variables out and set the fields
         /// </summary>
         /// <param name="animId"> ID of the animation </param>
-        private void SwitchAnimation(int animId)
+        private void SwitchAnimation(int animId, bool repeat = true)
         {
-            model = AnimationManager.SwitchAnimation(animId, true);
+            model = AnimationManager.GetAnimatedModel(animId, true, repeat);
             Transform.Scale = AnimationManager.GetScale(animId);
-            _animAcceleration = AnimationManager.GetAcceleration(animId);
 
             if (team == Team.BLUE)
             {
-                model.UseAltColor(new Color3(.4f,.4f,1.2f));
+                model.UseAltColor(new Color3(.5f, .5f, 1.0f));
             }
             else if (team == Team.RED)
             {
-                model.UseAltColor(new Color3(1.2f, .4f, .4f));
+                model.UseAltColor(new Color3(1.0f, .5f, .5f));
+            }
+
+            _currAnim = animId;
+        }
+
+        /// <summary>
+        /// Override a current animation
+        /// </summary>
+        /// <param name="animId"> the animation to override with </param>
+        private void OverrideAnimation(int animId)
+        {
+            _overridedAnim = _currAnim;
+            SwitchAnimation(animId, false);
+        }
+
+        /// <summary>
+        /// restart the previous animation
+        /// </summary>
+        private void RestartOveridedAnimation()
+        {
+            SwitchAnimation(_overridedAnim);
+            _overridedAnim = -1;
+        }
+
+        public Team team
+        {
+            get { return _team; }
+            set
+            {
+                _team = value;
+                model.UseAltColor( _team == Team.BLUE ? new Color3(.5f,.5f,1.0f) : new Color3(1.0f, .5f, .5f));
             }
         }
 
-        public Team team { get; set; }
+        private Team _team;
+
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
@@ -253,6 +289,9 @@ namespace Client
             bool prevUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool prevUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
             bool prevUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
+            float prevHealth = Health;
+            bool prevEquipThrower = ToolEquipped == ToolType.THROWER;
+            bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
 
             base.UpdateFromPacket(packet.ObjData);
             Dead = packet.Dead;
@@ -273,8 +312,12 @@ namespace Client
             bool currUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
             bool currUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
-            
-            EvaluateAnimation(prevMoving, currMoving);
+            bool hurt = prevHealth > Health;
+            bool currEquipThrower = ToolEquipped == ToolType.THROWER;
+            bool currEquipBlower = ToolEquipped == ToolType.BLOWER;
+
+
+            EvaluateAnimation(prevMoving, currMoving, prevEquipBlower, currEquipBlower, prevEquipThrower, currEquipThrower, hurt);
             EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction);
 
             switch (ActiveToolMode)
@@ -306,7 +349,17 @@ namespace Client
 
         }
 
-        private void EvaluateAnimation(bool prevMoving, bool currMoving)
+        /// <summary>
+        /// Evaluate which animation model to use
+        /// </summary>
+        /// <param name="prevMoving"> is player moving previously? </param>
+        /// <param name="currMoving"> is player moving currently? </param>
+        /// <param name="prevEquipBlower"> is the leaf blower equipped previously? </param>
+        /// <param name="currEquipBlower"> is the leaf blower equipped currently? </param>
+        /// <param name="prevEquipThrower"> is the flame thrower equipped previously? </param>
+        /// <param name="currEquipThrower"> is the flame thrower equipped currently? </param>
+        /// <param name="hurt"> is the player hurt? </param>
+        private void EvaluateAnimation(bool prevMoving, bool currMoving, bool prevEquipBlower, bool currEquipBlower, bool prevEquipThrower, bool currEquipThrower, bool hurt)
         {
             if (prevMoving && !currMoving)
             {
@@ -314,11 +367,25 @@ namespace Client
             }
             else if (!prevMoving && currMoving)
             {
-                SwitchAnimation(_animWalk);
+                if (currEquipBlower)
+                {
+                    SwitchAnimation(_animWalkBlower);
+                }
+                else if (currEquipThrower)
+                {
+                    SwitchAnimation(_animWalkThrower);
+                }
             }
+            else if (currMoving && !prevEquipBlower && currEquipBlower)
+            {
+                SwitchAnimation(_animWalkBlower);
+            }
+            else if (currMoving && !prevEquipThrower && currEquipThrower)
+            {
+                SwitchAnimation(_animWalkThrower);
+            }
+            
         }
-
-
 
         /// <summary>
         /// Evaluate audio logic
@@ -399,18 +466,7 @@ namespace Client
 
         public override void Update(float deltaTime)
         {
-            if (model != null)
-            {
-                model.m_Properties = Transform;
-                model.Update(_animAcceleration * deltaTime);
-            }
-
-            // If we're debugging, move the pivot cube.
-            if (PivotCube != null)
-            {
-                PivotCube.Transform.Position = Transform.Position;
-                PivotCube.Update(deltaTime);
-            }
+            base.Update(deltaTime);
 
             Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
                          Matrix.RotationY(Transform.Rotation.Y) *

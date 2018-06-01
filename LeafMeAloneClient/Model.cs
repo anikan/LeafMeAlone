@@ -142,6 +142,7 @@ namespace Client
         private bool RepeatAnimation = false;
         private bool PauseAnimation = false;
         private bool ReverseAnimation = false;
+        private float TimeScale = 1.0f;
 
         private bool _useAltColor = false;
         private Color3 _altColor;
@@ -155,6 +156,11 @@ namespace Client
         public void DisableAltColor()
         {
             _useAltColor = false;
+        }
+
+        public void SetAnimationTimeScale(float t)
+        {
+            TimeScale = t;
         }
 
         /// <summary>
@@ -238,7 +244,7 @@ namespace Client
 
             if (!PauseAnimation && CurrentAnimationIndex != -1)
             {
-                CurrentAnimationTime += delta_time;
+                CurrentAnimationTime += delta_time * TimeScale;
             }
         }
 

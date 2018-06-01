@@ -67,7 +67,6 @@ namespace Client
 
         // Timer to calculate time between frames.
         public Stopwatch FrameTimer;
-        private UIFramesPersecond fps;
         private NetworkClient networkClient;
 
         private Match activeMatch = Match.DefaultMatch;
@@ -152,7 +151,6 @@ namespace Client
             GlobalUIManager.fps.StopAndCalculateFps();
             UICulled.Culled = 0;
             AudioManager.Update();
-            fps.StopAndCalculateFps();
 
         }
 

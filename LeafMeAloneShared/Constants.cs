@@ -62,6 +62,10 @@ namespace Shared
 
         public const string PlayerFootstep = @"../../Sound/Footsteps.wav";
 
+        /// <summary>
+        /// Map Constants
+        /// </summary>
+        
         // Height of the world floor.
         public const float FLOOR_HEIGHT = -10.0f;
 
@@ -72,9 +76,13 @@ namespace Shared
         // Map tile size information.
         public const float TILE_SIZE = 8.0f;
 
+        // Percent of the map that's no man's land. Will be rounded to tile size.
         public const float NO_MANS_LAND_PERCENT = 0.25f;
 
-        // Margin around the map. Leaves won't spawn in these margins.
+        // Size of the map outside the treeline (to prevent players from seeing skybox).
+        public const float OUTER_BORDER_SIZE = 40.0f;
+
+        // Margin around the map for leaf spawning (within treeline). Leaves won't spawn in these margins.
         public const float BORDER_MARGIN = 5.0f;
 
         // Total number of leaves in the game.

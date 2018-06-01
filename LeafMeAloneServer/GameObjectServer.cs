@@ -16,7 +16,7 @@ namespace Server
     {
        
         // Is the object being actively burned this frame?
-        private bool BurningThisFrame = false;
+        private bool FlamethrowerActivelyBurning = false;
 
         // Rate (in seconds) that health decrements if an object is on fire.
         public const float HEALTH_DECREMENT_RATE = 1.0f;
@@ -65,17 +65,17 @@ namespace Server
         {
 
             // If this object is burning.
-            if (Burning || BurningThisFrame)
+            if (Burning || FlamethrowerActivelyBurning)
             {
 
                 // If it is being actively burned this frame.
-                if (BurningThisFrame)
+                if (FlamethrowerActivelyBurning)
                 {
                     // Increase the frames this object is burning.
                     burnFrames++;
 
                     // No longer burning next frame
-                    BurningThisFrame = false;
+                    FlamethrowerActivelyBurning = false;
                 }
 
                 // If not actively being burned this frame, set burn frames to just 1.
@@ -109,7 +109,7 @@ namespace Server
         {
             if (Burnable)
             {
-                BurningThisFrame = true;
+                FlamethrowerActivelyBurning = true;
             }
         }
 

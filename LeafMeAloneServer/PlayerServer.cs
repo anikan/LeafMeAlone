@@ -93,10 +93,15 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Gets the transform of the active tool.
+        /// </summary>
+        /// <returns>Transform of the tool.</returns>
         public Transform GetToolTransform()
         {
 
             // TODO: Make this the actual tool transform.
+            // Currently just the player transform.
             return Transform;
 
         }

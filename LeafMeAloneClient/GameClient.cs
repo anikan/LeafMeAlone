@@ -423,14 +423,14 @@ namespace Client
                     if (section.IsInBounds(leaf.Transform.Position))
                     {
                         // Tint the leaf to section.
-                        leaf.CurrentTint = section.sectionColor;
+                        leaf.CurrentHue = section.sectionColor;
                     }
                 }
                 // Check if this leaf is in no mans land.
                 if (activeMatch.NoMansLand.IsInBounds(leaf.Transform.Position))
                 {
                     // Tint the leaf.
-                    leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
+                    leaf.CurrentHue = activeMatch.NoMansLand.sectionColor;
                 }
             }
         }

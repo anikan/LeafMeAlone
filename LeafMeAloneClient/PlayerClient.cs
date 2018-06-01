@@ -384,13 +384,5 @@ namespace Client
         {
             UpdateFromPacket(packet as PlayerPacket);
         }
-
-        /// <summary>
-        /// "Kills" the player and forces a respawn.
-        /// </summary>
-        public override void Destroy()
-        {
-            // You can't destroy a player silly. Do something else here instead.
-        }
     }
 }

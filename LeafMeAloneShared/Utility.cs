@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 using Assimp;
 using SlimDX;
+using SlimDX.Direct3D11;
 using SlimDX.X3DAudio;
 
 namespace Shared
@@ -66,8 +68,16 @@ namespace Shared
 
         public static float ToRadians(this float degrees)
         {
-            return degrees * ((float) Math.PI / 180.0f);
+            return degrees * ((float)Math.PI / 180.0f);
         }
+
+        public static Vector2 IntersectionPoint(this Vector2 a, Vector2 b)
+        {
+            Vector2 c = b - a;
+            float t = Vector2.Dot(b,c) / Vector2.Dot(a,b);
+            return a + (a * t);
+        }
+
 
         public static void Copy(this Vector4 dest, Vector4 src)
         {
@@ -127,7 +137,17 @@ namespace Shared
 
         public static Vector4 Mult(this Matrix m, Vector4 multBy)
         {
-            return Vector4.Transform(multBy, Matrix.Transpose(m));
+            return Vector4.Transform(multBy, m);
+        }
+
+        /// <summary>
+        /// Create new texture.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static ShaderResourceView CreateTexture(string fileName, Device d)
+        {
+            return File.Exists(fileName) ? ShaderResourceView.FromFile(d, fileName) : null;
         }
 
 

@@ -9,7 +9,14 @@ namespace Shared
     {
         public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 3.85f, 3.0f);
 
+        //arrow for following player.
+        public const string Arrow = @"../../Textures/Arrow.png";
 
+        /// <summary>
+        /// Win/loss text.
+        /// </summary>
+        public const string WinText = "You Win!";
+        public const string LoseText = "You Lose!";
 
         /// <summary>
         /// Shaders
@@ -35,21 +42,25 @@ namespace Shared
         /// <summary>
         /// Sounds/Audio files
         /// </summary>
-        public const string Bgm = @"../../Sound/song.wav";
-        public const string FlameThrowerStart = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string FlameThrowerLoop = @"../../Sound/collision.wav";
-        public const string FlameThrowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string Bgm = @"../../Sound/OptionalForestAmbient.wav";
+        public const string FlameThrowerStart = @"../../Sound/FlameThrower_Start.wav";
+        public const string FlameThrowerLoop = @"../../Sound/FlameThrower_Loop.wav";
+        public const string FlameThrowerEnd = @"../../Sound/FlameThrower_End.wav";
 
-        public const string LeafBlowerStart = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string LeafBlowerLoop = @"../../Sound/collision.wav";
-        public const string LeafBlowerEnd = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string LeafBlowerStart = @"../../Sound/LeafBlower_Start.wav";
+        public const string LeafBlowerLoop = @"../../Sound/LeafBlower_Loop.wav";
+        public const string LeafBlowerEnd = @"../../Sound/LeafBlower_End.wav";
 
-        public const string LeafIgniting = @"../../Sound/collision.wav";
-        public const string LeafBurning = @"../../Sound/burn.wav";
-        public const string LeafBurnup = @"../../Sound/Crash-Cymbal-1.wav";
-        public const string LeafPutoff = @"../../Sound/Crash-Cymbal-1.wav";
+        public const string SuctionStart = @"../../Sound/Suction_Start.wav";
+        public const string SuctionLoop = @"../../Sound/Suction_Loop.wav";
+        public const string SuctionEnd = @"../../Sound/Suction_End.wav";
 
-        public const string PlayerFootstep = @"../../Sound/running.wav";
+        public const string LeafIgniting = @"../../Sound/Leaf_Igniting.wav";
+        public const string LeafBurning = @"../../Sound/Leaf_Burning.wav";
+        public const string LeafBurnup = @"../../Sound/Leaf_Burnup.wav";
+        public const string LeafPutoff = @"../../Sound/Leaf_Putoff.wav";
+
+        public const string PlayerFootstep = @"../../Sound/Footsteps.wav";
 
         // Height of the world floor.
         public const float FLOOR_HEIGHT = -10.0f;

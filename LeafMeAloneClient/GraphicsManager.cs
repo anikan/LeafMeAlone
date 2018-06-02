@@ -102,6 +102,24 @@ namespace Client
 
             return screenSpace;
         }
+        public static Vector2 WorldToViewportPoint(Vector3 worldPos)
+        {
+
+            // Get the view and projection matrices
+            Matrix viewMat = ActiveCamera.m_ViewMatrix;
+            Matrix projectMat = GraphicsRenderer.ProjectionMatrix;
+
+            //multiply view,proj,and world pos to get the clip space pos
+            Vector4 clipSpace = (viewMat * projectMat).Mult(new Vector4(worldPos, 1.0f));
+
+            //normalize the clip space by dividing by w
+            Vector3 normalDeviceCoordSpace = new Vector3(clipSpace.X / clipSpace.W, clipSpace.Y / clipSpace.W, clipSpace.Z / clipSpace.W);
+
+            //transform into screen space by mult by window size.
+            Vector2 viewPort = new Vector2((normalDeviceCoordSpace.X + 1.0f) / 2.0f, (1.0f - normalDeviceCoordSpace.Y) / 2.0f);
+
+            return viewPort;
+        }
 
         public static Shader ActiveShader;
 

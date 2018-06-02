@@ -24,7 +24,7 @@ namespace Client
             Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width / 2, 0));
             GameWinLossState = new UIGameWLState();
             Culled = new UICulled();
-            //TeammateUI = new UIFindTeammate();
+            TeammateUI = new UIFindTeammate();
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Client
         public static void Update()
         {
             Culled.Update();
-            //TeammateUI.Update();
+            TeammateUI.Update();
         }
     }
 }

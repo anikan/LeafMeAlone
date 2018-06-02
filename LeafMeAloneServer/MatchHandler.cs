@@ -98,5 +98,9 @@ namespace Server
         {
             return match;
         }
+
+        internal void PlacePlayer(PlayerServer newActivePlayer)
+        {
+        }
     }
 }

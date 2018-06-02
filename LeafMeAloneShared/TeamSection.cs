@@ -21,9 +21,25 @@ namespace Shared
         // Number of leaves in this section.
         public int numLeaves;
 
+        public List<Vector3> spawnPoints;
         // Color of the section.
         public Vector3 sectionColor;
         internal Team team;
+
+        public TeamSection()
+        {
+            spawnPoints = new List<Vector3>()
+            {
+                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
+                            downZ + new Random().Range(Math.Abs(upZ - downZ))),
+                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
+                            downZ + new Random().Range(Math.Abs(upZ - downZ))),
+                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
+                            downZ + new Random().Range(Math.Abs(upZ - downZ))),
+                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
+                            downZ + new Random().Range(Math.Abs(upZ - downZ)))
+            };
+        }
 
         // Checks if a position is in the bounds.
         public bool IsInBounds(Vector3 position)
@@ -73,6 +89,25 @@ namespace Shared
             // Just print out the bounds.
             return string.Format("Left Bound: {0}, Right Bound: {1}, Up Bound: {2}, Low Bound: {3}", leftX, rightX, upZ, downZ);
 
+        }
+
+        /// <summary>
+        /// Gets a new random spawn point for the player.
+        /// </summary>
+        /// <returns>A vector 3 of the spawn point</returns>
+        public Vector3 GetRandomSpawnPoint()
+        {
+            int index = new Random().Next(spawnPoints.Count);
+            return spawnPoints.ElementAt(index);
+        }
+
+        /// <summary>
+        /// Gets the next spawn point of the player spawn index
+        /// </summary>
+        /// <returns>The vector 3 of the next spawn point</returns>
+        public Vector3 NextSpawnPoint(int index)
+        {
+            return spawnPoints[(index % spawnPoints.Count)];
         }
     }
 }

@@ -235,6 +235,8 @@ namespace Client
                 }
                 else
                 {
+                    CurrentTint = new Vector3(1,1,1);
+                    CurrentHue = new Vector3(1,1,1);
                     model.Enabled = true;
                 }
             }

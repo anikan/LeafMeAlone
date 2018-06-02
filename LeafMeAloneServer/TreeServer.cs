@@ -13,15 +13,15 @@ namespace Server
     /// </summary>
     public class TreeServer : ColliderObject
     {
-        // Constants for the tree.
-        public const float TREE_RADIUS = 3.0f;
-        public const float TREE_HEALTH = 10000.0f;
+
 
         /// <summary>
         /// Create a new tree on the server, and register it as an object.
         /// </summary>
-        public TreeServer() : base(ObjectType.TREE, TREE_HEALTH, TREE_RADIUS)
+        public TreeServer() : base(ObjectType.TREE, Constants.TREE_HEALTH)
         {
+            colliderType = ColliderType.BOX;
+            Radius = Constants.TREE_RADIUS;
             Register();
         }
 

@@ -39,6 +39,7 @@ namespace Server
             ToolEquipped = ToolType.BLOWER;
             Burnable = true;
             Radius = PLAYER_RADIUS;
+            colliderType = ColliderType.CIRCLE;
         }
 
         /// <summary>

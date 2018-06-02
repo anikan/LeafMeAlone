@@ -241,7 +241,7 @@ namespace Server
             // Create the map with a width and height.
             MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
-            float startX = (-newMap.Width / 2.0f) + TreeServer.TREE_RADIUS;
+            float startX = (-newMap.Width / 2.0f) + Constants.TREE_RADIUS;
             float startY = -newMap.Height / 2.0f;
             float endX = newMap.Width / 2.0f;
             float endY = newMap.Height / 2.0f;
@@ -250,11 +250,11 @@ namespace Server
 
             // Spawn trees around the border of the map!
             // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
-            for (float y = startY; y < endY; y += TreeServer.TREE_RADIUS)
+            for (float y = startY; y < endY; y += (Constants.TREE_RADIUS))
             {
 
                 // Iterate through the width of the map, centered on origin and increase by radius of a tree.
-                for (float x = startX; x < endX; x += TreeServer.TREE_RADIUS)
+                for (float x = startX; x < endX; x += (Constants.TREE_RADIUS))
                 {
 
                     float random = (float)rnd.NextDouble();
@@ -274,7 +274,7 @@ namespace Server
                     }
 
                     // If this is a top or bottom row, create trees.
-                    if (y <= startY || endY <= (y + TreeServer.TREE_RADIUS))
+                    if (y <= startY || endY <= (y + (Constants.TREE_RADIUS)))
                     {
 
                         // Make a new tree.
@@ -289,7 +289,7 @@ namespace Server
                     }
 
                     // If this is the far left or right columns, create a tree.
-                    else if (x <= startX || endX <= (x + TreeServer.TREE_RADIUS))
+                    else if (x <= startX || endX <= (x + (Constants.TREE_RADIUS)))
                     {
 
                         // Make a new tree.
@@ -335,8 +335,8 @@ namespace Server
 
             float minX = matchHandler.GetMatch().NoMansLand.leftX;
             float maxX = matchHandler.GetMatch().NoMansLand.rightX;
-            float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * TreeServer.TREE_RADIUS);
-            float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * TreeServer.TREE_RADIUS);
+            float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * Constants.TREE_RADIUS);
+            float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * Constants.TREE_RADIUS);
 
             // Get random doubles for position.
             double randX = rnd.NextDouble();

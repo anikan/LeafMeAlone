@@ -75,13 +75,19 @@ namespace Server
         /// <returns>True if colliding, false otherwise.</returns>
         public bool IsColliding(ColliderObject other)
         {
+
+            if (other is LeafServer)
+            {
+                return false;
+            }
+
             // Get this position and the position of the other object, and make 2D.
             Vector3 colliderPos = Transform.Position;
             Vector3 otherPos = other.Transform.Position;
             colliderPos.Y = 0.0f;
             otherPos.Y = 0.0f;
 
-            if (colliderType == ColliderType.CIRCLE)
+            if (other.colliderType == ColliderType.CIRCLE)
             {
 
                 // Get distance between objects.
@@ -94,28 +100,101 @@ namespace Server
                     return true;
                 }
             }
-            else if (colliderType == ColliderType.BOX)
+            else if (other.colliderType == ColliderType.BOX)
             {
 
-                float down = other.Transform.Position.Z - Radius;
-                float up = other.Transform.Position.Z + Radius;
-                float left = other.Transform.Position.X - Radius;
-                float right = other.Transform.Position.X + Radius;
+                float down = other.Transform.Position.Z - other.Radius;
+                float up = other.Transform.Position.Z + other.Radius;
+                float left = other.Transform.Position.X - other.Radius;
+                float right = other.Transform.Position.X + other.Radius;
 
-
+                if (Transform.Position.X > left && Transform.Position.X < right && Transform.Position.Z < up && Transform.Position.Z > down)
+                {
+                    return true;
+                }
             }
-
 
             // If not overlapping, return false.
             return false;
 
         }
 
+        public Vector3 GetNormalVectorFromCollision(ColliderObject other, Vector3 originalPos, Vector3 newPos)
+        {
+
+            if (IsColliding(other))
+            {
+
+                if (other.colliderType == ColliderType.CIRCLE)
+                {
+                    // Normal is just vector from colliding object to this object.
+                    return Transform.Position - other.Transform.Position;
+                }
+                else if (other.colliderType == ColliderType.BOX)
+                {
+
+                    float min = 100.0f;
+
+                    float down = other.Transform.Position.Z - other.Radius;
+                    float up = other.Transform.Position.Z + other.Radius;
+                    float left = other.Transform.Position.X - other.Radius;
+                    float right = other.Transform.Position.X + other.Radius;
+
+                    Vector3 oldToNew = newPos - originalPos;
+
+                    
+                    Vector3 downNormal = new Vector3(0.0f, 0.0f, -1.0f);
+                    Vector3 upNormal = new Vector3(0.0f, 0.0f, 1.0f);
+                    Vector3 leftNormal = new Vector3(-1.0f, 0.0f, 0.0f);
+                    Vector3 rightNormal = new Vector3(1.0f, 0.0f, 0.0f);
+
+                    float dotDown = Vector3.Dot(oldToNew, downNormal);
+                    float dotUp = Vector3.Dot(oldToNew, upNormal);
+                    float dotLeft = Vector3.Dot(oldToNew, leftNormal);
+                    float dotRight = Vector3.Dot(oldToNew, rightNormal);
+
+                    Vector3 normal = Vector3.Zero;
+
+                    if (dotDown < min)
+                    {
+                        min = dotDown;
+                        normal = downNormal;
+                    }
+
+                    if (dotUp < min)
+                    {
+                        min = dotUp;
+                        normal = upNormal;
+                    }
+
+                    if (dotLeft < min)
+                    {
+                        min = dotLeft;
+                        normal = leftNormal;
+                    }
+
+                    if (dotRight < min)
+                    {
+                        min = dotRight;
+                        normal = rightNormal;
+                    }
+
+                    return normal;
+                }
+            }
+            else
+            {
+                Console.WriteLine("ERROR: Trying to get normal vector when there was no collision. This shouldn't happen!");
+            }
+
+            return Vector3.Zero;
+        }
+
         /// <summary>
         /// Tries to move an object to a new position, based on collider positions.
         /// </summary>
         /// <param name="newPosition"></param>
-        public bool TryMoveObject(Vector3 newPosition)
+        public bool TryMoveObject(Vector3 newPosition, int stacklevel = 0)
         {
 
             // Save the original position of this object.
@@ -137,9 +216,28 @@ namespace Server
                     if (obj != this && IsColliding(obj))
                     {
                         //    Console.WriteLine(string.Format("Cannot move {0} {1}. Colliding with {2} {3}, radius {4}", GetType(), Id, obj.GetType(), obj.Id, obj.Radius));
-                        
+
+                        Vector3 normal = GetNormalVectorFromCollision(obj, OriginalPosition, newPosition);
+
                         // Set the object back to it's original position.
                         Transform.Position = OriginalPosition;
+
+                        Vector3 newNewPosition = Transform.Position;
+
+                        if (normal != Vector3.Zero && normal.X == 0.0f)
+                        {
+                            newNewPosition.X = newPosition.X;
+                        }
+
+                        if (normal != Vector3.Zero && normal.Z == 0.0f)
+                        {
+                            newNewPosition.Z = newPosition.Z;
+                        }
+
+                        if (stacklevel < 1)
+                        {
+                            TryMoveObject(newNewPosition, stacklevel+1);
+                        }
 
                         // If this is a physics object
                         if (this is PhysicsObject me)

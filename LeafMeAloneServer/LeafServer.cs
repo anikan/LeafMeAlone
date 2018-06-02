@@ -20,6 +20,7 @@ namespace Server
         {
             Burnable = true;
             Radius = Constants.LEAF_RADIUS;
+            colliderType = ColliderType.CIRCLE;
         }
 
         /// <summary>

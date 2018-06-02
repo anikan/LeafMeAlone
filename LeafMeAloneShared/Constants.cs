@@ -125,5 +125,10 @@ namespace Shared
         public const float LEAF_BOUNCIENESS = 0.8f;
 
         public const float LEAF_ROTATE_SPEED = 0.2f;
+
+        // Constants for the tree.
+        public const float TREE_RADIUS = 4.0f;
+        public const float TREE_HEALTH = 10000.0f;
+
     }
 }

@@ -37,6 +37,8 @@ namespace Client
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
+        private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
+        private int _currAnim, _overridedAnim;
 
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
@@ -51,10 +53,72 @@ namespace Client
             _audioWind = AudioManager.GetNewSource();
             _audioSuction = AudioManager.GetNewSource();
 
-            Burnable = true;
+            // Create new animations
+            float scale = .07f;
+            float timeScale = 3f;
+            _animWalkBlower = AnimationManager.AddAnimation(Constants.PlayerWalkBlowerAnim, new Vector3(scale), timeScale);
+            _animWalkThrower = AnimationManager.AddAnimation(Constants.PlayerWalkThrowerAnim, new Vector3(scale), timeScale);
+            _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), timeScale);
+            _animVictory = AnimationManager.AddAnimation(Constants.PlayerVictoryAnim, new Vector3(scale), timeScale);
+            _animLose = AnimationManager.AddAnimation(Constants.PlayerDefeatAnim, new Vector3(scale), timeScale);
+            _animHurt = AnimationManager.AddAnimation(Constants.PlayerHurtAnim, new Vector3(scale), timeScale);
+
+            // set to idle animation by default
+            SwitchAnimation(_animIdle);
         }
 
-        public Team team { get; set; }
+        /// <summary>
+        /// Get the animation variables out and set the fields
+        /// </summary>
+        /// <param name="animId"> ID of the animation </param>
+        private void SwitchAnimation(int animId, bool repeat = true)
+        {
+            model = AnimationManager.GetAnimatedModel(animId, true, repeat);
+            Transform.Scale = AnimationManager.GetScale(animId);
+
+            if (team == Team.BLUE)
+            {
+                model.UseAltColor(new Color3(.5f, .5f, 1.0f));
+            }
+            else if (team == Team.RED)
+            {
+                model.UseAltColor(new Color3(1.0f, .5f, .5f));
+            }
+
+            _currAnim = animId;
+        }
+
+        /// <summary>
+        /// Override a current animation
+        /// </summary>
+        /// <param name="animId"> the animation to override with </param>
+        private void OverrideAnimation(int animId)
+        {
+            _overridedAnim = _currAnim;
+            SwitchAnimation(animId, false);
+        }
+
+        /// <summary>
+        /// restart the previous animation
+        /// </summary>
+        private void RestartOveridedAnimation()
+        {
+            SwitchAnimation(_overridedAnim);
+            _overridedAnim = -1;
+        }
+
+        public Team team
+        {
+            get { return _team; }
+            set
+            {
+                _team = value;
+                model.UseAltColor( _team == Team.BLUE ? new Color3(.5f,.5f,1.0f) : new Color3(1.0f, .5f, .5f));
+            }
+        }
+
+        private Team _team;
+
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
         public ToolType ToolEquipped { get; set; }
@@ -225,6 +289,10 @@ namespace Client
             bool prevUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool prevUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
             bool prevUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
+            float prevHealth = Health;
+            bool prevEquipThrower = ToolEquipped == ToolType.THROWER;
+            bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
+
             base.UpdateFromPacket(packet.ObjData);
 
             if (Dead != packet.Dead)
@@ -251,7 +319,12 @@ namespace Client
             bool currUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool currUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
             bool currUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
+            bool hurt = prevHealth > Health;
+            bool currEquipThrower = ToolEquipped == ToolType.THROWER;
+            bool currEquipBlower = ToolEquipped == ToolType.BLOWER;
 
+
+            EvaluateAnimation(prevMoving, currMoving, prevEquipBlower, currEquipBlower, prevEquipThrower, currEquipThrower, hurt);
             EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction);
 
             switch (ActiveToolMode)
@@ -281,6 +354,44 @@ namespace Client
                     throw new ArgumentOutOfRangeException();
             }
 
+        }
+
+        /// <summary>
+        /// Evaluate which animation model to use
+        /// </summary>
+        /// <param name="prevMoving"> is player moving previously? </param>
+        /// <param name="currMoving"> is player moving currently? </param>
+        /// <param name="prevEquipBlower"> is the leaf blower equipped previously? </param>
+        /// <param name="currEquipBlower"> is the leaf blower equipped currently? </param>
+        /// <param name="prevEquipThrower"> is the flame thrower equipped previously? </param>
+        /// <param name="currEquipThrower"> is the flame thrower equipped currently? </param>
+        /// <param name="hurt"> is the player hurt? </param>
+        private void EvaluateAnimation(bool prevMoving, bool currMoving, bool prevEquipBlower, bool currEquipBlower, bool prevEquipThrower, bool currEquipThrower, bool hurt)
+        {
+            if (prevMoving && !currMoving)
+            {
+                SwitchAnimation(_animIdle);
+            }
+            else if (!prevMoving && currMoving)
+            {
+                if (currEquipBlower)
+                {
+                    SwitchAnimation(_animWalkBlower);
+                }
+                else if (currEquipThrower)
+                {
+                    SwitchAnimation(_animWalkThrower);
+                }
+            }
+            else if (currMoving && !prevEquipBlower && currEquipBlower)
+            {
+                SwitchAnimation(_animWalkBlower);
+            }
+            else if (currMoving && !prevEquipThrower && currEquipThrower)
+            {
+                SwitchAnimation(_animWalkThrower);
+            }
+            
         }
 
         /// <summary>
@@ -363,6 +474,7 @@ namespace Client
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
+
             Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
                          Matrix.RotationY(Transform.Rotation.Y) *
                          Matrix.RotationZ(Transform.Rotation.Z);

@@ -43,7 +43,11 @@ namespace Server
         private void RestartMatch()
         {
             game.GetLeafListAsObjects().ForEach(l => l.Destroy());
-            game.playerServerList.ForEach(p => p.Reset(game.NextSpawnPoint()));
+            foreach (PlayerServer player in game.playerServerList)
+            {
+                player.Transform.Position = teamSection.GetRandomSpawnPoint();
+                player.Reset();
+            }
             matchResetTimer.Reset();
             StartMatch();
         }
@@ -99,8 +103,19 @@ namespace Server
             return match;
         }
 
-        internal void PlacePlayer(PlayerServer newActivePlayer)
+        /// <summary>
+        /// Places a player in the match based upon their team.
+        /// </summary>
+        /// <param name="player">The player to place</param>
+        internal void PlacePlayer(PlayerServer player)
         {
+            match.teamSections.ForEach((teamSection) =>
+            {
+                if (teamSection.team == player.Team)
+                {
+                    player.Transform.Position = teamSection.GetRandomSpawnPoint();
+                }
+            });
         }
     }
 }

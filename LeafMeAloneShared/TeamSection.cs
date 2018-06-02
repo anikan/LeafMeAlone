@@ -24,7 +24,7 @@ namespace Shared
         public List<Vector3> spawnPoints;
         // Color of the section.
         public Vector3 sectionColor;
-        internal Team team;
+        public Team team;
 
         public TeamSection()
         {

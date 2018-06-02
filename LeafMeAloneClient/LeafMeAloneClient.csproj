@@ -115,6 +115,7 @@
   <ItemGroup>
     <Compile Include="AudioManager.cs" />
     <Compile Include="AudioSystem.cs" />
+    <Compile Include="AnimationManager.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="ClientPacketHandler.cs" />
     <Compile Include="Debug.cs" />

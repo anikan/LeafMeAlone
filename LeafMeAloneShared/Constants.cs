@@ -13,6 +13,17 @@ namespace Shared
         public const string Arrow = @"../../Textures/Arrow.png";
 
         /// <summary>
+        /// Player animation paths
+        /// </summary>
+        public const string PlayerWalkBlowerAnim = @"../../Models/PlayerModel/Walk_Leafblower.dae";
+        public const string PlayerWalkThrowerAnim = @"../../Models/PlayerModel/Walk_Heavy_Flamethrower.dae";
+        public const string PlayerIdleAnim = @"../../Models/PlayerModel/Tail_Wag_Idle.dae";
+        public const string PlayerVictoryAnim = @"../../Models/PlayerModel/Victory.dae";
+        public const string PlayerDefeatAnim = @"../../Models/PlayerModel/Defeat.dae";
+        public const string PlayerHurtAnim = @"../../Models/PlayerModel/Hurt.dae";
+
+
+        /// <summary>
         /// Win/loss text.
         /// </summary>
         public const string WinText = "You Win!";
@@ -34,10 +45,10 @@ namespace Shared
         /// <summary>
         /// Models
         /// </summary>
-        public const string LeafModel = @"../../Models/05.13.18_Leaf.fbx";
-        public const string PlayerModel = @"../../Models/05.03.18_Version2.fbx";
-        public const string DefaultMapModel = @"../../Models/Terrain.fbx";
-        public const string TreeModel = @"../../Models/TreeAttempt.fbx";
+        public const string LeafModel = @"../../Models/LeafModel/05.13.18_Leaf.fbx";
+        public const string PlayerModel = @"../../Models/PlayerModel/05.03.18_Version2.fbx";
+        public const string DefaultMapModel = @"../../Models/Terrain/Terrain.fbx";
+        public const string TreeModel = @"../../Models/Tree/TreeAttempt.fbx";
 
         /// <summary>
         /// Sounds/Audio files
@@ -111,6 +122,8 @@ namespace Shared
         public const float LEAF_HEALTH = 10.0f;
         public const float LEAF_MASS = 0.1f;
         public const float LEAF_RADIUS = 0.0f;
-        public const float LEAF_BOUNCIENESS = 3.0f;
+        public const float LEAF_BOUNCIENESS = 0.8f;
+
+        public const float LEAF_ROTATE_SPEED = 0.2f;
     }
 }

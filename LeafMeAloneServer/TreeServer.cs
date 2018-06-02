@@ -36,12 +36,12 @@ namespace Server
         /// <summary>
         /// Have the tree react to being hit by a tool.
         /// </summary>
-        /// <param name="playerPosition">Position of the player hitting this object.</param>
+        /// <param name="toolTransform">Position of the player hitting this object.</param>
         /// <param name="toolType">Type of tool hit by.</param>
         /// <param name="toolMode">Mode the tool was in.</param>
-        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(playerPosition, toolType, toolMode);
+            base.HitByTool(toolTransform, toolType, toolMode);
         }
 
         /// <summary>

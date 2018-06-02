@@ -1,6 +1,7 @@
 ﻿using Shared;
 using Shared.Packet;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Server
@@ -14,6 +15,7 @@ namespace Server
         private Match match;
         private NetworkServer network;
         private GameServer game;
+        private int playerCount = 0;
 
 
         /// <summary>
@@ -45,7 +47,6 @@ namespace Server
             game.GetLeafListAsObjects().ForEach(l => l.Destroy());
             foreach (PlayerServer player in game.playerServerList)
             {
-                player.Transform.Position = teamSection.GetRandomSpawnPoint();
                 player.Reset();
             }
             matchResetTimer.Reset();
@@ -58,7 +59,7 @@ namespace Server
         /// <param name="winningTeam">The team that won the match</param>
         private void EndMatch(Team winningTeam)
         {
-            BasePacket donePacket = new MatchResultPacket(winningTeam);
+            BasePacket donePacket = new MatchResultPacket(winningTeam.name);
             network.SendAll(PacketUtil.Serialize(donePacket));
             game.GetLeafListAsObjects().ForEach(l => l.Burning = true);
             matchResetTimer.Start();
@@ -88,7 +89,7 @@ namespace Server
             // Check for match end
             match.CountObjectsOnSides(game.GetLeafListAsObjects());
             Team winningTeam = match.TryGameOver();
-            if (winningTeam != Team.NONE)
+            if (winningTeam != null)
             {
                 EndMatch(winningTeam);
             }
@@ -103,19 +104,10 @@ namespace Server
             return match;
         }
 
-        /// <summary>
-        /// Places a player in the match based upon their team.
-        /// </summary>
-        /// <param name="player">The player to place</param>
-        internal void PlacePlayer(PlayerServer player)
+        internal PlayerServer AddPlayer()
         {
-            match.teamSections.ForEach((teamSection) =>
-            {
-                if (teamSection.team == player.Team)
-                {
-                    player.Transform.Position = teamSection.GetRandomSpawnPoint();
-                }
-            });
+            PlayerServer newPlayer = new PlayerServer(match.teams[playerCount++ % match.teams.Count]);
+            return newPlayer;
         }
     }
 }

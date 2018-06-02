@@ -76,11 +76,11 @@ namespace Client
             model = AnimationManager.GetAnimatedModel(animId, true, repeat);
             Transform.Scale = AnimationManager.GetScale(animId);
 
-            if (team == Team.BLUE)
+            if (Team== TeamName.BLUE)
             {
                 model.UseAltColor(new Color3(.5f, .5f, 1.0f));
             }
-            else if (team == Team.RED)
+            else if (Team == TeamName.RED)
             {
                 model.UseAltColor(new Color3(1.0f, .5f, .5f));
             }
@@ -107,17 +107,18 @@ namespace Client
             _overridedAnim = -1;
         }
 
-        public Team team
+        public TeamName Team
         {
-            get { return _team; }
+            get => _team;
             set
             {
                 _team = value;
-                model.UseAltColor( _team == Team.BLUE ? new Color3(.5f,.5f,1.0f) : new Color3(1.0f, .5f, .5f));
+                model.UseAltColor(_team == TeamName.BLUE ?
+                    new Color3(.5f, .5f, 1.0f) : new Color3(1.0f, .5f, .5f));
             }
         }
 
-        private Team _team;
+        private TeamName _team;
 
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
@@ -303,8 +304,8 @@ namespace Client
                 }
                 else
                 {
-                    CurrentTint = new Vector3(1,1,1);
-                    CurrentHue = new Vector3(1,1,1);
+                    CurrentTint = new Vector3(1, 1, 1);
+                    CurrentHue = new Vector3(1, 1, 1);
                     model.Enabled = true;
                 }
             }
@@ -391,7 +392,7 @@ namespace Client
             {
                 SwitchAnimation(_animWalkThrower);
             }
-            
+
         }
 
         /// <summary>

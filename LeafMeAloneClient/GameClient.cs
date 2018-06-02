@@ -114,9 +114,9 @@ namespace Client
             GlobalUIManager.gameTimer.End();
         }
 
-        internal Team GetPlayerTeam()
+        internal TeamName GetPlayerTeam()
         {
-            return ActivePlayer.team;
+            return ActivePlayer.Team;
         }
         
         private void DoGameLoop()
@@ -438,9 +438,9 @@ namespace Client
             foreach (LeafClient leaf in leaves)
             {
                 // Iterate through all team sections.
-                for (int index = 0; index < activeMatch.teamSections.Count; index++)
+                for (int index = 0; index < activeMatch.teams.Count; index++)
                 {
-                    TeamSection section = activeMatch.teamSections[index];
+                    TeamSection section = activeMatch.teams[index].teamSection;
                     // If this leaf is in this team section.
                     if (section.IsInBounds(leaf.Transform.Position))
                     {
@@ -463,10 +463,10 @@ namespace Client
         public void CountLeaves()
         {
 
-            for (int index = 0; index < activeMatch.teamSections.Count; index++)
+            for (int index = 0; index < activeMatch.teams.Count; index++)
             {
 
-                TeamSection section = activeMatch.teamSections[index];
+                TeamSection section = activeMatch.teams[index].teamSection;
 
                 int leafCount = activeMatch.GetTeamLeaves(index, GetLeafListAsGameObjects());
 

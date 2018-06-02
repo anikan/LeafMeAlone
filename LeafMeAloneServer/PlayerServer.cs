@@ -35,6 +35,20 @@ namespace Server
             Team = team;
             ToolEquipped = ToolType.BLOWER;
             Burnable = true;
+            JumpToRandomSpawn();
+
+        }
+
+        private void JumpToRandomSpawn()
+        {
+            Transform.Position = Team.GetNextSpawnPoint();
+            foreach (PlayerServer player in GameServer.instance.playerServerList)
+            {
+                if (player != this && IsColliding(player))
+                {
+                    Transform.Position = Team.GetNextSpawnPoint();
+                }
+            }
         }
 
         /// <summary>
@@ -69,7 +83,7 @@ namespace Server
             } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
             {
                 deathClock.Reset();
-                Reset(GameServer.instance.GetRandomSpawnPoint());
+                Reset();
             }
         }
 
@@ -161,11 +175,11 @@ namespace Server
         /// Resets the player to a specified position
         /// </summary>
         /// <param name="pos">The position to set the player to</param>
-        internal void Reset(Vector3 pos)
+        internal void Reset()
         {
             Velocity = new Vector3();
             moveRequest = new Vector3();
-            Transform.Position = pos;
+            JumpToRandomSpawn();
             Health = Constants.PLAYER_HEALTH;
             Burning = false;
             Dead = false;

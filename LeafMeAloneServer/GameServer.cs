@@ -187,21 +187,17 @@ namespace Server
             int id = gameObjectDict.Count();
 
             //Create two players, one to send as an active player to client. Other to keep track of on server.
-            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1);
+            PlayerServer newPlayer = matchHandler.AddPlayer();
             newPlayer.Register();
+            playerServerList.Add(newPlayer);
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1)
+            PlayerServer newActivePlayer = new PlayerServer(newPlayer.Team)
             {
                 ObjectType = ObjectType.ACTIVE_PLAYER,
                 Id = newPlayer.Id
             };
-
-            playerServerList.Add(newPlayer);
-
-            //Note currently assuming players get ids 0-3
-            matchHandler.PlacePlayer(newActivePlayer);
-            newPlayer.Transform.Position = newActivePlayer.Transform.Position;
+            newActivePlayer.Transform.Position = newPlayer.Transform.Position;
 
             CreatePlayerPacket objPacket = ServerPacketFactory.NewCreatePacket(newPlayer);
 

@@ -24,22 +24,6 @@ namespace Shared
         public List<Vector3> spawnPoints;
         // Color of the section.
         public Vector3 sectionColor;
-        public Team team;
-
-        public TeamSection()
-        {
-            spawnPoints = new List<Vector3>()
-            {
-                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
-                            downZ + new Random().Range(Math.Abs(upZ - downZ))),
-                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
-                            downZ + new Random().Range(Math.Abs(upZ - downZ))),
-                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
-                            downZ + new Random().Range(Math.Abs(upZ - downZ))),
-                new Vector3(leftX + new Random().Range(Math.Abs(rightX - leftX)), 0, 
-                            downZ + new Random().Range(Math.Abs(upZ - downZ)))
-            };
-        }
 
         // Checks if a position is in the bounds.
         public bool IsInBounds(Vector3 position)
@@ -74,7 +58,7 @@ namespace Shared
                     // Increase the number of leaves.
                     numLeaves++;
 
-                //    Console.WriteLine("Num objects is now " + numLeaves);
+                    //    Console.WriteLine("Num objects is now " + numLeaves);
                 }
             }
         }
@@ -92,22 +76,17 @@ namespace Shared
         }
 
         /// <summary>
-        /// Gets a new random spawn point for the player.
+        /// Initializes the spawn points for the team section based upon random ranges in each section
         /// </summary>
-        /// <returns>A vector 3 of the spawn point</returns>
-        public Vector3 GetRandomSpawnPoint()
+        internal void InitSpawnPoints()
         {
-            int index = new Random().Next(spawnPoints.Count);
-            return spawnPoints.ElementAt(index);
-        }
-
-        /// <summary>
-        /// Gets the next spawn point of the player spawn index
-        /// </summary>
-        /// <returns>The vector 3 of the next spawn point</returns>
-        public Vector3 NextSpawnPoint(int index)
-        {
-            return spawnPoints[(index % spawnPoints.Count)];
+            spawnPoints = new List<Vector3>
+            {
+                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5)),
+                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5)),
+                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5)),
+                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5))
+            };
         }
     }
 }

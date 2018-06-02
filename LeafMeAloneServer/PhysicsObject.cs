@@ -189,7 +189,7 @@ namespace Server
                 {
 
                     // Get the force of this tool.
-                    float toolForce = toolInfo.Force;
+                    float toolForce = toolInfo.Force * 0.5f;
 
                     // Get the vector from the player to the object.
                     Vector3 objToPlayer = toolTransform.Position - Transform.Position;

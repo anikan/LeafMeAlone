@@ -225,7 +225,6 @@ namespace Client
             bool prevUsingFlame = ToolEquipped == ToolType.THROWER && ActiveToolMode == ToolMode.PRIMARY;
             bool prevUsingWind = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.PRIMARY;
             bool prevUsingSuction = ToolEquipped == ToolType.BLOWER && ActiveToolMode == ToolMode.SECONDARY;
-
             base.UpdateFromPacket(packet.ObjData);
 
             if (Dead != packet.Dead)
@@ -236,10 +235,10 @@ namespace Client
                 }
                 else
                 {
-                    CurrentTint = new Vector3(1, 1, 1);
                     model.Enabled = true;
                 }
             }
+
             Dead = packet.Dead;
 
             ToolEquipped = packet.ToolEquipped;

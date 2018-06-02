@@ -10,9 +10,22 @@ namespace Shared
 {
     public static class Utility
     {
+
+        private static Random rnd;
+
         public static Vector3 ToVector3(this Vector3D vector)
         {
             return new Vector3(vector.X, vector.Y, vector.Z);
+        }
+
+        public static Vector4 ScalarMultiply(this Vector4 me, Vector4 other)
+        {
+            Vector4 newVec = new Vector4();
+            newVec.X = me.X * other.X;
+            newVec.Y = me.Y * other.Y;
+            newVec.Z = me.Z * other.Z;
+            newVec.W = me.W * other.W;
+            return newVec;
         }
 
         public static SlimDX.Quaternion ToQuaternion(this Assimp.Quaternion q)
@@ -145,6 +158,58 @@ namespace Shared
         public static ShaderResourceView CreateTexture(string fileName, Device d)
         {
             return File.Exists(fileName) ? ShaderResourceView.FromFile(d, fileName) : null;
+        }
+
+        /// <summary>
+        /// Get a random float in the specified range (inclusive).
+        /// </summary>
+        /// <param name="low">Low value</param>
+        /// <param name="high">High value.</param>
+        /// <returns>Random value between low and high.</returns>
+        public static float RandomInRange(float low, float high)
+        {
+
+            // Get a random number.
+            if (rnd == null)
+            {
+                rnd = new Random();
+            }
+
+            // Get the next float.
+            float random = rnd.NextFloat();
+
+            // Bound random float between low and high.
+            random = (random * (high - low)) + low;
+
+            // Return random number.
+            return random;
+
+
+        }
+
+        /// <summary>
+        /// Get the angle between two vectors (Using atan2).
+        /// </summary>
+        /// <param name="a">First vector.</param>
+        /// <param name="b">Second vector.</param>
+        /// <returns>Angle in degrees</returns>
+        public static float AngleBetweenVectors(Vector3 a, Vector3 b)
+        {
+
+            // It's a 2D game!
+            a.Y = 0.0f;
+            b.Y = 0.0f;
+
+            // Get the angle in radians.
+            float angle = (float)( Math.Atan2(b.Z, b.X) - Math.Atan2(a.Z, a.X));
+
+            // Convert to degrees.
+            angle *= (180.0f / (float)Math.PI);
+
+            // Return the angle.
+            return angle;
+
+
         }
     }
 }

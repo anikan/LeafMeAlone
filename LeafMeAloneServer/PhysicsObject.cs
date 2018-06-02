@@ -36,7 +36,7 @@ namespace Server
 
         // Force, applied each tick and then reset.
         // Affects through the ApplyForce() function.
-        private Vector3 Force;
+        public Vector3 Force;
 
         // Acceleration and Velocity, calculated from force.
         private Vector3 Acceleration;
@@ -113,21 +113,7 @@ namespace Server
 
         }
 
-        /// <summary>
-        /// Checks if a vector's values are less than a specified minimum. If so, sets that value to zero.
-        /// </summary>
-        /// <param name="vector">Vector to check.</param>
-        /// <param name="minBeforeZero">Minimum value before it's set to zero.</param>
-        /// <returns>Vector with any values rounded to zero, if applicable.</returns>
-        private Vector3 RoundVectorToZero(Vector3 vector, float minBeforeZero)
-        {
-            // Checks each value and sets to zero if less than minimum.
-            if (Math.Abs(vector.X) < minBeforeZero) vector.X = 0.0f;
-            if (Math.Abs(vector.Y) < minBeforeZero) vector.Y = 0.0f;
-            if (Math.Abs(vector.Z) < minBeforeZero) vector.Z = 0.0f;
 
-            return vector;
-        }
 
         /// <summary>
         /// Bounce off of another object.
@@ -136,23 +122,7 @@ namespace Server
         public void Bounce(ColliderObject other)
         {
 
-
-            //Console.WriteLine(string.Format("{0} {1} is bouncing off of {2} {2}", GetType(), Id, other.GetType(), other.Id));
-
-            // TODO: Make this work
-
-            /*
-            Vector3 v = Velocity;
-            Vector3 n = Transform.Position - other.Transform.Position;
-            n.Normalize();
-            n.Y = 0.0f;
-
-            Vector3 u = (Vector3.Dot(v, n) / Vector3.Dot(n, n)) * n;
-
-            Vector3 w = v - u;
-
-            Vector3 afterVelocity = (w - u) * Bounciness;
-            */
+            Velocity = (-Velocity * Bounciness);
 
         }
 
@@ -173,13 +143,13 @@ namespace Server
         /// <summary>
         /// Function called when this object is hit by a player's tool.
         /// </summary>
-        /// <param name="playerPosition">Position of the player that hit this object.</param>
+        /// <param name="toolTransform">Position of the player that hit this object.</param>
         /// <param name="toolType">Type of tool equipped.</param>
         /// <param name="toolMode">Mode (primary or secondary) of tool equipped.</param>
-        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             // Call the base's HitByTool function (burns the object)
-            base.HitByTool(playerPosition, toolType, toolMode);
+            base.HitByTool(toolTransform, toolType, toolMode);
 
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
@@ -198,7 +168,7 @@ namespace Server
                     float toolForce = toolInfo.Force;
 
                     // Get the vector from the player to the object.
-                    Vector3 playerToObj = Transform.Position - playerPosition;
+                    Vector3 playerToObj = Transform.Position - toolTransform.Position;
                     playerToObj.Y = 0.0f;
                     float distance = playerToObj.Length();
 
@@ -219,10 +189,10 @@ namespace Server
                 {
 
                     // Get the force of this tool.
-                    float toolForce = toolInfo.Force;
+                    float toolForce = toolInfo.Force * 0.5f;
 
                     // Get the vector from the player to the object.
-                    Vector3 objToPlayer = playerPosition - Transform.Position;
+                    Vector3 objToPlayer = toolTransform.Position - Transform.Position;
                     objToPlayer.Y = 0.0f;
                     float distance = objToPlayer.Length();
 

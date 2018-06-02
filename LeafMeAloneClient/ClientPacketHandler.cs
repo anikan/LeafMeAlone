@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Client
 {
@@ -64,14 +65,23 @@ namespace Client
             }
 
             // What to do on game finish
-            void GameResultAction(ThePacketToEndAllPackets p)
+            void GameResultAction(MatchResultPacket p)
             {
+                client.ResetGameTimer();
                 if (client.GetPlayerTeam() == p.winningTeam)
                 {
-                    throw new Exception("YOU WIN!");
+                    GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Win);
                 }
+                else
+                {
+                    GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Lose);
+                }
+            }
 
-                throw new Exception("YOU LOSE!");
+            void GameStartAction(MatchStartPacket p)
+            {
+                client.StartMatchTimer(p.gameTime);
+                GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
@@ -81,7 +91,8 @@ namespace Client
                     {PacketType.ObjectPacket, (p) => UpdateObjectAction((ObjectPacket) p) },
                     {PacketType.PlayerPacket, (p) => UpdatePlayerAction((PlayerPacket) p) },
                     {PacketType.DestroyObjectPacket, (p) => DestroyAction((DestroyObjectPacket) p)},
-                    {PacketType.GameResultPacket, (p) => GameResultAction((ThePacketToEndAllPackets) p)},
+                    {PacketType.GameResultPacket, (p) => GameResultAction((MatchResultPacket) p)},
+                    {PacketType.MatchStartPacket, (p) => GameStartAction((MatchStartPacket)p)},
                 };
         }
 

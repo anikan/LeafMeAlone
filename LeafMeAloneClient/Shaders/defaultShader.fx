@@ -112,7 +112,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 
 	float4 retColor = float4(0,0,0,1);
 
-	float3 eVec = (float3) normalize(CamPosObj - PositionObj);
+	float3 eVec = normalize( (float3) (CamPosObj - PositionObj) );
 	NormalObj = normalize(NormalObj);
 
 	for (int idx = 0; idx < NUM_LIGHTS; idx++)
@@ -212,7 +212,21 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		retColor = retColor * tex_diffuse.Sample(MeshTextureSampler, iTex);
 	}
 
-	return float4( retColor.xyz * Tint * Hue, Opacity );
+	retColor = float4( retColor.xyz * Tint * Hue, 1.0f );
+
+	// Toon shading
+	float categories = 10.0f;
+	float edge = max(0.0f, dot( normalize( NormalObj.xyz) , eVec ));
+	if (edge < 0.3f  )
+	{
+		retColor = float4(0, 0, 0, 1);
+	}
+	else
+	{
+		retColor = float4((float(floor(retColor.x * categories + 0.5))) / categories, (float(floor(retColor.y * categories + 0.5))) / categories, (float(floor(retColor.z * categories + 0.5))) / categories, retColor.w);
+	}
+
+	return retColor;
 }
 
 technique10 ColorTech

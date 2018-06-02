@@ -18,6 +18,9 @@ namespace Server
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 3.0f;
         public const float PLAYER_SPEED = 25.0f;
+        public const float THROWER_SPEED = 10.0f;
+
+        private float currentSpeed = PLAYER_SPEED;
 
         public Team Team { get; set; }
         public bool Dead { get; set; }
@@ -30,11 +33,12 @@ namespace Server
 
         private Stopwatch deathClock = new Stopwatch();
 
-        public PlayerServer(Team team) : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
+        public PlayerServer(Team team) : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, 0.0f, true)
         {
             Team = team;
             ToolEquipped = ToolType.BLOWER;
             Burnable = true;
+            Radius = PLAYER_RADIUS;
         }
 
         /// <summary>
@@ -45,7 +49,7 @@ namespace Server
         {
             base.Update(deltaTime);
             // Move the player in accordance with requests
-            Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
+            Vector3 newPlayerPos = Transform.Position + moveRequest * currentSpeed * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
             TryMoveObject(newPlayerPos);
 
@@ -89,6 +93,21 @@ namespace Server
                         gameObject.HitByTool(GetToolTransform(), ToolEquipped, ActiveToolMode);
 
                     }
+
+                    if (ToolEquipped == ToolType.THROWER)
+                    {
+
+                        currentSpeed = THROWER_SPEED;
+
+                    }
+                    else
+                    {
+                        currentSpeed = PLAYER_SPEED;
+                    }
+                }
+                else
+                {
+                    currentSpeed = PLAYER_SPEED;
                 }
             }
         }

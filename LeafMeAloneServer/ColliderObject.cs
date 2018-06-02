@@ -15,8 +15,17 @@ namespace Server
     public class ColliderObject : GameObjectServer
     {
 
+        protected enum ColliderType
+        {
+            NONE,
+            CIRCLE,
+            BOX
+        }
+
+        protected ColliderType colliderType;
+
         // Radius of this object for basic n00b collisions.
-        public float Radius = 1.0f;
+        protected float Radius = 1.0f;
 
         /// <summary>
         /// Creates a new collider object.
@@ -24,9 +33,10 @@ namespace Server
         /// <param name="objectType">Type of this object.</param>
         /// <param name="health">Obhect health.</param>
         /// <param name="radius">Radius of the object for collisions.</param>
-        public ColliderObject(ObjectType objectType, float health, float radius) : base(objectType, health)
+        public ColliderObject(ObjectType objectType, float health) : base(objectType, health)
         {
-            Radius = radius;
+
+
         }
 
         /// <summary>
@@ -59,7 +69,7 @@ namespace Server
         }
 
         /// <summary>
-        /// Checks if another collider object is colliding.
+        /// Checks if this object is colliding with the collider of another object.
         /// </summary>
         /// <param name="other">Other collider object.</param>
         /// <returns>True if colliding, false otherwise.</returns>
@@ -71,15 +81,30 @@ namespace Server
             colliderPos.Y = 0.0f;
             otherPos.Y = 0.0f;
 
-            // Get distance between objects.
-            float distance = Vector3.Distance(colliderPos, otherPos);
-
-            // Check if the objects are overlapping.
-            if (other.Radius > 0.0f && distance <= Radius + other.Radius)
+            if (colliderType == ColliderType.CIRCLE)
             {
-                // If overlapping, they're colliding. Return true.
-                return true;
+
+                // Get distance between objects.
+                float distance = Vector3.Distance(colliderPos, otherPos);
+
+                // Check if the objects are overlapping.
+                if (other.Radius > 0.0f && distance <= Radius + other.Radius)
+                {
+                    // If overlapping, they're colliding. Return true.
+                    return true;
+                }
             }
+            else if (colliderType == ColliderType.BOX)
+            {
+
+                float down = other.Transform.Position.Z - Radius;
+                float up = other.Transform.Position.Z + Radius;
+                float left = other.Transform.Position.X - Radius;
+                float right = other.Transform.Position.X + Radius;
+
+
+            }
+
 
             // If not overlapping, return false.
             return false;

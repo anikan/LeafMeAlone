@@ -20,8 +20,8 @@ namespace Server
 
         // Rate (in seconds) that health decrements if an object is on fire.
         public const float HEALTH_DECREMENT_RATE = 1.0f;
-
         public const float BURNING_RAMP_RATE = 1.0f;
+        public const float SECONDS_TO_EXTINGUISH = 0.5f;
 
         //True if this object has been changed since the last update and needs to be sent to all clients.
         //Set when burning or when it moves.
@@ -90,6 +90,13 @@ namespace Server
                     burnFrames = 1;
                 }
 
+                // If we've been blowing on the object for the desired period of time, extinguish it.
+                if (blowFrames * deltaTime > SECONDS_TO_EXTINGUISH)
+                {
+                    // Stop the object from burning.
+                    Extinguish();
+                }
+
                 // Get fire damage from the flamethrower.
                 float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
 
@@ -123,10 +130,10 @@ namespace Server
         /// </summary>
         public void Extinguish()
         {
-            //The object stopped burning, it's been modified.
-            Modified = true;
 
+            // Extinguish the object by setting burn and blow frames to 0.
             burnFrames = 0;
+            blowFrames = 0;
         }
 
         /// <summary>
@@ -155,12 +162,20 @@ namespace Server
             {
             
                 // If this is the primary function of the blower.
-                if (toolMode == ToolMode.PRIMARY)
+                if (toolMode == ToolMode.PRIMARY && Burning)
                 {
 
-                    Extinguish();
+                    blowFrames++;
 
                 }
+                else
+                {
+                    blowFrames = 0;
+                }
+            }
+            else
+            {
+                blowFrames = 0;
             }
         }
 

@@ -80,14 +80,30 @@ namespace Server
                 //Get the current object.
                 GameObjectServer gameObject = allObjects[j];
 
-                // Check if it's within tool range, and that it's not the current player.
-                if (gameObject != this && gameObject.IsInPlayerToolRange(this))
+                if (ActiveToolMode == ToolMode.PRIMARY || ActiveToolMode == ToolMode.SECONDARY)
                 {
-                    // Hit the object.
-                    gameObject.HitByTool(Transform.Position, ToolEquipped, ActiveToolMode);
+                    // Check if it's within tool range, and that it's not the current player.
+                    if (gameObject != this && gameObject.IsInPlayerToolRange(this))
+                    {
+                        // Hit the object.
+                        gameObject.HitByTool(GetToolTransform(), ToolEquipped, ActiveToolMode);
 
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the transform of the active tool.
+        /// </summary>
+        /// <returns>Transform of the tool.</returns>
+        public Transform GetToolTransform()
+        {
+
+            // TODO: Make this the actual tool transform.
+            // Currently just the player transform.
+            return Transform;
+
         }
 
         /// <summary>
@@ -118,14 +134,15 @@ namespace Server
         /// <summary>
         /// Function that determines what happens when the player is hit by another player's tool.
         /// </summary>
-        /// <param name="playerPosition">Position of the other player.</param>
+        /// <param name="toolTransform">Position of the other player.</param>
         /// <param name="toolType">Type of tool hit by.</param>
         /// <param name="toolMode">Tool mode hit by.</param>
-        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
+
             if (!Dead)
             {
-                base.HitByTool(playerPosition, toolType, toolMode);
+                base.HitByTool(toolTransform, toolType, toolMode);
             }
         }
 

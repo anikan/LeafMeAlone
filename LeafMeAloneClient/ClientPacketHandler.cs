@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Client.UI;
 
 namespace Client
 {
@@ -62,6 +63,7 @@ namespace Client
             {
                 PlayerClient player = (PlayerClient)CreateObjectAction(p.createPacket);
                 player.team = p.team;
+                player.healthUI = new UIHealth(player, p.team);
             }
 
             // What to do on game finish

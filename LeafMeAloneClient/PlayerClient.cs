@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Client.UI;
 using SlimDX;
 using Shared;
 using Shared.Packet;
@@ -39,6 +40,7 @@ namespace Client
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
         private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
         private int _currAnim, _overridedAnim;
+        public UIHealth healthUI;
 
         public PlayerClient(CreateObjectPacket createPacket) : 
             base(createPacket, Constants.PlayerModel)
@@ -47,6 +49,8 @@ namespace Client
             LeafBlower = new LeafBlowerParticleSystem();
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
+
+            
 
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
@@ -299,9 +303,11 @@ namespace Client
             if (Dead)
             {
                 model.Enabled = false;
+                healthUI.HealthBar.Enabled = false;
             } else
             {
                 model.Enabled = true;
+                healthUI.HealthBar.Enabled = true;
             }
             
             ToolEquipped = packet.ToolEquipped;
@@ -467,7 +473,6 @@ namespace Client
         public override void Update(float deltaTime)
         {
             base.Update(deltaTime);
-
             Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
                          Matrix.RotationY(Transform.Rotation.Y) *
                          Matrix.RotationZ(Transform.Rotation.Z);
@@ -495,6 +500,14 @@ namespace Client
         public override void UpdateFromPacket(BasePacket packet)
         {
             UpdateFromPacket(packet as PlayerPacket);
+
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            
+            healthUI.Update();
         }
 
         public override void Destroy()

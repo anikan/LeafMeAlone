@@ -11,6 +11,8 @@ namespace Shared
 
         //arrow for following player.
         public const string Arrow = @"../../Textures/Arrow.png";
+        public const string RedHealth = @"../../Textures/RedHealth.png";
+        public const string BlueHealth = @"../../Textures/BlueHealth.png";
 
         /// <summary>
         /// Player animation paths

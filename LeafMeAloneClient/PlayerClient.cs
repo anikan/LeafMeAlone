@@ -303,11 +303,13 @@ namespace Client
             if (Dead)
             {
                 model.Enabled = false;
-                healthUI.HealthBar.Enabled = false;
+                if(healthUI != null)
+                    healthUI.HealthBar.Enabled = false;
             } else
             {
                 model.Enabled = true;
-                healthUI.HealthBar.Enabled = true;
+                if (healthUI != null)
+                    healthUI.HealthBar.Enabled = true;
             }
             
             ToolEquipped = packet.ToolEquipped;
@@ -506,8 +508,9 @@ namespace Client
         public override void Draw()
         {
             base.Draw();
-            
-            healthUI.Update();
+            if(healthUI == null)
+                healthUI = new UIHealth(this, team);
+            healthUI?.Update();
         }
 
         public override void Destroy()

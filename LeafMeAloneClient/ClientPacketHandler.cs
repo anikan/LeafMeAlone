@@ -63,7 +63,6 @@ namespace Client
             {
                 PlayerClient player = (PlayerClient)CreateObjectAction(p.createPacket);
                 player.team = p.team;
-                player.healthUI = new UIHealth(player, p.team);
             }
 
             // What to do on game finish

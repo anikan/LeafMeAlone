@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Shared;
 using Shared.Packet;
@@ -38,11 +39,13 @@ namespace Server
 
         private Random rnd;
 
-        private Match activeMatch = Match.DefaultMatch;
+        // Whether game is running on net or not
+        private bool development;
 
         //Used to assign unique object ids. Increments with each object. Potentially subject to overflow issues.
         public int nextObjectId = 0;
-        
+        private MatchHandler matchHandler;
+
         public GameServer(bool networked)
         {
             if (instance != null)
@@ -51,6 +54,7 @@ namespace Server
             }
 
             instance = this;
+            development = !networked;
 
             timer = new Stopwatch();
             testTimer = new Stopwatch();
@@ -65,6 +69,7 @@ namespace Server
             spawnPoints.Add(new Vector3(10, 0, 10));
 
             networkServer = new NetworkServer(networked);
+            matchHandler = new MatchHandler(Match.DefaultMatch, networkServer, this);
 
             // Create the initial game map.
             CreateMap();
@@ -72,6 +77,7 @@ namespace Server
             // Create the leaves for the game.
             CreateRandomLeaves(Constants.NUM_LEAVES);
             //CreateLeaves(100, -10, 10, -10, 10);
+
         }
 
         public static int Main(String[] args)
@@ -107,18 +113,12 @@ namespace Server
                 networkServer.Receive();
 
                 //Update the server players based on received packets.
-                for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
+                if (!matchHandler.MatchInitializing())
                 {
-                    RequestPacket packet = networkServer.PlayerPackets[i];
-                    int playerId = packet.GetId();
-                    gameObjectDict.TryGetValue(playerId, out GameObjectServer playerGameObject);
-
-                    if (packet != null && playerGameObject != null)
-                    {
-                        PlayerServer player = (PlayerServer)playerGameObject;
-                        player.UpdateFromPacket(networkServer.PlayerPackets[i]);
-                    }
+                    HandleIncomingPackets();
                 }
+
+                matchHandler.DoMatchStatusUpdates();
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
@@ -141,6 +141,32 @@ namespace Server
             }
         }
 
+        private void HandleIncomingPackets()
+        {
+            for (int i = 0; i < networkServer.PlayerPackets.Count(); i++)
+            {
+                RequestPacket packet = networkServer.PlayerPackets[i];
+                int playerId = packet.GetId();
+                gameObjectDict.TryGetValue(playerId, out GameObjectServer playerGameObject);
+
+                if (packet != null && playerGameObject != null)
+                {
+                    PlayerServer player = (PlayerServer)playerGameObject;
+                    player.UpdateFromPacket(networkServer.PlayerPackets[i]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles what to do once a new client socket is connected
+        /// </summary>
+        internal void ConnectCallback()
+        {
+            if ((development && playerServerList.Count == 1) || (!development && playerServerList.Count == 4)) {
+                matchHandler.StartMatch();
+            }
+        }
+
         /// <summary>
         /// Call Update() on all objects in the object dict.
         /// </summary>
@@ -159,15 +185,16 @@ namespace Server
             // Add the effects of the player tools.
             AddPlayerToolEffects();
 
-            activeMatch.CountObjectsOnSides(GetLeafListAsObjects());
-          //  Console.WriteLine(defaultMatch);
+        }
 
-            if (playerServerList.Count > 0)
-            {
-           //     Console.WriteLine(playerServerList[0].Transform.Position);
 
-            }
-
+        /// <summary>
+        /// Gets the next spawn point of the player spawn index
+        /// </summary>
+        /// <returns>The vector 3 of the next spawn point</returns>
+        public Vector3 NextSpawnPoint()
+        {
+            return spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
         }
 
         public PlayerServer CreateNewPlayer()
@@ -176,17 +203,19 @@ namespace Server
             int id = gameObjectDict.Count();
 
             //Create two players, one to send as an active player to client. Other to keep track of on server.
-            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
+            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1);
             newPlayer.Register();
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2));
-            newActivePlayer.ObjectType = ObjectType.ACTIVE_PLAYER;
-            newActivePlayer.Id = newPlayer.Id;
+            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1)
+            {
+                ObjectType = ObjectType.ACTIVE_PLAYER,
+                Id = newPlayer.Id
+            };
 
             playerServerList.Add(newPlayer);
 
-            Vector3 nextSpawnPoint = spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
+            Vector3 nextSpawnPoint = NextSpawnPoint();
 
             //Note currently assuming players get ids 0-3
             newActivePlayer.Transform.Position = nextSpawnPoint;
@@ -221,15 +250,15 @@ namespace Server
 
             // Spawn trees around the border of the map!
             // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
-            for (float y = startY; y < endY; y+= TreeServer.TREE_RADIUS)
+            for (float y = startY; y < endY; y += TreeServer.TREE_RADIUS)
             {
 
                 // Iterate through the width of the map, centered on origin and increase by radius of a tree.
-                for (float x = startX; x < endX; x+= TreeServer.TREE_RADIUS)
+                for (float x = startX; x < endX; x += TreeServer.TREE_RADIUS)
                 {
 
                     float random = (float)rnd.NextDouble();
-                    
+
                     if (random < Constants.TREE_FREQUENCY)
                     {
 
@@ -293,7 +322,7 @@ namespace Server
             {
 
                 CreateRandomLeaf();
-               
+
             }
         }
 
@@ -304,10 +333,10 @@ namespace Server
             double minY = Constants.FLOOR_HEIGHT;
             double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
-            float minX = activeMatch.NoMansLand.leftX;
-            float maxX = activeMatch.NoMansLand.rightX;
-            float minZ = activeMatch.NoMansLand.downZ + (2 * TreeServer.TREE_RADIUS);
-            float maxZ = activeMatch.NoMansLand.upZ - (2 * TreeServer.TREE_RADIUS);
+            float minX = matchHandler.GetMatch().NoMansLand.leftX;
+            float maxX = matchHandler.GetMatch().NoMansLand.rightX;
+            float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * TreeServer.TREE_RADIUS);
+            float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * TreeServer.TREE_RADIUS);
 
             // Get random doubles for position.
             double randX = rnd.NextDouble();
@@ -328,13 +357,13 @@ namespace Server
 
             // Set the leaf's initial position.
             newLeaf.Transform.Position = pos;
-          
+
             // Set the leaf's initial rotation.
             newLeaf.Transform.Rotation.Y = rotation;
 
             // Add this leaf to the leaf list and object dictionary.
             newLeaf.Register();
-             
+
             // Send this object to the other objects.
             networkServer.SendNewObjectToAll(newLeaf);
         }
@@ -353,7 +382,7 @@ namespace Server
                 PlayerServer player = playerServerList[i];
 
                 // Affect all objects within range of the player.
-                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList<GameObjectServer>());
+                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList());
 
             }
         }
@@ -389,15 +418,19 @@ namespace Server
         public List<GameObjectServer> GetGameObjectList()
         {
             // Turn the game objects to a value list.
-            return gameObjectDict.Values.ToList<GameObjectServer>();
+            return gameObjectDict.Values.ToList();
         }
 
+        /// <summary>
+        /// Gets a new random spawn point for the player.
+        /// </summary>
+        /// <returns>A vector 3 of the spawn point</returns>
         public Vector3 GetRandomSpawnPoint()
         {
             int index = new Random().Next(spawnPoints.Count);
             return spawnPoints.ElementAt(index);
         }
-      
+
         public List<GameObject> GetLeafListAsObjects()
         {
 
@@ -406,12 +439,10 @@ namespace Server
 
             for (int i = 0; i < gameObjects.Count; i++)
             {
-                
                 if (gameObjects[i] is LeafServer)
                 {
                     leaves.Add(gameObjects[i]);
                 }
-
             }
 
             return leaves;

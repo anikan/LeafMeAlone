@@ -444,9 +444,9 @@ namespace Client {
         /// </summary>
         /// <param name="AnimationIndex"> The index of the animation sequences to be played </param>
         /// <param name="TimeInSeconds"> The time since this animation is first started </param>
-        protected void SetBoneTransform(int AnimationIndex, double TimeInSeconds)
+        protected void SetBoneTransform(int AnimationIndex, double TimeInSeconds, bool reverse = false)
         {
-            float offset = 1;
+            float offset = 0;
 
             // number of ticks per second
             double TicksPerSecond = scene.Animations[AnimationIndex].TicksPerSecond;
@@ -457,6 +457,11 @@ namespace Client {
 
             // animation time in ticks
             double AnimationTime = TimeInTicks % (scene.Animations[AnimationIndex].DurationInTicks - offset);
+
+            if (reverse)
+            {
+                AnimationTime = scene.Animations[AnimationIndex].DurationInTicks - AnimationTime - offset;
+            }
 
             // read node hierarchy
             ResetLocalTransforms();
@@ -634,6 +639,7 @@ namespace Client {
         public int CurrentAnimationIndex = -1;
         public string CurrentAnimationName = null;
         public bool RepeatAnimation = false;
+        public bool ReverseAnimation = false;
 
         // need to be called in order to use the skeletal animation
         public void UpdateAnimation()
@@ -650,7 +656,7 @@ namespace Client {
                 // start animation if it is not done or in repeat mode
                 if (scene.Animations[CurrentAnimationIndex].DurationInTicks > TimeInTicks || RepeatAnimation)
                 {
-                    SetBoneTransform(CurrentAnimationIndex, CurrentAnimationTime);
+                    SetBoneTransform(CurrentAnimationIndex, CurrentAnimationTime, ReverseAnimation);
                     UpdateBoneMatricesList();
                 }
                 // stop the animation if it is done
@@ -715,7 +721,7 @@ namespace Client {
                 if (mat.GetMaterialTexture(TextureType.Diffuse, 0, out tex))
                 {
                     ShaderResourceView temp;
-                    myMat.setDiffuseTexture( temp = CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), tex.FilePath)) );
+                    myMat.setDiffuseTexture( temp = CreateTexture(Path.Combine(Path.GetDirectoryName(sourceFileName), Path.GetFileName(tex.FilePath))) );
                     myMat.setTexCount( temp == null ? 0 : 1);
                 }
                 else
@@ -793,6 +799,23 @@ namespace Client {
             }
         }
 
+        public Vector4 altDiffuseColor;
+        public bool useAltColor = false;
+
+        public void UseAltColor(Color3 color)
+        {
+            altDiffuseColor.X = color.Red;
+            altDiffuseColor.Y = color.Green;
+            altDiffuseColor.Z = color.Blue;
+            altDiffuseColor.W = 0;
+            useAltColor = true;
+        }
+
+        public void DisableAltColor()
+        {
+            useAltColor = false;
+        }
+
         /// <summary>
         /// Draw a model by using the modelmatrix it is assigned to
         /// </summary>
@@ -857,7 +880,15 @@ namespace Client {
                 }
 
                 // pass material properties into the shader
-                shader.ShaderEffect.GetVariableByName("Diffuse").AsVector().Set(mesh.Materials.diffuse);
+                if (!useAltColor || mesh.Materials.texCount > 0)
+                {
+                    shader.ShaderEffect.GetVariableByName("Diffuse").AsVector().Set(mesh.Materials.diffuse);
+                }
+                else
+                {
+                    shader.ShaderEffect.GetVariableByName("Diffuse").AsVector().Set(mesh.Materials.diffuse.ScalarMultiply(altDiffuseColor));
+                }
+
                 shader.ShaderEffect.GetVariableByName("Specular").AsVector().Set(mesh.Materials.specular);
                 shader.ShaderEffect.GetVariableByName("Ambient").AsVector().Set(mesh.Materials.ambient);
                 shader.ShaderEffect.GetVariableByName("Emissive").AsVector().Set(mesh.Materials.emissive);

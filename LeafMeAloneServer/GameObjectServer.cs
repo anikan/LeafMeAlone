@@ -16,12 +16,16 @@ namespace Server
     {
        
         // Is the object being actively burned this frame?
-        private bool BurningThisFrame = false;
+        private bool FlamethrowerActivelyBurning = false;
 
         // Rate (in seconds) that health decrements if an object is on fire.
         public const float HEALTH_DECREMENT_RATE = 1.0f;
 
         public const float BURNING_RAMP_RATE = 1.0f;
+
+        //True if this object has been changed since the last update and needs to be sent to all clients.
+        //Set when burning or when it moves.
+        public bool Modified;
 
         /// <summary>
         /// Constructor for a GameObject that's on the server, with default instantiation position.
@@ -63,19 +67,20 @@ namespace Server
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
-
             // If this object is burning.
-            if (Burning || BurningThisFrame)
+            if (Burning || FlamethrowerActivelyBurning)
             {
+                //The object took damage, it's been modified.
+                Modified = true;
 
                 // If it is being actively burned this frame.
-                if (BurningThisFrame)
+                if (FlamethrowerActivelyBurning)
                 {
                     // Increase the frames this object is burning.
                     burnFrames++;
 
                     // No longer burning next frame
-                    BurningThisFrame = false;
+                    FlamethrowerActivelyBurning = false;
                 }
 
                 // If not actively being burned this frame, set burn frames to just 1.
@@ -109,7 +114,7 @@ namespace Server
         {
             if (Burnable)
             {
-                BurningThisFrame = true;
+                FlamethrowerActivelyBurning = true;
             }
         }
 
@@ -118,18 +123,20 @@ namespace Server
         /// </summary>
         public void Extinguish()
         {
+            //The object stopped burning, it's been modified.
+            Modified = true;
+
             burnFrames = 0;
         }
 
         /// <summary>
         /// Function called when this object is hit by the player's active tool (in range)
         /// </summary>
-        /// <param name="playerPosition">Position of the player. </param>
+        /// <param name="toolTransform">Position of the player. </param>
         /// <param name="toolType">Type of the tool hit by.</param>
         /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
-        public virtual void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public virtual void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
 

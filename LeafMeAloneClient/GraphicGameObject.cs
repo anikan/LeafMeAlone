@@ -23,7 +23,7 @@ namespace Client
         internal Model model;
 
         // Debug cube to find the pivots of objects.
-        private NonNetworkedGameObjectClient PivotCube;
+        public NonNetworkedGameObjectClient PivotCube;
 
 
         private float minCap = .3f;
@@ -32,14 +32,28 @@ namespace Client
             get => model.Tint;
             set
             {
-                if(model.Tint.X > minCap)
+                if (model.Tint.X > minCap)
                     model.Tint.X = value.X;
                 if (model.Tint.Y > minCap)
                     model.Tint.Y = value.Y;
                 if (model.Tint.Z > minCap)
                     model.Tint.Z = value.Z;
             }
-            
+
+        }
+        public Vector3 CurrentHue
+        {
+            get => model.Hue;
+            set
+            {
+                if (model.Hue.X > minCap)
+                    model.Hue.X = value.X;
+                if (model.Hue.Y > minCap)
+                    model.Hue.Y = value.Y;
+                if (model.Hue.Z > minCap)
+                    model.Hue.Z = value.Z;
+            }
+
         }
 
 

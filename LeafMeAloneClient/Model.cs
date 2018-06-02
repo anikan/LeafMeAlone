@@ -27,8 +27,9 @@ namespace Client
 
         //is the object culled.
         public bool IsCulled = false;
-        
+
         public Vector3 Tint = new Vector3(1, 1, 1);
+        public Vector3 Hue = new Vector3(1, 1, 1);
 
         // public float burningGeoColor;
         // public bool burningGeoColorEnabled;
@@ -72,6 +73,7 @@ namespace Client
             setShader(Constants.DefaultShader);
 
             m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+            m_ActiveShader.ShaderEffect.GetVariableByName("Hue").AsVector().Set(Hue);
         }
 
         /// <summary>
@@ -139,13 +141,33 @@ namespace Client
         private string CurrentAnimationName = null;
         private bool RepeatAnimation = false;
         private bool PauseAnimation = false;
+        private bool ReverseAnimation = false;
+        private float TimeScale = 1.0f;
+
+        private bool _useAltColor = false;
+        private Color3 _altColor;
+
+        public void UseAltColor(Color3 color)
+        {
+            _altColor = color;
+            _useAltColor = true;
+        }
+
+        public void DisableAltColor()
+        {
+            _useAltColor = false;
+        }
+
+        public void SetAnimationTimeScale(float t)
+        {
+            TimeScale = t;
+        }
 
         /// <summary>
         /// pass the model matrix to the shader and draw the active geometry
         /// </summary>
         public void Draw()
         {
-
             //Check if we need to cull.
             int meshesOffScreen = 0;
             foreach (BoundingBox boundingBox in modelBoundingBoxes)
@@ -162,22 +184,32 @@ namespace Client
                 return;
             }
             IsCulled = false;
-
-            if (Enabled) {
+            if (Enabled)
+            {
                 m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
+                m_ActiveShader.ShaderEffect.GetVariableByName("Hue").AsVector().Set(Hue);
                 if (CurrentAnimationIndex != -1)
                 {
-
                     m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
                     m_ActiveGeo.CurrentAnimationName = CurrentAnimationName;
                     m_ActiveGeo.CurrentAnimationIndex = CurrentAnimationIndex;
                     m_ActiveGeo.RepeatAnimation = RepeatAnimation;
+                    m_ActiveGeo.ReverseAnimation = ReverseAnimation;
                     m_ActiveGeo.UpdateAnimation();
                 }
 
                 m_ActiveShader.UseShader();
+
+                if (_useAltColor)
+                {
+                    m_ActiveGeo.UseAltColor(_altColor);
+                }
+                else
+                {
+                    m_ActiveGeo.DisableAltColor();
+                }
+
                 m_ActiveGeo.Draw(m_ModelMatrix, m_ActiveShader);
-                
             }
         }
 
@@ -208,7 +240,7 @@ namespace Client
 
             if (!PauseAnimation && CurrentAnimationIndex != -1)
             {
-                CurrentAnimationTime += delta_time;
+                CurrentAnimationTime += delta_time * TimeScale;
             }
         }
 
@@ -218,7 +250,7 @@ namespace Client
         /// <param name="animationName"> The name of the animation, specified by the artist </param>
         /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
         /// <returns> true if succeeded in starting the animation, false if else </returns>
-        public bool StartAnimationSequenceByName(string animationName, bool repeatAnimation)
+        public bool StartAnimationSequenceByName(string animationName, bool repeatAnimation, bool reverse = false)
         {
             if (!m_ActiveGeo.AnimationIndices.ContainsKey(animationName)) return false;
 
@@ -236,7 +268,7 @@ namespace Client
         /// <param name="index"> The index of the animation, specified by the artist </param>
         /// <param name="repeatAnimation"> State whether or not the animation is to be repeated infinitely </param>
         /// <returns> true if succeeded in starting the animation, false if else </returns>
-        public bool StartAnimationSequenceByIndex(int index, bool repeatAnimation)
+        public bool StartAnimationSequenceByIndex(int index, bool repeatAnimation, bool reverse = false)
         {
             if (index < 0 || index >= m_ActiveGeo.GetAnimationCount()) return false;
 
@@ -244,6 +276,7 @@ namespace Client
             CurrentAnimationIndex = index;
             CurrentAnimationName = m_ActiveGeo.GetAnimationNameByIndex(index);
             RepeatAnimation = repeatAnimation;
+            ReverseAnimation = reverse;
             PauseAnimation = false;
             return true;
         }

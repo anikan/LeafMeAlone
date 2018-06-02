@@ -27,6 +27,8 @@ namespace Client
             Transform.Position.X = createPacket.ObjData.PositionX;
             Transform.Position.Y = createPacket.ObjData.PositionY;
             Transform.Position.Z = createPacket.ObjData.PositionZ;
+
+            Transform.Rotation.Y = createPacket.ObjData.Rotation;
         }
 
         /// <summary>
@@ -43,6 +45,7 @@ namespace Client
 
             Transform.Position.X = objPacket.PositionX;
             Transform.Position.Z = objPacket.PositionZ;
+
             Transform.Rotation.Y = objPacket.Rotation;
 
             // Set the initial burning status.
@@ -55,8 +58,9 @@ namespace Client
             {
                 //change of health
                 var deltaHealth = oldHealth - Health;
-                CurrentTint -= new Vector3((deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH));
-
+                Console.WriteLine(deltaHealth);
+                CurrentTint = new Vector3(1,1,1) * ((Health / Constants.LEAF_HEALTH) * .7f + .3f);
+                //Debug.Log(CurrentTint.ToString());
             }
         }
     }

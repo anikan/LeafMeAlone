@@ -71,6 +71,8 @@ namespace Client
 
         private Match activeMatch = Match.DefaultMatch;
 
+        private int _audioBGM;
+
         public static GameClient instance;
 
 
@@ -90,10 +92,12 @@ namespace Client
             Camera activeCamera =
                 new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
 
-            // Initialize graphics classes
+            // Initialize static classes
             GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
+            AudioManager.SetListenerVolume(8.0f);
+            AnimationManager.Init();
 
             GameClient Client = new GameClient(new NetworkClient(ipAddress));
             
@@ -103,6 +107,11 @@ namespace Client
 
             GraphicsRenderer.Dispose();
 
+        }
+
+        internal void ResetGameTimer()
+        {
+            GlobalUIManager.gameTimer.End();
         }
 
         internal Team GetPlayerTeam()
@@ -147,6 +156,12 @@ namespace Client
             GlobalUIManager.fps.StopAndCalculateFps();
             UICulled.Culled = 0;
             AudioManager.Update();
+
+        }
+
+        internal void StartMatchTimer(float gameTime)
+        {
+            GlobalUIManager.gameTimer.Start(gameTime);
         }
 
         // Start the networked client (connect to server).
@@ -172,6 +187,10 @@ namespace Client
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
 
             leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
+
+            _audioBGM = AudioManager.GetNewSource();
+            AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
+            AudioManager.SetSourceVolume(_audioBGM, 0.01f);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -219,10 +238,13 @@ namespace Client
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);
+            AudioManager.Update();
+            AnimationManager.Update(delta);
 
             // Restart the frame timer.
             FrameTimer.Restart();
 
+            //AudioManager.UpdateSourceLocation(_audioBGM, Camera.CameraPosition);
         }
 
         /// <summary>
@@ -423,14 +445,14 @@ namespace Client
                     if (section.IsInBounds(leaf.Transform.Position))
                     {
                         // Tint the leaf to section.
-                        leaf.CurrentTint = section.sectionColor;
+                        leaf.CurrentHue = section.sectionColor;
                     }
                 }
                 // Check if this leaf is in no mans land.
                 if (activeMatch.NoMansLand.IsInBounds(leaf.Transform.Position))
                 {
                     // Tint the leaf.
-                    leaf.CurrentTint = activeMatch.NoMansLand.sectionColor;
+                    leaf.CurrentHue = activeMatch.NoMansLand.sectionColor;
                 }
             }
         }

@@ -40,12 +40,12 @@ namespace Server
         /// <summary>
         /// What happens when this object is hit by a tool.
         /// </summary>
-        /// <param name="playerPosition"></param>
+        /// <param name="toolTransform"></param>
         /// <param name="toolType"></param>
         /// <param name="toolMode"></param>
-        public override void HitByTool(Vector3 playerPosition, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(playerPosition, toolType, toolMode);
+            base.HitByTool(toolTransform, toolType, toolMode);
         }
 
         /// <summary>
@@ -139,8 +139,28 @@ namespace Server
                 }
             }
 
-            // Moved!
+            // Moved! 
+            //The object moved, it's been modified.
+            Modified = true;
+
             return true;
+        }
+
+
+        /// <summary>
+        /// Checks if a vector's values are less than a specified minimum. If so, sets that value to zero.
+        /// </summary>
+        /// <param name="vector">Vector to check.</param>
+        /// <param name="minBeforeZero">Minimum value before it's set to zero.</param>
+        /// <returns>Vector with any values rounded to zero, if applicable.</returns>
+        public Vector3 RoundVectorToZero(Vector3 vector, float minBeforeZero)
+        {
+            // Checks each value and sets to zero if less than minimum.
+            if (Math.Abs(vector.X) < minBeforeZero) vector.X = 0.0f;
+            if (Math.Abs(vector.Y) < minBeforeZero) vector.Y = 0.0f;
+            if (Math.Abs(vector.Z) < minBeforeZero) vector.Z = 0.0f;
+
+            return vector;
         }
     }
 }

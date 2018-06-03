@@ -404,6 +404,12 @@ namespace Server
             return gameObjectDict.Values.ToList();
         }
 
+        internal void DisconnectPlayer(PlayerServer player)
+        {
+            player.Team.numPlayers--;
+            Destroy(player);
+        }
+
         public List<GameObject> GetLeafListAsObjects()
         {
 

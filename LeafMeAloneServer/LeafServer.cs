@@ -79,8 +79,15 @@ namespace Server
         {
 
             Transform.Rotation.Y -= Utility.RandomInRange(0.0f, Constants.LEAF_ROTATE_SPEED);
-
-
         }
+
+        /// <summary>
+        /// Removes the game object from the gameserver
+        /// </summary>
+        public override void Die()
+        {
+            GameServer.instance.Destroy(this);
+        }
+
     }
 }

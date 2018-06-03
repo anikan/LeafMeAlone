@@ -372,7 +372,7 @@ namespace Server
                 GameObjectServer player;
                 if (GameServer.instance.gameObjectDict.TryGetValue(playerId, out player))
                 {
-                    GameServer.instance.Destroy(player);
+                    ((PlayerServer) player).Destroy();
                 }
             }
         }

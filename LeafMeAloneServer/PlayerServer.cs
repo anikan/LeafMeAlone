@@ -171,8 +171,13 @@ namespace Server
             }
         }
 
+        /// <summary>
+        /// Removes the player from the team 
+        /// </summary>
         public override void Destroy()
         {
+            Team.numPlayers--;
+            base.Destroy();
         }
 
         /// <summary>

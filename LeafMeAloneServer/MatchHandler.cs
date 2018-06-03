@@ -16,7 +16,6 @@ namespace Server
         private Match match;
         private NetworkServer network;
         private GameServer game;
-        private int playerCount = 0;
 
 
         /// <summary>

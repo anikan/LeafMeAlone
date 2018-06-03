@@ -108,7 +108,6 @@ namespace Shared
         public const int MATCH_RESET_TIME = 10;
 
         public const float PUSH_FACTOR = 3.0f;
-        public const float PLAYER_HEALTH = 10.0f;
 
         public const float BLOWER_DISTANCE_SCALER = 2.0f;
 
@@ -132,6 +131,9 @@ namespace Shared
 
         // How long an object can burn for before extinguishing automatically.
         public const float MAX_SECONDS_BURNING = 10.0f;
+
+        public const float PLAYER_HEALTH = 10.0f;
+        public const float HEALTH_REGEN_RATE = 0.01f;
 
 
     }

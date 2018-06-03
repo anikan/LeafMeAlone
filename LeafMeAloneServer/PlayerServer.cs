@@ -14,7 +14,6 @@ namespace Server
     {
 
         // Constant values of the player.
-        public const float PLAYER_HEALTH = 10.0f;
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 3.0f;
         public const float PLAYER_SPEED = 25.0f;
@@ -33,7 +32,7 @@ namespace Server
 
         private Stopwatch deathClock = new Stopwatch();
 
-        public PlayerServer(Team team) : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, 0.0f, true)
+        public PlayerServer(Team team) : base(ObjectType.PLAYER, Constants.PLAYER_HEALTH, PLAYER_MASS, 0.0f, true)
         {
             Team = team;
             ToolEquipped = ToolType.BLOWER;
@@ -59,7 +58,7 @@ namespace Server
             {
                 Dead = true;
                 Burning = false;
-                Health = PLAYER_HEALTH;
+                Health = Constants.PLAYER_HEALTH;
                 deathClock.Start();
             // Once health is up, reset te death clock and player position
             } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
@@ -68,6 +67,12 @@ namespace Server
                 Transform.Position = GameServer.instance.GetRandomSpawnPoint();
                 Dead = false;
             }
+
+            if (!Burning && Health < Constants.PLAYER_HEALTH)
+            {
+                Health += Constants.HEALTH_REGEN_RATE * deltaTime;
+            }
+
 
         }
 

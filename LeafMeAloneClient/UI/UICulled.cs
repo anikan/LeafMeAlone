@@ -19,7 +19,7 @@ namespace Client.UI
         /// Create UI.
         /// </summary>
         public UICulled() : base("", UIManagerSpriteRenderer.TextType.BOLD,
-            RectangleF.Empty, TextAlignment.HorizontalCenter | TextAlignment.Bottom, Color.White)
+            RectangleF.Empty, TextAlignment.Top | TextAlignment.Left, Color.White)
         {
 
         }
@@ -29,7 +29,7 @@ namespace Client.UI
         /// </summary>
         public override void Update()
         {
-            UIText.Text = "Objects Culled This Frame: " + Culled;
+            UIText.Text = "Culled: " + Culled;
         }
     }
 }

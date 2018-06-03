@@ -13,8 +13,8 @@ namespace Client.UI
 
         public UITeams()
         {
-            Team1_Leaves = new UI("0", UIManagerSpriteRenderer.TextType.NORMAL, new RectangleF(0, 0, -100, -100), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.Red);
-            Team2_Leaves = new UI("0", UIManagerSpriteRenderer.TextType.NORMAL, new RectangleF(0, 0, 0, 0), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.Blue);
+            Team1_Leaves = new UI("0", UIManagerSpriteRenderer.TextType.BOLD, new RectangleF(0, 16, -100, 32), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.LightCoral);
+            Team2_Leaves = new UI("0", UIManagerSpriteRenderer.TextType.BOLD, new RectangleF(0, 16, 0, 32), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.LightBlue);
         }
     }
 }

@@ -22,8 +22,8 @@ namespace Client
 
         private readonly Timer t;
 
-        public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString(TimeFormatting), UIManagerSpriteRenderer.TextType.NORMAL,
-            RectangleF.Empty, TextAlignment.Top | TextAlignment.Left, Color.White)
+        public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString(TimeFormatting), UIManagerSpriteRenderer.TextType.BOLD,
+            new RectangleF(0, 0, -50, 0), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.White)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
@@ -73,6 +73,6 @@ namespace Client
             UIText.Text = time.ToString(TimeFormatting);
             t.Start();
         }
-        
+
     }
 }

@@ -187,18 +187,18 @@ namespace Client
             {
 
                 // Iterate through all the team sections.
-                for (int j = 0; j < currentMatch.teamSections.Count; j++)
+                for (int j = 0; j < currentMatch.teams.Count; j++)
                 {
 
                     // Create a new list for this team.
                     List<MapTile> ThisTeamTiles = new List<MapTile>();
 
                     // If the current tile is in the bounds of the section.
-                    if (currentMatch.teamSections[j].IsInBounds(AllMapTiles[i].Transform.Position))
+                    if (currentMatch.teams[j].teamSection.IsInBounds(AllMapTiles[i].Transform.Position))
                     {
 
                         // Tint the tile.
-                        AllMapTiles[i].CurrentHue = currentMatch.teamSections[j].sectionColor;
+                        AllMapTiles[i].CurrentHue = currentMatch.teams[j].teamSection.sectionColor;
 
                         // Add the tile to the tiles for this team.
                         ThisTeamTiles.Add(AllMapTiles[i]);

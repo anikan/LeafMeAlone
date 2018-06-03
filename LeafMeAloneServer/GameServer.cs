@@ -32,7 +32,6 @@ namespace Server
             "ERROR: Singleton pattern violated on GameServer.cs. There are multiple instances!";
         private Stopwatch timer;
 
-        private List<Vector3> spawnPoints = new List<Vector3>();
         private int playerSpawnIndex = 0;
 
         private Stopwatch testTimer;
@@ -62,11 +61,6 @@ namespace Server
 
             timer.Start();
             testTimer.Start();
-
-            spawnPoints.Add(new Vector3(-10, 0, -10));
-            spawnPoints.Add(new Vector3(-10, 0, 10));
-            spawnPoints.Add(new Vector3(10, 0, -10));
-            spawnPoints.Add(new Vector3(10, 0, 10));
 
             networkServer = new NetworkServer(networked);
             matchHandler = new MatchHandler(Match.DefaultMatch, networkServer, this);
@@ -187,39 +181,23 @@ namespace Server
 
         }
 
-
-        /// <summary>
-        /// Gets the next spawn point of the player spawn index
-        /// </summary>
-        /// <returns>The vector 3 of the next spawn point</returns>
-        public Vector3 NextSpawnPoint()
-        {
-            return spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
-        }
-
         public PlayerServer CreateNewPlayer()
         {
             //Assign id based on the next spot in the gameObjectDict.
             int id = gameObjectDict.Count();
 
             //Create two players, one to send as an active player to client. Other to keep track of on server.
-            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1);
+            PlayerServer newPlayer = matchHandler.AddPlayer();
             newPlayer.Register();
+            playerServerList.Add(newPlayer);
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1)
+            PlayerServer newActivePlayer = new PlayerServer(newPlayer.Team)
             {
                 ObjectType = ObjectType.ACTIVE_PLAYER,
                 Id = newPlayer.Id
             };
-
-            playerServerList.Add(newPlayer);
-
-            Vector3 nextSpawnPoint = NextSpawnPoint();
-
-            //Note currently assuming players get ids 0-3
-            newActivePlayer.Transform.Position = nextSpawnPoint;
-            newPlayer.Transform.Position = nextSpawnPoint;
+            newActivePlayer.Transform.Position = newPlayer.Transform.Position;
 
             CreatePlayerPacket objPacket = ServerPacketFactory.NewCreatePacket(newPlayer);
 
@@ -419,16 +397,6 @@ namespace Server
         {
             // Turn the game objects to a value list.
             return gameObjectDict.Values.ToList();
-        }
-
-        /// <summary>
-        /// Gets a new random spawn point for the player.
-        /// </summary>
-        /// <returns>A vector 3 of the spawn point</returns>
-        public Vector3 GetRandomSpawnPoint()
-        {
-            int index = new Random().Next(spawnPoints.Count);
-            return spawnPoints.ElementAt(index);
         }
 
         public List<GameObject> GetLeafListAsObjects()

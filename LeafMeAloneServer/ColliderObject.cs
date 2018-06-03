@@ -239,7 +239,7 @@ namespace Server
             for (int i = 0; i < allObjects.Count; i++)
             {
                 // Check if the object has a collider.
-                if (allObjects[i] is ColliderObject obj)
+                if (allObjects[i] is ColliderObject obj && (!(this is LeafServer && obj is PlayerServer)))
                 {
                     // If the object is colliding, mark as unsafe.
                     if (obj != this && IsColliding(obj))

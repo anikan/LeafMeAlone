@@ -13,7 +13,7 @@ namespace Server
     internal class MatchHandler
     {
         private Stopwatch matchResetTimer; // the timer for match reset
-        private Match match;
+        public static Match match;
         private NetworkServer network;
         private GameServer game;
 

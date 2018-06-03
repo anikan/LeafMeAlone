@@ -21,7 +21,7 @@ namespace Server
         public Dictionary<int, GameObjectServer> gameObjectDict =
             new Dictionary<int, GameObjectServer>();
 
-        private NetworkServer networkServer;
+        public NetworkServer networkServer;
 
         //Time in ms for each tick.
         public const long TICK_TIME = 33;
@@ -219,75 +219,6 @@ namespace Server
             // Create the map with a width and height.
             MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
-            float startX = (-newMap.Width / 2.0f) + Constants.TREE_RADIUS;
-            float startY = -newMap.Height / 2.0f;
-            float endX = newMap.Width / 2.0f;
-            float endY = newMap.Height / 2.0f;
-
-            // Spawn trees around the border of the map!
-            // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
-            for (float y = startY; y < endY; y += (Constants.TREE_RADIUS))
-            {
-
-                // Iterate through the width of the map, centered on origin and increase by radius of a tree.
-                for (float x = startX; x < endX; x += (Constants.TREE_RADIUS))
-                {
-
-                    float random = (float)rnd.NextDouble();
-
-                    if (random < Constants.TREE_FREQUENCY)
-                    {
-
-                        // Make a new tree.
-                        TreeServer newTree = new TreeServer();
-
-                        // Set the tree's initial position.
-                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
-
-                        // Send the new object to client.
-                        networkServer.SendNewObjectToAll(newTree);
-
-                    }
-
-                    // If this is a top or bottom row, create trees.
-                    if (y <= startY || endY <= (y + (Constants.TREE_RADIUS)))
-                    {
-
-                        // Make a new tree.
-                        TreeServer newTree = new TreeServer();
-
-                        // Set the tree's initial position.
-                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
-
-                        // If this is the bottom row.
-                        if (y <= startY)
-                        {
-                            // Increase the radius.
-                            newTree.Radius = Constants.TREE_RADIUS * 2;
-                        }
-
-                        // Send the new object to client.
-                        networkServer.SendNewObjectToAll(newTree);
-
-                    }
-
-                    // If this is the far left or right columns, create a tree.
-                    else if (x <= startX || endX <= (x + (Constants.TREE_RADIUS)))
-                    {
-
-                        // Make a new tree.
-                        TreeServer newTree = new TreeServer();
-
-                        // Set the tree's initial position.
-                        newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
-
-                        // Send the new object to client.
-                        networkServer.SendNewObjectToAll(newTree);
-
-                    }
-                }
-            }
-
             // Return the new map.
             return newMap;
 
@@ -316,8 +247,8 @@ namespace Server
             double minY = Constants.FLOOR_HEIGHT;
             double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
-            float minX = matchHandler.GetMatch().NoMansLand.leftX;
-            float maxX = matchHandler.GetMatch().NoMansLand.rightX;
+            float minX = matchHandler.GetMatch().NoMansLand.leftX + Constants.TREE_RADIUS;
+            float maxX = matchHandler.GetMatch().NoMansLand.rightX - Constants.TREE_RADIUS;
             float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * Constants.TREE_RADIUS);
             float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * Constants.TREE_RADIUS);
 

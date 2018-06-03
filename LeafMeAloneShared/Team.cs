@@ -21,6 +21,7 @@ namespace Shared
         public TeamName name;
         public TeamSection teamSection;
         private int spawnIndex = 0;
+        public int numPlayers = 0;
 
         public Team(TeamName teamName, TeamSection section)
         {

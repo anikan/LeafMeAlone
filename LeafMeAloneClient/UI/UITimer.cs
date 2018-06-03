@@ -12,15 +12,17 @@ namespace Client
         public delegate void TimerCompleted();
         public TimerCompleted OnTimerCompleted;
 
+        public const string TimeFormatting = "mm\\:ss\\:f";
+
         //time delta (in seconds)
-        private const float tickDelta = 100.0f / 1000.0f;
+        private const float tickDelta = .1f;
 
         //Time remaining (in seconds)
         public float TimeRemaining { get; private set; }
 
         private readonly Timer t;
 
-        public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString("g"), UIManagerSpriteRenderer.TextType.NORMAL,
+        public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString(TimeFormatting), UIManagerSpriteRenderer.TextType.NORMAL,
             new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White)
         {
             t = new Timer(tickDelta * 1000f);
@@ -33,7 +35,7 @@ namespace Client
         {
             TimeRemaining -= tickDelta;
             var time = TimeSpan.FromSeconds(TimeRemaining);
-            UIText.Text = time.ToString("g");
+            UIText.Text = time.ToString(TimeFormatting);
 
             if (TimeRemaining < 0.0f)
             {
@@ -68,7 +70,7 @@ namespace Client
             t.Enabled = true;
             TimeRemaining = timeToCountInSeconds;
             var time = TimeSpan.FromSeconds(TimeRemaining);
-            UIText.Text = time.ToString("g");
+            UIText.Text = time.ToString(TimeFormatting);
             t.Start();
         }
         

@@ -35,7 +35,7 @@ namespace Client.UI
         /// <param name="pos"></param>
         /// <param name="size"></param>
         /// <param name="rotationAngle"></param>
-        public UI(string texture, UIManagerSpriteRenderer.TextType bOLD, Vector2 pos, Vector2 size, double rotationAngle)
+        public UI(string texture, Vector2 pos, Vector2 size, double rotationAngle)
         {
             UITexture = UIManagerSpriteRenderer.DrawTextureContinuous(texture, pos, size, rotationAngle);
         }

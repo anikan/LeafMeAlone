@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SlimDX;
 using Shared;
 using Shared.Packet;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -13,6 +14,8 @@ namespace Client
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
+
+        public bool StoppedRequesting = true;
 
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
@@ -167,16 +170,52 @@ namespace Client
             PlayerRequests.ActiveToolMode = ToolMode.SECONDARY;
         }
 
+        /// <summary>
+        /// Request to equip a specific tool type.
+        /// </summary>
+        /// <param name="type">Tool type to equip.</param>
         public void RequestToolEquip(ToolType type)
         {
+            // If this isn't the existing tool type.
             if (type != ToolEquipped)
             {
-                Console.WriteLine("Requesting new tool! " + type.ToString());
+                // Request the new tool.
                 PlayerRequests.EquipToolRequest = type;
             }
+            // If it's the same as what's equipped.
             else
             {
+                // Just request same.
                 PlayerRequests.EquipToolRequest = ToolType.SAME;
+            }
+        }
+
+        /// <summary>
+        /// Request to cycle to the next tool.
+        /// </summary>
+        public void RequestCycleTool()
+        {
+
+            // If we don't already have a request and check the bool to prevent rapid cycling.
+            if (PlayerRequests.EquipToolRequest == ToolType.SAME && StoppedRequesting)
+            {
+
+                // We have not stopped requesting.
+                StoppedRequesting = false;
+
+                // If the equipped tool is the blower.
+                if (ToolEquipped == ToolType.BLOWER)
+                {
+                    // Equip the thrower.
+                    PlayerRequests.EquipToolRequest = ToolType.THROWER;
+                }
+
+                //If the equipped tool is the thrower.
+                else
+                {
+                    // Equip the blower.
+                    PlayerRequests.EquipToolRequest = ToolType.BLOWER;
+                }
             }
         }
 

@@ -46,7 +46,9 @@ namespace Client
                 {Keys.S, () => { userPlayer.RequestMove(new Vector2(0.0f, -1.0f)); } },
                 {Keys.D, () => { userPlayer.RequestMove(new Vector2(1.0f, 0.0f));  } },
                 {Keys.D1, () => { userPlayer.RequestToolEquip(ToolType.BLOWER); } },
-                {Keys.D2, () => { userPlayer.RequestToolEquip(ToolType.THROWER);  } }
+                {Keys.D2, () => { userPlayer.RequestToolEquip(ToolType.THROWER);  } },
+                {Keys.Space, () => { userPlayer.RequestCycleTool(); } },
+                {Keys.Q, () => { userPlayer.RequestCycleTool();  } }
             };
 
             // Dictionary to keep track of what functions should be called by what mouse presses
@@ -115,6 +117,11 @@ namespace Client
             if (KeysPressed.Contains(keyArg.KeyCode))
             {
                 KeysPressed.Remove(keyArg.KeyCode);
+            }
+
+            if (keyArg.KeyCode == Keys.Q || keyArg.KeyCode == Keys.Space)
+            {
+                userPlayer.StoppedRequesting = true;
             }
         }
 

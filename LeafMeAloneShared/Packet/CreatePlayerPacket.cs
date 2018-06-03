@@ -15,10 +15,10 @@ namespace Shared.Packet
         public CreateObjectPacket createPacket;
 
         [ProtoMember(2)]
-        public Team team;
+        public TeamName team;
 
         public CreatePlayerPacket() : base(PacketType.CreatePlayerPacket) { }
-        public CreatePlayerPacket(CreateObjectPacket createPacket, Team team) : base(PacketType.CreatePlayerPacket)
+        public CreatePlayerPacket(CreateObjectPacket createPacket, TeamName team) : base(PacketType.CreatePlayerPacket)
         {
             this.createPacket = createPacket;
             this.team = team;

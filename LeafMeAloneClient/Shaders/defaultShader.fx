@@ -189,7 +189,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		if (texCount == 0)
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
-			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
+			c_mat += (nDotL <= 0.0f) ? float4(0,0,0,0) : mul(Specular, max(0.0f, pow(dot(rVec, eVec), Shininess*512.0f)) * .1f );
 
 			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
 		}
@@ -198,7 +198,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		else
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
-			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
+			c_mat += (nDotL <= 0.0f) ? float4(0,0,0,0) : mul( Specular, max(0.0f, pow(dot(rVec, eVec), Shininess*512.0f)) * .1f );
 			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
 		}
 

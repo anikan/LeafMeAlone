@@ -68,8 +68,10 @@ namespace Server
                 Dead = false;
             }
 
+            // If player isn't burning and is low on health.
             if (!Burning && Health < Constants.PLAYER_HEALTH)
             {
+                // Regen health.
                 Health += Constants.HEALTH_REGEN_RATE * deltaTime;
             }
 

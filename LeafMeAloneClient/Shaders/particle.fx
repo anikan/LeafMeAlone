@@ -5,6 +5,11 @@ uniform extern float CutoffDist;
 uniform extern float StopDist;
 uniform extern int AlphaCutoffOnly;
 
+
+
+//is the player dead
+uniform int isGrayscale = 0;
+
 uniform extern Texture2D tex_diffuse;
 
 //texture sampling
@@ -55,14 +60,24 @@ float4 PS(float4 iPosH  : SV_POSITION,
 		clip(-1);
 	}
 
+	float4 retColor;
+
 	if (AlphaCutoffOnly == 1)
 	{
-		return float4(ret.xyz, ret.w * factor);
+		retColor = float4(ret.xyz, ret.w * factor);
 	}
 	else
 	{
-		return factor * ret;
+		retColor = factor * ret;
 	}
+
+	if(isGrayscale == 1)
+	{
+		float currColor = retColor.x + retColor.y + retColor.z;
+		currColor/=3.0;
+		return currColor;
+	}
+	return retColor;
 }
 
 

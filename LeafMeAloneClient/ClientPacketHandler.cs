@@ -86,7 +86,8 @@ namespace Client
 
             void SpectatorAction(SpectatorPacket p)
             {
-                GraphicsManager.ActiveCamera.CameraPosition = new SlimDX.Vector3(0, 200, -30);
+                GraphicsManager.ActiveCamera.CameraPosition = new SlimDX.Vector3(0, 150, -1);
+                GraphicsManager.ActiveCamera.CameraLookAt = new SlimDX.Vector3(0, 0, 0);
                 client.CreateMap();
             }
 

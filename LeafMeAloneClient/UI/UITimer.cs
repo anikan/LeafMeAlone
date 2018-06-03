@@ -7,35 +7,35 @@ using SpriteTextRenderer;
 
 namespace Client
 {
-    public class UITimer
+    public class UITimer : UI.UI
     {
         public delegate void TimerCompleted();
         public TimerCompleted OnTimerCompleted;
 
+        public const string TimeFormatting = "mm\\:ss\\:f";
+
         //time delta (in seconds)
-        private const float tickDelta = 100.0f / 1000.0f;
+        private const float tickDelta = .1f;
 
         //Time remaining (in seconds)
         public float TimeRemaining { get; private set; }
 
         private readonly Timer t;
 
-        private readonly DrawableString uiElem;
-
-        public UITimer(float timeToCountInSeconds)
+        public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString(TimeFormatting), UIManagerSpriteRenderer.TextType.BOLD,
+            new RectangleF(0, 0, -50, 0), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.White)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
-            uiElem = UIManagerSpriteRenderer.DrawTextContinuous("Time Remaining:" + TimeRemaining, UIManagerSpriteRenderer.TextType.NORMAL, 
-                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White);
         }
 
         //Tick every 100 milliseconds.
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)
         {
             TimeRemaining -= tickDelta;
-            uiElem.Text = "Time Remaining:" + TimeRemaining;
+            var time = TimeSpan.FromSeconds(TimeRemaining);
+            UIText.Text = time.ToString(TimeFormatting);
 
             if (TimeRemaining < 0.0f)
             {
@@ -56,7 +56,7 @@ namespace Client
         public void End()
         {
             TimeRemaining = 0;
-            uiElem.Text = "Match Over";
+            UIText.Text = "Match Over";
             t.Stop();
         }
 
@@ -69,7 +69,8 @@ namespace Client
             t.AutoReset = true;
             t.Enabled = true;
             TimeRemaining = timeToCountInSeconds;
-            uiElem.Text = "Time Remaining:" + TimeRemaining;
+            var time = TimeSpan.FromSeconds(TimeRemaining);
+            UIText.Text = time.ToString(TimeFormatting);
             t.Start();
         }
 

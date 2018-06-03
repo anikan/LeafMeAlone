@@ -3,6 +3,7 @@ using Shared.Packet;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Server
 {
@@ -15,7 +16,6 @@ namespace Server
         public static Match match;
         private NetworkServer network;
         private GameServer game;
-        private int playerCount = 0;
 
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Server
         /// </summary>
         private void RestartMatch()
         {
-            game.GetLeafListAsObjects().ForEach(l => l.Destroy());
+            game.GetLeafListAsObjects().ForEach(l => l.Die());
             foreach (PlayerServer player in game.playerServerList)
             {
                 player.Reset();
@@ -106,7 +106,11 @@ namespace Server
 
         internal PlayerServer AddPlayer()
         {
-            PlayerServer newPlayer = new PlayerServer(match.teams[playerCount++ % match.teams.Count]);
+            Team minPlayerTeam = match.teams.Aggregate(
+                    (curMin, x) => (curMin == null || (x.numPlayers) < curMin.numPlayers ? x : curMin)
+                    );
+            PlayerServer newPlayer = new PlayerServer(minPlayerTeam);
+            minPlayerTeam.numPlayers++;
             return newPlayer;
         }
     }

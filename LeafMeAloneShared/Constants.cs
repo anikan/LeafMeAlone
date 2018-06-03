@@ -7,10 +7,16 @@ namespace Shared
     /// </summary>
     public static class Constants
     {
-        public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 3.85f, 3.0f);
+        public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 4.4f, 4.0f);
 
         //arrow for following player.
         public const string Arrow = @"../../Textures/Arrow.png";
+        public const string RedHealth = @"../../Textures/RedHealth.png";
+        public const string BlueHealth = @"../../Textures/BlueHealth.png";
+
+
+        public const string GlobalFont = "Arial";
+        public const int GlobalFontSize = 16;
 
         /// <summary>
         /// Player animation paths

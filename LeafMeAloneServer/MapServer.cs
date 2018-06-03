@@ -212,7 +212,7 @@ namespace Server
         {
         }
 
-        public override void Destroy()
+        public override void Die()
         {
             // lol pls don't destroy the map
         }

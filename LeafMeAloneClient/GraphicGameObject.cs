@@ -67,7 +67,7 @@ namespace Client
             if (Fire == null)
             {
 
-                Fire = new FlameThrowerParticleSystem(2, 10, 2.5f, 1f, 5f)
+                Fire = new FlameThrowerParticleSystem(320f, 2, 10, 0f, 1f, 5f, 1.0f)
                 {
                     emissionRate = 5,
                     Enabled = true
@@ -149,7 +149,7 @@ namespace Client
             if (Burning)
             {
                 Transform t = new Transform {Position = Transform.Position,Scale =  new Vector3(1,1,1)};
-                Fire?.DrawTransform(t);
+                GraphicsManager.DrawParticlesThisFrame(Fire,t);
             }
 
             // If we're debugging, draw the pivot cube.
@@ -173,7 +173,7 @@ namespace Client
         /// <summary>
         /// Destroy this GameObject and remove any references.
         /// </summary>
-        public override void Destroy()
+        public override void Die()
         {
             GameClient.instance.Destroy(this);
         }

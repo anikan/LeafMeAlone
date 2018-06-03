@@ -199,7 +199,7 @@ namespace Server
             };
             newActivePlayer.Transform.Position = newPlayer.Transform.Position;
 
-            CreatePlayerPacket objPacket = ServerPacketFactory.NewCreatePacket(newPlayer);
+            CreatePlayerPacket objPacket = (CreatePlayerPacket)ServerPacketFactory.NewCreatePacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
             networkServer.SendAll(PacketUtil.Serialize(objPacket));
@@ -333,6 +333,12 @@ namespace Server
         {
             // Turn the game objects to a value list.
             return gameObjectDict.Values.ToList();
+        }
+
+        internal void DisconnectPlayer(PlayerServer player)
+        {
+            player.Team.numPlayers--;
+            Destroy(player);
         }
 
         public List<GameObject> GetLeafListAsObjects()

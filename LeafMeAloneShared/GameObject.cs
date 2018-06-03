@@ -66,7 +66,7 @@ namespace Shared
         public int Id { get; set; }
 
         public abstract void Update(float deltaTime);
-        public abstract void Destroy();
+        public abstract void Die();
           
         protected GameObject()
         {

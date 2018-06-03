@@ -115,7 +115,7 @@ namespace Server
                 if (Health <= 0)
                 {
                     // Destroy.
-                    Destroy();
+                    Die();
                 }
 
                 if (ExtinguishTimer.ElapsedMilliseconds / 1000.0f >= Constants.MAX_SECONDS_BURNING)
@@ -263,11 +263,10 @@ namespace Server
         }
 
         /// <summary>
-        /// Destroys this object and removes references.
+        /// Death method which should be overridden by child classes
         /// </summary>
-        public override void Destroy()
-        {
-            GameServer.instance.Destroy(this);
-        }
+        public override void Die()
+        { }
+
     }
 }

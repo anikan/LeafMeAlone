@@ -121,6 +121,7 @@
     <Compile Include="Debug.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
     <Compile Include="Frustum.cs" />
+    <Compile Include="InverseParticleSystem.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
     <Compile Include="MapTile.cs" />
     <Compile Include="ParticleSystemManager.cs" />
@@ -132,6 +133,8 @@
     <Compile Include="UI\DrawableString.cs" />
     <Compile Include="UI\DrawableTexture.cs" />
     <Compile Include="UI\GlobalUIManager.cs" />
+    <Compile Include="UI\Screen.cs" />
+    <Compile Include="UI\UI.cs" />
     <Compile Include="UI\UICulled.cs" />
     <Compile Include="UI\UIFindTeammate.cs" />
     <Compile Include="UI\UIFramesPersecond.cs" />

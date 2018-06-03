@@ -74,9 +74,9 @@ namespace Client
             }
         }
 
-        public override void Destroy()
+        public override void Die()
         {
-            base.Destroy();
+            base.Die();
 
             PlayBurnupAudio();
         }

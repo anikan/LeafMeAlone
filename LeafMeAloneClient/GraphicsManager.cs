@@ -149,28 +149,28 @@ namespace Client
                 light0.UseDirectionalPreset();
                 light0.intensities = new Vector4(1.3f, 1.2f, 1.0f, 0);
                 light0.status = LightParameters.STATUS_ON;
-                light0.position = Vector4.Normalize(new Vector4(-1, 0, 0, 0));
+                light0.position = Vector4.Normalize(new Vector4(-1, 1, 0, 0));
             }
             {
                 LightParameters light1 = ActiveLightSystem.GetLightParameters(1);
                 light1.UseDirectionalPreset();
                 light1.status = LightParameters.STATUS_ON;
                 light1.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
-                light1.position = Vector4.Normalize(new Vector4(0, -1, 0, 0));
+                light1.position = Vector4.Normalize(new Vector4(1, -1, 0, 0));
             }
             {
                 LightParameters light2 = ActiveLightSystem.GetLightParameters(2);
                 light2.UseDirectionalPreset();
                 light2.status = LightParameters.STATUS_ON;
                 light2.intensities = new Vector4(1.2f, 1.2f, 1.2f, 0);
-                light2.position = Vector4.Normalize(new Vector4(0, 1, 0, 0));
+                light2.position = Vector4.Normalize(new Vector4(-1, 0, 1, 0));
             }
             {
                 LightParameters light3 = ActiveLightSystem.GetLightParameters(3);
                 light3.UseDirectionalPreset();
                 light3.status = LightParameters.STATUS_ON;
-                light3.intensities = new Vector4(0.8f, 0.8f, 0.8f, 0);
-                light3.position = Vector4.Normalize(new Vector4(0, 0, -1, 0));
+                light3.intensities = new Vector4(1.3f, 1.3f, 1.3f, 0);
+                light3.position = Vector4.Normalize(new Vector4(1, 0, -1, 0));
             }
 
             LoadAllShaders();

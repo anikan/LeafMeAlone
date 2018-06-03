@@ -112,7 +112,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 
 	float4 retColor = float4(0,0,0,1);
 
-	float3 eVec = (float3) normalize(CamPosObj - PositionObj);
+	float3 eVec = normalize( (float3) (CamPosObj - PositionObj) );
 	NormalObj = normalize(NormalObj);
 
 	for (int idx = 0; idx < NUM_LIGHTS; idx++)
@@ -127,6 +127,9 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		float4 c_l;
 		float dist;
 		float attenuation_val;
+
+		//float categories = 6.0f;
+		//float4 DiffuseToon = float4((float(ceil(Diffuse.x * categories - 0.5))) / categories, (float(ceil(Diffuse.y * categories - 0.5))) / categories, (float(ceil(Diffuse.z * categories - 0.5))) / categories, Diffuse.w);
 		
 		// find the direction of the light
 		if (lights[idx].type == TYPE_DIRECTIONAL)
@@ -189,7 +192,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		if (texCount == 0)
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
-			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
+			c_mat += (nDotL <= 0.0f) ? float4(0,0,0,0) : mul(Specular, max(0.0f, pow(dot(rVec, eVec), Shininess*512.0f)) * .1f );
 
 			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
 		}
@@ -198,7 +201,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		else
 		{
 			c_mat = Diffuse * max(0.0f, nDotL);
-			c_mat += (nDotL == 0.0f) ? float4(0,0,0,0) : Specular * max(0.0f, pow(dot(rVec, eVec), Shininess*128.0f)) * .5f;
+			c_mat += (nDotL <= 0.0f) ? float4(0,0,0,0) : mul( Specular, max(0.0f, pow(dot(rVec, eVec), Shininess*512.0f)) * .1f );
 			c_mat += Diffuse * lights[idx].ambientCoefficient * Ambient * .1f;
 		}
 
@@ -209,10 +212,26 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 	if (texCount > 0)
 	{
 		// use this to find the texture color
-		retColor = retColor * tex_diffuse.Sample(MeshTextureSampler, iTex);
+		float4 texColor = tex_diffuse.Sample(MeshTextureSampler, iTex);
+		
+		retColor = retColor * texColor ;
 	}
 
-	return float4( retColor.xyz * Tint * Hue, Opacity );
+	retColor = float4( retColor.xyz * Tint * Hue, 1.0f );
+
+	// Toon shading
+	float edge = max(0.0f, dot( normalize( NormalObj.xyz) , eVec ));
+	if (edge < 0.3f  )
+	{
+		//retColor = float4(0, 0, 0, 1);
+	}
+	else if (texCount == 0)
+	{
+		float categories = 6.0f;
+		retColor = float4((float(ceil(retColor.x * categories - 0.5))) / categories, (float(ceil(retColor.y * categories - 0.5))) / categories, (float(ceil(retColor.z * categories - 0.5))) / categories, retColor.w);
+	}
+
+	return retColor;
 }
 
 technique10 ColorTech

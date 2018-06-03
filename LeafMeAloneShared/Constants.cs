@@ -48,7 +48,7 @@ namespace Shared
         public const string LeafModel = @"../../Models/LeafModel/05.13.18_Leaf.fbx";
         public const string PlayerModel = @"../../Models/PlayerModel/05.03.18_Version2.fbx";
         public const string DefaultMapModel = @"../../Models/Terrain/Terrain.fbx";
-        public const string TreeModel = @"../../Models/Tree/TreeAttempt.fbx";
+        public const string TreeModel = @"../../Models/Tree/SmoothTree.fbx";
 
         /// <summary>
         /// Sounds/Audio files

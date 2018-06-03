@@ -24,5 +24,21 @@ namespace Shared.Packet
         {
             ObjectId = objectId;
         }
+
+        /// <summary>
+        /// Compare equality between two packets.
+        /// </summary>
+        /// <param name="thisPacket"></param>
+        /// <param name="otherPacket"></param>
+        /// <returns>True if they encode the same data, false otherwise or if 1 is null</returns>
+        public static bool equals(IdPacket thisPacket, IdPacket otherPacket)
+        {
+            if ((thisPacket == null) || (otherPacket == null))
+            {
+                return false;
+            }
+
+            return thisPacket.ObjectId == otherPacket.ObjectId;
+        }
     }
 }

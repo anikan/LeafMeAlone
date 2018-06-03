@@ -13,7 +13,7 @@ namespace Client.UI
         private readonly GameObject FollowGameObject;
 
         private readonly float delta = 100f;
-        public UIHealth(GameObject followGameObject, Team team): base(team == Team.RED ? Constants.RedHealth : Constants.BlueHealth, new Vector2(100, 100),
+        public UIHealth(GameObject followGameObject, TeamName team): base(team == TeamName.RED ? Constants.RedHealth : Constants.BlueHealth, new Vector2(100, 100),
             new Vector2(50, 10), 0)
         {
             FollowGameObject = followGameObject;

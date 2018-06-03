@@ -581,7 +581,7 @@ namespace Client
         {
             base.Draw();
             if(healthUI == null)
-                healthUI = new UIHealth(this, team);
+                healthUI = new UIHealth(this, Team);
             healthUI?.Update();
         }
 

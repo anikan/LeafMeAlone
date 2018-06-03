@@ -30,23 +30,36 @@ namespace Client
         private static List<DrawableString> textPerFrame = new List<DrawableString>();
         private static List<DrawableTexture> texturesPerFrame = new List<DrawableTexture>();
 
+        /// <summary>
+        /// Initialize UI Manager
+        /// </summary>
         public static void Init()
         {
             SpriteRenderer = new SpriteRenderer(GraphicsRenderer.Device);
         }
         #region Text
+
+        /// <summary>
+        /// Draw Text for 1 frame.
+        /// </summary>
         public static void DrawText(string text, TextType type, Vector2 position, Color color)
         {
             EnsureTypeExists(type);
             TextRenderers[type].DrawString(text, position, new Color4(color));
         }
 
+        /// <summary>
+        /// Draw text for 1 frame.
+        /// </summary>
         public static void DrawText(string text, TextType type, RectangleF pos, TextAlignment alignment, Color color)
         {
             EnsureTypeExists(type);
             TextRenderers[type].DrawString(text, pos, alignment, new Color4(color));
         }
 
+        /// <summary>
+        /// Get Text width.
+        /// </summary>
         public static Vector2 GetTextWidth(string text, TextType type)
         {
             EnsureTypeExists(type);
@@ -54,12 +67,21 @@ namespace Client
             return new Vector2(textWid.Size.X,textWid.Size.Y);
         }
 
+
+        /// <summary>
+        /// Draw a text for every frame until removetextcontinuous is used..
+        /// </summary>
         public static DrawableString DrawTextContinuous(string text, TextType type, RectangleF pos, SpriteTextRenderer.TextAlignment alignment, Color color)
         {
             DrawableString d = new DrawableString(text, type, pos, alignment, color);
             textPerFrame.Add(d);
             return d;
         }
+
+        /// <summary>
+        /// remove text from drawtextcontinuous.
+        /// </summary>
+        /// <param name="d"></param>
         public static void RemoveTextContinuous(DrawableString d)
         {
             textPerFrame.Remove(d);
@@ -68,6 +90,9 @@ namespace Client
         #endregion
         #region Textures
 
+        /// <summary>
+        /// draw texture for 1 frame.
+        /// </summary>
         public static void DrawTexture(string texture, Vector2 pos, Vector2 size, double rotationAngle)
         {
             if (!DrawableImages.ContainsKey(texture))
@@ -78,6 +103,9 @@ namespace Client
             SpriteRenderer.Draw(DrawableImages[texture], pos, size, Vector2.Zero, rotationAngle, CoordinateType.Absolute);
         }
 
+        /// <summary>
+        /// Draw texture until removed.
+        /// </summary>
         public static DrawableTexture DrawTextureContinuous(string texture, Vector2 pos, Vector2 size, double rotationAngle)
         {
             if (!DrawableImages.ContainsKey(texture))
@@ -91,6 +119,10 @@ namespace Client
 
         #endregion
 
+
+        /// <summary>
+        /// Update the continuous textures.
+        /// </summary>
         public static void Update()
         {
             foreach (DrawableString str in textPerFrame)
@@ -104,6 +136,10 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// ensure the textblock renderers exist.
+        /// </summary>
+        /// <param name="t"></param>
         private static void EnsureTypeExists(TextType t)
         {
             if (TextRenderers.ContainsKey(t)) return;

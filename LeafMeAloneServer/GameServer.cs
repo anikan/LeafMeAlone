@@ -246,8 +246,6 @@ namespace Server
             float endX = newMap.Width / 2.0f;
             float endY = newMap.Height / 2.0f;
 
-
-
             // Spawn trees around the border of the map!
             // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
             for (float y = startY; y < endY; y += (Constants.TREE_RADIUS))
@@ -282,6 +280,13 @@ namespace Server
 
                         // Set the tree's initial position.
                         newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // If this is the bottom row.
+                        if (y <= startY)
+                        {
+                            // Increase the radius.
+                            newTree.Radius = Constants.TREE_RADIUS * 2;
+                        }
 
                         // Send the new object to client.
                         networkServer.SendNewObjectToAll(newTree);

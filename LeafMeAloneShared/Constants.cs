@@ -119,7 +119,7 @@ namespace Shared
         public const int DEATH_TIME = 3;
 
         // Constants for leafs. 
-        public const float LEAF_HEALTH = 10.0f;
+        public const float LEAF_HEALTH = 8.0f;
         public const float LEAF_MASS = 0.1f;
         public const float LEAF_RADIUS = 0.0f;
         public const float LEAF_BOUNCIENESS = 0.8f;
@@ -129,6 +129,10 @@ namespace Shared
         // Constants for the tree.
         public const float TREE_RADIUS = 4.0f;
         public const float TREE_HEALTH = 10000.0f;
+
+        // How long an object can burn for before extinguishing automatically.
+        public const float MAX_SECONDS_BURNING = 10.0f;
+
 
     }
 }

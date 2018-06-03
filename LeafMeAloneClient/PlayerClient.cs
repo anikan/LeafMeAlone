@@ -180,6 +180,27 @@ namespace Client
             }
         }
 
+        /// <summary>
+        /// Gets the transform of the active tool.
+        /// </summary>
+        /// <returns>Transform of the tool.</returns>
+        public Transform GetToolTransform()
+        {
+            Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
+                       Matrix.RotationY(Transform.Rotation.Y) *
+                       Matrix.RotationZ(Transform.Rotation.Z);
+
+            Transform toolTransform = new Transform();
+            toolTransform.Position = Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat);
+            toolTransform.Rotation = Transform.Rotation;
+
+            // TODO: Make this the actual tool transform.
+            // Currently just the player transform.
+
+            return toolTransform;
+
+        }
+
         // Note: Causes weird behaviour sometimes. Needs to be fixed if want to use.
         public void RequestLookAtWorldSpace(Vector2 position)
         {
@@ -472,14 +493,16 @@ namespace Client
                          Matrix.RotationY(Transform.Rotation.Y) *
                          Matrix.RotationZ(Transform.Rotation.Z);
 
+            Transform toolTransform = GetToolTransform();
+
             FlameThrowerParticleSystem p = FlameThrower as FlameThrowerParticleSystem;
             // flame throwing particle system update
-            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
+            FlameThrower.SetOrigin(toolTransform.Position);
             FlameThrower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             FlameThrower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             FlameThrower.Update(deltaTime);
 
-            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
+            LeafBlower.SetOrigin(toolTransform.Position);
             LeafBlower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             LeafBlower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             LeafBlower.Update(deltaTime);

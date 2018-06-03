@@ -119,12 +119,21 @@ namespace Server
         /// <returns>Transform of the tool.</returns>
         public Transform GetToolTransform()
         {
+            Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
+                       Matrix.RotationY(Transform.Rotation.Y) *
+                       Matrix.RotationZ(Transform.Rotation.Z);
+
+            Transform toolTransform = new Transform();
+            toolTransform.Position = Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat);
+            toolTransform.Rotation = Transform.Rotation;
 
             // TODO: Make this the actual tool transform.
             // Currently just the player transform.
-            return Transform;
+
+            return toolTransform;
 
         }
+
 
         /// <summary>
         /// Update the player based on a packet sent from the client.

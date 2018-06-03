@@ -121,6 +121,7 @@
     <Compile Include="Debug.cs" />
     <Compile Include="FlameThrowerParticleSystem.cs" />
     <Compile Include="Frustum.cs" />
+    <Compile Include="InverseParticleSystem.cs" />
     <Compile Include="LeafBlowerParticleSystem.cs" />
     <Compile Include="MapTile.cs" />
     <Compile Include="ParticleSystemManager.cs" />

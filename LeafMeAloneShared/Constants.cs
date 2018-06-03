@@ -14,6 +14,10 @@ namespace Shared
         public const string RedHealth = @"../../Textures/RedHealth.png";
         public const string BlueHealth = @"../../Textures/BlueHealth.png";
 
+
+        public const string GlobalFont = "Arial";
+        public const int GlobalFontSize = 16;
+
         /// <summary>
         /// Player animation paths
         /// </summary>

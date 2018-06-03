@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DirectWrite;
@@ -103,16 +104,16 @@ namespace Client
             switch (t)
             {
                 case TextType.BOLD:
-                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Bold, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Bold, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, Constants.GlobalFontSize);
                     break;
                 case TextType.NORMAL:
-                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, Constants.GlobalFontSize);
                     break;
                 case TextType.COMIC_SANS:
-                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Comic Sans", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 16);
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Comic Sans", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, Constants.GlobalFontSize);
                     break;
                 case TextType.MASSIVE:
-                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, "Arial", FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(t), t, null);

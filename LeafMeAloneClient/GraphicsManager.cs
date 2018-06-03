@@ -29,6 +29,9 @@ namespace Client
         /// </summary>
         public static Dictionary<string, Light> DictLight = new Dictionary<string, Light>();
 
+        public static List<KeyValuePair<ParticleSystem,Transform>> DrawThisFrame = new List<KeyValuePair<ParticleSystem, Transform>>();
+
+
         /// <summary>
         /// ActiveCamera contains the currently active camera.
         /// </summary>
@@ -149,7 +152,18 @@ namespace Client
                 particleSystem.Draw();
             }
 
+            foreach (var particleSystem in DrawThisFrame)
+            {
+                particleSystem.Key.DrawTransform(particleSystem.Value);
+            }
+            DrawThisFrame.Clear();
         }
+
+        public static void DrawParticlesThisFrame(ParticleSystem p,Transform t)
+        {
+            DrawThisFrame.Add(new KeyValuePair<ParticleSystem,Transform>(p,t));
+        }
+
 
         /// <summary>
         /// Initialize the graphics manager

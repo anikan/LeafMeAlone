@@ -241,14 +241,14 @@ namespace Client
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = GraphicsRenderer.BlendState;
 
             //turn off depth for now
-            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthStateOff;
+           // GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthStateOff;
 
             //apply pass
             ParticleSystemManager.Pass.Apply(GraphicsRenderer.Device.ImmediateContext);
             GraphicsRenderer.DeviceContext.DrawIndexed(Particles.Count * 6, 0, 0);
 
             //turn back on depth 
-            GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
+           // GraphicsRenderer.DeviceContext.OutputMerger.DepthStencilState = GraphicsRenderer.DepthState;
             GraphicsRenderer.DeviceContext.OutputMerger.BlendState = null;
         }
 

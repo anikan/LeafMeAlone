@@ -76,7 +76,7 @@ namespace Client
             model = AnimationManager.GetAnimatedModel(animId, true, repeat);
             Transform.Scale = AnimationManager.GetScale(animId);
 
-            if (Team== TeamName.BLUE)
+            if (Team == TeamName.BLUE)
             {
                 model.UseAltColor(new Color3(.5f, .5f, 1.0f));
             }
@@ -296,18 +296,11 @@ namespace Client
 
             base.UpdateFromPacket(packet.ObjData);
 
+            // If death state changes, reset tint.
             if (Dead != packet.Dead)
             {
-                if (packet.Dead)
-                {
-                    model.Enabled = false;
-                }
-                else
-                {
-                    CurrentTint = new Vector3(1, 1, 1);
-                    CurrentHue = new Vector3(1, 1, 1);
-                    model.Enabled = true;
-                }
+                CurrentTint = new Vector3(1, 1, 1);
+                CurrentHue = new Vector3(1, 1, 1);
             }
 
             Dead = packet.Dead;
@@ -324,9 +317,18 @@ namespace Client
             bool currEquipThrower = ToolEquipped == ToolType.THROWER;
             bool currEquipBlower = ToolEquipped == ToolType.BLOWER;
 
-
             EvaluateAnimation(prevMoving, currMoving, prevEquipBlower, currEquipBlower, prevEquipThrower, currEquipThrower, hurt);
             EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction);
+
+            // Depending on death state, show model
+            if (Dead)
+            {
+                model.Enabled = false;
+            }
+            else
+            {
+                model.Enabled = true;
+            }
 
             switch (ActiveToolMode)
             {

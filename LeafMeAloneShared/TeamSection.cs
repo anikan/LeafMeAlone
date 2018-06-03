@@ -80,13 +80,27 @@ namespace Shared
         /// </summary>
         internal void InitSpawnPoints()
         {
-            spawnPoints = new List<Vector3>
+            float halfway = (rightX + leftX) / 2;
+            // on the left side of the map, spawn starting from the left
+            if (leftX < 0 && rightX < 0) 
             {
-                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5)),
-                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5)),
-                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5)),
-                new Vector3(Utility.RandomInRange(leftX+5,rightX-5), 0, Utility.RandomInRange(downZ+5,upZ-5))
-            };
+                spawnPoints = new List<Vector3>
+                {
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10))
+                };
+            } else if (leftX > 0 && rightX > 0)
+            {
+                spawnPoints = new List<Vector3>
+                {
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10))
+                };
+            }
         }
     }
 }

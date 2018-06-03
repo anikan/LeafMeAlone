@@ -26,7 +26,7 @@ namespace Client
             1.0f, // initial delta size
             0f, // cutoff distance
             0.5f, // cutoff speed
-            0.1f, // enlarge speed
+            0.02f, // enlarge speed
             Tool.Blower.Range//.WindStopDistance // stop dist
             )
         {

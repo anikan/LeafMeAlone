@@ -7,7 +7,7 @@ namespace Shared
     /// </summary>
     public static class Constants
     {
-        public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 3.85f, 3.0f);
+        public static Vector3 PlayerToToolOffset = new Vector3(1.8f, 4.4f, 4.0f);
 
         //arrow for following player.
         public const string Arrow = @"../../Textures/Arrow.png";

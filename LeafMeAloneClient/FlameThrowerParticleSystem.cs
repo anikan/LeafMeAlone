@@ -14,7 +14,7 @@ namespace Client
         public float FlameAcceleration = 15.0f;
         public float CutoffDist = 10.0f;
 
-        public FlameThrowerParticleSystem(float initSpd = 40.0f, float initAccel = 15.0f,float cutoff = 10.0f, float size = 1.0f, float range = 20f) : 
+        public FlameThrowerParticleSystem(float angle = 320f, float initSpd = 40.0f, float initAccel = 15.0f,float cutoff = 10.0f, float size = 1.0f, float range = 20f, float cutoffSpeed = 0.2f) : 
             base(Constants.FireTexture,
                 Vector3.Zero +
                 Vector3.TransformCoordinate(Constants.PlayerToToolOffset, Matrix.Identity), // origin
@@ -22,10 +22,10 @@ namespace Client
                 Vector3.UnitZ * initAccel, // initial speed
                 false, // cutoff all colors
                 true, // no backward particle prevention
-                Tool.Thrower.ConeAngle * 10,//320.0f, // cone radius, may need to adjust whenever acceleration changes
+                angle,//320.0f, // cone radius, may need to adjust whenever acceleration changes
                 size, // initial delta size
-                cutoff * .3f, // cutoff distance
-                0.2f, // cutoff speed
+                cutoff, // cutoff distance
+                cutoffSpeed, // cutoff speed
                 0.075f, // enlarge speed,,
                 range
                 //Tool.Thrower.Range

@@ -46,7 +46,7 @@ namespace Client
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
         {
-            FlameThrower = new FlameThrowerParticleSystem();
+            FlameThrower = new FlameThrowerParticleSystem(Tool.Thrower.ConeAngle * 10f, 40.0f, 15.0f, Tool.Thrower.Range/2.0f, 1.0f, Tool.Thrower.Range, 1.0f);
             LeafBlower = new LeafBlowerParticleSystem();
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);

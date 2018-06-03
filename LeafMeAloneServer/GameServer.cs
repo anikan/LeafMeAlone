@@ -199,7 +199,7 @@ namespace Server
             };
             newActivePlayer.Transform.Position = newPlayer.Transform.Position;
 
-            CreatePlayerPacket objPacket = ServerPacketFactory.NewCreatePacket(newPlayer);
+            CreatePlayerPacket objPacket = (CreatePlayerPacket)ServerPacketFactory.NewCreatePacket(newPlayer);
 
             // Sending this new packet before the new client joins. 
             networkServer.SendAll(PacketUtil.Serialize(objPacket));

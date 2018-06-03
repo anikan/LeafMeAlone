@@ -158,7 +158,7 @@ namespace Server
         {
             foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
             {
-                CreateObjectPacket packetToSend = PacketFactory.NewCreatePacket(pair.Value);
+                BasePacket packetToSend = ServerPacketFactory.NewCreatePacket(pair.Value);
                 clientSocket.Send(PacketUtil.Serialize(packetToSend));
             }
         }
@@ -207,7 +207,7 @@ namespace Server
             //Associate player's id with with the socket. 
             playerDictionary.Add(clientSocket, player.Id);
 
-            CreatePlayerPacket createPlayPack = ServerPacketFactory.NewCreatePacket(player);
+            BasePacket createPlayPack = ServerPacketFactory.NewCreatePacket(player);
             // Create createObjectPacket, send to client
             byte[] data = PacketUtil.Serialize(createPlayPack);
             Send(clientSocket, data);

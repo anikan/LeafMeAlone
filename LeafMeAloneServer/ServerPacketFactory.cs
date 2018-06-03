@@ -29,10 +29,14 @@ namespace Server
             return new MatchResultPacket(winningTeam.name);
         }
 
-        internal static CreatePlayerPacket NewCreatePacket(PlayerServer player)
+        internal static BasePacket NewCreatePacket(GameObjectServer obj)
         {
-            CreateObjectPacket createPacket = NewCreatePacket((GameObject) player);
-            return new CreatePlayerPacket(createPacket, player.Team.name);
+            CreateObjectPacket createPacket = NewCreatePacket((GameObject)obj);
+            if (obj is PlayerServer player)
+            {
+                return new CreatePlayerPacket(createPacket, player.Team.name);
+            }
+            return createPacket;
         }
 
         internal static PlayerPacket CreatePlayerPacket(PlayerServer player)

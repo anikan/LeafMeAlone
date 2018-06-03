@@ -304,12 +304,12 @@ namespace Client
             {
                 model.Enabled = false;
                 if(healthUI != null)
-                    healthUI.HealthBar.Enabled = false;
+                    healthUI.UITexture.Enabled = false;
             } else
             {
                 model.Enabled = true;
                 if (healthUI != null)
-                    healthUI.HealthBar.Enabled = true;
+                    healthUI.UITexture.Enabled = true;
             }
             
             ToolEquipped = packet.ToolEquipped;

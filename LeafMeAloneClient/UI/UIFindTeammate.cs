@@ -8,12 +8,12 @@ using SlimDX;
 
 namespace Client.UI
 {
-    public class UIFindTeammate
+    public class UIFindTeammate : UI
     {
         public PlayerClient Teammate;
-        private readonly DrawableTexture teammateFinder;
 
-        public UIFindTeammate()
+        public UIFindTeammate() : base(Constants.Arrow, new Vector2(100, 100),
+            new Vector2(75, 75), 0)
         {
             foreach (PlayerClient client in GameClient.instance.playerClients)
             {
@@ -23,9 +23,7 @@ namespace Client.UI
                     break;
                 }
             }
-            teammateFinder = UIManagerSpriteRenderer.DrawTextureContinuous(Constants.Arrow, new Vector2(100, 100),
-                 new Vector2(75, 75), 0);
-            teammateFinder.Enabled = false;
+            UITexture.Enabled = false;
         }
 
         Vector2 IntersectScreenEdge(Vector2 vectorToTeammate)
@@ -54,7 +52,7 @@ namespace Client.UI
             return intersection;
         }
 
-        public void Update()
+        public override void Update()
         {
             if (Teammate == null)
             {
@@ -71,7 +69,7 @@ namespace Client.UI
             {
                 if (Teammate.model.IsCulled)
                 {
-                    teammateFinder.Enabled = true;
+                    UITexture.Enabled = true;
                     //Vector2 teammatePos = GraphicsManager.WorldToScreenPoint(Teammate.Transform.Position);
                     //Vector2 myPos = GraphicsManager.WorldToScreenPoint(GraphicsManager.ActivePlayer.Transform.Position);
                     //var direction = myPos - teammatePos;
@@ -108,7 +106,7 @@ namespace Client.UI
 
                     //float angle = ((float)Math.Atan2(pdir.X, pdir.Y));
 
-                    teammateFinder.Position = indPos;
+                    UITexture.Position = indPos;
                     Debug.Log(indPos.ToString());
 
                     
@@ -126,7 +124,7 @@ namespace Client.UI
                 }
                 else
                 {
-                    teammateFinder.Enabled = false;
+                    UITexture.Enabled = false;
                 }
             }
         }

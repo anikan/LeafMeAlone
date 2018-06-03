@@ -11,7 +11,7 @@ using SpriteTextRenderer;
 
 namespace Client.UI
 {
-    public class UIGameWLState
+    public class UIGameWLState : UI
     {
         /// <summary>
         /// Winning or losing state.
@@ -27,12 +27,10 @@ namespace Client.UI
         /// Win or Lose or None.
         /// </summary>
         private WinLoseState currWinLoseState = WinLoseState.None;
-
-        public DrawableString StateText;
-        public UIGameWLState()
+        
+        public UIGameWLState() : base("", UIManagerSpriteRenderer.TextType.MASSIVE,
+            new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter, Color.Transparent)
         {
-            StateText = UIManagerSpriteRenderer.DrawTextContinuous("", UIManagerSpriteRenderer.TextType.MASSIVE, 
-                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter, Color.Transparent);
             SetState(WinLoseState.None);
         }
 
@@ -47,15 +45,15 @@ namespace Client.UI
             switch (currWinLoseState)
             {
                 case WinLoseState.Win:
-                    StateText.Text = Constants.WinText;
-                    StateText.Color = Color.Green;
+                    UIText.Text = Constants.WinText;
+                    UIText.Color = Color.Green;
                     break;
                 case WinLoseState.Lose:
-                    StateText.Text = Constants.LoseText;
-                    StateText.Color = Color.Red;
+                    UIText.Text = Constants.LoseText;
+                    UIText.Color = Color.Red;
                     break;
                 case WinLoseState.None:
-                    StateText.Text = String.Empty;
+                    UIText.Text = String.Empty;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(s), s, null);
@@ -64,5 +62,9 @@ namespace Client.UI
         }
 
 
+        public override void Update()
+        {
+            
+        }
     }
 }

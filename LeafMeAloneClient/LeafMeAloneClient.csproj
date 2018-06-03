@@ -132,6 +132,8 @@
     <Compile Include="UI\DrawableString.cs" />
     <Compile Include="UI\DrawableTexture.cs" />
     <Compile Include="UI\GlobalUIManager.cs" />
+    <Compile Include="UI\Screen.cs" />
+    <Compile Include="UI\UI.cs" />
     <Compile Include="UI\UICulled.cs" />
     <Compile Include="UI\UIFindTeammate.cs" />
     <Compile Include="UI\UIFramesPersecond.cs" />

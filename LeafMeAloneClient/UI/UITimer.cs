@@ -7,7 +7,7 @@ using SpriteTextRenderer;
 
 namespace Client
 {
-    public class UITimer
+    public class UITimer : UI.UI
     {
         public delegate void TimerCompleted();
         public TimerCompleted OnTimerCompleted;
@@ -20,16 +20,12 @@ namespace Client
 
         private readonly Timer t;
 
-        private readonly DrawableString uiElem;
-
-        public UITimer(float timeToCountInSeconds)
+        public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString("g"), UIManagerSpriteRenderer.TextType.NORMAL,
+            new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
-            var time = TimeSpan.FromSeconds(TimeRemaining);
-            uiElem = UIManagerSpriteRenderer.DrawTextContinuous(time.ToString("g"), UIManagerSpriteRenderer.TextType.NORMAL, 
-                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White);
         }
 
         //Tick every 100 milliseconds.
@@ -37,7 +33,7 @@ namespace Client
         {
             TimeRemaining -= tickDelta;
             var time = TimeSpan.FromSeconds(TimeRemaining);
-            uiElem.Text = time.ToString("g");
+            UIText.Text = time.ToString("g");
 
             if (TimeRemaining < 0.0f)
             {
@@ -58,7 +54,7 @@ namespace Client
         public void End()
         {
             TimeRemaining = 0;
-            uiElem.Text = "Match Over";
+            UIText.Text = "Match Over";
             t.Stop();
         }
 
@@ -71,9 +67,10 @@ namespace Client
             t.AutoReset = true;
             t.Enabled = true;
             TimeRemaining = timeToCountInSeconds;
-            uiElem.Text = "Time Remaining:" + TimeRemaining;
+            var time = TimeSpan.FromSeconds(TimeRemaining);
+            UIText.Text = time.ToString("g");
             t.Start();
         }
-
+        
     }
 }

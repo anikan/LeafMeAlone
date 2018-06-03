@@ -68,7 +68,7 @@ namespace Client
             if (Fire == null)
             {
 
-                Fire = new FlameThrowerParticleSystem(2, 10, 2.5f, 1f, 5f)
+                Fire = new FlameThrowerParticleSystem(320f, 2, 10, 0f, 1f, 5f, 1.0f)
                 {
                     emissionRate = 5,
                     Enabled = true

@@ -51,7 +51,7 @@ namespace Shared
         public int numTeams = 2;
 
         // Sections of the map that belong to teams.
-        public List<TeamSection> teamSections;
+        public List<Team> teams;
 
         private Stopwatch matchTimer = new Stopwatch();
 
@@ -106,38 +106,37 @@ namespace Shared
                 sectionColor = new Vector3(0.7f, 0.7f, 0.7f)
             };
 
-            // Create a new list of team sections.
-            newMatch.teamSections = new List<TeamSection>();
+            newMatch.teams = new List<Team>();
 
             // Create a new section for team one, on the left side of the map.
-            newMatch.teamSections.Add(new TeamSection
+            TeamSection redSection = new TeamSection
             {
                 leftX = -(Constants.MAP_WIDTH / 2.0f),
                 rightX = newMatch.NoMansLand.leftX,
                 upZ = (Constants.MAP_HEIGHT / 2.0f),
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
-                team = Team.RED,
                 // Make the section red
                 sectionColor = new Vector3(1.8f, 1.0f, 1.0f)
-
-            });
+            };
+            redSection.InitSpawnPoints();
+            newMatch.teams.Add(new Team(TeamName.RED, redSection));
 
             // Create a new section for team two, on the right side of the map.
-            newMatch.teamSections.Add(new TeamSection
+            TeamSection blueSection = new TeamSection
             {
                 leftX = newMatch.NoMansLand.rightX,
                 rightX = Constants.MAP_WIDTH / 2.0f,
                 upZ = Constants.MAP_HEIGHT / 2.0f,
                 downZ = -Constants.MAP_HEIGHT / 2.0f,
-                team = Team.BLUE,
-
                 // Make the section blue.
                 sectionColor = new Vector3(1.0f, 1.0f, 1.8f)
-            });
+            };
+            blueSection.InitSpawnPoints();
+            newMatch.teams.Add(new Team(TeamName.BLUE, blueSection));
 
             // Print out the bounds of the match.
-            Console.WriteLine(newMatch.teamSections[0]);
-            Console.WriteLine(newMatch.teamSections[1]);
+            Console.WriteLine(newMatch.teams[0].teamSection);
+            Console.WriteLine(newMatch.teams[1].teamSection);
             Console.WriteLine(newMatch.NoMansLand);
 
             newMatch.matchType = MatchType.TEAMS_1;
@@ -173,7 +172,7 @@ namespace Shared
         {
 
             // Iterate through all sections.
-            foreach (TeamSection square in teamSections)
+            foreach (TeamSection square in teams.Select((t) => t.teamSection))
             {
                 // Count the objects and save them.
                 square.CountObjectsInBounds(objects);
@@ -192,15 +191,15 @@ namespace Shared
         public int GetTeamLeaves(int teamIndex, List<GameObject> objects)
         {
 
-            if (teamIndex < 0 || teamIndex >= teamSections.Count)
+            if (teamIndex < 0 || teamIndex >= teams.Count)
             {
-                Console.WriteLine(string.Format("No team exists with index {0}. There are {1} teams, max index is {2}", teamIndex, teamSections.Count, teamSections.Count - 1));
+                Console.WriteLine(string.Format("No team exists with index {0}. There are {1} teams, max index is {2}", teamIndex, teams.Count, teams.Count - 1));
             }
             // Count the objects in that section.
-            teamSections[teamIndex].CountObjectsInBounds(objects);
+            teams[teamIndex].teamSection.CountObjectsInBounds(objects);
 
             // Return the num leaves in that section.
-            return teamSections[teamIndex].numLeaves;
+            return teams[teamIndex].teamSection.numLeaves;
         }
 
         /// <summary>
@@ -211,15 +210,15 @@ namespace Shared
         /// <returns>The winning team or null on not game over.</returns>
         public Team TryGameOver()
         {
-            Team winningTeam = Team.NONE;
+            Team winningTeam = null;
 
             int maxLeaves = 0;
-            foreach (TeamSection teamSection in teamSections)
+            foreach (Team team in teams)
             {
-                if (teamSection.numLeaves > maxLeaves)
+                if (team.teamSection.numLeaves > maxLeaves)
                 {
-                    maxLeaves = teamSection.numLeaves;
-                    winningTeam = teamSection.team;
+                    maxLeaves = team.teamSection.numLeaves;
+                    winningTeam = team;
                 }
             }
 
@@ -229,7 +228,7 @@ namespace Shared
                 return winningTeam;
             }
 
-            return Team.NONE;
+            return null;
         }
 
         /// <summary>
@@ -243,13 +242,13 @@ namespace Shared
             string returnString = "[Current Match Status] ";
 
             // Iterate through all team sections.
-            for (int i = 0; i < teamSections.Count; i++)
+            for (int i = 0; i < teams.Count; i++)
             {
 
                 //    Console.WriteLine(teamSections[i]);
 
                 // Add team info about the objects in this section.
-                returnString += string.Format("Team {0}: {1}", i, teamSections[i].numLeaves);
+                returnString += string.Format("Team {0}: {1}", i, teams[i].teamSection.numLeaves);
 
                 // Divide sections.
                 returnString += " | ";

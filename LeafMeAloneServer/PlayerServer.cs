@@ -39,6 +39,24 @@ namespace Server
             Burnable = true;
             Radius = PLAYER_RADIUS;
             colliderType = ColliderType.CIRCLE;
+            JumpToRandomSpawn();
+
+        }
+
+        private void JumpToRandomSpawn()
+        {
+            Transform.Position = Team.GetNextSpawnPoint();
+            foreach (ColliderObject obj in GameServer.instance.gameObjectDict.Values)
+            {
+                if (obj is PlayerServer || obj is TreeServer)
+                {
+                    if (obj != this && IsColliding(obj))
+                    {
+                        Transform.Position = Team.GetNextSpawnPoint();
+                    }
+
+                }
+            }
         }
 
         /// <summary>
@@ -52,21 +70,7 @@ namespace Server
             Vector3 newPlayerPos = Transform.Position + moveRequest * currentSpeed * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
             TryMoveObject(newPlayerPos);
-
-            // if health is down, start the players death clock
-            if (Health < 0 && !Dead)
-            {
-                Dead = true;
-                Burning = false;
-                Health = Constants.PLAYER_HEALTH;
-                deathClock.Start();
-            // Once health is up, reset te death clock and player position
-            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
-            {
-                deathClock.Reset();
-                Transform.Position = GameServer.instance.GetRandomSpawnPoint();
-                Dead = false;
-            }
+            DoDeathLogic();
 
             // If player isn't burning and is low on health.
             if (!Burning && Health < Constants.PLAYER_HEALTH)
@@ -75,6 +79,28 @@ namespace Server
                 Health += Constants.HEALTH_REGEN_RATE * deltaTime;
             }
 
+        }
+
+        /// <summary>
+        /// Handles player death
+        /// </summary>
+        private void DoDeathLogic()
+        {
+            // if health is down, start the players death clock
+            if (Health < 0 && !Dead)
+            {
+                Dead = true;
+                Burning = false;
+                Burnable = false;
+                Health = Constants.PLAYER_HEALTH;
+                deathClock.Start();
+                Collidable = false;
+            // Once health is up, reset te death clock and player position
+            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
+            {
+                deathClock.Reset();
+                Reset();
+            }
 
         }
 
@@ -186,13 +212,20 @@ namespace Server
         {
         }
 
-        internal void Reset(Vector3 pos)
+        /// <summary>
+        /// Resets the player to a specified position
+        /// </summary>
+        /// <param name="pos">The position to set the player to</param>
+        internal void Reset()
         {
             Velocity = new Vector3();
             moveRequest = new Vector3();
-            Transform.Position = pos;
+            JumpToRandomSpawn();
             Health = Constants.PLAYER_HEALTH;
             Burning = false;
+            Dead = false;
+            Burnable = true;
+            Collidable = true;
             ActiveToolMode = ToolMode.NONE;
         }
     }

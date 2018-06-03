@@ -11,10 +11,10 @@ namespace Shared.Packet
     public class MatchResultPacket : BasePacket
     {
         [ProtoMember(1)]
-        public Team winningTeam;
+        public TeamName winningTeam;
 
         public MatchResultPacket() : base(PacketType.GameResultPacket) { }
-        public MatchResultPacket(Team winningTeam) : base(PacketType.GameResultPacket)
+        public MatchResultPacket(TeamName winningTeam) : base(PacketType.GameResultPacket)
         {
             this.winningTeam = winningTeam;
         }

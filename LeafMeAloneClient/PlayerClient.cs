@@ -32,18 +32,18 @@ namespace Client
 
             public ToolType EquipToolRequest;
         };
-        
+
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
-        private ParticleSystem FlameThrower,LeafBlower;
+        private ParticleSystem FlameThrower, LeafBlower;
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
         private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
         private int _currAnim, _overridedAnim;
 
-        public PlayerClient(CreateObjectPacket createPacket) : 
+        public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
         {
             FlameThrower = new FlameThrowerParticleSystem();
@@ -79,11 +79,11 @@ namespace Client
             model = AnimationManager.GetAnimatedModel(animId, true, repeat);
             Transform.Scale = AnimationManager.GetScale(animId);
 
-            if (team == Team.BLUE)
+            if (Team == TeamName.BLUE)
             {
                 model.UseAltColor(new Color3(.4f, .4f, 1.2f));
             }
-            else if (team == Team.RED)
+            else if (Team == TeamName.RED)
             {
                 model.UseAltColor(new Color3(1.2f, .4f, .4f));
             }
@@ -110,17 +110,18 @@ namespace Client
             _overridedAnim = -1;
         }
 
-        public Team team
+        public TeamName Team
         {
-            get { return _team; }
+            get => _team;
             set
             {
                 _team = value;
-                model.UseAltColor( _team == Team.BLUE ? new Color3(.4f,.4f,1.2f) : new Color3(1.2f, .4f, .4f));
+
+                model.UseAltColor( _team == TeamName.BLUE ? new Color3(.4f,.4f,1.2f) : new Color3(1.2f, .4f, .4f));
             }
         }
 
-        private Team _team;
+        private TeamName _team;
 
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
@@ -260,7 +261,7 @@ namespace Client
             {
                 angle = -angle;
             }
-       
+
             Transform.Rotation = new Vector3(Transform.Rotation.X, angle, Transform.Rotation.Z);
 
         }
@@ -334,7 +335,7 @@ namespace Client
             // Set rotation initially to the rotation of the player
 
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
-  
+
             // PlayerRequests.EquipToolRequest = equippedTool;
         }
 
@@ -354,16 +355,16 @@ namespace Client
             bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
 
             base.UpdateFromPacket(packet.ObjData);
+
+            // If death state changes, reset tint.
+            if (Dead != packet.Dead)
+            {
+                CurrentTint = new Vector3(1, 1, 1);
+                CurrentHue = new Vector3(1, 1, 1);
+            }
+
             Dead = packet.Dead;
 
-            if (Dead)
-            {
-                model.Enabled = false;
-            } else
-            {
-                model.Enabled = true;
-            }
-            
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;
@@ -376,9 +377,18 @@ namespace Client
             bool currEquipThrower = ToolEquipped == ToolType.THROWER;
             bool currEquipBlower = ToolEquipped == ToolType.BLOWER;
 
-
             EvaluateAnimation(prevMoving, currMoving, prevEquipBlower, currEquipBlower, prevEquipThrower, currEquipThrower, hurt);
             EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction);
+
+            // Depending on death state, show model
+            if (Dead)
+            {
+                model.Enabled = false;
+            }
+            else
+            {
+                model.Enabled = true;
+            }
 
             switch (ActiveToolMode)
             {
@@ -444,7 +454,7 @@ namespace Client
             {
                 SwitchAnimation(_animWalkThrower);
             }
-            
+
         }
 
         /// <summary>
@@ -458,8 +468,8 @@ namespace Client
         /// <param name="currUsingWind"> using windblower currently? </param>
         /// <param name="prevUsingSuction"> using suction previously? </param>
         /// <param name="currUsingSuction"> using suction currently? </param>
-        public void EvaluateAudio(bool prevMoving, bool currMoving, 
-            bool prevUsingFlame, bool currUsingFlame, 
+        public void EvaluateAudio(bool prevMoving, bool currMoving,
+            bool prevUsingFlame, bool currUsingFlame,
             bool prevUsingWind, bool currUsingWind,
             bool prevUsingSuction, bool currUsingSuction)
         {

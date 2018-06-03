@@ -14,6 +14,7 @@ namespace Server
     /// </summary>
     public class ColliderObject : GameObjectServer
     {
+        public bool Collidable = true;
 
         protected enum ColliderType
         {
@@ -57,8 +58,10 @@ namespace Server
         /// <param name="toolMode"></param>
         public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(toolTransform, toolType, toolMode);
-
+            if (Collidable)
+            {
+                base.HitByTool(toolTransform, toolType, toolMode);
+            }
         }
 
         /// <summary>
@@ -78,11 +81,11 @@ namespace Server
         /// <returns>True if colliding, false otherwise.</returns>
         public bool IsColliding(ColliderObject other)
         {
-
-            if (other is LeafServer)
+            if (!Collidable || other is LeafServer)
             {
                 return false;
             }
+
 
             // Get this position and the position of the other object, and make 2D.
             Vector3 colliderPos = Transform.Position;

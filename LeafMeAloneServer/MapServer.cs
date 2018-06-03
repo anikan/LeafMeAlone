@@ -13,6 +13,9 @@ namespace Server
     /// </summary>
     public class MapServer : GameObject
     {
+        public List<MapVersion> mapVersions;
+
+        public MapVersion activeMapVersion;
 
         // Width and height of the current map.
         public float Width;
@@ -27,6 +30,107 @@ namespace Server
         {
             this.Width = width;
             this.Height = height;
+
+            // Create the tree border.
+            CreateTreeBorder();
+
+            mapVersions = new List<MapVersion>();
+            mapVersions.Add(new MapVersion1());
+
+            CreateObstacles(activeMapVersion);
+
+        }
+
+        public void CreateTreeBorder()
+        {
+
+            Console.WriteLine("Creating border");
+
+            float startX = -(Width / 2.0f) + Constants.TREE_RADIUS;
+            float startY = -Height / 2.0f;
+            float endX = Width / 2.0f;
+            float endY = Height / 2.0f;
+
+            // Spawn trees around the border of the map!
+            // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
+            for (float y = startY; y < endY; y += (Constants.TREE_RADIUS))
+            {
+
+                // Iterate through the width of the map, centered on origin and increase by radius of a tree.
+                for (float x = startX; x < endX; x += (Constants.TREE_RADIUS))
+                {
+
+                    // If this is a top or bottom row, create trees.
+                    if (y <= startY || endY <= (y + (Constants.TREE_RADIUS)))
+                    {
+
+                        // Set the tree's initial position.
+                        Vector3 obstaclePosition = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+
+                        // If this is the bottom row.
+                        if (y <= startY)
+                        {
+                            CreateObstacle(obstaclePosition, Constants.TREE_RADIUS * 2);
+                        }
+                        else
+                        {
+                            CreateObstacle(obstaclePosition, Constants.TREE_RADIUS);
+                        }
+                    }
+
+                    // If this is the far left or right columns, create a tree.
+                    else if (x <= startX || endX <= (x + (Constants.TREE_RADIUS)))
+                    {
+
+                        // Set the tree's initial position.
+                        Vector3 obstaclePosition = new Vector3(x, Constants.FLOOR_HEIGHT, y);
+                        CreateObstacle(obstaclePosition, Constants.TREE_RADIUS);
+
+                    }
+                }
+            }
+        }
+
+        public void CreateObstacles(MapVersion version)
+        {
+            if (version == null)
+            {
+                version = mapVersions[0];
+            }
+
+            for (int i = 0; i < version.noMansObstacles.Count; i++)
+            {
+                Vector3 position = version.noMansObstacles[i];
+
+                CreateObstacle(position, Constants.TREE_RADIUS);
+            }
+
+            for (int i = 0; i < version.sideObstacles.Count; i++)
+            {
+
+                Vector3 rightPosition = version.sideObstacles[i];
+
+                Vector3 leftPosition = rightPosition;
+                leftPosition.X *= -1;
+
+                CreateObstacle(rightPosition, Constants.TREE_RADIUS);
+                CreateObstacle(leftPosition, Constants.TREE_RADIUS);
+
+            }
+        }
+
+        public void CreateObstacle(Vector3 position, float radius)
+        {
+
+            // Make a new tree.
+            TreeServer newTree = new TreeServer();
+            newTree.Transform.Position = position;
+            newTree.Radius = radius;
+
+            Console.WriteLine("Creating tree at " + newTree.Transform.Position);
+
+            GameServer.instance.networkServer.SendNewObjectToAll(newTree);
+
         }
 
         /// <summary>

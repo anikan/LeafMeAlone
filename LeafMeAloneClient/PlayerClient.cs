@@ -78,11 +78,11 @@ namespace Client
 
             if (team == Team.BLUE)
             {
-                model.UseAltColor(new Color3(.5f, .5f, 1.0f));
+                model.UseAltColor(new Color3(.4f, .4f, 1.2f));
             }
             else if (team == Team.RED)
             {
-                model.UseAltColor(new Color3(1.0f, .5f, .5f));
+                model.UseAltColor(new Color3(1.2f, .4f, .4f));
             }
 
             _currAnim = animId;
@@ -113,7 +113,7 @@ namespace Client
             set
             {
                 _team = value;
-                model.UseAltColor( _team == Team.BLUE ? new Color3(.5f,.5f,1.0f) : new Color3(1.0f, .5f, .5f));
+                model.UseAltColor( _team == Team.BLUE ? new Color3(.4f,.4f,1.2f) : new Color3(1.2f, .4f, .4f));
             }
         }
 

@@ -44,7 +44,7 @@ namespace Server
         /// </summary>
         private void RestartMatch()
         {
-            game.GetLeafListAsObjects().ForEach(l => l.Destroy());
+            game.GetLeafListAsObjects().ForEach(l => l.Die());
             foreach (PlayerServer player in game.playerServerList)
             {
                 player.Reset();

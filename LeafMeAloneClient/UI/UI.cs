@@ -18,9 +18,9 @@ namespace Client.UI
         /// <summary>
         /// Text UI.
         /// </summary>
-        public UI(string text, UIManagerSpriteRenderer.TextType type, RectangleF pos, SpriteTextRenderer.TextAlignment alignment, Color color)
+        public UI(string text, UIManagerSpriteRenderer.TextType type, RectangleF offset, SpriteTextRenderer.TextAlignment alignment, Color color)
         {
-            UIText = UIManagerSpriteRenderer.DrawTextContinuous(text, type, pos, alignment, color);
+            UIText = UIManagerSpriteRenderer.DrawTextContinuous(text, type, offset, alignment, color);
         }
 
         public void SetUpdateAction(Action a)

@@ -47,6 +47,13 @@ namespace Client
             TextRenderers[type].DrawString(text, pos, alignment, new Color4(color));
         }
 
+        public static Vector2 GetTextWidth(string text, TextType type)
+        {
+            EnsureTypeExists(type);
+           var textWid = TextRenderers[type].MeasureString(text);
+            return new Vector2(textWid.Size.X,textWid.Size.Y);
+        }
+
         public static DrawableString DrawTextContinuous(string text, TextType type, RectangleF pos, SpriteTextRenderer.TextAlignment alignment, Color color)
         {
             DrawableString d = new DrawableString(text, type, pos, alignment, color);
@@ -88,7 +95,7 @@ namespace Client
         {
             foreach (DrawableString str in textPerFrame)
             {
-                DrawText(str.Text, str.Type, new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), str.Alignment, str.Color);
+                DrawText(str.Text, str.Type, new RectangleF(0 + str.Offset.X, 0 + str.Offset.Y, GraphicsRenderer.Form.ClientSize.Width + str.Offset.Width, GraphicsRenderer.Form.ClientSize.Height + str.Offset.Height), str.Alignment, str.Color);
             }
             foreach (DrawableTexture tex in texturesPerFrame)
             {

@@ -472,11 +472,11 @@ namespace Client
 
                 if (index == 0)
                 {
-                    GlobalUIManager.Teams.Team1_Leaves.Value = leafCount;
+                    GlobalUIManager.Teams.Team1_Leaves.UIText.Text = leafCount.ToString();
                 }
                 else
                 {
-                    GlobalUIManager.Teams.Team2_Leaves.Value = leafCount;
+                    GlobalUIManager.Teams.Team2_Leaves.UIText.Text = leafCount.ToString();
                 }
             }
 

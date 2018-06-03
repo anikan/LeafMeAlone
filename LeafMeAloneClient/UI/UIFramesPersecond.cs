@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace Client
         /// Constructor.
         /// </summary>
         public UIFramesPersecond() : base("0", UIManagerSpriteRenderer.TextType.BOLD,
-            new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), TextAlignment.Right | TextAlignment.Top, Color.Red)
+            RectangleF.Empty, TextAlignment.Right | TextAlignment.Top, Color.Red)
         {
             CurrentFps = 0.0f;
             stopwatch = Stopwatch.StartNew();
@@ -64,7 +65,7 @@ namespace Client
 
             }
 
-            UIText.Text = CurrentFps.ToString();
+            UIText.Text = CurrentFps.ToString(CultureInfo.InvariantCulture);
             stopwatch.Reset();
         }
 

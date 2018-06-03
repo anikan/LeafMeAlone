@@ -28,14 +28,13 @@ namespace Client
         {
             fps = new UIFramesPersecond();
             gameTimer = new UITimer(60);
-            Teams = new UITeams(new Size(8, 10), new Point(GraphicsRenderer.Form.ClientSize.Width / 2, 0));
+            Teams = new UITeams();
             GameWinLossState = new UIGameWLState();
             Culled = new UICulled();
 
             //Tool
             Tool = new UI.UI("Leaf Blower", UIManagerSpriteRenderer.TextType.BOLD,
-                new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height),
-                TextAlignment.Bottom | TextAlignment.Left, Color.White);
+               RectangleF.Empty, TextAlignment.Bottom | TextAlignment.Left, Color.White);
             Tool.SetUpdateAction(() =>
             {
                 switch (GraphicsManager.ActivePlayer.ToolEquipped)
@@ -51,14 +50,10 @@ namespace Client
                             case ToolMode.SECONDARY:
                                 Tool.UIText.Text = "Leaf Suctionery Thing";
                                 break;
-                            default:
-                                break;
                         }
                         break;
                     case ToolType.THROWER:
                         Tool.UIText.Text = "Flame Thrower";
-                        break;
-                    default:
                         break;
                 }
             });
@@ -70,8 +65,8 @@ namespace Client
 
             TeammateUI = new UIFindTeammate();
 
-            UIList.AddRange(new UI.UI[]{ fps, gameTimer, GameWinLossState, Culled, Tool, TeammateUI });
-            
+            UIList.AddRange(new UI.UI[] { fps, gameTimer, GameWinLossState, Culled, Tool, TeammateUI });
+
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace Client
         private readonly Timer t;
 
         public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString(TimeFormatting), UIManagerSpriteRenderer.TextType.NORMAL,
-            new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.Top | TextAlignment.Left, Color.White)
+            RectangleF.Empty, TextAlignment.Top | TextAlignment.Left, Color.White)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;

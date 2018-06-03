@@ -29,7 +29,7 @@ namespace Client.UI
         private WinLoseState currWinLoseState = WinLoseState.None;
         
         public UIGameWLState() : base("", UIManagerSpriteRenderer.TextType.MASSIVE,
-            new RectangleF(0, 0, GraphicsRenderer.Form.Width, GraphicsRenderer.Form.Height), TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter, Color.Transparent)
+            RectangleF.Empty, TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter, Color.Transparent)
         {
             SetState(WinLoseState.None);
         }

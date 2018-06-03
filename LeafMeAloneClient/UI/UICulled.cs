@@ -19,7 +19,7 @@ namespace Client.UI
         /// Create UI.
         /// </summary>
         public UICulled() : base("", UIManagerSpriteRenderer.TextType.BOLD,
-            new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), TextAlignment.HorizontalCenter | TextAlignment.Bottom, Color.White)
+            RectangleF.Empty, TextAlignment.HorizontalCenter | TextAlignment.Bottom, Color.White)
         {
 
         }

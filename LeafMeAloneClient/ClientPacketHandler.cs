@@ -84,6 +84,12 @@ namespace Client
                 GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
             }
 
+            void SpectatorAction(SpectatorPacket p)
+            {
+                GraphicsManager.ActiveCamera.CameraPosition = new SlimDX.Vector3(0, 200, -30);
+                client.CreateMap();
+            }
+
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
                 {
                     {PacketType.CreatePlayerPacket, (p) => CreatePlayerAction((CreatePlayerPacket) p)},
@@ -93,6 +99,7 @@ namespace Client
                     {PacketType.DestroyObjectPacket, (p) => DestroyAction((DestroyObjectPacket) p)},
                     {PacketType.GameResultPacket, (p) => GameResultAction((MatchResultPacket) p)},
                     {PacketType.MatchStartPacket, (p) => GameStartAction((MatchStartPacket)p)},
+                    {PacketType.SpectatorPacket, (p) => SpectatorAction((SpectatorPacket)p)},
                 };
         }
 

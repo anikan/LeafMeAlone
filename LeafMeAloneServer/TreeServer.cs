@@ -26,11 +26,11 @@ namespace Server
         }
 
         /// <summary>
-        /// Destroy the tree.
+        /// If a tree dies, destroy it completely
         /// </summary>
-        public override void Destroy()
+        public override void Die()
         {
-            base.Destroy();
+            GameServer.instance.Destroy(this);
         }
 
         /// <summary>

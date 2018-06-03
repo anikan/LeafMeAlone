@@ -173,7 +173,7 @@ namespace Client
         /// <summary>
         /// Destroy this GameObject and remove any references.
         /// </summary>
-        public override void Destroy()
+        public override void Die()
         {
             GameClient.instance.Destroy(this);
         }

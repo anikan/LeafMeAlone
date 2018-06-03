@@ -49,7 +49,7 @@ namespace Client
             void DestroyAction(DestroyObjectPacket p)
             {
                 NetworkedGameObjectClient packetObject = client.GetObjectFromPacket(p);
-                packetObject.Destroy();
+                packetObject.Die();
             }
 
             // What to do when creating an object

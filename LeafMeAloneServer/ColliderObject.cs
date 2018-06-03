@@ -45,9 +45,9 @@ namespace Server
         /// <summary>
         /// Destroys this object.
         /// </summary>
-        public override void Destroy()
+        public override void Die()
         {
-            base.Destroy();
+            base.Die();
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Server
         /// <returns>True if colliding, false otherwise.</returns>
         public bool IsColliding(ColliderObject other)
         {
-            if (!Collidable || other is LeafServer)
+            if (!other.Collidable || !Collidable || other is LeafServer)
             {
                 return false;
             }

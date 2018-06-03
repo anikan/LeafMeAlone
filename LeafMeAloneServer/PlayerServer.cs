@@ -70,7 +70,7 @@ namespace Server
             Vector3 newPlayerPos = Transform.Position + moveRequest * currentSpeed * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
             TryMoveObject(newPlayerPos);
-            DoDeathLogic();
+            TryRespawn();
 
             // If player isn't burning and is low on health.
             if (!Burning && Health < Constants.PLAYER_HEALTH)
@@ -82,26 +82,15 @@ namespace Server
         }
 
         /// <summary>
-        /// Handles player death
+        /// checks if the player is ready to respawn and does so.
         /// </summary>
-        private void DoDeathLogic()
+        private void TryRespawn()
         {
-            // if health is down, start the players death clock
-            if (Health < 0 && !Dead)
-            {
-                Dead = true;
-                Burning = false;
-                Burnable = false;
-                Health = Constants.PLAYER_HEALTH;
-                deathClock.Start();
-                Collidable = false;
-            // Once health is up, reset te death clock and player position
-            } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
+            if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
             {
                 deathClock.Reset();
                 Reset();
             }
-
         }
 
         /// <summary>
@@ -209,10 +198,16 @@ namespace Server
         }
 
         /// <summary>
-        /// In the case where a player burns to death, do nothing.
+        /// Kill the player
         /// </summary>
-        public override void Destroy()
+        public override void Die()
         {
+            Dead = true;
+            Burning = false;
+            Burnable = false;
+            Health = Constants.PLAYER_HEALTH;
+            deathClock.Start();
+            Collidable = false;
         }
 
         /// <summary>

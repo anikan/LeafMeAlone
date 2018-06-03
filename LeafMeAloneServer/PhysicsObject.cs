@@ -47,7 +47,7 @@ namespace Server
         /// </summary>
         /// <param name="objectType">Type of this object.</param>
         /// <param name="mass">Optional mass of the object, default 1</param>
-        public PhysicsObject(ObjectType objectType, float health, float mass, float radius, float bouncieness = 0.0f, bool canPush = false) : base(objectType, health, radius)
+        public PhysicsObject(ObjectType objectType, float health, float mass, float bouncieness = 0.0f, bool canPush = false) : base(objectType, health)
         {
             Mass = mass;
             Bounciness = bouncieness;
@@ -161,8 +161,6 @@ namespace Server
                 // If this is the leafblower's primary tool.
                 if (toolMode == ToolMode.PRIMARY)
                 {
-                    // Extinguish any objects that get blowed by the leaf blower.
-                    Extinguish();
 
                     // Get the force of this tool.
                     float toolForce = toolInfo.Force;

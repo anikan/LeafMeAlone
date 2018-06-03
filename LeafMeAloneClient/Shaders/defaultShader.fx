@@ -215,7 +215,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 	retColor = float4( retColor.xyz * Tint * Hue, 1.0f );
 
 	// Toon shading
-	float categories = 10.0f;
+	float categories = 6.0f;
 	float edge = max(0.0f, dot( normalize( NormalObj.xyz) , eVec ));
 	if (edge < 0.3f  )
 	{
@@ -223,7 +223,7 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 	}
 	else
 	{
-		retColor = float4((float(floor(retColor.x * categories + 0.5))) / categories, (float(floor(retColor.y * categories + 0.5))) / categories, (float(floor(retColor.z * categories + 0.5))) / categories, retColor.w);
+		retColor = float4((float(ceil(retColor.x * categories - 0.5))) / categories, (float(ceil(retColor.y * categories - 0.5))) / categories, (float(ceil(retColor.z * categories - 0.5))) / categories, retColor.w);
 	}
 
 	return retColor;

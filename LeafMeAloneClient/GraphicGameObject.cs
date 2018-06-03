@@ -149,7 +149,7 @@ namespace Client
             if (Burning)
             {
                 Transform t = new Transform {Position = Transform.Position,Scale =  new Vector3(1,1,1)};
-                Fire?.DrawTransform(t);
+                GraphicsManager.DrawParticlesThisFrame(Fire,t);
             }
 
             // If we're debugging, draw the pivot cube.

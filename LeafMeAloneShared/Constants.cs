@@ -11,6 +11,12 @@ namespace Shared
 
         //arrow for following player.
         public const string Arrow = @"../../Textures/Arrow.png";
+        public const string RedHealth = @"../../Textures/RedHealth.png";
+        public const string BlueHealth = @"../../Textures/BlueHealth.png";
+
+
+        public const string GlobalFont = "Arial";
+        public const int GlobalFontSize = 16;
 
         /// <summary>
         /// Player animation paths

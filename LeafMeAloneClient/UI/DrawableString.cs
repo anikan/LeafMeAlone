@@ -10,15 +10,15 @@ namespace Client
         public string Text;
         public UIManagerSpriteRenderer.TextType Type;
         public Color Color;
-        public RectangleF Position;
+        public RectangleF Offset;
         public TextAlignment Alignment;
 
-        public DrawableString(string text, UIManagerSpriteRenderer.TextType type, RectangleF position, TextAlignment alignment, Color color)
+        public DrawableString(string text, UIManagerSpriteRenderer.TextType type, RectangleF Offset, TextAlignment alignment, Color color)
         {
             this.Text = text;
             this.Type = type;
             this.Color = color;
-            this.Position = position;
+            this.Offset = Offset;
             this.Alignment = alignment;
         }
     }

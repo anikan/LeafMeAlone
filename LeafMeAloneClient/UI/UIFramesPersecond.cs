@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,14 +13,13 @@ using SpriteTextRenderer;
 
 namespace Client
 {
-    public class UIFramesPersecond
+    public class UIFramesPersecond : UI.UI
     {
         //Current FPS
         public double CurrentFps;
 
         //Stopwatch for counting.
         private readonly Stopwatch stopwatch;
-        private readonly DrawableString fps;
 
         private double totalFrames = 0.0f;
         private double totalTime = 0.0f;
@@ -28,12 +28,11 @@ namespace Client
         /// <summary>
         /// Constructor.
         /// </summary>
-        public UIFramesPersecond()
+        public UIFramesPersecond() : base("0", UIManagerSpriteRenderer.TextType.BOLD,
+            RectangleF.Empty, TextAlignment.Right | TextAlignment.Top, Color.Red)
         {
             CurrentFps = 0.0f;
             stopwatch = Stopwatch.StartNew();
-            fps = UIManagerSpriteRenderer.DrawTextContinuous("0", UIManagerSpriteRenderer.TextType.BOLD,
-                new RectangleF(0, 0, GraphicsRenderer.Form.ClientSize.Width, GraphicsRenderer.Form.ClientSize.Height), TextAlignment.Right | TextAlignment.Top, Color.Red);
 
            
         }
@@ -66,8 +65,13 @@ namespace Client
 
             }
 
-            fps.Text = CurrentFps.ToString();
+            UIText.Text = CurrentFps.ToString(CultureInfo.InvariantCulture);
             stopwatch.Reset();
+        }
+
+        public override void Update()
+        {
+            
         }
     }
 }

@@ -3,6 +3,7 @@ using Shared.Packet;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Server
 {
@@ -106,7 +107,11 @@ namespace Server
 
         internal PlayerServer AddPlayer()
         {
-            PlayerServer newPlayer = new PlayerServer(match.teams[playerCount++ % match.teams.Count]);
+            Team minPlayerTeam = match.teams.Aggregate(
+                    (curMin, x) => (curMin == null || (x.numPlayers) < curMin.numPlayers ? x : curMin)
+                    );
+            PlayerServer newPlayer = new PlayerServer(minPlayerTeam);
+            minPlayerTeam.numPlayers++;
             return newPlayer;
         }
     }

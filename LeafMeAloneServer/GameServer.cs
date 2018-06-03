@@ -32,7 +32,6 @@ namespace Server
             "ERROR: Singleton pattern violated on GameServer.cs. There are multiple instances!";
         private Stopwatch timer;
 
-        private List<Vector3> spawnPoints = new List<Vector3>();
         private int playerSpawnIndex = 0;
 
         private Stopwatch testTimer;
@@ -62,11 +61,6 @@ namespace Server
 
             timer.Start();
             testTimer.Start();
-
-            spawnPoints.Add(new Vector3(-10, 0, -10));
-            spawnPoints.Add(new Vector3(-10, 0, 10));
-            spawnPoints.Add(new Vector3(10, 0, -10));
-            spawnPoints.Add(new Vector3(10, 0, 10));
 
             networkServer = new NetworkServer(networked);
             matchHandler = new MatchHandler(Match.DefaultMatch, networkServer, this);
@@ -187,39 +181,23 @@ namespace Server
 
         }
 
-
-        /// <summary>
-        /// Gets the next spawn point of the player spawn index
-        /// </summary>
-        /// <returns>The vector 3 of the next spawn point</returns>
-        public Vector3 NextSpawnPoint()
-        {
-            return spawnPoints[(playerSpawnIndex++ % spawnPoints.Count)];
-        }
-
         public PlayerServer CreateNewPlayer()
         {
             //Assign id based on the next spot in the gameObjectDict.
             int id = gameObjectDict.Count();
 
             //Create two players, one to send as an active player to client. Other to keep track of on server.
-            PlayerServer newPlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1);
+            PlayerServer newPlayer = matchHandler.AddPlayer();
             newPlayer.Register();
+            playerServerList.Add(newPlayer);
 
             //Create the active player with the same id as the newPlayer.
-            PlayerServer newActivePlayer = new PlayerServer((Team)(playerSpawnIndex % 2) + 1)
+            PlayerServer newActivePlayer = new PlayerServer(newPlayer.Team)
             {
                 ObjectType = ObjectType.ACTIVE_PLAYER,
                 Id = newPlayer.Id
             };
-
-            playerServerList.Add(newPlayer);
-
-            Vector3 nextSpawnPoint = NextSpawnPoint();
-
-            //Note currently assuming players get ids 0-3
-            newActivePlayer.Transform.Position = nextSpawnPoint;
-            newPlayer.Transform.Position = nextSpawnPoint;
+            newActivePlayer.Transform.Position = newPlayer.Transform.Position;
 
             CreatePlayerPacket objPacket = ServerPacketFactory.NewCreatePacket(newPlayer);
 
@@ -241,20 +219,18 @@ namespace Server
             // Create the map with a width and height.
             MapServer newMap = new MapServer(Constants.MAP_WIDTH, Constants.MAP_HEIGHT);
 
-            float startX = (-newMap.Width / 2.0f) + TreeServer.TREE_RADIUS;
+            float startX = (-newMap.Width / 2.0f) + Constants.TREE_RADIUS;
             float startY = -newMap.Height / 2.0f;
             float endX = newMap.Width / 2.0f;
             float endY = newMap.Height / 2.0f;
 
-
-
             // Spawn trees around the border of the map!
             // Start by iterating through the height of the map, centered on origin and increase by the radius of a tree.
-            for (float y = startY; y < endY; y += TreeServer.TREE_RADIUS)
+            for (float y = startY; y < endY; y += (Constants.TREE_RADIUS))
             {
 
                 // Iterate through the width of the map, centered on origin and increase by radius of a tree.
-                for (float x = startX; x < endX; x += TreeServer.TREE_RADIUS)
+                for (float x = startX; x < endX; x += (Constants.TREE_RADIUS))
                 {
 
                     float random = (float)rnd.NextDouble();
@@ -274,7 +250,7 @@ namespace Server
                     }
 
                     // If this is a top or bottom row, create trees.
-                    if (y <= startY || endY <= (y + TreeServer.TREE_RADIUS))
+                    if (y <= startY || endY <= (y + (Constants.TREE_RADIUS)))
                     {
 
                         // Make a new tree.
@@ -283,13 +259,20 @@ namespace Server
                         // Set the tree's initial position.
                         newTree.Transform.Position = new Vector3(x, Constants.FLOOR_HEIGHT, y);
 
+                        // If this is the bottom row.
+                        if (y <= startY)
+                        {
+                            // Increase the radius.
+                            newTree.Radius = Constants.TREE_RADIUS * 2;
+                        }
+
                         // Send the new object to client.
                         networkServer.SendNewObjectToAll(newTree);
 
                     }
 
                     // If this is the far left or right columns, create a tree.
-                    else if (x <= startX || endX <= (x + TreeServer.TREE_RADIUS))
+                    else if (x <= startX || endX <= (x + (Constants.TREE_RADIUS)))
                     {
 
                         // Make a new tree.
@@ -335,8 +318,8 @@ namespace Server
 
             float minX = matchHandler.GetMatch().NoMansLand.leftX;
             float maxX = matchHandler.GetMatch().NoMansLand.rightX;
-            float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * TreeServer.TREE_RADIUS);
-            float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * TreeServer.TREE_RADIUS);
+            float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * Constants.TREE_RADIUS);
+            float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * Constants.TREE_RADIUS);
 
             // Get random doubles for position.
             double randX = rnd.NextDouble();
@@ -419,16 +402,6 @@ namespace Server
         {
             // Turn the game objects to a value list.
             return gameObjectDict.Values.ToList();
-        }
-
-        /// <summary>
-        /// Gets a new random spawn point for the player.
-        /// </summary>
-        /// <returns>A vector 3 of the spawn point</returns>
-        public Vector3 GetRandomSpawnPoint()
-        {
-            int index = new Random().Next(spawnPoints.Count);
-            return spawnPoints.ElementAt(index);
         }
 
         public List<GameObject> GetLeafListAsObjects()

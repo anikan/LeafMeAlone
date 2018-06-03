@@ -7,6 +7,7 @@ using Client.UI;
 using SlimDX;
 using Shared;
 using Shared.Packet;
+using System.Diagnostics;
 
 namespace Client
 {
@@ -14,6 +15,8 @@ namespace Client
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
+
+        public bool StoppedRequesting = true;
 
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
@@ -30,11 +33,11 @@ namespace Client
 
             public ToolType EquipToolRequest;
         };
-        
+
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
-        private ParticleSystem FlameThrower,LeafBlower;
+        private ParticleSystem FlameThrower, LeafBlower;
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
@@ -42,7 +45,7 @@ namespace Client
         private int _currAnim, _overridedAnim;
         public UIHealth healthUI;
 
-        public PlayerClient(CreateObjectPacket createPacket) : 
+        public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
         {
             FlameThrower = new FlameThrowerParticleSystem();
@@ -80,13 +83,13 @@ namespace Client
             model = AnimationManager.GetAnimatedModel(animId, true, repeat);
             Transform.Scale = AnimationManager.GetScale(animId);
 
-            if (team == Team.BLUE)
+            if (Team == TeamName.BLUE)
             {
-                model.UseAltColor(new Color3(.5f, .5f, 1.0f));
+                model.UseAltColor(new Color3(.4f, .4f, 1.2f));
             }
-            else if (team == Team.RED)
+            else if (Team == TeamName.RED)
             {
-                model.UseAltColor(new Color3(1.0f, .5f, .5f));
+                model.UseAltColor(new Color3(1.2f, .4f, .4f));
             }
 
             _currAnim = animId;
@@ -111,17 +114,18 @@ namespace Client
             _overridedAnim = -1;
         }
 
-        public Team team
+        public TeamName Team
         {
-            get { return _team; }
+            get => _team;
             set
             {
                 _team = value;
-                model.UseAltColor( _team == Team.BLUE ? new Color3(.5f,.5f,1.0f) : new Color3(1.0f, .5f, .5f));
+
+                model.UseAltColor( _team == TeamName.BLUE ? new Color3(.4f,.4f,1.2f) : new Color3(1.2f, .4f, .4f));
             }
         }
 
-        private Team _team;
+        private TeamName _team;
 
         //Implementations of IPlayer fields
         public bool Dead { get; set; }
@@ -171,17 +175,74 @@ namespace Client
             PlayerRequests.ActiveToolMode = ToolMode.SECONDARY;
         }
 
+        /// <summary>
+        /// Request to equip a specific tool type.
+        /// </summary>
+        /// <param name="type">Tool type to equip.</param>
         public void RequestToolEquip(ToolType type)
         {
+            // If this isn't the existing tool type.
             if (type != ToolEquipped)
             {
-                Console.WriteLine("Requesting new tool! " + type.ToString());
+                // Request the new tool.
                 PlayerRequests.EquipToolRequest = type;
             }
+            // If it's the same as what's equipped.
             else
             {
+                // Just request same.
                 PlayerRequests.EquipToolRequest = ToolType.SAME;
             }
+        }
+
+        /// <summary>
+        /// Request to cycle to the next tool.
+        /// </summary>
+        public void RequestCycleTool()
+        {
+
+            // If we don't already have a request and check the bool to prevent rapid cycling.
+            if (PlayerRequests.EquipToolRequest == ToolType.SAME && StoppedRequesting)
+            {
+
+                // We have not stopped requesting.
+                StoppedRequesting = false;
+
+                // If the equipped tool is the blower.
+                if (ToolEquipped == ToolType.BLOWER)
+                {
+                    // Equip the thrower.
+                    PlayerRequests.EquipToolRequest = ToolType.THROWER;
+                }
+
+                //If the equipped tool is the thrower.
+                else
+                {
+                    // Equip the blower.
+                    PlayerRequests.EquipToolRequest = ToolType.BLOWER;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the transform of the active tool.
+        /// </summary>
+        /// <returns>Transform of the tool.</returns>
+        public Transform GetToolTransform()
+        {
+            Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
+                       Matrix.RotationY(Transform.Rotation.Y) *
+                       Matrix.RotationZ(Transform.Rotation.Z);
+
+            Transform toolTransform = new Transform();
+            toolTransform.Position = Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat);
+            toolTransform.Rotation = Transform.Rotation;
+
+            // TODO: Make this the actual tool transform.
+            // Currently just the player transform.
+
+            return toolTransform;
+
         }
 
         // Note: Causes weird behaviour sometimes. Needs to be fixed if want to use.
@@ -204,7 +265,7 @@ namespace Client
             {
                 angle = -angle;
             }
-       
+
             Transform.Rotation = new Vector3(Transform.Rotation.X, angle, Transform.Rotation.Z);
 
         }
@@ -278,7 +339,7 @@ namespace Client
             // Set rotation initially to the rotation of the player
 
             PlayerRequests.RotationRequested = Transform.Rotation.Y;
-  
+
             // PlayerRequests.EquipToolRequest = equippedTool;
         }
 
@@ -298,20 +359,16 @@ namespace Client
             bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
 
             base.UpdateFromPacket(packet.ObjData);
+
+            // If death state changes, reset tint.
+            if (Dead != packet.Dead)
+            {
+                CurrentTint = new Vector3(1, 1, 1);
+                CurrentHue = new Vector3(1, 1, 1);
+            }
+
             Dead = packet.Dead;
 
-            if (Dead)
-            {
-                model.Enabled = false;
-                if(healthUI != null)
-                    healthUI.UITexture.Enabled = false;
-            } else
-            {
-                model.Enabled = true;
-                if (healthUI != null)
-                    healthUI.UITexture.Enabled = true;
-            }
-            
             ToolEquipped = packet.ToolEquipped;
             ActiveToolMode = packet.ActiveToolMode;
             Transform.Position.Y = Constants.FLOOR_HEIGHT;
@@ -324,9 +381,22 @@ namespace Client
             bool currEquipThrower = ToolEquipped == ToolType.THROWER;
             bool currEquipBlower = ToolEquipped == ToolType.BLOWER;
 
-
             EvaluateAnimation(prevMoving, currMoving, prevEquipBlower, currEquipBlower, prevEquipThrower, currEquipThrower, hurt);
             EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction);
+
+            // Depending on death state, show model
+            if (Dead)
+            {
+                model.Enabled = false;
+                if (healthUI != null)
+                    healthUI.UITexture.Enabled = false;
+            }
+            else
+            {
+                model.Enabled = true;
+                if (healthUI != null)
+                    healthUI.UITexture.Enabled = true;
+            }
 
             switch (ActiveToolMode)
             {
@@ -392,7 +462,7 @@ namespace Client
             {
                 SwitchAnimation(_animWalkThrower);
             }
-            
+
         }
 
         /// <summary>
@@ -406,8 +476,8 @@ namespace Client
         /// <param name="currUsingWind"> using windblower currently? </param>
         /// <param name="prevUsingSuction"> using suction previously? </param>
         /// <param name="currUsingSuction"> using suction currently? </param>
-        public void EvaluateAudio(bool prevMoving, bool currMoving, 
-            bool prevUsingFlame, bool currUsingFlame, 
+        public void EvaluateAudio(bool prevMoving, bool currMoving,
+            bool prevUsingFlame, bool currUsingFlame,
             bool prevUsingWind, bool currUsingWind,
             bool prevUsingSuction, bool currUsingSuction)
         {
@@ -479,14 +549,16 @@ namespace Client
                          Matrix.RotationY(Transform.Rotation.Y) *
                          Matrix.RotationZ(Transform.Rotation.Z);
 
+            Transform toolTransform = GetToolTransform();
+
             FlameThrowerParticleSystem p = FlameThrower as FlameThrowerParticleSystem;
             // flame throwing particle system update
-            FlameThrower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
+            FlameThrower.SetOrigin(toolTransform.Position);
             FlameThrower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             FlameThrower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             FlameThrower.Update(deltaTime);
 
-            LeafBlower.SetOrigin(Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat));
+            LeafBlower.SetOrigin(toolTransform.Position);
             LeafBlower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             LeafBlower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             LeafBlower.Update(deltaTime);

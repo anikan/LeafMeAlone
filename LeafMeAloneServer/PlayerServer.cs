@@ -14,10 +14,12 @@ namespace Server
     {
 
         // Constant values of the player.
-        public const float PLAYER_HEALTH = 10.0f;
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 3.0f;
         public const float PLAYER_SPEED = 25.0f;
+        public const float THROWER_SPEED = 10.0f;
+
+        private float currentSpeed = PLAYER_SPEED;
 
         public Team Team { get; set; }
         public bool Dead { get; set; }
@@ -30,11 +32,31 @@ namespace Server
 
         private Stopwatch deathClock = new Stopwatch();
 
-        public PlayerServer(Team team) : base(ObjectType.PLAYER, PLAYER_HEALTH, PLAYER_MASS, PLAYER_RADIUS, 0.0f, true)
+        public PlayerServer(Team team) : base(ObjectType.PLAYER, Constants.PLAYER_HEALTH, PLAYER_MASS, 0.0f, true)
         {
             Team = team;
             ToolEquipped = ToolType.BLOWER;
             Burnable = true;
+            Radius = PLAYER_RADIUS;
+            colliderType = ColliderType.CIRCLE;
+            JumpToRandomSpawn();
+
+        }
+
+        private void JumpToRandomSpawn()
+        {
+            Transform.Position = Team.GetNextSpawnPoint();
+            foreach (ColliderObject obj in GameServer.instance.gameObjectDict.Values)
+            {
+                if (obj is PlayerServer || obj is TreeServer)
+                {
+                    if (obj != this && IsColliding(obj))
+                    {
+                        Transform.Position = Team.GetNextSpawnPoint();
+                    }
+
+                }
+            }
         }
 
         /// <summary>
@@ -45,23 +67,39 @@ namespace Server
         {
             base.Update(deltaTime);
             // Move the player in accordance with requests
-            Vector3 newPlayerPos = Transform.Position + moveRequest * PLAYER_SPEED * deltaTime;
+            Vector3 newPlayerPos = Transform.Position + moveRequest * currentSpeed * deltaTime;
             newPlayerPos.Y = Constants.FLOOR_HEIGHT;
             TryMoveObject(newPlayerPos);
+            DoDeathLogic();
 
+            // If player isn't burning and is low on health.
+            if (!Burning && Health < Constants.PLAYER_HEALTH)
+            {
+                // Regen health.
+                Health += Constants.HEALTH_REGEN_RATE * deltaTime;
+            }
+
+        }
+
+        /// <summary>
+        /// Handles player death
+        /// </summary>
+        private void DoDeathLogic()
+        {
             // if health is down, start the players death clock
             if (Health < 0 && !Dead)
             {
                 Dead = true;
                 Burning = false;
-                Health = PLAYER_HEALTH;
+                Burnable = false;
+                Health = Constants.PLAYER_HEALTH;
                 deathClock.Start();
+                Collidable = false;
             // Once health is up, reset te death clock and player position
             } else if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
             {
                 deathClock.Reset();
-                Transform.Position = GameServer.instance.GetRandomSpawnPoint();
-                Dead = false;
+                Reset();
             }
 
         }
@@ -89,6 +127,21 @@ namespace Server
                         gameObject.HitByTool(GetToolTransform(), ToolEquipped, ActiveToolMode);
 
                     }
+
+                    if (ToolEquipped == ToolType.THROWER)
+                    {
+
+                        currentSpeed = THROWER_SPEED;
+
+                    }
+                    else
+                    {
+                        currentSpeed = PLAYER_SPEED;
+                    }
+                }
+                else
+                {
+                    currentSpeed = PLAYER_SPEED;
                 }
             }
         }
@@ -99,12 +152,21 @@ namespace Server
         /// <returns>Transform of the tool.</returns>
         public Transform GetToolTransform()
         {
+            Matrix mat = Matrix.RotationX(Transform.Rotation.X) *
+                       Matrix.RotationY(Transform.Rotation.Y) *
+                       Matrix.RotationZ(Transform.Rotation.Z);
+
+            Transform toolTransform = new Transform();
+            toolTransform.Position = Transform.Position + Vector3.TransformCoordinate(Constants.PlayerToToolOffset, mat);
+            toolTransform.Rotation = Transform.Rotation;
 
             // TODO: Make this the actual tool transform.
             // Currently just the player transform.
-            return Transform;
+
+            return toolTransform;
 
         }
+
 
         /// <summary>
         /// Update the player based on a packet sent from the client.
@@ -150,13 +212,20 @@ namespace Server
         {
         }
 
-        internal void Reset(Vector3 pos)
+        /// <summary>
+        /// Resets the player to a specified position
+        /// </summary>
+        /// <param name="pos">The position to set the player to</param>
+        internal void Reset()
         {
             Velocity = new Vector3();
             moveRequest = new Vector3();
-            Transform.Position = pos;
+            JumpToRandomSpawn();
             Health = Constants.PLAYER_HEALTH;
             Burning = false;
+            Dead = false;
+            Burnable = true;
+            Collidable = true;
             ActiveToolMode = ToolMode.NONE;
         }
     }

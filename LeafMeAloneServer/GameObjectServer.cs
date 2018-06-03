@@ -20,8 +20,10 @@ namespace Server
 
         // Rate (in seconds) that health decrements if an object is on fire.
         public const float HEALTH_DECREMENT_RATE = 1.0f;
-
         public const float BURNING_RAMP_RATE = 1.0f;
+        public const float SECONDS_TO_EXTINGUISH = 0.5f;
+
+        private Stopwatch ExtinguishTimer;
 
         //True if this object has been changed since the last update and needs to be sent to all clients.
         //Set when burning or when it moves.
@@ -36,6 +38,7 @@ namespace Server
         {
             // Call the initialize function with correct arguments.
             Initialize(objectType, health);
+
         }
 
         /// <summary>
@@ -58,6 +61,7 @@ namespace Server
         {
             ObjectType = objectType;
             Health = health;
+            ExtinguishTimer = new Stopwatch();
 
         }
 
@@ -76,6 +80,7 @@ namespace Server
                 // If it is being actively burned this frame.
                 if (FlamethrowerActivelyBurning)
                 {
+
                     // Increase the frames this object is burning.
                     burnFrames++;
 
@@ -89,6 +94,14 @@ namespace Server
                     // Set to 1.
                     burnFrames = 1;
                 }
+
+                // If we've been blowing on the object for the desired period of time, extinguish it.
+                if (blowFrames * deltaTime > SECONDS_TO_EXTINGUISH)
+                {
+                    // Stop the object from burning.
+                    Extinguish();
+                }
+
 
                 // Get fire damage from the flamethrower.
                 float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
@@ -104,6 +117,12 @@ namespace Server
                     // Destroy.
                     Destroy();
                 }
+
+                if (ExtinguishTimer.ElapsedMilliseconds / 1000.0f >= Constants.MAX_SECONDS_BURNING)
+                {
+                    Extinguish();
+                }
+
             }
         }
 
@@ -115,6 +134,8 @@ namespace Server
             if (Burnable)
             {
                 FlamethrowerActivelyBurning = true;
+                ExtinguishTimer.Restart();
+
             }
         }
 
@@ -123,10 +144,11 @@ namespace Server
         /// </summary>
         public void Extinguish()
         {
-            //The object stopped burning, it's been modified.
-            Modified = true;
 
+            // Extinguish the object by setting burn and blow frames to 0.
             burnFrames = 0;
+            blowFrames = 0;
+            ExtinguishTimer.Stop();
         }
 
         /// <summary>
@@ -155,12 +177,20 @@ namespace Server
             {
             
                 // If this is the primary function of the blower.
-                if (toolMode == ToolMode.PRIMARY)
+                if (toolMode == ToolMode.PRIMARY && Burning)
                 {
 
-                    Extinguish();
+                    blowFrames++;
 
                 }
+                else
+                {
+                    blowFrames = 0;
+                }
+            }
+            else
+            {
+                blowFrames = 0;
             }
         }
 
@@ -169,11 +199,11 @@ namespace Server
         /// </summary>
         /// <param name="player">The player to check</param>
         /// <returns>The distance from the object to the player</returns>
-        public float GetDistanceToPlayer(PlayerServer player)
+        public float GetDistanceToTool(Transform toolTransform)
         {
 
             // Get the vector between the two.
-            Vector3 VectorBetween = Transform.Position - player.Transform.Position;
+            Vector3 VectorBetween = Transform.Position - toolTransform.Position;
             VectorBetween.Y = 0.0f;
 
             // Calculate the length.
@@ -191,22 +221,22 @@ namespace Server
           //  Console.WriteLine("Checking object with ID " + Id  + " and type " + this.GetType().ToString());
             // Get the player's equipped tool.
             ToolInfo equippedToolInfo = Tool.GetToolInfo(player.ToolEquipped);
+            Transform toolTransform = player.GetToolTransform();
 
             // Check if the leaf is within range of the player.
-            if (GetDistanceToPlayer(player) <= equippedToolInfo.Range)
+            if (GetDistanceToTool(toolTransform) <= equippedToolInfo.Range)
             {
                 // Get the forward vector of the player.
-                // TODO: Have an actual Transform.Forward
-                Vector3 PlayerForward = player.Transform.Forward;
-                PlayerForward.Y = 0.0f;
+                Vector3 ToolForward = toolTransform.Forward;
+                ToolForward.Y = 0.0f;
 
-                // Get the vector from the player to the leaf.
-                Vector3 PlayertoObject = Transform.Position - player.Transform.Position;
-                PlayertoObject.Y = 0.0f;
+                // Get the vector from the tool to the leaf.
+                Vector3 ToolToObject = Transform.Position - toolTransform.Position;
+                ToolToObject.Y = 0.0f;
 
                 // Get dot product of the two vectors and the product of their magnitudes.
-                float dot = Vector3.Dot(PlayerForward, PlayertoObject);
-                float mag = PlayerForward.Length() * PlayertoObject.Length();
+                float dot = Vector3.Dot(ToolForward, ToolToObject);
+                float mag = ToolForward.Length() * ToolToObject.Length();
 
                 // Calculate the angle between the two vectors.
                 float angleBetween = (float)Math.Acos(dot / mag);

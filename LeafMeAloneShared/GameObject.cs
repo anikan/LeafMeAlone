@@ -29,6 +29,7 @@ namespace Shared
 
         // How many frames this object has consistently been burning for.
         protected int burnFrames = 0;
+        protected int blowFrames = 0;
 
         // Is this object burning?
         public bool Burning

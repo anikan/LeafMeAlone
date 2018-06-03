@@ -16,9 +16,11 @@ namespace Server
         /// <summary>
         /// Create a new leaf on the server.
         /// </summary>
-        public LeafServer() : base(ObjectType.LEAF, Constants.LEAF_HEALTH, Constants.LEAF_MASS, Constants.LEAF_RADIUS, Constants.LEAF_BOUNCIENESS)
+        public LeafServer() : base(ObjectType.LEAF, Constants.LEAF_HEALTH, Constants.LEAF_MASS, Constants.LEAF_BOUNCIENESS)
         {
             Burnable = true;
+            Radius = Constants.LEAF_RADIUS;
+            colliderType = ColliderType.CIRCLE;
         }
 
         /// <summary>

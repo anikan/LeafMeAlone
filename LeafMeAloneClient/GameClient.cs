@@ -73,9 +73,9 @@ namespace Client
 
         private int _audioBGM;
 
+        private RequestPacket lastRequest = null;
+
         public static GameClient instance;
-
-
 
         private static void Main(String[] args)
         {
@@ -114,9 +114,9 @@ namespace Client
             GlobalUIManager.gameTimer.End();
         }
 
-        internal Team GetPlayerTeam()
+        internal TeamName GetPlayerTeam()
         {
-            return ActivePlayer.team;
+            return ActivePlayer.Team;
         }
         
         private void DoGameLoop()
@@ -137,7 +137,7 @@ namespace Client
                 InputManager.Update();
 
                 // Send any packets to the server.
-                SendPackets();
+                SendRequest();
             }
 
 
@@ -190,7 +190,7 @@ namespace Client
 
             _audioBGM = AudioManager.GetNewSource();
             AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
-            AudioManager.SetSourceVolume(_audioBGM, 0.01f);
+            AudioManager.SetSourceVolume(_audioBGM, 0.05f);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -371,16 +371,24 @@ namespace Client
         }
 
         /// <summary>
-        /// Sends out the data associated with the active player's input, 
-        /// resets requested movement
+        /// Sends out the data associated with the active player's input if the player is requesting something different, 
+        /// resets requested movement.
+        /// 
         /// </summary>
-        private void SendPackets()
+        private void SendRequest()
         {
             // Create a new player packet, and fill it with player info.
             RequestPacket toSend =
                 ClientPacketFactory.CreateRequestPacket(ActivePlayer);
-            byte[] data = PacketUtil.Serialize(toSend);
-            networkClient.Send(data);
+
+            //If this is sending different data from before, send it.
+            if (!RequestPacket.equals(toSend, lastRequest))
+            {
+                byte[] data = PacketUtil.Serialize(toSend);
+                networkClient.Send(data);
+
+                lastRequest = toSend;
+            }
 
             // Reset the player's requested movement after the packet is sent.
             // Note: This should be last!
@@ -438,9 +446,9 @@ namespace Client
             foreach (LeafClient leaf in leaves)
             {
                 // Iterate through all team sections.
-                for (int index = 0; index < activeMatch.teamSections.Count; index++)
+                for (int index = 0; index < activeMatch.teams.Count; index++)
                 {
-                    TeamSection section = activeMatch.teamSections[index];
+                    TeamSection section = activeMatch.teams[index].teamSection;
                     // If this leaf is in this team section.
                     if (section.IsInBounds(leaf.Transform.Position))
                     {
@@ -463,10 +471,10 @@ namespace Client
         public void CountLeaves()
         {
 
-            for (int index = 0; index < activeMatch.teamSections.Count; index++)
+            for (int index = 0; index < activeMatch.teams.Count; index++)
             {
 
-                TeamSection section = activeMatch.teamSections[index];
+                TeamSection section = activeMatch.teams[index].teamSection;
 
                 int leafCount = activeMatch.GetTeamLeaves(index, GetLeafListAsGameObjects());
 

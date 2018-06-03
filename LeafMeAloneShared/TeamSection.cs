@@ -21,9 +21,9 @@ namespace Shared
         // Number of leaves in this section.
         public int numLeaves;
 
+        public List<Vector3> spawnPoints;
         // Color of the section.
         public Vector3 sectionColor;
-        internal Team team;
 
         // Checks if a position is in the bounds.
         public bool IsInBounds(Vector3 position)
@@ -58,7 +58,7 @@ namespace Shared
                     // Increase the number of leaves.
                     numLeaves++;
 
-                //    Console.WriteLine("Num objects is now " + numLeaves);
+                    //    Console.WriteLine("Num objects is now " + numLeaves);
                 }
             }
         }
@@ -73,6 +73,34 @@ namespace Shared
             // Just print out the bounds.
             return string.Format("Left Bound: {0}, Right Bound: {1}, Up Bound: {2}, Low Bound: {3}", leftX, rightX, upZ, downZ);
 
+        }
+
+        /// <summary>
+        /// Initializes the spawn points for the team section based upon random ranges in each section
+        /// </summary>
+        internal void InitSpawnPoints()
+        {
+            float halfway = (rightX + leftX) / 2;
+            // on the left side of the map, spawn starting from the left
+            if (leftX < 0 && rightX < 0) 
+            {
+                spawnPoints = new List<Vector3>
+                {
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(leftX+10,halfway), 0, Utility.RandomInRange(downZ+10,upZ-10))
+                };
+            } else if (leftX > 0 && rightX > 0)
+            {
+                spawnPoints = new List<Vector3>
+                {
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10)),
+                    new Vector3(Utility.RandomInRange(halfway,rightX-10), 0, Utility.RandomInRange(downZ+10,upZ-10))
+                };
+            }
         }
     }
 }

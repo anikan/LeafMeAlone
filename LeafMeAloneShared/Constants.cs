@@ -54,7 +54,7 @@ namespace Shared
         public const string LeafModel = @"../../Models/LeafModel/05.13.18_Leaf.fbx";
         public const string PlayerModel = @"../../Models/PlayerModel/05.03.18_Version2.fbx";
         public const string DefaultMapModel = @"../../Models/Terrain/Terrain.fbx";
-        public const string TreeModel = @"../../Models/Tree/TreeAttempt.fbx";
+        public const string TreeModel = @"../../Models/Tree/SmoothTree.fbx";
 
         /// <summary>
         /// Sounds/Audio files
@@ -114,7 +114,6 @@ namespace Shared
         public const int MATCH_RESET_TIME = 10;
 
         public const float PUSH_FACTOR = 3.0f;
-        public const float PLAYER_HEALTH = 10.0f;
 
         public const float BLOWER_DISTANCE_SCALER = 2.0f;
 
@@ -125,11 +124,23 @@ namespace Shared
         public const int DEATH_TIME = 3;
 
         // Constants for leafs. 
-        public const float LEAF_HEALTH = 10.0f;
+        public const float LEAF_HEALTH = 8.0f;
         public const float LEAF_MASS = 0.1f;
         public const float LEAF_RADIUS = 0.0f;
         public const float LEAF_BOUNCIENESS = 0.8f;
 
         public const float LEAF_ROTATE_SPEED = 0.2f;
+
+        // Constants for the tree.
+        public const float TREE_RADIUS = 4.0f;
+        public const float TREE_HEALTH = 10000.0f;
+
+        // How long an object can burn for before extinguishing automatically.
+        public const float MAX_SECONDS_BURNING = 10.0f;
+
+        public const float PLAYER_HEALTH = 10.0f;
+        public const float HEALTH_REGEN_RATE = 0.01f;
+
+
     }
 }

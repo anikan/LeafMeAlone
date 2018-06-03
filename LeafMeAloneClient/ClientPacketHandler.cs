@@ -62,7 +62,7 @@ namespace Client
             void CreatePlayerAction(CreatePlayerPacket p)
             {
                 PlayerClient player = (PlayerClient)CreateObjectAction(p.createPacket);
-                player.team = p.team;
+                player.Team = p.team;
             }
 
             // What to do on game finish

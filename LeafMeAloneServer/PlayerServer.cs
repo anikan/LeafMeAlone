@@ -209,12 +209,10 @@ namespace Server
         }
 
         /// <summary>
-        /// Removes the player from the team 
+        /// In the case where a player burns to death, do nothing.
         /// </summary>
         public override void Destroy()
         {
-            Team.numPlayers--;
-            base.Destroy();
         }
 
         /// <summary>

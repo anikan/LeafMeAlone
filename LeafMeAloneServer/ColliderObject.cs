@@ -24,6 +24,8 @@ namespace Server
 
         protected ColliderType colliderType;
 
+        private Random rnd;
+
         // Radius of this object for basic n00b collisions.
         public float Radius = 1.0f;
 
@@ -36,7 +38,7 @@ namespace Server
         public ColliderObject(ObjectType objectType, float health) : base(objectType, health)
         {
 
-
+            rnd = new Random();
         }
 
         /// <summary>
@@ -56,6 +58,7 @@ namespace Server
         public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             base.HitByTool(toolTransform, toolType, toolMode);
+
         }
 
         /// <summary>
@@ -153,13 +156,13 @@ namespace Server
                         // Try to move only in the X axis.
                         if (stacklevel < 1)
                         {
-                            TryMoveObject(new Vector3(newPosition.X, OriginalPosition.Y, OriginalPosition.Z), stacklevel+1);
+                            TryMoveObject(new Vector3(newPosition.X, OriginalPosition.Y, OriginalPosition.Z), stacklevel + 1);
                         }
 
                         // Try to move only in the Z axis.
                         if (stacklevel < 1)
                         {
-                            TryMoveObject(new Vector3(OriginalPosition.X, OriginalPosition.Y, newPosition.Z), stacklevel+1);
+                            TryMoveObject(new Vector3(OriginalPosition.X, OriginalPosition.Y, newPosition.Z), stacklevel + 1);
                         }
 
                         // If this is a physics object
@@ -179,6 +182,8 @@ namespace Server
 
                         }
 
+                        EnsureSafePosition();
+
                         // couldn't move
                         return false;
                     }
@@ -188,6 +193,8 @@ namespace Server
             // Moved! 
             //The object moved, it's been modified.
             Modified = true;
+
+            EnsureSafePosition();
 
             return true;
         }
@@ -207,6 +214,57 @@ namespace Server
             if (Math.Abs(vector.Z) < minBeforeZero) vector.Z = 0.0f;
 
             return vector;
+        }
+
+        /// <summary>
+        /// Force the object to a safe position.
+        /// </summary>
+        /// <param name="stackCount">Times this function has been recursively called.</param>
+        public void EnsureSafePosition(int stackCount = 0)
+        {
+
+            // Is the position safe?
+            bool safe = false;
+
+            // Save the original position of this object.
+            Vector3 OriginalPosition = Transform.Position;
+
+            // First, we need all the game objects on the server.
+            List<GameObjectServer> allObjects = GameServer.instance.GetGameObjectList();
+
+            // Iterate through all the objects.
+            for (int i = 0; i < allObjects.Count; i++)
+            {
+                // Check if the object has a collider.
+                if (allObjects[i] is ColliderObject obj)
+                {
+                    // If the object is colliding, mark as unsafe.
+                    if (obj != this && IsColliding(obj))
+                    {
+                        safe = false;
+                        break;
+                    }
+                }
+
+                // Position is safe.
+                safe = true;
+            }
+
+            // If not safe (and preventing stack overflow)
+            if (!safe && stackCount < 10)
+            {
+
+                // Get a random offset for the position.
+                Vector3 newRandomOffset = new Vector3(Utility.RandomInRange(-5.0f, 5.0f), Utility.RandomInRange(-5.0f, 5.0f), Utility.RandomInRange(-5.0f, 5.0f));
+                Vector3 newTestPosition = Transform.Position + newRandomOffset;
+
+                // Try to move the object to the test position.
+                TryMoveObject(newTestPosition);
+
+                // Ensure safe position again.
+                EnsureSafePosition(stackCount+1);
+
+            }
         }
     }
 }

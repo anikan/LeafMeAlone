@@ -15,8 +15,8 @@ namespace Shared
         public const string BlueHealth = @"../../Textures/BlueHealth.png";
 
 
-        public const string GlobalFont = "Arial";
-        public const int GlobalFontSize = 16;
+        public const string GlobalFont = "Dimbo";
+        public const int GlobalFontSize = 32;
 
         /// <summary>
         /// Player animation paths

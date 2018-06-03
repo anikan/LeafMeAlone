@@ -58,8 +58,9 @@ namespace Client
             {
                 //change of health
                 var deltaHealth = oldHealth - Health;
-                CurrentTint -= new Vector3((deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH), (deltaHealth / Constants.LEAF_HEALTH));
-
+                Console.WriteLine(deltaHealth);
+                CurrentTint = new Vector3(1,1,1) * ((Health / Constants.LEAF_HEALTH) * .7f + .3f);
+                //Debug.Log(CurrentTint.ToString());
             }
         }
     }

@@ -247,8 +247,8 @@ namespace Server
             double minY = Constants.FLOOR_HEIGHT;
             double maxY = Constants.FLOOR_HEIGHT + 0.2f;
 
-            float minX = matchHandler.GetMatch().NoMansLand.leftX;
-            float maxX = matchHandler.GetMatch().NoMansLand.rightX;
+            float minX = matchHandler.GetMatch().NoMansLand.leftX + Constants.TREE_RADIUS;
+            float maxX = matchHandler.GetMatch().NoMansLand.rightX - Constants.TREE_RADIUS;
             float minZ = matchHandler.GetMatch().NoMansLand.downZ + (2 * Constants.TREE_RADIUS);
             float maxZ = matchHandler.GetMatch().NoMansLand.upZ - (2 * Constants.TREE_RADIUS);
 

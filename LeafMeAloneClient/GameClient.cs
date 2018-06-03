@@ -190,7 +190,7 @@ namespace Client
 
             _audioBGM = AudioManager.GetNewSource();
             AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
-            AudioManager.SetSourceVolume(_audioBGM, 0.01f);
+            AudioManager.SetSourceVolume(_audioBGM, 0.05f);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);

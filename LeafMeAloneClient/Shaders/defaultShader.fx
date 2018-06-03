@@ -127,6 +127,9 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 		float4 c_l;
 		float dist;
 		float attenuation_val;
+
+		//float categories = 6.0f;
+		//float4 DiffuseToon = float4((float(ceil(Diffuse.x * categories - 0.5))) / categories, (float(ceil(Diffuse.y * categories - 0.5))) / categories, (float(ceil(Diffuse.z * categories - 0.5))) / categories, Diffuse.w);
 		
 		// find the direction of the light
 		if (lights[idx].type == TYPE_DIRECTIONAL)
@@ -209,20 +212,22 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 	if (texCount > 0)
 	{
 		// use this to find the texture color
-		retColor = retColor * tex_diffuse.Sample(MeshTextureSampler, iTex);
+		float4 texColor = tex_diffuse.Sample(MeshTextureSampler, iTex);
+		
+		retColor = retColor * texColor ;
 	}
 
 	retColor = float4( retColor.xyz * Tint * Hue, 1.0f );
 
 	// Toon shading
-	float categories = 6.0f;
 	float edge = max(0.0f, dot( normalize( NormalObj.xyz) , eVec ));
 	if (edge < 0.3f  )
 	{
-		retColor = float4(0, 0, 0, 1);
+		//retColor = float4(0, 0, 0, 1);
 	}
-	else
+	else if (texCount == 0)
 	{
+		float categories = 6.0f;
 		retColor = float4((float(ceil(retColor.x * categories - 0.5))) / categories, (float(ceil(retColor.y * categories - 0.5))) / categories, (float(ceil(retColor.z * categories - 0.5))) / categories, retColor.w);
 	}
 

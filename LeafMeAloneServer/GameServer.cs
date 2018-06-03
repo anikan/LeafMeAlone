@@ -34,7 +34,7 @@ namespace Server
 
         private int playerSpawnIndex = 0;
 
-        private Stopwatch testTimer;
+        private Stopwatch currentFrameTimer;
 
         private Random rnd;
 
@@ -56,11 +56,11 @@ namespace Server
             development = !networked;
 
             timer = new Stopwatch();
-            testTimer = new Stopwatch();
+            currentFrameTimer = new Stopwatch();
             rnd = new Random();
 
             timer.Start();
-            testTimer.Start();
+            currentFrameTimer.Start();
 
             networkServer = new NetworkServer(networked);
             matchHandler = new MatchHandler(Match.DefaultMatch, networkServer, this);
@@ -99,6 +99,7 @@ namespace Server
         {
             while (true)
             {
+                currentFrameTimer.Restart();
 
                 //Check if a client wants to connect.
                 networkServer.CheckForConnections();
@@ -123,15 +124,16 @@ namespace Server
                 networkServer.SendWorldUpdateToAllClients();
                 toDestroyQueue.Clear();
 
-                if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
-                {
-                    //     Console.WriteLine("Warning: Server is falling behind.");
-                }
-
                 timer.Restart();
 
+
+                if ((int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds) < 0)
+                {
+                    Console.WriteLine("Warning: Server is falling behind.");
+                }
+
                 //Sleep for the rest of this tick.
-                System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
+                System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds)));
             }
         }
 

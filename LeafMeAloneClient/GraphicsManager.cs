@@ -43,6 +43,8 @@ namespace Client
         // The list of particle systems
         public static List<ParticleSystem> ParticleSystems;
 
+        public static List<InverseParticleSystem> SuctionSystems;
+
         // Converts a screen point to a world position.
         // Converts a screen point to a world position.
         public static Vector3 ScreenToWorldPoint(Vector2 screenPos)
@@ -141,7 +143,6 @@ namespace Client
                     ActivePlayer.Transform.Position);
             }
             LeafClient.Fire?.Update(delta_t);
-
         }
 
         public static void Draw()
@@ -152,10 +153,16 @@ namespace Client
                 particleSystem.Draw();
             }
 
-            foreach (var particleSystem in DrawThisFrame)
+            foreach (var suctionSystem in SuctionSystems)
             {
-                particleSystem.Key.DrawTransform(particleSystem.Value);
+                suctionSystem.Draw();
             }
+
+            foreach (var leafFire in DrawThisFrame)
+            {
+                leafFire.Key.DrawTransform(leafFire.Value);
+            }
+
             DrawThisFrame.Clear();
         }
 
@@ -209,6 +216,7 @@ namespace Client
 
             ParticleSystems = new List<ParticleSystem>();
 
+            SuctionSystems = new List<InverseParticleSystem>();
         }
 
         /// <summary>

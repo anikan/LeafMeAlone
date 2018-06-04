@@ -38,6 +38,7 @@ namespace Client
         public PlayerRequestInfo PlayerRequests;
 
         private ParticleSystem FlameThrower, LeafBlower;
+        private InverseParticleSystem Suction;
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
@@ -50,10 +51,13 @@ namespace Client
         {
             FlameThrower = new FlameThrowerParticleSystem(Tool.Thrower.ConeAngle * 10f, 40.0f, 15.0f, Tool.Thrower.Range/2.0f, 1.0f, Tool.Thrower.Range, 1.0f);
             LeafBlower = new LeafBlowerParticleSystem();
+            Suction = new InverseParticleSystem(Constants.WindTexture, Vector3.Zero, Vector3.UnitX*-40f, true);
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
-
-            
+            GraphicsManager.SuctionSystems.Add(Suction);
+            FlameThrower.EnableGeneration(false);
+            LeafBlower.EnableGeneration(false);
+            Suction.EnableGeneration(false);
 
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
@@ -398,28 +402,36 @@ namespace Client
                     healthUI.UITexture.Enabled = true;
             }
 
+            FlameThrower.EnableGeneration(false);
+            LeafBlower.EnableGeneration(false);
+            Suction.EnableGeneration(false);
+
             switch (ActiveToolMode)
             {
                 case ToolMode.NONE:
-                    FlameThrower.EnableGeneration(false);
-                    LeafBlower.EnableGeneration(false);
                     break;
                 case ToolMode.PRIMARY:
                     switch (ToolEquipped)
                     {
                         case ToolType.BLOWER:
-                            FlameThrower.EnableGeneration(false);
                             LeafBlower.EnableGeneration(true);
                             break;
                         case ToolType.THROWER:
                             FlameThrower.EnableGeneration(true);
-                            LeafBlower.EnableGeneration(false);
                             break;
                         default:
                             break;
                     }
                     break;
                 case ToolMode.SECONDARY:
+                    switch (ToolEquipped)
+                    {
+                        case ToolType.BLOWER:
+                            Suction.EnableGeneration(true);
+                            break;
+                        default:
+                            break;
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -562,6 +574,10 @@ namespace Client
             LeafBlower.SetVelocity(Transform.Forward * p.FlameInitSpeed);
             LeafBlower.SetAcceleration(Transform.Forward * p.FlameAcceleration);
             LeafBlower.Update(deltaTime);
+
+            Suction.SetEndposition(toolTransform.Position);
+            Suction.SetVelocity(-Transform.Forward * 40f);
+            Suction.Update(deltaTime);
 
         }
 

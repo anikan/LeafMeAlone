@@ -156,11 +156,15 @@ namespace Server
         /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
+            List<byte> allWorldPackets = new List<byte>();
+
             foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
             {
                 BasePacket packetToSend = ServerPacketFactory.NewCreatePacket(pair.Value);
-                clientSocket.Send(PacketUtil.Serialize(packetToSend));
+                allWorldPackets.AddRange(PacketUtil.Serialize(packetToSend));
             }
+
+            clientSocket.Send(allWorldPackets.ToArray());
         }
 
         public void SendWorldUpdateToAllClients()
@@ -185,11 +189,16 @@ namespace Server
 
             SendAll(allPackets.ToArray());
 
+            List<byte> destroyPackets = new List<byte>();
+
+
             foreach (var gameObj in GameServer.instance.toDestroyQueue)
             {
                 BasePacket packet = PacketFactory.NewDestroyPacket(gameObj);
-                SendAll(PacketUtil.Serialize(packet));
+                destroyPackets.AddRange(PacketUtil.Serialize(packet));
             }
+
+            SendAll(destroyPackets.ToArray());
         }
 
         public void SendNewObjectToAll(GameObjectServer newObject)

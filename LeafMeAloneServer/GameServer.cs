@@ -185,11 +185,12 @@ namespace Server
         {
             //TestPhysics();
 
-            List<GameObjectServer> toUpdateList = gameObjectDict.Values.ToList();
+            List<GameObjectServer> toUpdateList = GetInteractableObjects();
             //This foreach loop hurts my soul. May consider making it normal for loop.
             foreach (GameObjectServer toUpdate in toUpdateList)
             {
                 toUpdate.Update(deltaTime);
+                
             }
 
             // Add the effects of the player tools.
@@ -372,16 +373,18 @@ namespace Server
         /// </summary>
         public void AddPlayerToolEffects()
         {
-
             // Iterate through all players.
             for (int i = 0; i < playerServerList.Count; i++)
             {
-
                 // Get this player.
                 PlayerServer player = playerServerList[i];
 
-                // Affect all objects within range of the player.
-                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList());
+                //Only check if tools are active.
+                if (player.ActiveToolMode != ToolMode.NONE)
+                {
+                    // Affect all objects within range of the player.
+                    player.AffectObjectsInToolRange(GetInteractableObjects());
+                }
 
             }
         }
@@ -435,6 +438,26 @@ namespace Server
             }
 
             return leaves;
+        }
+
+        /// <summary>
+        /// Get list of players and leaves.
+        /// </summary>
+        /// <returns></returns>
+        public List<GameObjectServer> GetInteractableObjects()
+        {
+            List<GameObjectServer> gameObjects = GetGameObjectList();
+            List<GameObjectServer> interactableGameObjects = new List<GameObjectServer>();
+
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                if (gameObjects[i] is LeafServer || gameObjects[i] is PlayerServer)
+                {
+                    interactableGameObjects.Add(gameObjects[i]);
+                }
+            }
+
+            return interactableGameObjects;
         }
     }
 }

@@ -235,9 +235,8 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 
 	if(isGrayscale == 1)
 	{
-		float currColor = retColor.x + retColor.y + retColor.z;
-		currColor/=3.0;
-		return currColor;
+		float finalColor = retColor.x * .21 +  retColor.y * .72 + retColor.z * .07;
+		retColor = lerp(float4(finalColor,finalColor,finalColor,retColor.a),retColor,.2);
 	}
 
 	return retColor;

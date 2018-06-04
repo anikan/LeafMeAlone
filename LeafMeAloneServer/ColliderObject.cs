@@ -142,7 +142,7 @@ namespace Server
             Transform.Position = newPosition;
 
             // First, we need all the game objects on the server.
-            List<GameObjectServer> allObjects = GameServer.instance.GetGameObjectList();
+            List<GameObjectServer> allObjects = GameServer.instance.GetColliderObjects();
 
             // Iterate through all the objects.
             for (int i = 0; i < allObjects.Count; i++)

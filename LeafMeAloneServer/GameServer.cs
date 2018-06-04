@@ -190,11 +190,16 @@ namespace Server
             foreach (GameObjectServer toUpdate in toUpdateList)
             {
                 toUpdate.Update(deltaTime);
-                
             }
+
+            Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} after basic update loop");
+
 
             // Add the effects of the player tools.
             AddPlayerToolEffects();
+
+            Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} after player tool effects loop");
+
 
         }
 
@@ -458,6 +463,22 @@ namespace Server
             }
 
             return interactableGameObjects;
+        }
+
+        public List<GameObjectServer> GetColliderObjects()
+        {
+            List<GameObjectServer> gameObjects = GetGameObjectList();
+            List<GameObjectServer> colliderGameObjects = new List<GameObjectServer>();
+
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                if (gameObjects[i] is TreeServer || gameObjects[i] is PlayerServer)
+                {
+                    colliderGameObjects.Add(gameObjects[i]);
+                }
+            }
+
+            return colliderGameObjects;
         }
     }
 }

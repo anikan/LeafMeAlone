@@ -27,6 +27,8 @@ namespace Client
 
 
         private float minCap = .3f;
+
+
         public Vector3 CurrentTint
         {
             get => model.Tint;
@@ -136,6 +138,7 @@ namespace Client
                 PivotCube.Transform.Position = Transform.Position;
                 PivotCube.Update(deltaTime);
             }
+
         }
 
         /// <summary>
@@ -173,7 +176,7 @@ namespace Client
         /// <summary>
         /// Destroy this GameObject and remove any references.
         /// </summary>
-        public override void Destroy()
+        public override void Die()
         {
             GameClient.instance.Destroy(this);
         }

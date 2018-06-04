@@ -128,13 +128,18 @@ namespace Server
 
             // Create a new player and send them the world 
             SendWorldToClient(clientSocket);
-            ProcessNewPlayer(clientSocket);
+            if (GameServer.instance.playerServerList.Count < Constants.NUM_PLAYERS)
+            {
+                ProcessNewPlayer(clientSocket);
+            } else
+            {
+                SendSpectator(clientSocket);
+            }
 
             // Add the new socket to the list of sockets recieving updates
             clientSockets.Add(clientSocket);
 
             GameServer.instance.ConnectCallback();
-
             // Create the state object.  
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
@@ -145,6 +150,11 @@ namespace Server
             listener.BeginAccept(
                 new AsyncCallback(AcceptCallback),
                 listener);
+        }
+
+        private void SendSpectator(Socket clientSocket)
+        {
+            clientSocket.Send(PacketUtil.Serialize(new SpectatorPacket()));
         }
 
         /// <summary>
@@ -387,7 +397,7 @@ namespace Server
                 GameObjectServer player;
                 if (GameServer.instance.gameObjectDict.TryGetValue(playerId, out player))
                 {
-                    ((PlayerServer) player).Destroy();
+                    GameServer.instance.DisconnectPlayer((PlayerServer)player);
                 }
             }
         }

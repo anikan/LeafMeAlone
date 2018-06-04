@@ -97,6 +97,8 @@
     <Compile Include="GameServer.cs" />
     <Compile Include="LeafServer.cs" />
     <Compile Include="MapServer.cs" />
+    <Compile Include="MapVersion.cs" />
+    <Compile Include="MapVersion1.cs" />
     <Compile Include="MatchHandler.cs" />
     <Compile Include="NetworkServer.cs" />
     <Compile Include="PhysicsObject.cs" />

@@ -147,7 +147,7 @@ namespace Server
                 }
 
                 //Sleep for the rest of this tick.
-                System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds)));
+                Thread.Sleep(Math.Max(0, (int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds)));
             }
         }
 

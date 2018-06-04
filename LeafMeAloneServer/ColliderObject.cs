@@ -132,7 +132,9 @@ namespace Server
         /// <param name="newPosition"></param>
         public bool TryMoveObject(Vector3 newPosition, int stacklevel = 0)
         {
-
+            Stopwatch s = new Stopwatch();
+            s.Start();
+            bool ret = true;
             // Save the original position of this object.
             Vector3 OriginalPosition = Transform.Position;
 
@@ -168,27 +170,31 @@ namespace Server
                             TryMoveObject(new Vector3(OriginalPosition.X, OriginalPosition.Y, newPosition.Z), stacklevel + 1);
                         }
 
-                        // If this is a physics object
-                        if (this is PhysicsObject me)
-                        {
 
-                            // If the other object is also a physics object.
-                            if (obj is PhysicsObject other)
+                        if (!(this is LeafServer) && !(obj is LeafServer))
+                        {
+                            // If this is a physics object
+                            if (this is PhysicsObject me)
                             {
 
-                                // Push the other object.
-                                me.Push(other);
+                                // If the other object is also a physics object.
+                                if (obj is PhysicsObject other)
+                                {
+
+                                    // Push the other object.
+                                    me.Push(other);
+                                }
+
+                                // Bounce off the other object.
+                                me.Bounce(obj);
+
                             }
-
-                            // Bounce off the other object.
-                            me.Bounce(obj);
-
                         }
 
                         EnsureSafePosition();
 
                         // couldn't move
-                        return false;
+                        ret = false;
                     }
                 }
             }
@@ -199,9 +205,12 @@ namespace Server
 
             EnsureSafePosition();
 
-            return true;
-        }
+            if (s.ElapsedMilliseconds > 0)
+                //Console.WriteLine($"TryMoveObject finished in: {s.ElapsedMilliseconds}.");
+            s.Stop();
 
+            return ret;
+        }
 
         /// <summary>
         /// Checks if a vector's values are less than a specified minimum. If so, sets that value to zero.

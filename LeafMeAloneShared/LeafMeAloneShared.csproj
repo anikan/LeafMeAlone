@@ -112,6 +112,7 @@
     <Compile Include="Packet\PlayerPacket.cs" />
     <Compile Include="Packet\RequestPacket.cs" />
     <Compile Include="Packet\MatchResultPacket.cs" />
+    <Compile Include="Packet\SpectatorPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Team.cs" />
     <Compile Include="TeamSection.cs" />

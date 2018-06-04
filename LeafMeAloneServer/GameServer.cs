@@ -129,11 +129,11 @@ namespace Server
 
                 if ((int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds) < 0)
                 {
-                    Console.WriteLine("Warning: Server is falling behind.");
+                    Console.WriteLine($"Warning: Server is falling behind. Took {currentFrameTimer.ElapsedMilliseconds} milliseconds.");
                 }
 
                 //Sleep for the rest of this tick.
-                System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds)));
+                Thread.Sleep(Math.Max(0, (int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds)));
             }
         }
 

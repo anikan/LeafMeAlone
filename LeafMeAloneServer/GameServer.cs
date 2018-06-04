@@ -104,8 +104,12 @@ namespace Server
                 //Check if a client wants to connect.
                 networkServer.CheckForConnections();
 
+                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before receive");
+
                 // Go ahead and try to receive new updates
                 networkServer.Receive();
+
+                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before incoming packets");
 
                 //Update the server players based on received packets.
                 if (!matchHandler.MatchInitializing())
@@ -113,12 +117,20 @@ namespace Server
                     HandleIncomingPackets();
                 }
 
+                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before status updates");
+
                 matchHandler.DoMatchStatusUpdates();
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
 
+                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before object updates");
+
+
                 UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
+
+
+                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before send updates");
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
@@ -126,10 +138,12 @@ namespace Server
 
                 timer.Restart();
 
+                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} after send updates");
+
 
                 if ((int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds) < 0)
                 {
-                    Console.WriteLine("Warning: Server is falling behind.");
+                    Console.WriteLine($"Warning: Server is falling behind. Took {currentFrameTimer.ElapsedMilliseconds} ms");
                 }
 
                 //Sleep for the rest of this tick.

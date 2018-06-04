@@ -166,18 +166,24 @@ namespace Server
         public void SendWorldUpdateToAllClients()
         {
             List<GameObjectServer> gameObjects = GameServer.instance.gameObjectDict.Values.ToList();
+
+            List<byte> allPackets = new List<byte>();
+
             for (int i = 0; i < gameObjects.Count; i++)
             {
                 GameObjectServer objectToSend = gameObjects[i];
 
+
                 //Send an update if the object is not a leaf or if the leaf has been modified.
-                if (!(objectToSend is LeafServer) || objectToSend.Modified)
+                if ((objectToSend is LeafServer && objectToSend.Modified) || (objectToSend is PlayerServer))
                 {
                     objectToSend.Modified = false;
                     BasePacket packetToSend = ServerPacketFactory.CreateUpdatePacket(gameObjects[i]);
-                    SendAll(PacketUtil.Serialize(packetToSend));
+                    allPackets.AddRange(PacketUtil.Serialize(packetToSend));
                 }
             }
+
+            SendAll(allPackets.ToArray());
 
             foreach (var gameObj in GameServer.instance.toDestroyQueue)
             {

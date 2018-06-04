@@ -12,6 +12,8 @@ uniform int animationIndex;
 // some material properties
 uniform float4 Diffuse, Specular, Ambient, Emissive;
 
+//is the player dead
+uniform int isGrayscale = 0;
 
 //the tint of the object
 uniform float4 Tint;
@@ -229,6 +231,12 @@ float4 PS(float4 iPosHProj  : SV_POSITION,
 	{
 		float categories = 6.0f;
 		retColor = float4((float(ceil(retColor.x * categories - 0.5))) / categories, (float(ceil(retColor.y * categories - 0.5))) / categories, (float(ceil(retColor.z * categories - 0.5))) / categories, retColor.w);
+	}
+
+	if(isGrayscale == 1)
+	{
+		float finalColor = retColor.x * .21 +  retColor.y * .72 + retColor.z * .07;
+		retColor = lerp(float4(finalColor,finalColor,finalColor,retColor.a),retColor,.2);
 	}
 
 	return retColor;

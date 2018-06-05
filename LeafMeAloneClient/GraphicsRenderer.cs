@@ -79,7 +79,7 @@ namespace Client
             Rasterizer = new RasterizerStateDescription()
             {
                 FillMode = FillMode.Solid,
-                CullMode = CullMode.None,
+                CullMode = CullMode.Back,
                 IsFrontCounterclockwise = false,
                 IsDepthClipEnabled = true
             };
@@ -284,12 +284,7 @@ namespace Client
                 }
             }
 
-            if (networkedCheckbox.Checked == false)
-                ipTextbox.Enabled = false;
-            else
-            {
-                ipTextbox.Enabled = true;
-            }
+            ipTextbox.Enabled = networkedCheckbox.Checked;
 
             // 
             // Form1

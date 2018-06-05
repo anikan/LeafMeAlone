@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
@@ -7,6 +8,7 @@ using Device = SlimDX.Direct3D11.Device;
 using Resource = SlimDX.Direct3D11.Resource;
 using System.Windows.Forms;
 using AntTweakBar;
+using Button = AntTweakBar.Button;
 
 namespace Client
 {
@@ -41,6 +43,17 @@ namespace Client
         public static Matrix ProjectionMatrix;
 
         public static Context BarContext;
+
+
+        #region FormConnections
+        public static Panel Panel1;
+        public static Label nicknameLabel;
+        public static Label ipLabel;
+        public static TextBox ipTextbox;
+        public static TextBox nicknameTextbox;
+        public static System.Windows.Forms.Button connectButton;
+        #endregion
+
 
         #region Depth Buffer and Rasterizer
         private static Texture2DDescription depthBufferDesc;
@@ -137,7 +150,103 @@ namespace Client
             BlendState = BlendState.FromDescription(Device, bs);
         }
 
+        private static void InitializeComponent(Form FormToShowOn)
+        {
+            Panel1 = new Panel();
+            nicknameLabel = new Label();
+            ipLabel = new Label();
+            ipTextbox = new TextBox();
+            nicknameTextbox = new TextBox();
+            connectButton = new System.Windows.Forms.Button();
+            // 
+            // Panel1
+            // 
+            Panel1.Controls.Add(nicknameLabel);
+            Panel1.Controls.Add(ipLabel);
+            Panel1.Controls.Add(ipTextbox);
+            Panel1.Controls.Add(nicknameTextbox);
+            Panel1.Controls.Add(connectButton);
+            Panel1.Dock = DockStyle.Top;
+            Panel1.Location = new System.Drawing.Point(0, 0);
+            Panel1.Name = "Panel1";
+            Panel1.Size = new System.Drawing.Size(800, 37);
+            Panel1.TabIndex = 1;
+            // 
+            // nicknameLabel
+            // 
+            nicknameLabel.AutoSize = true;
+            nicknameLabel.Location = new System.Drawing.Point(313, 13);
+            nicknameLabel.Name = "nicknameLabel";
+            nicknameLabel.Size = new System.Drawing.Size(55, 13);
+            nicknameLabel.TabIndex = 6;
+            nicknameLabel.Text = "Nickname";
+            // 
+            // ipLabel
+            // 
+            ipLabel.AutoSize = true;
+            ipLabel.Location = new System.Drawing.Point(7, 13);
+            ipLabel.Name = "ipLabel";
+            ipLabel.Size = new System.Drawing.Size(58, 13);
+            ipLabel.TabIndex = 5;
+            ipLabel.Text = "IP Address";
+            // 
+            // ipTextbox
+            // 
+            ipTextbox.Location = new System.Drawing.Point(71, 10);
+            ipTextbox.Name = "ipTextbox";
+            ipTextbox.Size = new System.Drawing.Size(225, 20);
+            ipTextbox.TabIndex = 4;
+            ipTextbox.Text = Properties.Settings.Default.IP;
+            // 
+            // nicknameTextbox
+            // 
+            nicknameTextbox.Location = new System.Drawing.Point(377, 10);
+            nicknameTextbox.Name = "nicknameTextbox";
+            nicknameTextbox.Size = new System.Drawing.Size(225, 20);
+            nicknameTextbox.TabIndex = 3;
+            
+            // 
+            // connectButton
+            // 
+            connectButton.Location = new System.Drawing.Point(608, 8);
+            connectButton.Name = "connectButton";
+            connectButton.Size = new System.Drawing.Size(180, 23);
+            connectButton.TabIndex = 0;
+            connectButton.Text = "Connect";
+            connectButton.UseVisualStyleBackColor = true;
 
+
+            nicknameTextbox.AcceptsReturn = true;
+            connectButton.NotifyDefault(true);
+
+            nicknameTextbox.KeyPress += (sender, args) =>
+            {
+                if (args.KeyChar == '\t')
+                {
+                    connectButton.Focus();
+                }
+            };
+
+            ipTextbox.KeyPress += (sender, args) =>
+            {
+                if (args.KeyChar == '\t')
+                {
+                    nicknameTextbox.Focus();
+                }
+            };
+            ipTextbox.TextChanged += (sender, args) =>
+            {
+                Properties.Settings.Default.IP = ipTextbox.Text; 
+                Properties.Settings.Default.Save();
+            };
+
+
+            // 
+            // Form1
+            // 
+            FormToShowOn.Controls.Add(Panel1);
+
+        }
         /// <summary>
         /// Initialize graphics properties and create the main window.
         /// </summary>
@@ -212,8 +321,8 @@ namespace Client
 
             BarContext = new Context(Tw.GraphicsAPI.D3D11, Device.ComPointer);
             BarContext.HandleResize(Form.ClientSize);
-
-
+            
+            InitializeComponent(Form);
         }
         /// <summary>
         /// Method called when the form is resized by the user.

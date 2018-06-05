@@ -44,6 +44,7 @@ namespace Client
         private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
         private int _currAnim, _overridedAnim;
         public UIHealth healthUI;
+        public UINickname nicknameUI;
 
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
@@ -72,6 +73,8 @@ namespace Client
 
             // set to idle animation by default
             SwitchAnimation(_animIdle);
+
+            nicknameUI = new UINickname(this,this.Name);
         }
 
         /// <summary>
@@ -583,11 +586,12 @@ namespace Client
             if(healthUI == null)
                 healthUI = new UIHealth(this, Team);
             healthUI?.Update();
+            nicknameUI?.Update();
         }
 
         public override void Die()
         {
-            GameClient.instance.playerClients.Remove(this);
+            healthUI = null;
             base.Die();
         }
     }

@@ -97,7 +97,7 @@ namespace Shared
                 rightX = (0.0f + (Constants.TILE_SIZE / 2.0f)) + (NoMansLandTilesOnEachSide * Constants.TILE_SIZE),
 
                 // Upper bound is at the top of the map.
-                upZ = (Constants.MAP_HEIGHT / 2.0f),
+                upZ = (Constants.MAP_HEIGHT / 2.0f) - Constants.TREE_RADIUS,
 
                 // Lower bound is at the bottom of the map.
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
@@ -113,7 +113,7 @@ namespace Shared
             {
                 leftX = -(Constants.MAP_WIDTH / 2.0f),
                 rightX = newMatch.NoMansLand.leftX,
-                upZ = (Constants.MAP_HEIGHT / 2.0f),
+                upZ = (Constants.MAP_HEIGHT / 2.0f) - Constants.TREE_RADIUS,
                 downZ = -(Constants.MAP_HEIGHT / 2.0f),
                 // Make the section red
                 sectionColor = new Vector3(1.8f, 1.0f, 1.0f)
@@ -126,7 +126,7 @@ namespace Shared
             {
                 leftX = newMatch.NoMansLand.rightX,
                 rightX = Constants.MAP_WIDTH / 2.0f,
-                upZ = Constants.MAP_HEIGHT / 2.0f,
+                upZ = Constants.MAP_HEIGHT / 2.0f - Constants.TREE_RADIUS,
                 downZ = -Constants.MAP_HEIGHT / 2.0f,
                 // Make the section blue.
                 sectionColor = new Vector3(1.0f, 1.0f, 1.8f)

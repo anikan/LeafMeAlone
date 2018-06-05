@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Server</RootNamespace>
     <AssemblyName>LeafMeAloneServer</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -97,6 +97,8 @@
     <Compile Include="GameServer.cs" />
     <Compile Include="LeafServer.cs" />
     <Compile Include="MapServer.cs" />
+    <Compile Include="MapVersion.cs" />
+    <Compile Include="MapVersion1.cs" />
     <Compile Include="MatchHandler.cs" />
     <Compile Include="NetworkServer.cs" />
     <Compile Include="PhysicsObject.cs" />

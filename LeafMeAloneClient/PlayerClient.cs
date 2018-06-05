@@ -585,10 +585,10 @@ namespace Client
             healthUI?.Update();
         }
 
-        public override void Destroy()
+        public override void Die()
         {
             GameClient.instance.playerClients.Remove(this);
-            base.Destroy();
+            base.Die();
         }
     }
 }

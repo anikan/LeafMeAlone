@@ -28,6 +28,8 @@ namespace Client
         //is the object culled.
         public bool IsCulled = false;
 
+        public bool IsGrayscale = false;
+
         public Vector3 Tint = new Vector3(1, 1, 1);
         public Vector3 Hue = new Vector3(1, 1, 1);
 
@@ -188,6 +190,8 @@ namespace Client
             {
                 m_ActiveShader.ShaderEffect.GetVariableByName("Tint").AsVector().Set(Tint);
                 m_ActiveShader.ShaderEffect.GetVariableByName("Hue").AsVector().Set(Hue);
+                m_ActiveShader.ShaderEffect.GetVariableByName("isGrayscale").AsScalar().Set(IsGrayscale ? 1 : 0);
+
                 if (CurrentAnimationIndex != -1)
                 {
                     m_ActiveGeo.CurrentAnimationTime = CurrentAnimationTime;
@@ -221,7 +225,8 @@ namespace Client
         /// <param name="delta_time"> the time advanced since the previous frame </param>
         public void Update(float delta_time)
         {
-
+            if(GraphicsManager.ActivePlayer != null)
+                IsGrayscale = GraphicsManager.ActivePlayer.Dead;
             // update the matrix only if the properties has changes
             if (!m_Properties.Equals(m_PrevProperties))
             {

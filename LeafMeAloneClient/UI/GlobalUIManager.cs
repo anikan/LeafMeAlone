@@ -32,40 +32,42 @@ namespace Client
             GameWinLossState = new UIGameWLState();
             Culled = new UICulled();
 
-            //Tool
-            Tool = new UI.UI("Leaf Blower", UIManagerSpriteRenderer.TextType.BOLD,
-               RectangleF.Empty, TextAlignment.Bottom | TextAlignment.Left, Color.White);
-            Tool.SetUpdateAction(() =>
+            if (GraphicsManager.ActivePlayer != null)
             {
-                switch (GraphicsManager.ActivePlayer.ToolEquipped)
+                //Tool
+                Tool = new UI.UI("Leaf Blower", UIManagerSpriteRenderer.TextType.BOLD,
+                   RectangleF.Empty, TextAlignment.Bottom | TextAlignment.Left, Color.White);
+                Tool.SetUpdateAction(() =>
                 {
-                    case ToolType.SAME:
-                        break;
-                    case ToolType.BLOWER:
-                        Tool.UIText.Text = "Leaf Blower";
-                        switch (GraphicsManager.ActivePlayer.ActiveToolMode)
-                        {
-                            case ToolMode.PRIMARY:
-                                break;
-                            case ToolMode.SECONDARY:
-                                Tool.UIText.Text = "Leaf Suctionery Thing";
-                                break;
-                        }
-                        break;
-                    case ToolType.THROWER:
-                        Tool.UIText.Text = "Flame Thrower";
-                        break;
-                }
-            });
+                    switch (GraphicsManager.ActivePlayer.ToolEquipped)
+                    {
+                        case ToolType.SAME:
+                            break;
+                        case ToolType.BLOWER:
+                            Tool.UIText.Text = "Leaf Blower";
+                            switch (GraphicsManager.ActivePlayer.ActiveToolMode)
+                            {
+                                case ToolMode.PRIMARY:
+                                    break;
+                                case ToolMode.SECONDARY:
+                                    Tool.UIText.Text = "Leaf Suctionery Thing";
+                                    break;
+                            }
+                            break;
+                        case ToolType.THROWER:
+                            Tool.UIText.Text = "Flame Thrower";
+                            break;
+                    }
+                });
 
+                TeammateUI = new UIFindTeammate();
 
-
-
-
-
-            TeammateUI = new UIFindTeammate();
-
-            UIList.AddRange(new UI.UI[] { fps, gameTimer, GameWinLossState, Culled, Tool, TeammateUI });
+                UIList.AddRange(new UI.UI[] { fps, gameTimer, GameWinLossState, Culled, Tool, TeammateUI });
+            }
+            else
+            {
+                UIList.AddRange(new UI.UI[] { fps, gameTimer, GameWinLossState, Culled });
+            }
 
         }
 

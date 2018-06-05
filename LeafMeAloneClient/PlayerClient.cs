@@ -15,6 +15,7 @@ namespace Client
     {
         // Small offset for floating point errors
         public const float FLOAT_RANGE = 0.01f;
+        public const float SUCTION_SPEED = 80f;
 
         public bool StoppedRequesting = true;
 
@@ -51,7 +52,7 @@ namespace Client
         {
             FlameThrower = new FlameThrowerParticleSystem(Tool.Thrower.ConeAngle * 10f, 40.0f, 15.0f, Tool.Thrower.Range/2.0f, 1.0f, Tool.Thrower.Range, 1.0f);
             LeafBlower = new LeafBlowerParticleSystem();
-            Suction = new InverseParticleSystem(Constants.WindTexture, Vector3.Zero, Vector3.UnitX*-40f, true);
+            Suction = new InverseParticleSystem(Constants.WindTexture, Vector3.Zero, -Vector3.UnitX*SUCTION_SPEED, true);
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
             GraphicsManager.SuctionSystems.Add(Suction);
@@ -576,7 +577,7 @@ namespace Client
             LeafBlower.Update(deltaTime);
 
             Suction.SetEndposition(toolTransform.Position);
-            Suction.SetVelocity(-Transform.Forward * 40f);
+            Suction.SetVelocity(-Transform.Forward * SUCTION_SPEED);
             Suction.Update(deltaTime);
 
         }

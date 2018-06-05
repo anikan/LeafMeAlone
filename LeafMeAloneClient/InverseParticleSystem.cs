@@ -44,9 +44,10 @@ namespace Client
         //random for use in forces.
         private static Random r;
 
-        // where the particle is being spit out
+        // where the particle is being absorbed
         private Vector3 EndPosition;
         private Vector3 InitVelocity;
+        private float Speed;
         private float ConeSize;
         private float CutoffDist;
         private float CutOffSpeed;
@@ -58,10 +59,35 @@ namespace Client
         private bool ShouldGenerate;
         private bool ShouldRender;
 
-        public InverseParticleSystem(string TexturePath, Vector3 end_pos, Vector3 velocity,
-            bool alpha_cutoff_only = false, bool disable_rewind = true, float cone_radius = 8, float initial_size = 1.5f, 
-            float cutoff_dist = 10, float cutoff_speed = 0.2f, float shrink_speed = 0.075f, float origin_dist = 30, 
-            int emissionrate = 2, int maxparticles = 100) 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="TexturePath"></param>
+        /// <param name="end_pos"></param>
+        /// <param name="velocity"></param>
+        /// <param name="alpha_cutoff_only"></param>
+        /// <param name="disable_rewind"></param>
+        /// <param name="cone_radius"></param>
+        /// <param name="initial_size"></param>
+        /// <param name="cutoff_dist"></param>
+        /// <param name="cutoff_speed"></param>
+        /// <param name="shrink_speed"></param>
+        /// <param name="origin_dist"></param>
+        /// <param name="emissionrate"></param>
+        /// <param name="maxparticles"></param>
+        public InverseParticleSystem(string TexturePath, 
+            Vector3 end_pos, 
+            Vector3 velocity,
+            bool alpha_cutoff_only = false, 
+            bool disable_rewind = true, 
+            float cone_radius = 8, 
+            float initial_size = 2.5f, 
+            float cutoff_dist = 0, 
+            float cutoff_speed = 0.2f, 
+            float shrink_speed = 0.07f, 
+            float origin_dist = 20, 
+            int emissionrate = 2, 
+            int maxparticles = 100) 
         {
             Transform.Scale = new Vector3(1, 1, 1);
             delta = initial_size;
@@ -69,6 +95,7 @@ namespace Client
             maxParticles = maxparticles;
 
             InitVelocity = velocity;
+            Speed = Vector3.Distance(Vector3.Zero, InitVelocity);
             EndPosition = end_pos;
             ConeSize = cone_radius;
             CutOffSpeed = cutoff_speed;
@@ -255,13 +282,15 @@ namespace Client
                     }
                 }
 
-                if (particle.LifeRemaining <= 0 || Vector3.Distance(particle.Position, particle.Origin) >= OriginDist)
+                float front = Vector3.Dot(Vector3.Normalize(particle.InitialVelocity),
+                    Vector3.Normalize(EndPosition - particle.Position) );
+                if (particle.LifeRemaining <= 0 || front < 0f)
                 {
                     if (emissionThisFrame < emissionRate && ShouldGenerate)
                     {
                         particle.Origin = findRandOrigin(EndPosition, InitVelocity, ConeSize, OriginDist);
                         particle.Position = particle.Origin;
-                        particle.Velocity = Vector3.Normalize(EndPosition - particle.Position) * Vector3.Distance(InitVelocity, Vector3.Zero);
+                        particle.Velocity = Vector3.Normalize(EndPosition - particle.Position) * Speed;
                         particle.InitialVelocity = particle.Velocity;
                         particle.LifeRemaining = r.Range(10f);
                         emissionThisFrame++;
@@ -273,8 +302,8 @@ namespace Client
                     Num_CurrentlyActiveParticles++;
                 }
                 
-                particle.Force = Vector3.Normalize(EndPosition - particle.Position) * Vector3.Distance(InitVelocity, Vector3.Zero);
-                particle.Update(deltaTime);
+                particle.Velocity = Vector3.Normalize(EndPosition - particle.Position) * Speed;
+                particle.Update(deltaTime, true);
             }
 
             ShouldRender = (Num_CurrentlyActiveParticles != 0);
@@ -305,13 +334,7 @@ namespace Client
         /// <param name="pos"></param>
         public void SetEndposition(Vector3 pos)
         {
-            Vector3 offset = pos - EndPosition;
             EndPosition = pos;
-            foreach (var particle in Particles)
-            {
-                particle.Position = particle.Position + offset;
-                particle.Origin = particle.Origin + offset;
-            }
         }
 
         /// <summary>
@@ -321,6 +344,7 @@ namespace Client
         public void SetVelocity(Vector3 vel)
         {
             InitVelocity = vel;
+            Speed = Vector3.Distance(Vector3.Zero, vel);
         }
 
         /// <summary>

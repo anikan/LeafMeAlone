@@ -22,7 +22,9 @@ namespace Client
         /// </summary>
         public static RenderForm Form;
 
+#if DEBUG
         public static Form DebugForm;
+#endif
 
         /// <summary>
         /// Device is an adapter used to render.
@@ -301,20 +303,26 @@ namespace Client
             //Make the Form
             Form = new RenderForm("LeafMeAlone");
 
+            Device = new Device(DriverType.Hardware,DeviceCreationFlags.None);
+            var msaa = Device.CheckMultisampleQualityLevels(Format.R8G8B8A8_UNorm, 4);
+            
             SwapChainDescription description = new SwapChainDescription()
             {
                 BufferCount = 1,
                 Usage = Usage.RenderTargetOutput,
                 OutputHandle = Form.Handle,
                 IsWindowed = true,
-                ModeDescription = new ModeDescription(0, 0, new Rational(60, 1), Format.R8G8B8A8_UNorm),
-                SampleDescription = new SampleDescription(1, 0),
-                Flags = SwapChainFlags.AllowModeSwitch,
+                ModeDescription = new ModeDescription(0,0, new Rational(60, 1), Format.R8G8B8A8_UNorm),
+                SampleDescription = /*msaa != 0 ? new SampleDescription(4,msaa) : */new SampleDescription(1, 0),
+                Flags = SwapChainFlags.None,
                 SwapEffect = SwapEffect.Discard
             };
 
+
+            SwapChain = new SwapChain(Device.Factory,Device,description);
+
             //create new device (with directx) which can be used throughout the project.
-            Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, description, out Device, out SwapChain);
+           // Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.None, description, out Device, out SwapChain);
 
 
 
@@ -342,7 +350,7 @@ namespace Client
             using (var factory = SwapChain.GetParent<Factory>())
                 factory.SetWindowAssociation(Form.Handle, WindowAssociationFlags.IgnoreAltEnter);
 
-
+#if DEBUG
             TextBox debugTextbox = new TextBox { Multiline = true, Dock = DockStyle.Fill, ScrollBars = ScrollBars.Vertical };
             DebugForm = new Form();
             DebugForm.Controls.Add(debugTextbox);
@@ -352,16 +360,23 @@ namespace Client
                 DebugForm.Hide();
             };
             Debug.Init(debugTextbox);
+#endif
 
             // handle alt+enter ourselves
             Form.KeyDown += (o, e) =>
             {
                 if (e.Shift && e.KeyCode == Keys.Enter)
+                {
+                    Form.Size =  new Size(Screen.PrimaryScreen.WorkingArea.Width,Screen.PrimaryScreen.WorkingArea.Height);
                     SwapChain.IsFullScreen = !SwapChain.IsFullScreen;
+                }
+
                 if (e.KeyCode == Keys.Escape)
                     Application.Exit();
+#if DEBUG
                 if (e.Control && e.KeyCode == Keys.Enter)
                     DebugForm.Show();
+#endif
             };
 
             BarContext = new Context(Tw.GraphicsAPI.D3D11, Device.ComPointer);

@@ -272,9 +272,9 @@ namespace Client
                 Properties.Settings.Default.IP = ipTextbox.Text; 
                 Properties.Settings.Default.Save();
             };
+            networkedCheckbox.CheckedChanged += (sender, args) => { ipTextbox.Enabled = networkedCheckbox.Checked; };
 
-
-            if (ipTextbox.Text == "")
+            if (ipTextbox.Text == "" && networkedCheckbox.Checked)
             {
                 var ip = Dns.GetHostEntry(Dns.GetHostName());
                 foreach (var ipAddress in ip.AddressList)
@@ -282,6 +282,13 @@ namespace Client
                     if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
                         ipTextbox.Text = ipAddress.ToString();
                 }
+            }
+
+            if (networkedCheckbox.Checked == false)
+                ipTextbox.Enabled = false;
+            else
+            {
+                ipTextbox.Enabled = true;
             }
 
             // 

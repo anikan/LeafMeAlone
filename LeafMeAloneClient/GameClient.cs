@@ -109,15 +109,16 @@ namespace Client
                         IPAddress ipAddress = IPAddress.Loopback;
                         try
                         {
-                            ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
-                            Console.WriteLine($" ip is {ipAddress.ToString()}");
+                            if (GraphicsRenderer.networkedCheckbox.Checked)
+                            {
+                                ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
+                                Console.WriteLine($" ip is {ipAddress.ToString()}");
+                            }
                         }
-
                         catch (FormatException e)
                         {
                             //IPHostEntry ipHostInfo = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
                             //ipAddress = ipHostInfo.AddressList[0];
-
                         }
                         catch (Exception e)
                         {

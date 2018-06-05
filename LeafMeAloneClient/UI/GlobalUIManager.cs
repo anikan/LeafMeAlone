@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Client.UI;
 using Shared;
@@ -33,29 +34,34 @@ namespace Client
             GameWinLossState = new UIGameWLState();
             Culled = new UICulled();
 
-            if (GraphicsManager.ActivePlayer != null)
-            {
-                LeafBlowerTool = new UI.UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(200, 50), 0);
-                FlameThrowerTool = new UI.UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(200, 50), 0);
+            const int xSize = 300;
+            const int ySize = 75;
+            LeafBlowerTool = new UI.UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
+            FlameThrowerTool = new UI.UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
+
+            
                 LeafBlowerTool.SetUpdateAction(() =>
                 {
-                    LeafBlowerTool.UITexture.Enabled = GraphicsManager.ActivePlayer.ToolEquipped == ToolType.BLOWER;
-                    LeafBlowerTool.UITexture.Position = LeafBlowerTool.UITexture.Size;
+                    if (GraphicsManager.ActivePlayer != null)
+                    {
+                        LeafBlowerTool.UITexture.Enabled = GraphicsManager.ActivePlayer.ToolEquipped == ToolType.BLOWER;
+                        LeafBlowerTool.UITexture.Position = new Vector2(0,Screen.Height - ySize);
+                    }
                 });
+
                 FlameThrowerTool.SetUpdateAction(() =>
                 {
-                    FlameThrowerTool.UITexture.Enabled = GraphicsManager.ActivePlayer.ToolEquipped == ToolType.THROWER;
-                    FlameThrowerTool.UITexture.Position = FlameThrowerTool.UITexture.Size;
+                    if (GraphicsManager.ActivePlayer != null)
+                    {
+                        FlameThrowerTool.UITexture.Enabled =
+                            GraphicsManager.ActivePlayer.ToolEquipped == ToolType.THROWER;
+                        FlameThrowerTool.UITexture.Position = new Vector2(0, Screen.Height - ySize);
+                    }
                 });
 
                 TeammateUI = new UIFindTeammate();
 
                 UIList.AddRange(new[] { fps, gameTimer, GameWinLossState, Culled, LeafBlowerTool,FlameThrowerTool, TeammateUI });
-            }
-            else
-            {
-                UIList.AddRange(new UI.UI[] { fps, gameTimer, GameWinLossState, Culled });
-            }
 
         }
 

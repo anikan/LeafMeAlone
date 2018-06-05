@@ -66,8 +66,8 @@ namespace Server
             // The DNS name of the computer  
             if (networked)
             {
-                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                ipAddress = ipHostInfo.AddressList[0];
+                IPHostEntry ipHostInfo = Dns.GetHostEntry("");
+                ipAddress = ipHostInfo.AddressList.Last();
             }
 
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.Net;
+using System.Net.Sockets;
 using SlimDX;
 using SlimDX.Direct3D11;
 using SlimDX.DXGI;
@@ -8,11 +10,11 @@ using Device = SlimDX.Direct3D11.Device;
 using Resource = SlimDX.Direct3D11.Resource;
 using System.Windows.Forms;
 using AntTweakBar;
-using Button = AntTweakBar.Button;
+using Button = System.Windows.Forms.Button;
 
 namespace Client
 {
-    static class GraphicsRenderer
+    internal static class GraphicsRenderer
     {
 
         /// <summary>
@@ -43,18 +45,18 @@ namespace Client
         public static Matrix ProjectionMatrix;
 
         public static Context BarContext;
-
-
         #region FormConnections
         public static Panel Panel1;
+        public static SplitContainer splitContainer1;
         public static Label nicknameLabel;
-        public static Label ipLabel;
-        public static TextBox ipTextbox;
+        public static CheckBox networkedCheckbox;
         public static TextBox nicknameTextbox;
-        public static System.Windows.Forms.Button connectButton;
+        public static TextBox ipTextbox;
+        public static Label ipLabel;
+        public static Button connectButton;
         #endregion
 
-
+        
         #region Depth Buffer and Rasterizer
         private static Texture2DDescription depthBufferDesc;
         private static Texture2D depthBuffer;
@@ -72,7 +74,7 @@ namespace Client
         #endregion
 
 
-        static void InitializeRasterizer()
+        private static void InitializeRasterizer()
         {
             Rasterizer = new RasterizerStateDescription()
             {
@@ -84,7 +86,7 @@ namespace Client
             DeviceContext.Rasterizer.State = RasterizerState.FromDescription(Device, Rasterizer);
         }
 
-        static void InitializeDepthBuffer()
+        private static void InitializeDepthBuffer()
         {
             Format depthFormat = Format.D32_Float;
             depthBufferDesc = new Texture2DDescription
@@ -124,7 +126,7 @@ namespace Client
             DeviceContext.OutputMerger.DepthStencilState = DepthState;
         }
 
-        static void InitializeBlending()
+        private static void InitializeBlending()
         {
             BlendStateDescription bs = new BlendStateDescription()
             {
@@ -153,65 +155,96 @@ namespace Client
         private static void InitializeComponent(Form FormToShowOn)
         {
             Panel1 = new Panel();
+            splitContainer1 = new SplitContainer();
+            networkedCheckbox = new CheckBox();
             nicknameLabel = new Label();
-            ipLabel = new Label();
-            ipTextbox = new TextBox();
             nicknameTextbox = new TextBox();
-            connectButton = new System.Windows.Forms.Button();
+            ipTextbox = new TextBox();
+            ipLabel = new Label();
+            connectButton = new Button();
             // 
             // Panel1
             // 
-            Panel1.Controls.Add(nicknameLabel);
-            Panel1.Controls.Add(ipLabel);
-            Panel1.Controls.Add(ipTextbox);
-            Panel1.Controls.Add(nicknameTextbox);
-            Panel1.Controls.Add(connectButton);
+            Panel1.Controls.Add(splitContainer1);
             Panel1.Dock = DockStyle.Top;
-            Panel1.Location = new System.Drawing.Point(0, 0);
+            Panel1.Location = new Point(0, 0);
             Panel1.Name = "Panel1";
-            Panel1.Size = new System.Drawing.Size(800, 37);
-            Panel1.TabIndex = 1;
+            Panel1.Size = new Size(784, 45);
+            Panel1.TabIndex = 0;
+            // 
+            // splitContainer1
+            // 
+            splitContainer1.Dock = DockStyle.Fill;
+            splitContainer1.Location = new Point(0, 0);
+            splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            splitContainer1.Panel1.Controls.Add(nicknameTextbox);
+            splitContainer1.Panel1.Controls.Add(nicknameLabel);
+            // 
+            // splitContainer1.Panel2
+            // 
+            splitContainer1.Panel2.Controls.Add(connectButton);
+            splitContainer1.Panel2.Controls.Add(networkedCheckbox);
+            splitContainer1.Panel2.Controls.Add(ipTextbox);
+            splitContainer1.Panel2.Controls.Add(ipLabel);
+            splitContainer1.Size = new Size(784, 45);
+            splitContainer1.SplitterDistance = 224;
+            splitContainer1.TabIndex = 0;
+            // 
+            // networkedCheckbox
+            // 
+            networkedCheckbox.AutoSize = true;
+            networkedCheckbox.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+            networkedCheckbox.Location = new Point(240, 9);
+            networkedCheckbox.Name = "networkedCheckbox";
+            networkedCheckbox.Size = new Size(109, 29);
+            networkedCheckbox.TabIndex = 0;
+            networkedCheckbox.Text = "Networked";
+            networkedCheckbox.UseVisualStyleBackColor = true;
             // 
             // nicknameLabel
             // 
             nicknameLabel.AutoSize = true;
-            nicknameLabel.Location = new System.Drawing.Point(313, 13);
+            nicknameLabel.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+            nicknameLabel.Location = new Point(3, 9);
             nicknameLabel.Name = "nicknameLabel";
-            nicknameLabel.Size = new System.Drawing.Size(55, 13);
-            nicknameLabel.TabIndex = 6;
+            nicknameLabel.Size = new Size(76, 25);
+            nicknameLabel.TabIndex = 0;
             nicknameLabel.Text = "Nickname";
+            // 
+            // nicknameTextbox
+            // 
+            nicknameTextbox.Location = new Point(77, 13);
+            nicknameTextbox.Name = "nicknameTextbox";
+            nicknameTextbox.Size = new Size(142, 20);
+            nicknameTextbox.TabIndex = 1;
+            // 
+            // ipTextbox
+            // 
+            ipTextbox.Location = new Point(89, 13);
+            ipTextbox.Name = "ipTextbox";
+            ipTextbox.Size = new Size(142, 20);
+            ipTextbox.TabIndex = 3;
             // 
             // ipLabel
             // 
             ipLabel.AutoSize = true;
-            ipLabel.Location = new System.Drawing.Point(7, 13);
+            ipLabel.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+            ipLabel.Location = new Point(3, 9);
             ipLabel.Name = "ipLabel";
-            ipLabel.Size = new System.Drawing.Size(58, 13);
-            ipLabel.TabIndex = 5;
+            ipLabel.Size = new Size(87, 25);
+            ipLabel.TabIndex = 2;
             ipLabel.Text = "IP Address";
-            // 
-            // ipTextbox
-            // 
-            ipTextbox.Location = new System.Drawing.Point(71, 10);
-            ipTextbox.Name = "ipTextbox";
-            ipTextbox.Size = new System.Drawing.Size(225, 20);
-            ipTextbox.TabIndex = 4;
-            ipTextbox.Text = Properties.Settings.Default.IP;
-            // 
-            // nicknameTextbox
-            // 
-            nicknameTextbox.Location = new System.Drawing.Point(377, 10);
-            nicknameTextbox.Name = "nicknameTextbox";
-            nicknameTextbox.Size = new System.Drawing.Size(225, 20);
-            nicknameTextbox.TabIndex = 3;
-            
             // 
             // connectButton
             // 
-            connectButton.Location = new System.Drawing.Point(608, 8);
+            connectButton.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
+            connectButton.Location = new Point(352, 3);
             connectButton.Name = "connectButton";
-            connectButton.Size = new System.Drawing.Size(180, 23);
-            connectButton.TabIndex = 0;
+            connectButton.Size = new Size(199, 39);
+            connectButton.TabIndex = 4;
             connectButton.Text = "Connect";
             connectButton.UseVisualStyleBackColor = true;
 
@@ -240,6 +273,16 @@ namespace Client
                 Properties.Settings.Default.Save();
             };
 
+
+            if (ipTextbox.Text == "")
+            {
+                var ip = Dns.GetHostEntry(Dns.GetHostName());
+                foreach (var ipAddress in ip.AddressList)
+                {
+                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+                        ipTextbox.Text = ipAddress.ToString();
+                }
+            }
 
             // 
             // Form1

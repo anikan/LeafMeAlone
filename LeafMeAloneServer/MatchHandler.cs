@@ -72,7 +72,7 @@ namespace Server
             network.SendAll(PacketUtil.Serialize(donePacket));
             foreach (PlayerServer player in GameServer.instance.playerServerList )
             {
-                network.SendAll(PacketUtil.Serialize(new StatResultPacket(player.playerStats)));
+            network.SendAll(PacketUtil.Serialize(new StatResultPacket(player.playerStats,player.Id)));
             }
 
             game.GetLeafListAsObjects().ForEach(l => { l.Burning = true; });

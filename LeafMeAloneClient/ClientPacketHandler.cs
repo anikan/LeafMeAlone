@@ -85,6 +85,7 @@ namespace Client
             {
                 client.StartMatchTimer(p.gameTime);
                 GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
+                GlobalUIManager.GameWinLossState.SetStats(null);
                 client.PendingRematchState = false;
             }
 
@@ -97,7 +98,8 @@ namespace Client
 
             void StatReceiveAction(StatResultPacket p)
             {
-                // TODO: DO STUFF NICK!
+                if(p.PlayerID == GraphicsManager.ActivePlayer.Id)
+                    GlobalUIManager.GameWinLossState.SetStats(p.stats);
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()

@@ -11,12 +11,16 @@ namespace Shared.Packet
     public class StatResultPacket : BasePacket
     {
         [ProtoMember(1)]
-        PlayerStats stats;
+        public PlayerStats stats;
+
+        [ProtoMember(2)]
+        public int PlayerID;
 
         public StatResultPacket() : base(PacketType.StatResultPacket) { }
-        public StatResultPacket(PlayerStats stats) : base(PacketType.StatResultPacket)
+        public StatResultPacket(PlayerStats stats, int ID) : base(PacketType.StatResultPacket)
         {
             this.stats = stats;
+            this.PlayerID = ID;
         }
     }
 }

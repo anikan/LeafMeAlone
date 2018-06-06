@@ -35,7 +35,7 @@ namespace Shared
             { PacketType.ObjectPacket, typeof(ObjectPacket) },
             { PacketType.IdPacket, typeof(IdPacket) },
             { PacketType.RequestPacket, typeof(RequestPacket) },
-            { PacketType.GameResultPacket, typeof(MatchResultPacket) },
+            { PacketType.GameResultPacket, typeof(GameResultPacket) },
             { PacketType.MatchStartPacket, typeof(MatchStartPacket) },
             { PacketType.SpectatorPacket, typeof(SpectatorPacket) },
         };

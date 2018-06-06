@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 namespace Shared.Packet
 {
     [ProtoContract]
-    public class MatchResultPacket : BasePacket
+    public class GameResultPacket : BasePacket
     {
         [ProtoMember(1)]
         public TeamName winningTeam;
 
-        public MatchResultPacket() : base(PacketType.GameResultPacket) { }
-        public MatchResultPacket(TeamName winningTeam) : base(PacketType.GameResultPacket)
+        public GameResultPacket() : base(PacketType.GameResultPacket) { }
+        public GameResultPacket(TeamName winningTeam) : base(PacketType.GameResultPacket)
         {
             this.winningTeam = winningTeam;
         }

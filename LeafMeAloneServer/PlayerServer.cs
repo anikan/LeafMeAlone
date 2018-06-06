@@ -50,7 +50,7 @@ namespace Server
         private void JumpToRandomSpawn()
         {
             Transform.Position = Team.GetNextSpawnPoint();
-            foreach (ColliderObject obj in GameServer.instance.gameObjectDict.Values)
+            foreach (ColliderObject obj in GameServer.instance.GetGameObjectList())
             {
                 if (obj is PlayerServer || obj is TreeServer)
                 {

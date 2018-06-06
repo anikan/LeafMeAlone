@@ -394,7 +394,7 @@ namespace Server
         {
             Id = GameServer.instance.nextObjectId++;
 
-            GameServer.instance.gameObjectDict.Add(Id, this);
+            GameServer.instance.gameObjectDict.TryAdd(Id, this);
         }
 
         /// <summary>

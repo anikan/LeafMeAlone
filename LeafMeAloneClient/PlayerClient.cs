@@ -55,7 +55,7 @@ namespace Client
             Suction = new InverseParticleSystem(Constants.WindTexture, Vector3.Zero, -Vector3.UnitX*SUCTION_SPEED, true);
             GraphicsManager.ParticleSystems.Add(FlameThrower);
             GraphicsManager.ParticleSystems.Add(LeafBlower);
-            GraphicsManager.SuctionSystems.Add(Suction);
+            GraphicsManager.ParticleSystems.Add(Suction);
             FlameThrower.EnableGeneration(false);
             LeafBlower.EnableGeneration(false);
             Suction.EnableGeneration(false);

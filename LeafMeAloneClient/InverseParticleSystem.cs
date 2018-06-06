@@ -62,25 +62,25 @@ namespace Client
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="TexturePath"></param>
-        /// <param name="end_pos"></param>
-        /// <param name="velocity"></param>
-        /// <param name="alpha_cutoff_only"></param>
-        /// <param name="disable_rewind"></param>
-        /// <param name="cone_radius"></param>
-        /// <param name="initial_size"></param>
-        /// <param name="cutoff_dist"></param>
-        /// <param name="cutoff_speed"></param>
-        /// <param name="shrink_speed"></param>
-        /// <param name="origin_dist"></param>
-        /// <param name="emissionrate"></param>
-        /// <param name="maxparticles"></param>
+        /// <param name="TexturePath"> The filepath to the texture file used for the particle system </param>
+        /// <param name="end_pos"> the location that all particles end up disappearing to </param>
+        /// <param name="velocity"> the velocity of the particles (also used to determine direction and thus starting location) </param>
+        /// <param name="alpha_cutoff_only"> only let particles to have alpha cutoff </param>
+        /// <param name="disable_rewind"> disable particles to flow backwards </param>
+        /// <param name="cone_radius"> cone radius of the particle system </param>
+        /// <param name="initial_size"> the initial size of the particles </param>
+        /// <param name="cutoff_dist"> the cutoff distance </param>
+        /// <param name="cutoff_speed"> the cutoff speed </param>
+        /// <param name="shrink_speed"> the shrinking speed </param>
+        /// <param name="origin_dist"> the length  of the beam of particle system </param>
+        /// <param name="emissionrate"> the rate of emission per frame </param>
+        /// <param name="maxparticles"> the max number of particles allowed at a time </param>
         public InverseParticleSystem(string TexturePath, 
             Vector3 end_pos, 
             Vector3 velocity,
             bool alpha_cutoff_only = false, 
             bool disable_rewind = true, 
-            float cone_radius = 8, 
+            float cone_radius = 10, 
             float initial_size = 2.5f, 
             float cutoff_dist = 0, 
             float cutoff_speed = 0.2f, 
@@ -111,10 +111,10 @@ namespace Client
                 r = new Random();
 
             Vector3 offset = Vector3.Normalize(-velocity) * OriginDist;
-            Vector3 coneOffset = Vector3.Normalize(Vector3.Cross(-velocity, Vector3.UnitY)) * ConeSize;
 
             for (int i = 0; i < maxParticles; i++)
             {
+                Vector3 coneOffset = Vector3.Normalize(Vector3.Cross(-velocity, Vector3.UnitY)) * (ConeSize * r.NextFloat());
                 Matrix rotation = Matrix.RotationAxis(Vector3.Normalize(-velocity), r.NextFloat() * 2 * (float) Math.PI);
                 Vector3 origin = EndPosition + offset + Vector3.TransformCoordinate(coneOffset, rotation);
                 
@@ -160,7 +160,7 @@ namespace Client
         {
 
             Vector3 offset = Vector3.Normalize(-velocity) * dist;
-            Vector3 coneOffset = Vector3.Normalize(Vector3.Cross(-velocity, Vector3.UnitY)) * coneRadius;
+            Vector3 coneOffset = Vector3.Normalize(Vector3.Cross(-velocity, Vector3.UnitY)) * ( r.NextFloat() * coneRadius );
             Matrix rotation = Matrix.RotationAxis(Vector3.Normalize(-velocity), r.NextFloat() * 2 * (float)Math.PI);
             Vector3 origin = endPoint + offset + Vector3.TransformCoordinate(coneOffset, rotation);
             return origin;
@@ -308,7 +308,6 @@ namespace Client
 
             ShouldRender = (Num_CurrentlyActiveParticles != 0);
             UpdateBuffer();
-            //Console.WriteLine(Num_CurrentlyActiveParticles);
         }
 
         /// <summary>
@@ -327,6 +326,7 @@ namespace Client
 
             UpdateBuffer();
         }
+
         #region GettersAndSetters
         /// <summary>
         /// Set the origin of the particles in the system

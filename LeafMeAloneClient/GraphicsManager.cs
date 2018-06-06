@@ -41,9 +41,7 @@ namespace Client
         public static PlayerClient ActivePlayer;
 
         // The list of particle systems
-        public static List<ParticleSystem> ParticleSystems;
-
-        public static List<InverseParticleSystem> SuctionSystems;
+        public static List<NonNetworkedGameObjectClient> ParticleSystems;
 
         // Converts a screen point to a world position.
         // Converts a screen point to a world position.
@@ -148,14 +146,9 @@ namespace Client
         public static void Draw()
         {
 
-            foreach (ParticleSystem particleSystem in ParticleSystems)
+            foreach (var particleSystem in ParticleSystems)
             {
                 particleSystem.Draw();
-            }
-
-            foreach (var suctionSystem in SuctionSystems)
-            {
-                suctionSystem.Draw();
             }
 
             foreach (var leafFire in DrawThisFrame)
@@ -214,9 +207,7 @@ namespace Client
 
             LoadAllShaders();
 
-            ParticleSystems = new List<ParticleSystem>();
-
-            SuctionSystems = new List<InverseParticleSystem>();
+            ParticleSystems = new List<NonNetworkedGameObjectClient>();
         }
 
         /// <summary>

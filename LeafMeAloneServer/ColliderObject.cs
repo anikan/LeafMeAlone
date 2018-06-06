@@ -132,7 +132,6 @@ namespace Server
         /// <param name="newPosition"></param>
         public bool TryMoveObject(Vector3 newPosition, int stacklevel = 0)
         {
-            bool ret = true;
             // Save the original position of this object.
             Vector3 OriginalPosition = Transform.Position;
 
@@ -168,31 +167,26 @@ namespace Server
                             TryMoveObject(new Vector3(OriginalPosition.X, OriginalPosition.Y, newPosition.Z), stacklevel + 1);
                         }
 
-
-                        if (!(this is LeafServer) && !(obj is LeafServer))
+                        // If this is a physics object and both objects aren't leaves.
+                        if (!(this is LeafServer) && !(obj is LeafServer) && this is PhysicsObject me)
                         {
-                            // If this is a physics object
-                            if (this is PhysicsObject me)
+                            // If the other object is also a physics object.
+                            if (obj is PhysicsObject other)
                             {
 
-                                // If the other object is also a physics object.
-                                if (obj is PhysicsObject other)
-                                {
-
-                                    // Push the other object.
-                                    me.Push(other);
-                                }
-
-                                // Bounce off the other object.
-                                me.Bounce(obj);
-
+                                // Push the other object.
+                                me.Push(other);
                             }
+
+                            // Bounce off the other object.
+                            me.Bounce(obj);
+
                         }
 
                         EnsureSafePosition();
 
                         // couldn't move
-                        ret = false;
+                        return false;
                     }
                 }
             }
@@ -203,7 +197,7 @@ namespace Server
 
             //EnsureSafePosition(); 
 
-            return ret;
+            return true;
         }
 
         /// <summary>
@@ -268,7 +262,7 @@ namespace Server
                 TryMoveObject(newTestPosition);
 
                 // Ensure safe position again.
-                EnsureSafePosition(stackCount+1);
+                EnsureSafePosition(stackCount + 1);
 
             }
         }

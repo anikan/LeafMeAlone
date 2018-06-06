@@ -28,6 +28,7 @@ namespace Shared
         {
             name = teamName;
             teamSection = section;
+            section.team = this;
         }
 
         /// <summary>

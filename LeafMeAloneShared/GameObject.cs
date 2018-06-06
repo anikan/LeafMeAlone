@@ -31,6 +31,9 @@ namespace Shared
         protected int burnFrames = 0;
         protected int blowFrames = 0;
 
+        public TeamSection section;
+        public TeamSection prevSection;
+
         // Is this object burning?
         public bool Burning
         {

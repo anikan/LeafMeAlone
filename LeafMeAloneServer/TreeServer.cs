@@ -28,8 +28,10 @@ namespace Server
         /// <summary>
         /// If a tree dies, destroy it completely
         /// </summary>
+        /// 
         public override void Die()
         {
+            base.Die();
             GameServer.instance.Destroy(this);
         }
 
@@ -39,9 +41,9 @@ namespace Server
         /// <param name="toolTransform">Position of the player hitting this object.</param>
         /// <param name="toolType">Type of tool hit by.</param>
         /// <param name="toolMode">Mode the tool was in.</param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
-            base.HitByTool(toolTransform, toolType, toolMode);
+            base.HitByTool(player, toolTransform, toolType, toolMode);
         }
 
         /// <summary>

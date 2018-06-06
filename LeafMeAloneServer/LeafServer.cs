@@ -29,10 +29,10 @@ namespace Server
         /// <param name="toolTransform">Transform of the tool.</param>
         /// <param name="toolType">Type of tool equipped.</param>
         /// <param name="toolMode">Mode of current tool.</param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             // Call the base hit by tool.
-            base.HitByTool(toolTransform, toolType, toolMode);
+            base.HitByTool(player, toolTransform, toolType, toolMode);
 
             // If this is a leaf blower.
             if (toolType == ToolType.BLOWER)
@@ -86,6 +86,8 @@ namespace Server
         /// </summary>
         public override void Die()
         {
+
+            base.Die();
             GameServer.instance.Destroy(this);
         }
 

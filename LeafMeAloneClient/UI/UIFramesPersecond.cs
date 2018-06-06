@@ -3,9 +3,9 @@ using System.Drawing;
 using System.Globalization;
 using SpriteTextRenderer;
 
-namespace Client
+namespace Client.UI
 {
-    public class UIFramesPersecond : UI.UI
+    public class UIFramesPersecond : UI
     {
         //Current FPS
         public double CurrentFps;

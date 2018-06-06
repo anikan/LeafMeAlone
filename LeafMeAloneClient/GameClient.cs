@@ -89,6 +89,12 @@ namespace Client
                 GraphicsRenderer.Init();
                 bool hasConnected = false;
 
+                //catch (FormatException e)
+                //{
+                //    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+                //    ipAddress = ipHostInfo.AddressList[0];
+                //}
+           // }
 
             // Create a new camera with a specified offset.
             Camera activeCamera =
@@ -107,23 +113,13 @@ namespace Client
                     {
                         hasConnected = true;
                         IPAddress ipAddress = IPAddress.Loopback;
-                        try
-                        {
                             if (GraphicsRenderer.networkedCheckbox.Checked)
                             {
-                                ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
+                                //ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
+                                var ipHostEntry = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
+                                ipAddress = ipHostEntry.AddressList[0];
                                 Console.WriteLine($" ip is {ipAddress.ToString()}");
                             }
-                        }
-                        catch (FormatException e)
-                        {
-                            //IPHostEntry ipHostInfo = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
-                            //ipAddress = ipHostInfo.AddressList[0];
-                        }
-                        catch (Exception e)
-                        {
-                            //ipAddress = IPAddress.Loopback;
-                        }
 
                         Client.Init(new NetworkClient(ipAddress));
                         GraphicsRenderer.Panel1.Visible = false;
@@ -178,8 +174,7 @@ namespace Client
             // Draw everythhing.
             Render();
             
-
-            GraphicsRenderer.BarContext.Draw();
+            
             GlobalUIManager.Update();
             UIManagerSpriteRenderer.Update();
             UIManagerSpriteRenderer.SpriteRenderer.Flush();

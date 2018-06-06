@@ -34,8 +34,6 @@ namespace Server
 
         private int playerSpawnIndex = 0;
 
-        private Stopwatch currentFrameTimer;
-
         private Random rnd;
 
         // Whether game is running on net or not
@@ -56,11 +54,9 @@ namespace Server
             development = !networked;
 
             timer = new Stopwatch();
-            currentFrameTimer = new Stopwatch();
             rnd = new Random();
 
             timer.Start();
-            currentFrameTimer.Start();
 
             networkServer = new NetworkServer(networked);
             matchHandler = new MatchHandler(Match.DefaultMatch, networkServer, this);
@@ -99,17 +95,15 @@ namespace Server
         {
             while (true)
             {
-                currentFrameTimer.Restart();
+                float deltaTime = timer.ElapsedMilliseconds / 1000.0f;
+
+                timer.Restart();
 
                 //Check if a client wants to connect.
                 networkServer.CheckForConnections();
 
-                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before receive");
-
                 // Go ahead and try to receive new updates
                 networkServer.Receive();
-
-                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before incoming packets");
 
                 //Update the server players based on received packets.
                 if (!matchHandler.MatchInitializing())
@@ -117,37 +111,28 @@ namespace Server
                     HandleIncomingPackets();
                 }
 
-                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before status updates");
-
                 matchHandler.DoMatchStatusUpdates();
 
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
 
-                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before object updates");
+                UpdateObjects(deltaTime);
 
-
-                UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
-
-
-                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} before send updates");
+                //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after object updates");
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
                 toDestroyQueue.Clear();
 
-                timer.Restart();
+                //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after send updates");
 
-                Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} after send updates");
-
-
-                if ((int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds) < 0)
+                if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
-                    Console.WriteLine($"Warning: Server is falling behind. Took {currentFrameTimer.ElapsedMilliseconds} ms");
+                    Console.WriteLine($"Warning: Server is falling behind. Took {timer.ElapsedMilliseconds} ms");
                 }
 
                 //Sleep for the rest of this tick.
-                Thread.Sleep(Math.Max(0, (int)(TICK_TIME - currentFrameTimer.ElapsedMilliseconds)));
+                Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
             }
         }
 
@@ -184,22 +169,26 @@ namespace Server
         public void UpdateObjects(float deltaTime)
         {
             //TestPhysics();
-
+            
             List<GameObjectServer> toUpdateList = GetInteractableObjects();
+
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} before {toUpdateList.Count} object updates");
+
             //This foreach loop hurts my soul. May consider making it normal for loop.
-            foreach (GameObjectServer toUpdate in toUpdateList)
+            for (int i = 0; i < toUpdateList.Count; i++)
             {
-                toUpdate.Update(deltaTime);
+                toUpdateList[i].Update(deltaTime);
+
+                
             }
 
-            Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} after basic update loop");
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after initial object updates");
 
 
             // Add the effects of the player tools.
             AddPlayerToolEffects();
 
-            Console.WriteLine($"Timer at {currentFrameTimer.ElapsedMilliseconds} after player tool effects loop");
-
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after tool object updates");
 
         }
 
@@ -296,6 +285,8 @@ namespace Server
 
             // Set the leaf's initial rotation.
             newLeaf.Transform.Rotation.Y = rotation;
+
+            newLeaf.EnsureSafePosition();
 
             // Add this leaf to the leaf list and object dictionary.
             newLeaf.Register();

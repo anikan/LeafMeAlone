@@ -8,7 +8,7 @@ using SlimDX;
 
 namespace Client
 {
-    public class LeafBlowerParticleSystem : ParticleSystem
+    public class LeafBlowerParticleSystem : NormalParticleSystem
     {
         public static float WindInitSpeed = 60.0f;
         public static float WindAcceleration = -30.0f;

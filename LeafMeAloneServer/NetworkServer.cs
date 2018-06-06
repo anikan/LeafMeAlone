@@ -66,8 +66,8 @@ namespace Server
             // The DNS name of the computer  
             if (networked)
             {
-                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                ipAddress = ipHostInfo.AddressList[0];
+                IPHostEntry ipHostInfo = Dns.GetHostEntry("");
+                ipAddress = ipHostInfo.AddressList.Last();
             }
 
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 2302);
@@ -179,14 +179,13 @@ namespace Server
 
         public void SendWorldUpdateToAllClients()
         {
-            List<GameObjectServer> gameObjects = GameServer.instance.gameObjectDict.Values.ToList();
+            List<GameObjectServer> gameObjects = GameServer.instance.GetInteractableObjects();
 
             List<byte> allPackets = new List<byte>();
 
             for (int i = 0; i < gameObjects.Count; i++)
             {
                 GameObjectServer objectToSend = gameObjects[i];
-
 
                 //Send an update if the object is not a leaf or if the leaf has been modified.
                 if ((objectToSend is LeafServer && objectToSend.Modified) || (objectToSend is PlayerServer))

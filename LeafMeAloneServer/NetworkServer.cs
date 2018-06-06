@@ -131,7 +131,8 @@ namespace Server
             if (GameServer.instance.playerServerList.Count < Constants.NUM_PLAYERS)
             {
                 ProcessNewPlayer(clientSocket);
-            } else
+            }
+            else
             {
                 SendSpectator(clientSocket);
             }
@@ -166,9 +167,10 @@ namespace Server
         /// </param>
         private void SendWorldToClient(Socket clientSocket)
         {
-            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
+            List<GameObjectServer> world = GameServer.instance.GetGameObjectList();
+            foreach (GameObjectServer val in world)
             {
-                BasePacket packetToSend = ServerPacketFactory.NewCreatePacket(pair.Value);
+                BasePacket packetToSend = ServerPacketFactory.NewCreatePacket(val);
                 clientSocket.Send(PacketUtil.Serialize(packetToSend));
             }
         }
@@ -189,10 +191,13 @@ namespace Server
                 }
             }
 
-            foreach (var gameObj in GameServer.instance.toDestroyQueue)
+            lock (GameServer.instance.toDestroyQueue)
             {
-                BasePacket packet = PacketFactory.NewDestroyPacket(gameObj);
-                SendAll(PacketUtil.Serialize(packet));
+                foreach (var gameObj in GameServer.instance.toDestroyQueue)
+                {
+                    BasePacket packet = PacketFactory.NewDestroyPacket(gameObj);
+                    SendAll(PacketUtil.Serialize(packet));
+                }
             }
         }
 
@@ -233,7 +238,7 @@ namespace Server
             // from the asynchronous state object.  
             StateObject state = (StateObject)ar.AsyncState;
             Socket handler = state.workSocket;
-            
+
             try
             {
                 // Read data from the client socket.   

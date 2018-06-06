@@ -215,7 +215,7 @@ namespace Shared
             int maxLeaves = 0;
             foreach (Team team in teams)
             {
-                if (team.teamSection.numLeaves > maxLeaves)
+                if (team.teamSection.numLeaves >= maxLeaves)
                 {
                     maxLeaves = team.teamSection.numLeaves;
                     winningTeam = team;
@@ -224,7 +224,6 @@ namespace Shared
 
             if (matchTimer.Elapsed.Seconds > matchTime || maxLeaves > Constants.WIN_LEAF_NUM)
             {
-                matchTimer.Reset();
                 return winningTeam;
             }
 
@@ -270,6 +269,14 @@ namespace Shared
         {
             this.matchTime = matchTime;
             matchTimer.Start();
+        }
+
+        /// <summary>
+        /// Stops the match by resetting the timer
+        /// </summary>
+        public void StopMatch()
+        {
+            matchTimer.Reset();
         }
     }
 }

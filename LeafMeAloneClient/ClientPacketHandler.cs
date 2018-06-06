@@ -66,7 +66,7 @@ namespace Client
             }
 
             // What to do on game finish
-            void GameResultAction(MatchResultPacket p)
+            void GameResultAction(GameResultPacket p)
             {
                 client.ResetGameTimer();
                 if (client.GetPlayerTeam() == p.winningTeam)
@@ -99,7 +99,7 @@ namespace Client
                     {PacketType.ObjectPacket, (p) => UpdateObjectAction((ObjectPacket) p) },
                     {PacketType.PlayerPacket, (p) => UpdatePlayerAction((PlayerPacket) p) },
                     {PacketType.DestroyObjectPacket, (p) => DestroyAction((DestroyObjectPacket) p)},
-                    {PacketType.GameResultPacket, (p) => GameResultAction((MatchResultPacket) p)},
+                    {PacketType.GameResultPacket, (p) => GameResultAction((GameResultPacket) p)},
                     {PacketType.MatchStartPacket, (p) => GameStartAction((MatchStartPacket)p)},
                     {PacketType.SpectatorPacket, (p) => SpectatorAction((SpectatorPacket)p)},
                 };

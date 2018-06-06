@@ -107,7 +107,7 @@ namespace Server
                 networkServer.Receive();
 
                 //Update the server players based on received packets.
-                if (!matchHandler.MatchInitializing())
+                if (!matchHandler.GetMatch().Started() || !matchHandler.MatchInitializing())
                 {
                     HandleIncomingPackets();
                 }
@@ -121,7 +121,10 @@ namespace Server
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
-                toDestroyQueue.Clear();
+                lock (toDestroyQueue)
+                {
+                    toDestroyQueue.Clear();
+                }
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
@@ -133,6 +136,15 @@ namespace Server
                 //Sleep for the rest of this tick.
                 System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
             }
+        }
+
+        /// <summary>
+        /// Whether enough players have connected to start a match
+        /// </summary>
+        /// <returns></returns>
+        private bool SufficientPlayersConnected()
+        {
+            return (development && playerServerList.Count == 4) || (!development && playerServerList.Count == 4);
         }
 
         private void HandleIncomingPackets()
@@ -156,8 +168,9 @@ namespace Server
         /// </summary>
         internal void ConnectCallback()
         {
-            if ((development && playerServerList.Count == 1) || (!development && playerServerList.Count == 4)) {
-                matchHandler.StartMatch();
+            if (SufficientPlayersConnected() && !matchHandler.GetMatch().Started())
+            {
+                matchHandler.RestartMatch();
             }
         }
 
@@ -317,7 +330,10 @@ namespace Server
                 playerServerList.Remove(player);
             }
 
-            toDestroyQueue.Add(gameObj);
+            lock (toDestroyQueue)
+            {
+                toDestroyQueue.Add(gameObj);
+            }
 
             if (gameObj is LeafServer)
             {

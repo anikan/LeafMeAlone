@@ -22,8 +22,11 @@ namespace Shared
         public int numLeaves;
 
         public List<Vector3> spawnPoints;
+
         // Color of the section.
         public Vector3 sectionColor;
+
+        public Team team;
 
         // Checks if a position is in the bounds.
         public bool IsInBounds(Vector3 position)
@@ -55,6 +58,9 @@ namespace Shared
                 // Check if the position is in bounds.
                 if (IsInBounds(obj.Transform.Position))
                 {
+
+                    obj.section = this;
+
                     // Increase the number of leaves.
                     numLeaves++;
 

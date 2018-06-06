@@ -8,9 +8,9 @@ using SlimDX;
 
 namespace Client
 {
-    public class LeafBlowerParticleSystem : ParticleSystem
+    public class LeafBlowerParticleSystem : NormalParticleSystem
     {
-        public static float WindInitSpeed = 60.0f;
+        public static float WindInitSpeed = 70.0f;
         public static float WindAcceleration = -30.0f;
         public static float WindStopDistance = 60.0f;
         public static Vector3 WindDirection = Vector3.UnitX;
@@ -23,7 +23,7 @@ namespace Client
             true, // cutoff alpha only
             true, // prevent backward flow 
             Tool.Blower.ConeAngle*30,//800.0f, // cone radius
-            1.0f, // initial delta size
+            1.2f, // initial delta size
             0f, // cutoff distance
             0.5f, // cutoff speed
             0.02f, // enlarge speed

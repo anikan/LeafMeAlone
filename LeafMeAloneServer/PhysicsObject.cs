@@ -32,8 +32,7 @@ namespace Server
         public float Bounciness = 0.0f;
 
         public bool CanPush;
-
-
+        
         // Force, applied each tick and then reset.
         // Affects through the ApplyForce() function.
         public Vector3 Force;
@@ -146,10 +145,10 @@ namespace Server
         /// <param name="toolTransform">Position of the player that hit this object.</param>
         /// <param name="toolType">Type of tool equipped.</param>
         /// <param name="toolMode">Mode (primary or secondary) of tool equipped.</param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             // Call the base's HitByTool function (burns the object)
-            base.HitByTool(toolTransform, toolType, toolMode);
+            base.HitByTool(player, toolTransform, toolType, toolMode);
 
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
@@ -187,7 +186,8 @@ namespace Server
                 {
 
                     // Get the force of this tool.
-                    float toolForce = toolInfo.Force * 0.5f;
+                    float toolForce = toolInfo.Force * 0.25f;
+                    float toolRange = toolInfo.Range * 0.5f;
 
                     // Get the vector from the player to the object.
                     Vector3 objToPlayer = toolTransform.Position - Transform.Position;
@@ -195,7 +195,7 @@ namespace Server
                     float distance = objToPlayer.Length();
 
                     // Divide the vector by the range of the tool to normalize it.
-                    objToPlayer /= toolInfo.Range;
+                    objToPlayer /= toolRange;
 
                     // Multiply tool force by distance so that it's stronger on objects that are closer.
                     // Also make sure denominator can't be zero.

@@ -1,6 +1,6 @@
 ﻿using SlimDX;
 
-namespace Client
+namespace Client.UI
 {
     public class DrawableTexture
     {

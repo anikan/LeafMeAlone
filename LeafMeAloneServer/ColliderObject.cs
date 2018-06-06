@@ -56,11 +56,11 @@ namespace Server
         /// <param name="toolTransform"></param>
         /// <param name="toolType"></param>
         /// <param name="toolMode"></param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             if (Collidable)
             {
-                base.HitByTool(toolTransform, toolType, toolMode);
+                base.HitByTool(player, toolTransform, toolType, toolMode);
             }
         }
 
@@ -132,15 +132,14 @@ namespace Server
         /// <param name="newPosition"></param>
         public bool TryMoveObject(Vector3 newPosition, int stacklevel = 0)
         {
-
             // Save the original position of this object.
             Vector3 OriginalPosition = Transform.Position;
 
             // First, update the position.
             Transform.Position = newPosition;
 
-            // First, we need all the game objects on the server.
-            List<GameObjectServer> allObjects = GameServer.instance.GetGameObjectList();
+            // First, we need all the colliding objects on the server.
+            List<GameObjectServer> allObjects = GameServer.instance.GetColliderObjects();
 
             // Iterate through all the objects.
             for (int i = 0; i < allObjects.Count; i++)
@@ -168,10 +167,9 @@ namespace Server
                             TryMoveObject(new Vector3(OriginalPosition.X, OriginalPosition.Y, newPosition.Z), stacklevel + 1);
                         }
 
-                        // If this is a physics object
-                        if (this is PhysicsObject me)
+                        // If this is a physics object and both objects aren't leaves.
+                        if (!(this is LeafServer) && !(obj is LeafServer) && this is PhysicsObject me)
                         {
-
                             // If the other object is also a physics object.
                             if (obj is PhysicsObject other)
                             {
@@ -197,11 +195,8 @@ namespace Server
             //The object moved, it's been modified.
             Modified = true;
 
-            EnsureSafePosition();
-
             return true;
         }
-
 
         /// <summary>
         /// Checks if a vector's values are less than a specified minimum. If so, sets that value to zero.
@@ -233,7 +228,7 @@ namespace Server
             Vector3 OriginalPosition = Transform.Position;
 
             // First, we need all the game objects on the server.
-            List<GameObjectServer> allObjects = GameServer.instance.GetGameObjectList();
+            List<GameObjectServer> allObjects = GameServer.instance.GetColliderObjects();
 
             // Iterate through all the objects.
             for (int i = 0; i < allObjects.Count; i++)
@@ -265,7 +260,7 @@ namespace Server
                 TryMoveObject(newTestPosition);
 
                 // Ensure safe position again.
-                EnsureSafePosition(stackCount+1);
+                EnsureSafePosition(stackCount + 1);
 
             }
         }

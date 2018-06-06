@@ -9,6 +9,7 @@ namespace Shared
 {
     public enum TeamName
     {
+        NONE,
         RED,
         BLUE
     };
@@ -27,6 +28,7 @@ namespace Shared
         {
             name = teamName;
             teamSection = section;
+            section.team = this;
         }
 
         /// <summary>

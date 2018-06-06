@@ -17,7 +17,7 @@ namespace Client
     {
 
         //static particle system which is used for any graphics gameobject to be burned
-        public static ParticleSystem Fire;
+        public static NormalParticleSystem Fire;
 
         // Model that's associated with this object.
         internal Model model;
@@ -88,7 +88,7 @@ namespace Client
         {
 
             // Check if debug mode is on and this isn't a particle system or another cube.
-            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            if (Constants.PIVOT_DEBUG && !(this is NormalParticleSystem) && !(this is MapTile))
             {
                 // Create a new cube at the pivot.
                 PivotCube = new MapTile();
@@ -109,7 +109,7 @@ namespace Client
             InitializeBurning();
 
             // Check if debug mode is on and this isn't a particle system or another cube.
-            if (Constants.PIVOT_DEBUG && !(this is ParticleSystem) && !(this is MapTile))
+            if (Constants.PIVOT_DEBUG && !(this is NormalParticleSystem) && !(this is MapTile))
             {
 
                 // Create a new cube at the pivot.
@@ -147,19 +147,9 @@ namespace Client
         public virtual void Draw()
         {
             model?.Draw();
-
-            //if the object is currently burning, draw the fire on them.
-            if (Burning)
-            {
-                Transform t = new Transform {Position = Transform.Position,Scale =  new Vector3(1,1,1)};
-                GraphicsManager.DrawParticlesThisFrame(Fire,t);
-            }
-
+            
             // If we're debugging, draw the pivot cube.
-            if (PivotCube != null)
-            {
-                PivotCube.Draw();
-            }
+            PivotCube?.Draw();
         }
 
         /// <summary>

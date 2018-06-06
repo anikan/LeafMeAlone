@@ -11,7 +11,7 @@ using SpriteRenderer = SpriteTextRenderer.SlimDX.SpriteRenderer;
 using TextAlignment = SpriteTextRenderer.TextAlignment;
 using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
 
-namespace Client
+namespace Client.UI
 {
     public static class UIManagerSpriteRenderer
     {
@@ -133,6 +133,7 @@ namespace Client
             {
                 if (tex.Enabled)
                     DrawTexture(tex.View, tex.Position, tex.Size, tex.Rotation);
+                
             }
         }
 
@@ -140,7 +141,7 @@ namespace Client
         /// ensure the textblock renderers exist.
         /// </summary>
         /// <param name="t"></param>
-        private static void EnsureTypeExists(TextType t)
+        public static void EnsureTypeExists(TextType t)
         {
             if (TextRenderers.ContainsKey(t)) return;
 

@@ -25,7 +25,7 @@ namespace Client.UI
         private WinLoseState currWinLoseState = WinLoseState.None;
         
         public UIGameWLState() : base("", UIManagerSpriteRenderer.TextType.MASSIVE,
-            RectangleF.Empty, TextAlignment.HorizontalCenter | TextAlignment.Top, Color.Transparent)
+            new RectangleF(0,70,0,0), TextAlignment.HorizontalCenter | TextAlignment.Top, Color.Transparent)
         {
             SetState(WinLoseState.None);
             LeafStatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(25, 0, 0, 0),
@@ -67,9 +67,16 @@ namespace Client.UI
 
         public void SetStats(PlayerStats st)
         {
+            if (st == null)
+            {
+                LeafStatsUI.UIText.Text = PlayerStatsUI.UIText.Text = ShameStatsUI.UIText.Text = "";
+            }
+            else
+            {
             LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
             PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
             ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
+            }
         }
 
 

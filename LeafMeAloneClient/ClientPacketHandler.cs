@@ -85,6 +85,7 @@ namespace Client
             {
                 client.StartMatchTimer(p.gameTime);
                 GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
+                GlobalUIManager.GameWinLossState.SetStats(null);
                 client.PendingRematchState = false;
             }
 

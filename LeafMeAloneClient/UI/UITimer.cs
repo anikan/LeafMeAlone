@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.Timers;
-using AntTweakBar;
-using SlimDX;
 using SpriteTextRenderer;
 
-namespace Client
+namespace Client.UI
 {
-    public class UITimer : UI.UI
+    public class UITimer : UI
     {
         public delegate void TimerCompleted();
         public TimerCompleted OnTimerCompleted;

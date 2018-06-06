@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using AntTweakBar;
-using SpriteTextRenderer.SlimDX;
 
-namespace Client
+namespace Client.UI
 {
     public class UIManagerAntTweakBar
     {

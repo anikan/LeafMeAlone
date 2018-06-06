@@ -11,7 +11,7 @@ using SpriteRenderer = SpriteTextRenderer.SlimDX.SpriteRenderer;
 using TextAlignment = SpriteTextRenderer.TextAlignment;
 using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
 
-namespace Client
+namespace Client.UI
 {
     public static class UIManagerSpriteRenderer
     {

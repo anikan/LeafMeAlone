@@ -10,7 +10,9 @@ using Device = SlimDX.Direct3D11.Device;
 using Resource = SlimDX.Direct3D11.Resource;
 using System.Windows.Forms;
 using AntTweakBar;
+using Client.UI;
 using Button = System.Windows.Forms.Button;
+using Screen = System.Windows.Forms.Screen;
 
 namespace Client
 {
@@ -37,11 +39,10 @@ namespace Client
         /// </summary>
         public static SwapChain SwapChain;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        //Render Target
         public static RenderTargetView RenderTarget;
 
+        //Viewport for screen view.
         public static Viewport Viewport;
 
         public static Matrix ProjectionMatrix;

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using Client.UI;
+﻿using System.Collections.Generic;
 using Shared;
 using SlimDX;
-using SpriteTextRenderer;
 
-namespace Client
+namespace Client.UI
 {
     public static class GlobalUIManager
     {
@@ -17,11 +13,11 @@ namespace Client
         public static UITeams Teams;
         public static UIGameWLState GameWinLossState;
         public static UICulled Culled;
-        private static UI.UI LeafBlowerTool, FlameThrowerTool;
+        private static Client.UI.UI LeafBlowerTool, FlameThrowerTool;
         public static UIFindTeammate TeammateUI;
 
 
-        public static List<UI.UI> UIList = new List<UI.UI>();
+        public static List<Client.UI.UI> UIList = new List<Client.UI.UI>();
 
         /// <summary>
         /// Initialize UI Elements.
@@ -36,8 +32,8 @@ namespace Client
 
             const int xSize = 300;
             const int ySize = 75;
-            LeafBlowerTool = new UI.UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
-            FlameThrowerTool = new UI.UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
+            LeafBlowerTool = new Client.UI.UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
+            FlameThrowerTool = new Client.UI.UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
 
             
                 LeafBlowerTool.SetUpdateAction(() =>

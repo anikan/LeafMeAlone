@@ -112,6 +112,7 @@
     <Compile Include="AudioManager.cs" />
     <Compile Include="AudioSystem.cs" />
     <Compile Include="AnimationManager.cs" />
+    <Compile Include="BaseParticleSystem.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="ClientPacketHandler.cs" />
     <Compile Include="Debug.cs" />
@@ -147,7 +148,7 @@
     <Compile Include="InputManager.cs" />
     <Compile Include="NonNetworkedGameObjectClient.cs" />
     <Compile Include="Particle.cs" />
-    <Compile Include="ParticleSystem.cs" />
+    <Compile Include="NormalParticleSystem.cs" />
     <Compile Include="PlayerClient.cs" />
     <Compile Include="GraphicsRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

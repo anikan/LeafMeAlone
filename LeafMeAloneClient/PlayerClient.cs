@@ -38,7 +38,7 @@ namespace Client
         // All of the requests from the player that will go into a packet.
         public PlayerRequestInfo PlayerRequests;
 
-        private ParticleSystem FlameThrower, LeafBlower;
+        private NormalParticleSystem FlameThrower, LeafBlower;
         private InverseParticleSystem Suction;
 
         // For the audio control

@@ -11,7 +11,7 @@ using Buffer = SlimDX.Direct3D11.Buffer;
 
 namespace Client
 {
-    class InverseParticleSystem : NonNetworkedGameObjectClient
+    class InverseParticleSystem : BaseParticleSystem
     {
         public bool Enabled = true;
 

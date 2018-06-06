@@ -19,7 +19,7 @@ namespace Client
     /// <summary>
     /// Particle system object, only exists client-side.
     /// </summary>
-    public abstract class ParticleSystem : NonNetworkedGameObjectClient
+    public abstract class NormalParticleSystem : BaseParticleSystem
     {
         public bool Enabled = true;
 
@@ -85,7 +85,7 @@ namespace Client
         /// <param name="stop_dist"> Specify the distance, where the particles stop showing up </param>
         /// <param name="emissionrate"> Specify the emission rate of the particle system </param>
         /// <param name="maxparticles"> Specify the max number of particles emitted at a time </param>
-        protected ParticleSystem(string TexturePath,
+        protected NormalParticleSystem(string TexturePath,
             Vector3 init_pos,
             Vector3 acceleration,
             Vector3 init_velocity,

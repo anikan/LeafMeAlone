@@ -29,7 +29,7 @@ namespace Client
         /// </summary>
         public static Dictionary<string, Light> DictLight = new Dictionary<string, Light>();
 
-        public static List<KeyValuePair<ParticleSystem,Transform>> DrawThisFrame = new List<KeyValuePair<ParticleSystem, Transform>>();
+        public static List<KeyValuePair<NormalParticleSystem,Transform>> DrawThisFrame = new List<KeyValuePair<NormalParticleSystem, Transform>>();
 
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Client
         public static PlayerClient ActivePlayer;
 
         // The list of particle systems
-        public static List<NonNetworkedGameObjectClient> ParticleSystems;
+        public static List<BaseParticleSystem> ParticleSystems;
 
         // Converts a screen point to a world position.
         // Converts a screen point to a world position.
@@ -159,9 +159,9 @@ namespace Client
             DrawThisFrame.Clear();
         }
 
-        public static void DrawParticlesThisFrame(ParticleSystem p,Transform t)
+        public static void DrawParticlesThisFrame(NormalParticleSystem p,Transform t)
         {
-            DrawThisFrame.Add(new KeyValuePair<ParticleSystem,Transform>(p,t));
+            DrawThisFrame.Add(new KeyValuePair<NormalParticleSystem,Transform>(p,t));
         }
 
 
@@ -207,7 +207,7 @@ namespace Client
 
             LoadAllShaders();
 
-            ParticleSystems = new List<NonNetworkedGameObjectClient>();
+            ParticleSystems = new List<BaseParticleSystem>();
         }
 
         /// <summary>

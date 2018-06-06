@@ -22,6 +22,7 @@ namespace Client
         //log a debug message to the textbox
         public static void Log(string msg)
         {
+#if DEBUG
             Console.WriteLine(msg);
             //reset logs if too long.
             if (debugBox.Lines.Length > 10000)
@@ -29,6 +30,7 @@ namespace Client
 
             //append to textbox.
             debugBox.AppendText(msg + Environment.NewLine);
+#endif
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Client.UI;
 using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
@@ -13,7 +14,6 @@ namespace Client
 {
     static class GraphicsManager
     {
-
         /// <summary>
         /// DictGeometry contains all the previously loaded geometries.
         /// </summary>
@@ -29,7 +29,8 @@ namespace Client
         /// </summary>
         public static Dictionary<string, Light> DictLight = new Dictionary<string, Light>();
 
-        public static List<KeyValuePair<NormalParticleSystem,Transform>> DrawThisFrame = new List<KeyValuePair<NormalParticleSystem, Transform>>();
+        public static List<KeyValuePair<NormalParticleSystem, Transform>> DrawThisFrame =
+            new List<KeyValuePair<NormalParticleSystem, Transform>>();
 
 
         /// <summary>
@@ -47,7 +48,6 @@ namespace Client
         // Converts a screen point to a world position.
         public static Vector3 ScreenToWorldPoint(Vector2 screenPos)
         {
-
             // Get the view and projection matrices
             Matrix viewMat = ActiveCamera.m_ViewMatrix;
             Matrix projectMat = GraphicsRenderer.ProjectionMatrix;
@@ -61,8 +61,8 @@ namespace Client
             float winZ = 1.0f;
 
             // Calculate vector arguments for final vector
-            args[0] = (2.0f * ((float)(screenPos.X - 0) / (GraphicsRenderer.Form.ClientSize.Width - 0))) - 1.0f;
-            args[1] = 1.0f - (2.0f * ((float)(screenPos.Y - 0) / (GraphicsRenderer.Form.ClientSize.Height - 0)));
+            args[0] = (2.0f * ((float) (screenPos.X - 0) / (GraphicsRenderer.Form.ClientSize.Width - 0))) - 1.0f;
+            args[1] = 1.0f - (2.0f * ((float) (screenPos.Y - 0) / (GraphicsRenderer.Form.ClientSize.Height - 0)));
             args[2] = 2.0f * winZ - 1.0f;
             args[3] = 1.0f;
 
@@ -88,7 +88,6 @@ namespace Client
         /// <returns></returns>
         public static Vector2 WorldToScreenPoint(Vector3 worldPos)
         {
-
             // Get the view and projection matrices
             Matrix viewMat = ActiveCamera.m_ViewMatrix;
             Matrix projectMat = GraphicsRenderer.ProjectionMatrix;
@@ -97,17 +96,19 @@ namespace Client
             Vector4 clipSpace = (viewMat * projectMat).Mult(new Vector4(worldPos, 1.0f));
 
             //normalize the clip space by dividing by w
-            Vector3 normalDeviceCoordSpace = new Vector3(clipSpace.X / clipSpace.W, clipSpace.Y / clipSpace.W, clipSpace.Z / clipSpace.W);
+            Vector3 normalDeviceCoordSpace = new Vector3(clipSpace.X / clipSpace.W, clipSpace.Y / clipSpace.W,
+                clipSpace.Z / clipSpace.W);
 
             //transform into screen space by mult by window size.
-            Vector2 screenSpace = new Vector2((normalDeviceCoordSpace.X + 1.0f) / 2.0f * GraphicsRenderer.Form.ClientSize.Width,
+            Vector2 screenSpace = new Vector2(
+                (normalDeviceCoordSpace.X + 1.0f) / 2.0f * GraphicsRenderer.Form.ClientSize.Width,
                 (1.0f - normalDeviceCoordSpace.Y) / 2.0f * GraphicsRenderer.Form.ClientSize.Height);
 
             return screenSpace;
         }
+
         public static Vector2 WorldToViewportPoint(Vector3 worldPos)
         {
-
             // Get the view and projection matrices
             Matrix viewMat = ActiveCamera.m_ViewMatrix;
             Matrix projectMat = GraphicsRenderer.ProjectionMatrix;
@@ -116,10 +117,12 @@ namespace Client
             Vector4 clipSpace = (viewMat * projectMat).Mult(new Vector4(worldPos, 1.0f));
 
             //normalize the clip space by dividing by w
-            Vector3 normalDeviceCoordSpace = new Vector3(clipSpace.X / clipSpace.W, clipSpace.Y / clipSpace.W, clipSpace.Z / clipSpace.W);
+            Vector3 normalDeviceCoordSpace = new Vector3(clipSpace.X / clipSpace.W, clipSpace.Y / clipSpace.W,
+                clipSpace.Z / clipSpace.W);
 
             //transform into screen space by mult by window size.
-            Vector2 viewPort = new Vector2((normalDeviceCoordSpace.X + 1.0f) / 2.0f, (1.0f - normalDeviceCoordSpace.Y) / 2.0f);
+            Vector2 viewPort = new Vector2((normalDeviceCoordSpace.X + 1.0f) / 2.0f,
+                (1.0f - normalDeviceCoordSpace.Y) / 2.0f);
 
             return viewPort;
         }
@@ -133,19 +136,18 @@ namespace Client
 
         public static void Update(float delta_t)
         {
-
             // update the camera position based on the player position
             if (ActivePlayer != null)
             {
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
             }
-            LeafClient.Fire?.Update(delta_t);
+
+            GraphicGameObject.Fire?.Update(delta_t);
         }
 
         public static void Draw()
         {
-
             foreach (var particleSystem in ParticleSystems)
             {
                 particleSystem.Draw();
@@ -159,9 +161,9 @@ namespace Client
             DrawThisFrame.Clear();
         }
 
-        public static void DrawParticlesThisFrame(NormalParticleSystem p,Transform t)
+        public static void DrawParticlesThisFrame(NormalParticleSystem p, Transform t)
         {
-            DrawThisFrame.Add(new KeyValuePair<NormalParticleSystem,Transform>(p,t));
+            DrawThisFrame.Add(new KeyValuePair<NormalParticleSystem, Transform>(p, t));
         }
 
 
@@ -232,7 +234,8 @@ namespace Client
             });
 
             List<InputElement[]> allShaderElements = new List<InputElement[]>();
-            allShaderElements.Add(new[] {
+            allShaderElements.Add(new[]
+            {
                 new InputElement("POSITION", 0, Format.R32G32B32_Float, 0),
                 new InputElement("NORMAL", 0, Format.R32G32B32_Float, 1),
                 new InputElement("TEXTURE", 0, Format.R32G32B32_Float, 2),
@@ -242,7 +245,8 @@ namespace Client
 
             for (int i = 0; i < allShaderPaths.Count; i++)
             {
-                DictShader[allShaderPaths[i]] = new Shader(allShaderPaths[i], allShaderVSName[i], allShaderPSName[i], allShaderElements[i]);
+                DictShader[allShaderPaths[i]] = new Shader(allShaderPaths[i], allShaderVSName[i], allShaderPSName[i],
+                    allShaderElements[i]);
             }
         }
     }

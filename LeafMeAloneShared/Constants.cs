@@ -13,6 +13,8 @@ namespace Shared
         public const string Arrow = @"../../Textures/Arrow.png";
         public const string RedHealth = @"../../Textures/RedHealth.png";
         public const string BlueHealth = @"../../Textures/BlueHealth.png";
+        public const string LeafToolTip = @"../../Textures/LeafblowerTooltip.png";
+        public const string FlameToolTip = @"../../Textures/FlamethrowerTooltip.png";
 
 
         public const string GlobalFont = "Dimbo";

@@ -3,9 +3,9 @@ using System.Drawing;
 using System.Timers;
 using SpriteTextRenderer;
 
-namespace Client
+namespace Client.UI
 {
-    public class UITimer : UI.UI
+    public class UITimer : UI
     {
         public delegate void TimerCompleted();
         public TimerCompleted OnTimerCompleted;
@@ -21,7 +21,7 @@ namespace Client
         private readonly Timer t;
 
         public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString(TimeFormatting), UIManagerSpriteRenderer.TextType.BOLD,
-            new RectangleF(0, 0, -50, 0), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.White)
+            new RectangleF(0, 0, 0, 0), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.White)
         {
             t = new Timer(tickDelta * 1000f);
             t.Elapsed += Timer_Tick;
@@ -41,7 +41,7 @@ namespace Client
                 OnTimerCompleted?.Invoke();
             }
         }
-        //Restart timer.
+        //Restart ElapsedTime.
         public void Restart(float timetoCountInSeconds)
         {
             TimeRemaining = timetoCountInSeconds;
@@ -49,7 +49,7 @@ namespace Client
         }
 
         /// <summary>
-        /// Reset the timer
+        /// Reset the ElapsedTime
         /// </summary>
         public void End()
         {
@@ -59,7 +59,7 @@ namespace Client
         }
 
         /// <summary>
-        /// Start the timer
+        /// Start the ElapsedTime
         /// </summary>
         /// <param name="timeToCountInSeconds">Amount to start at</param>
         public void Start(float timeToCountInSeconds)

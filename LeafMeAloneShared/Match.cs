@@ -86,6 +86,8 @@ namespace Shared
             // Number of tiles on each side of the center tile, for no man's land.
             int NoMansLandTilesOnEachSide = NoMansLandTiles / 2 - 1;
 
+            newMatch.teams = new List<Team>();
+
             // Set up no man's land information.
             newMatch.NoMansLand = new TeamSection
             {
@@ -106,7 +108,7 @@ namespace Shared
                 sectionColor = new Vector3(0.7f, 0.7f, 0.7f)
             };
 
-            newMatch.teams = new List<Team>();
+            newMatch.NoMansLand.team = new Team(TeamName.NONE, newMatch.NoMansLand);
 
             // Create a new section for team one, on the left side of the map.
             TeamSection redSection = new TeamSection
@@ -215,7 +217,7 @@ namespace Shared
             int maxLeaves = 0;
             foreach (Team team in teams)
             {
-                if (team.teamSection.numLeaves > maxLeaves)
+                if (team.teamSection.numLeaves >= maxLeaves)
                 {
                     maxLeaves = team.teamSection.numLeaves;
                     winningTeam = team;
@@ -224,7 +226,6 @@ namespace Shared
 
             if (matchTimer.Elapsed.Seconds > matchTime || maxLeaves > Constants.WIN_LEAF_NUM)
             {
-                matchTimer.Reset();
                 return winningTeam;
             }
 
@@ -270,6 +271,14 @@ namespace Shared
         {
             this.matchTime = matchTime;
             matchTimer.Start();
+        }
+
+        /// <summary>
+        /// Stops the match by resetting the timer
+        /// </summary>
+        public void StopMatch()
+        {
+            matchTimer.Reset();
         }
     }
 }

@@ -9,6 +9,8 @@ using SlimDX.Direct3D11;
 using SlimDX.DXGI;
 using SlimDX.Windows;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using Client.UI;
 using Shared.Packet;
 using SlimDX.DirectWrite;
@@ -40,6 +42,14 @@ namespace Client
         private List<NonNetworkedGameObjectClient> NonNetworkedGameObjects;
 
         private ClientPacketHandler clientPacketHandler;
+
+        private bool HasInitted = false;
+
+        // make win logic easier to handle
+        // check if the current match is over and new match is not started
+        public bool PendingRematchState = false;
+        public TeamName WinningTeam = TeamName.BLUE;
+
 
         // All leaves in the scene. 
         public List<LeafClient> leaves;
@@ -81,40 +91,52 @@ namespace Client
         {
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
 
-            IPAddress ipAddress = IPAddress.Loopback;
-            if (args.Length > 0)
-            {/*
-                try
-                {
-                    ipAddress = IPAddress.Parse(args[0]);
-                }
+                // Initialize static classes
+                GraphicsRenderer.Init();
+                bool hasConnected = false;
 
-                catch (FormatException e)
-                {*/
-                    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
-                    ipAddress = ipHostInfo.AddressList[0];
+                //catch (FormatException e)
+                //{
+                //    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+                //    ipAddress = ipHostInfo.AddressList[0];
                 //}
-            }
+           // }
 
             // Create a new camera with a specified offset.
             Camera activeCamera =
                 new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
-
-            // Initialize static classes
-            GraphicsRenderer.Init();
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
             AudioManager.SetListenerVolume(8.0f);
             AnimationManager.Init();
 
-            GameClient Client = new GameClient(new NetworkClient(ipAddress));
-            
+            GameClient Client = new GameClient();
             GlobalUIManager.Init();
+
+            GraphicsRenderer.connectButton.Click += (sender, eventArgs) =>
+                {
+                    if (!hasConnected)
+                    {
+                        hasConnected = true;
+                        IPAddress ipAddress = IPAddress.Loopback;
+                            if (GraphicsRenderer.networkedCheckbox.Checked)
+                            {
+                                //ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
+                                var ipHostEntry = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
+                                ipAddress = ipHostEntry.AddressList[0];
+                                Console.WriteLine($" ip is {ipAddress.ToString()}");
+                            }
+
+                        Client.Init(new NetworkClient(ipAddress));
+                        GraphicsRenderer.Panel1.Visible = false;
+                        GraphicsRenderer.Panel1.Hide();
+                        GraphicsRenderer.Form.Focus();
+                    }
+                };
 
             MessagePump.Run(GraphicsRenderer.Form, Client.DoGameLoop);
 
             GraphicsRenderer.Dispose();
-
         }
 
         internal void ResetGameTimer()
@@ -124,11 +146,14 @@ namespace Client
 
         internal TeamName GetPlayerTeam()
         {
-            return ActivePlayer.Team;
+            return ActivePlayer.PlayerTeam;
         }
         
         private void DoGameLoop()
         {
+            if (!HasInitted)
+                return;
+
             GlobalUIManager.fps.Start();
             GraphicsRenderer.DeviceContext.ClearRenderTargetView(
                 GraphicsRenderer.RenderTarget, new Color4(0.0f, .4f, 0.0f));
@@ -171,21 +196,14 @@ namespace Client
             GlobalUIManager.gameTimer.Start(gameTime);
         }
 
-        // Start the networked client (connect to server).
-        public GameClient(NetworkClient networkClient)
+        public void Init(NetworkClient client)
         {
-            if (instance != null)
-            {
-                Console.WriteLine("WARNING: Attempting to double instantiate GameClient!");
-            }
-            instance = this;
-
-            this.networkClient = networkClient;
+            this.networkClient = client;
             networkClient.StartClient();
 
             this.clientPacketHandler = new ClientPacketHandler(this);
 
-            // Initialize frame timer
+            // Initialize frame ElapsedTime
             FrameTimer = new Stopwatch();
             FrameTimer.Start();
 
@@ -198,6 +216,17 @@ namespace Client
             _audioBGM = AudioManager.GetNewSource();
             AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
             AudioManager.SetSourceVolume(_audioBGM, 0.05f);
+            HasInitted = true;
+        }
+
+        // Start the networked client (connect to server).
+        public GameClient()
+        {
+            if (instance != null)
+            {
+                Console.WriteLine("WARNING: Attempting to double instantiate GameClient!");
+            }
+            instance = this;
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -248,7 +277,7 @@ namespace Client
             AudioManager.Update();
             AnimationManager.Update(delta);
 
-            // Restart the frame timer.
+            // Restart the frame ElapsedTime.
             FrameTimer.Restart();
 
             //AudioManager.UpdateSourceLocation(_audioBGM, Camera.CameraPosition);
@@ -324,6 +353,7 @@ namespace Client
                 case (ObjectType.ACTIVE_PLAYER):
                     var newPlayer = InitializeUserPlayerAndMovement(createPacket) as PlayerClient;
                     playerClients.Add(newPlayer);
+                    newPlayer.Name = GraphicsRenderer.nicknameTextbox.Text;
                     return newPlayer;
                 // Create an other player
                 case (ObjectType.PLAYER):

@@ -14,7 +14,7 @@ namespace Server
     /// </summary>
     public abstract class GameObjectServer : GameObject
     {
-       
+
         // Is the object being actively burned this frame?
         private bool FlamethrowerActivelyBurning = false;
 
@@ -24,6 +24,9 @@ namespace Server
         public const float SECONDS_TO_EXTINGUISH = 0.5f;
 
         private Stopwatch ExtinguishTimer;
+
+        public PlayerServer LastPlayerInteracted;
+        public PlayerServer PlayerThatSetThisOnFire;
 
         //True if this object has been changed since the last update and needs to be sent to all clients.
         //Set when burning or when it moves.
@@ -71,6 +74,9 @@ namespace Server
         /// <param name="deltaTime">Time since last frame.</param>
         public override void Update(float deltaTime)
         {
+
+            CheckIfChangedSection();
+
             // If this object is burning.
             if (Burning || FlamethrowerActivelyBurning)
             {
@@ -100,16 +106,64 @@ namespace Server
                 {
                     // Stop the object from burning.
                     Extinguish();
+
+                    // If there was a player that interacted with this object.
+                    if (LastPlayerInteracted != null)
+                    {
+
+                        // If this is a leaf.
+                        if (this is LeafServer)
+                        {
+                            // Increment the number of leaves that were extinguished.
+                            LastPlayerInteracted.playerStats.numLeavesExtinguished++;
+                        }
+
+                        // If this is a Player.
+                        else if (this is PlayerServer me && me.Team == LastPlayerInteracted.Team)
+                        {
+                            // Increment number of teammates that were extinguished.
+                            LastPlayerInteracted.playerStats.timesTeammateExtinguished++;
+                        }
+                    }
                 }
 
 
                 // Get fire damage from the flamethrower.
                 float fireDamage = Tool.GetToolInfo(ToolType.THROWER).Damage;
+                float totalDamageToDeal = fireDamage * deltaTime * Math.Min(burnFrames * BURNING_RAMP_RATE, 10);
 
                 // Decrease health by burn damage.
-                Health -= fireDamage * deltaTime * Math.Min(burnFrames * BURNING_RAMP_RATE, 10);
+                Health -= totalDamageToDeal;
 
-//                Console.WriteLine("Health is " + Health);
+                // If there is a player that set this object on fire.
+                if (PlayerThatSetThisOnFire != null)
+                {
+                    // If this is a leaf.
+                    if (this is LeafServer)
+                    {
+                        // Increase player's damage to leaves.
+                        PlayerThatSetThisOnFire.playerStats.fireDamageDealtToLeaves += totalDamageToDeal;
+                    }
+                    
+                    // If this is a player.
+                    else if (this is PlayerServer me)
+                    {
+                        // Increase damage to enemy players.
+                        if (me.Team != PlayerThatSetThisOnFire.Team)
+                        {
+                            PlayerThatSetThisOnFire.playerStats.fireDamageDealtToEnemies += totalDamageToDeal;
+                        }
+
+                        // Increase damage to team players.
+                        else
+                        {
+                            PlayerThatSetThisOnFire.playerStats.fireDamageDealtToTeammates += totalDamageToDeal;
+                        }
+
+                        // Increment damage taken.
+                        me.playerStats.damageTaken += totalDamageToDeal;
+                    }
+                }
 
                 // If health goes negative, destroy the object.
                 if (Health <= 0)
@@ -123,6 +177,57 @@ namespace Server
                     Extinguish();
                 }
 
+            }
+        }
+
+        /// <summary>
+        /// Checks if this object changed sections this update.
+        /// </summary>
+        public void CheckIfChangedSection()
+        {
+
+            // Ensure prev section is set.
+            if (prevSection == null)
+            {
+                prevSection = section;
+            }
+
+            // Changed section!
+            if (section != prevSection)
+            {
+
+                // If this did not come from no man's land (came from red or blue side).
+                if (prevSection.team.name != TeamName.NONE)
+                {
+                    // If it was taken from the other team
+                    if (prevSection.team != LastPlayerInteracted.Team)
+                    {
+                        // Leaf was stolen from that player's section!
+                        LastPlayerInteracted.playerStats.numLeavesStolen++;
+                    }
+
+                    // If it was taken from your own team.
+                    else if (prevSection.team == LastPlayerInteracted.Team)
+                    {
+                        // Silly, you just blew away your own leaf.
+                        LastPlayerInteracted.playerStats.numberOfOwnLeavesBlownAway++;
+                    }
+                }
+
+                // If the NEW section is your team.
+                if (section.team == LastPlayerInteracted.Team)
+                {
+                    // Congrats, you claimed a leaf!
+                    LastPlayerInteracted.playerStats.numLeavesClaimed++;
+                }
+
+                // If the NEW section is the enemy team.
+                else if (section.team != LastPlayerInteracted.Team && section.team.name != TeamName.NONE)
+                {
+                    LastPlayerInteracted.playerStats.numLeavesClaimedForEnemy++;
+                }
+
+                prevSection = section;
             }
         }
 
@@ -149,6 +254,7 @@ namespace Server
             burnFrames = 0;
             blowFrames = 0;
             ExtinguishTimer.Stop();
+            PlayerThatSetThisOnFire = null;
         }
 
         /// <summary>
@@ -157,10 +263,12 @@ namespace Server
         /// <param name="toolTransform">Position of the player. </param>
         /// <param name="toolType">Type of the tool hit by.</param>
         /// <param name="toolMode">Mode (primary or secondary) the tool was in.</param>
-        public virtual void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public virtual void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);
+
+            LastPlayerInteracted = player;
 
             if (toolType == ToolType.THROWER)
             {
@@ -169,13 +277,33 @@ namespace Server
                 if (toolMode == ToolMode.PRIMARY)
                 {
                     CatchFire();
+                    PlayerThatSetThisOnFire = player;
 
+                    if (burnFrames == 0)
+                    {
+                        if (this is LeafServer)
+                        {
+                            player.playerStats.numLeavesSetOnFire++;
+                        }
+                        else if (this is PlayerServer me)
+                        {
+
+                            if (me.Team == player.Team)
+                            {
+                                player.playerStats.numTeammateSetOnFire++;
+                            }
+                            else
+                            {
+                                player.playerStats.numEnemiesSetOnFire++;
+                            }
+                        }
+                    }
                 }
             }
 
             if (toolType == ToolType.BLOWER)
             {
-            
+
                 // If this is the primary function of the blower.
                 if (toolMode == ToolMode.PRIMARY && Burning)
                 {
@@ -218,13 +346,20 @@ namespace Server
         /// <returns>True if within range, false if not.</returns>
         public bool IsInPlayerToolRange(PlayerServer player)
         {
-          //  Console.WriteLine("Checking object with ID " + Id  + " and type " + this.GetType().ToString());
+            //  Console.WriteLine("Checking object with ID " + Id  + " and type " + this.GetType().ToString());
             // Get the player's equipped tool.
             ToolInfo equippedToolInfo = Tool.GetToolInfo(player.ToolEquipped);
             Transform toolTransform = player.GetToolTransform();
 
+            float toolRange = equippedToolInfo.Range;
+
+            if (player.ToolEquipped == ToolType.BLOWER && player.ActiveToolMode == ToolMode.SECONDARY)
+            {
+                toolRange *= 0.5f;
+            }
+
             // Check if the leaf is within range of the player.
-            if (GetDistanceToTool(toolTransform) <= equippedToolInfo.Range)
+            if (GetDistanceToTool(toolTransform) <= toolRange)
             {
                 // Get the forward vector of the player.
                 Vector3 ToolForward = toolTransform.Forward;
@@ -242,7 +377,7 @@ namespace Server
                 float angleBetween = (float)Math.Acos(dot / mag);
                 angleBetween *= (180.0f / (float)Math.PI);
 
-              //  Console.WriteLine(string.Format("{0} {1}: Angle between is {2}, must be {3} before hit", this.GetType().ToString(), Id, angleBetween, equippedToolInfo.ConeAngle / 2.0f));
+                //  Console.WriteLine(string.Format("{0} {1}: Angle between is {2}, must be {3} before hit", this.GetType().ToString(), Id, angleBetween, equippedToolInfo.ConeAngle / 2.0f));
 
                 // Return true if the leaf is within the cone angle, false otherwise. 
                 return (angleBetween <= (equippedToolInfo.ConeAngle / 2.0f));
@@ -259,14 +394,62 @@ namespace Server
         {
             Id = GameServer.instance.nextObjectId++;
 
-            GameServer.instance.gameObjectDict.Add(Id, this);
+            GameServer.instance.gameObjectDict.TryAdd(Id, this);
         }
 
         /// <summary>
         /// Death method which should be overridden by child classes
         /// </summary>
         public override void Die()
-        { }
+        {
+
+            // If there is a valid player that set this on fire.
+            if (PlayerThatSetThisOnFire != null)
+            {
+                // If this is a leaf.
+                if (this is LeafServer)
+                {
+                    // Increase leaf destroy count for the other players.
+                    PlayerThatSetThisOnFire.playerStats.numLeavesDestroyed++;
+
+                    // If this leaf was on the player's team
+                    if (section.team == PlayerThatSetThisOnFire.Team)
+                    {
+                        // Oops! You destroyed your own leaf.
+                        PlayerThatSetThisOnFire.playerStats.numberOfOwnLeavesDestroyed++;
+                    }
+
+                }
+                
+                // If this is a player.
+                else if (this is PlayerServer me)
+                {
+
+                    // If your teammate killed you.
+                    if (me.Team == PlayerThatSetThisOnFire.Team)
+                    {
+                        // INcrease teammate kill count 
+                        PlayerThatSetThisOnFire.playerStats.numTeammateKills++;
+
+                        // Increase times you were killed by teammate.
+                        me.playerStats.timesKilledByTeammate++;
+
+                    }
+
+                    // If an enemy killed you.
+                    else
+                    {
+                        // Increase their kill count.
+                        PlayerThatSetThisOnFire.playerStats.numEnemyKills++;
+
+                        // Increase times you were killed by an enemy.
+                        me.playerStats.timesKilledByEnemy++;
+
+                    }
+
+                }
+            }
+        }
 
     }
 }

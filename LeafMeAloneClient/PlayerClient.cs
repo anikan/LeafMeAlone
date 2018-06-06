@@ -46,6 +46,7 @@ namespace Client
         private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
         private int _currAnim, _overridedAnim;
         public UIHealth healthUI;
+        public UINickname nicknameUI;
 
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
@@ -73,26 +74,32 @@ namespace Client
             _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), timeScale);
             _animVictory = AnimationManager.AddAnimation(Constants.PlayerVictoryAnim, new Vector3(scale), timeScale);
             _animLose = AnimationManager.AddAnimation(Constants.PlayerDefeatAnim, new Vector3(scale), timeScale);
-            _animHurt = AnimationManager.AddAnimation(Constants.PlayerHurtAnim, new Vector3(scale), timeScale);
+            _animHurt = AnimationManager.AddAnimation(Constants.PlayerHurtAnim, new Vector3(scale), 2f);
 
             // set to idle animation by default
             SwitchAnimation(_animIdle);
+
+            nicknameUI = new UINickname(this,this.Name);
+
+            Burnable = true;
         }
 
         /// <summary>
         /// Get the animation variables out and set the fields
         /// </summary>
         /// <param name="animId"> ID of the animation </param>
-        private void SwitchAnimation(int animId, bool repeat = true)
+        private void SwitchAnimation(int animId, bool repeat = true, int index = 0)
         {
-            model = AnimationManager.GetAnimatedModel(animId, true, repeat);
+            if (_currAnim == animId) return;
+
+            model = AnimationManager.GetAnimatedModel(animId, repeat, false, index);
             Transform.Scale = AnimationManager.GetScale(animId);
 
-            if (Team == TeamName.BLUE)
+            if (PlayerTeam == TeamName.BLUE)
             {
                 model.UseAltColor(new Color3(.4f, .4f, 1.2f));
             }
-            else if (Team == TeamName.RED)
+            else if (PlayerTeam == TeamName.RED)
             {
                 model.UseAltColor(new Color3(1.2f, .4f, .4f));
             }
@@ -119,7 +126,7 @@ namespace Client
             _overridedAnim = -1;
         }
 
-        public TeamName Team
+        public TeamName PlayerTeam
         {
             get => _team;
             set
@@ -364,6 +371,7 @@ namespace Client
             bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
 
             base.UpdateFromPacket(packet.ObjData);
+            Console.WriteLine($"Burning for player {Id} is {Burning}");
 
             // If death state changes, reset tint.
             if (Dead != packet.Dead)
@@ -440,6 +448,7 @@ namespace Client
 
         }
 
+        private const float HURT_LAG = 2f;
         /// <summary>
         /// Evaluate which animation model to use
         /// </summary>
@@ -452,31 +461,34 @@ namespace Client
         /// <param name="hurt"> is the player hurt? </param>
         private void EvaluateAnimation(bool prevMoving, bool currMoving, bool prevEquipBlower, bool currEquipBlower, bool prevEquipThrower, bool currEquipThrower, bool hurt)
         {
-            if (prevMoving && !currMoving)
+            // win/lose animation
+            if (GameClient.instance.PendingRematchState)
+            {
+                if (GameClient.instance.WinningTeam == _team)
+                {
+                    SwitchAnimation(_animVictory);
+                }
+                else
+                {
+                    SwitchAnimation(_animLose);
+                }
+            }
+            else if (!currMoving)
             {
                 SwitchAnimation(_animIdle);
             }
-            else if (!prevMoving && currMoving)
-            {
-                if (currEquipBlower)
-                {
-                    SwitchAnimation(_animWalkBlower);
-                }
-                else if (currEquipThrower)
-                {
-                    SwitchAnimation(_animWalkThrower);
-                }
-            }
-            else if (currMoving && !prevEquipBlower && currEquipBlower)
+            else if (currEquipBlower)
             {
                 SwitchAnimation(_animWalkBlower);
             }
-            else if (currMoving && !prevEquipThrower && currEquipThrower)
+            else if (currEquipThrower)
             {
                 SwitchAnimation(_animWalkThrower);
             }
-
+            
         }
+
+        
 
         /// <summary>
         /// Evaluate audio logic
@@ -596,15 +608,30 @@ namespace Client
 
         public override void Draw()
         {
+
+
             base.Draw();
+            //if the object is currently burning, draw the fire on them.
+            if (Burning)
+            {
+                Transform t = new Transform { Position = Transform.Position + new Vector3(0, 9, 0), Scale = new Vector3(1, 1, 1) };
+                GraphicsManager.DrawParticlesThisFrame(Fire, t);
+            }
+
+            if (healthUI == null)
+                healthUI = new UIHealth(this, PlayerTeam);
             if(healthUI == null)
-                healthUI = new UIHealth(this, Team);
+                healthUI = new UIHealth(this, PlayerTeam);
             healthUI?.Update();
+            nicknameUI?.Update();
+
+
+
         }
 
         public override void Die()
         {
-            GameClient.instance.playerClients.Remove(this);
+            healthUI = null;
             base.Die();
         }
     }

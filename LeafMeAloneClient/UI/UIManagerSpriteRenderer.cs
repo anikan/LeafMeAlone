@@ -11,7 +11,7 @@ using SpriteRenderer = SpriteTextRenderer.SlimDX.SpriteRenderer;
 using TextAlignment = SpriteTextRenderer.TextAlignment;
 using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
 
-namespace Client
+namespace Client.UI
 {
     public static class UIManagerSpriteRenderer
     {
@@ -19,6 +19,7 @@ namespace Client
         {
             BOLD,
             NORMAL,
+            SMALL,
             COMIC_SANS,
             MASSIVE
         }
@@ -133,6 +134,7 @@ namespace Client
             {
                 if (tex.Enabled)
                     DrawTexture(tex.View, tex.Position, tex.Size, tex.Rotation);
+                
             }
         }
 
@@ -140,7 +142,7 @@ namespace Client
         /// ensure the textblock renderers exist.
         /// </summary>
         /// <param name="t"></param>
-        private static void EnsureTypeExists(TextType t)
+        public static void EnsureTypeExists(TextType t)
         {
             if (TextRenderers.ContainsKey(t)) return;
 
@@ -157,6 +159,9 @@ namespace Client
                     break;
                 case TextType.MASSIVE:
                     TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
+                    break;
+                case TextType.SMALL:
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 20);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(t), t, null);

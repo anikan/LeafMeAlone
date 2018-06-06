@@ -85,8 +85,8 @@ namespace Client
             float cutoff_dist = 0, 
             float cutoff_speed = 0.2f, 
             float shrink_speed = 0.07f, 
-            float origin_dist = 20, 
-            int emissionrate = 2, 
+            float origin_dist = 10, 
+            int emissionrate = 1, 
             int maxparticles = 100) 
         {
             Transform.Scale = new Vector3(1, 1, 1);

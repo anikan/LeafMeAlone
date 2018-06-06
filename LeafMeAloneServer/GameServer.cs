@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -18,8 +19,8 @@ namespace Server
 
         public List<GameObject> toDestroyQueue = new List<GameObject>();
         public List<PlayerServer> playerServerList = new List<PlayerServer>();
-        public Dictionary<int, GameObjectServer> gameObjectDict =
-            new Dictionary<int, GameObjectServer>();
+        public ConcurrentDictionary<int, GameObjectServer> gameObjectDict =
+            new ConcurrentDictionary<int, GameObjectServer>();
 
         public NetworkServer networkServer;
 
@@ -106,7 +107,7 @@ namespace Server
                 networkServer.Receive();
 
                 //Update the server players based on received packets.
-                if (!matchHandler.MatchInitializing())
+                if (!matchHandler.GetMatch().Started() || !matchHandler.MatchInitializing())
                 {
                     HandleIncomingPackets();
                 }
@@ -122,7 +123,10 @@ namespace Server
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
-                toDestroyQueue.Clear();
+                lock (toDestroyQueue)
+                {
+                    toDestroyQueue.Clear();
+                }
 
                 //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after send updates");
 
@@ -134,6 +138,15 @@ namespace Server
                 //Sleep for the rest of this tick.
                 Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
             }
+        }
+
+        /// <summary>
+        /// Whether enough players have connected to start a match
+        /// </summary>
+        /// <returns></returns>
+        private bool SufficientPlayersConnected()
+        {
+            return (development && playerServerList.Count == 4) || (!development && playerServerList.Count == 4);
         }
 
         private void HandleIncomingPackets()
@@ -157,8 +170,9 @@ namespace Server
         /// </summary>
         internal void ConnectCallback()
         {
-            if ((development && playerServerList.Count == 1) || (!development && playerServerList.Count == 4)) {
-                matchHandler.StartMatch();
+            if (SufficientPlayersConnected() && !matchHandler.GetMatch().Started())
+            {
+                matchHandler.RestartMatch();
             }
         }
 
@@ -325,14 +339,17 @@ namespace Server
         public void Destroy(GameObject gameObj)
         {
 
-            gameObjectDict.Remove(gameObj.Id);
+            gameObjectDict.TryRemove(gameObj.Id, out GameObjectServer val);
 
             if (gameObj is PlayerServer player)
             {
                 playerServerList.Remove(player);
             }
 
-            toDestroyQueue.Add(gameObj);
+            lock (toDestroyQueue)
+            {
+                toDestroyQueue.Add(gameObj);
+            }
 
             if (gameObj is LeafServer)
             {

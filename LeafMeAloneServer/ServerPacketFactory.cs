@@ -24,11 +24,6 @@ namespace Server
                 return NewObjectPacket(serverObject);
         }
 
-        internal static MatchResultPacket NewGameResultPacket(Team winningTeam)
-        {
-            return new MatchResultPacket(winningTeam.name);
-        }
-
         internal static BasePacket NewCreatePacket(GameObjectServer obj)
         {
             CreateObjectPacket createPacket = NewCreatePacket((GameObject)obj);

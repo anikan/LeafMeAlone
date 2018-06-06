@@ -13,6 +13,9 @@ namespace Server
     public class PlayerServer : PhysicsObject, IPlayer
     {
 
+        // Stats for the player.
+        public PlayerStats playerStats;
+
         // Constant values of the player.
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 3.0f;
@@ -40,12 +43,14 @@ namespace Server
             Radius = PLAYER_RADIUS;
             colliderType = ColliderType.CIRCLE;
             JumpToRandomSpawn();
+            playerStats = new PlayerStats();
+            playerStats.playerId = Id;
         }
 
         private void JumpToRandomSpawn()
         {
             Transform.Position = Team.GetNextSpawnPoint();
-            foreach (ColliderObject obj in GameServer.instance.gameObjectDict.Values)
+            foreach (ColliderObject obj in GameServer.instance.GetGameObjectList())
             {
                 if (obj is PlayerServer || obj is TreeServer)
                 {
@@ -78,6 +83,24 @@ namespace Server
                 Health += Constants.HEALTH_REGEN_RATE * deltaTime;
             }
 
+            //If the player is using the flamethrower, slow them down.
+            if (ActiveToolMode == ToolMode.PRIMARY || ActiveToolMode == ToolMode.SECONDARY)
+            {
+                if (ToolEquipped == ToolType.THROWER)
+                {
+
+                    currentSpeed = THROWER_SPEED;
+
+                }
+                else
+                {
+                    currentSpeed = PLAYER_SPEED;
+                }
+            }
+            else
+            {
+                currentSpeed = PLAYER_SPEED;
+            }
         }
 
         /// <summary>
@@ -110,24 +133,9 @@ namespace Server
                     if (gameObject != this && gameObject.IsInPlayerToolRange(this))
                     {
                         // Hit the object.
-                        gameObject.HitByTool(GetToolTransform(), ToolEquipped, ActiveToolMode);
+                        gameObject.HitByTool(this, GetToolTransform(), ToolEquipped, ActiveToolMode);
 
                     }
-
-                    if (ToolEquipped == ToolType.THROWER)
-                    {
-
-                        currentSpeed = THROWER_SPEED;
-
-                    }
-                    else
-                    {
-                        currentSpeed = PLAYER_SPEED;
-                    }
-                }
-                else
-                {
-                    currentSpeed = PLAYER_SPEED;
                 }
             }
         }
@@ -185,12 +193,12 @@ namespace Server
         /// <param name="toolTransform">Position of the other player.</param>
         /// <param name="toolType">Type of tool hit by.</param>
         /// <param name="toolMode">Tool mode hit by.</param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
 
             if (!Dead)
             {
-                base.HitByTool(toolTransform, toolType, toolMode);
+                base.HitByTool(player, toolTransform, toolType, toolMode);
             }
         }
 
@@ -199,6 +207,9 @@ namespace Server
         /// </summary>
         public override void Die()
         {
+
+            base.Die();
+
             Dead = true;
             Burning = false;
             Burnable = false;
@@ -223,5 +234,8 @@ namespace Server
             Collidable = true;
             ActiveToolMode = ToolMode.NONE;
         }
+
+
+
     }
 }

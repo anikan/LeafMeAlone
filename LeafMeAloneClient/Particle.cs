@@ -66,10 +66,14 @@ namespace Client
             Force = Vector3.Zero;
 
         }
-        public void Update(float deltaTime)
+        public void Update(float deltaTime, bool fixedVelocity = false)
         {
-            Acceleration = (1.0f / Mass) * Force;
-            Velocity += Acceleration * deltaTime;
+            if (!fixedVelocity)
+            {
+                Acceleration = (1.0f / Mass) * Force;
+                Velocity += Acceleration * deltaTime;
+            }
+
             Position += Velocity * deltaTime;
             Force = Vector3.Zero;
             LifeRemaining -= deltaTime;

@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using SpriteTextRenderer;
 
-namespace Client
+namespace Client.UI
 {
     public class DrawableString
     {

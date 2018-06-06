@@ -141,7 +141,7 @@ namespace Client
         private double CurrentAnimationTime = 0;
         private int CurrentAnimationIndex = -1;
         private string CurrentAnimationName = null;
-        private bool RepeatAnimation = false;
+        public bool RepeatAnimation = false;
         private bool PauseAnimation = false;
         private bool ReverseAnimation = false;
         private float TimeScale = 1.0f;
@@ -247,6 +247,23 @@ namespace Client
             {
                 CurrentAnimationTime += delta_time * TimeScale;
             }
+        }
+
+        /// <summary>
+        /// Check if the current animation has ended
+        /// </summary>
+        /// <returns></returns>
+        public bool HasAnimationEnded()
+        {
+            if (CurrentAnimationIndex == -1) return true;
+
+            if (RepeatAnimation == false &&
+                m_ActiveGeo.GetAnimationDuration(CurrentAnimationIndex) < CurrentAnimationTime)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

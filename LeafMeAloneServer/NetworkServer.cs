@@ -131,7 +131,8 @@ namespace Server
             if (GameServer.instance.playerServerList.Count < Constants.NUM_PLAYERS)
             {
                 ProcessNewPlayer(clientSocket);
-            } else
+            }
+            else
             {
                 SendSpectator(clientSocket);
             }
@@ -167,10 +168,11 @@ namespace Server
         private void SendWorldToClient(Socket clientSocket)
         {
             List<byte> allWorldPackets = new List<byte>();
+            List<GameObjectServer> world = GameServer.instance.GetGameObjectList();
 
-            foreach (KeyValuePair<int, GameObjectServer> pair in GameServer.instance.gameObjectDict)
+            foreach (GameObjectServer val in world)
             {
-                BasePacket packetToSend = ServerPacketFactory.NewCreatePacket(pair.Value);
+                BasePacket packetToSend = ServerPacketFactory.NewCreatePacket(val);
                 allWorldPackets.AddRange(PacketUtil.Serialize(packetToSend));
             }
 
@@ -197,14 +199,14 @@ namespace Server
             }
 
             SendAll(allPackets.ToArray());
-
             List<byte> destroyPackets = new List<byte>();
-
-
-            foreach (var gameObj in GameServer.instance.toDestroyQueue)
+            lock (GameServer.instance.toDestroyQueue)
             {
-                BasePacket packet = PacketFactory.NewDestroyPacket(gameObj);
-                destroyPackets.AddRange(PacketUtil.Serialize(packet));
+                foreach (var gameObj in GameServer.instance.toDestroyQueue)
+                {
+                    BasePacket packet = PacketFactory.NewDestroyPacket(gameObj);
+                    destroyPackets.AddRange(PacketUtil.Serialize(packet));
+                }
             }
 
             SendAll(destroyPackets.ToArray());
@@ -235,6 +237,9 @@ namespace Server
             // Create createObjectPacket, send to client
             byte[] data = PacketUtil.Serialize(createPlayPack);
             Send(clientSocket, data);
+            MatchStartPacket informStart = 
+                new MatchStartPacket(MatchHandler.instance.GetMatch().GetTimeElapsed().Milliseconds);
+            Send(clientSocket, PacketUtil.Serialize(informStart));
         }
 
         /// <summary>
@@ -247,7 +252,7 @@ namespace Server
             // from the asynchronous state object.  
             StateObject state = (StateObject)ar.AsyncState;
             Socket handler = state.workSocket;
-            
+
             try
             {
                 // Read data from the client socket.   

@@ -21,7 +21,8 @@ namespace Shared
         RequestPacket,
         GameResultPacket,
         MatchStartPacket,
-        SpectatorPacket
+        SpectatorPacket,
+        StatResultPacket
     }
 
     public static class PacketUtil
@@ -35,9 +36,10 @@ namespace Shared
             { PacketType.ObjectPacket, typeof(ObjectPacket) },
             { PacketType.IdPacket, typeof(IdPacket) },
             { PacketType.RequestPacket, typeof(RequestPacket) },
-            { PacketType.GameResultPacket, typeof(MatchResultPacket) },
+            { PacketType.GameResultPacket, typeof(GameResultPacket) },
             { PacketType.MatchStartPacket, typeof(MatchStartPacket) },
             { PacketType.SpectatorPacket, typeof(SpectatorPacket) },
+            { PacketType.StatResultPacket, typeof(StatResultPacket) },
         };
 
         public const int PACK_HEAD_SIZE = 5;

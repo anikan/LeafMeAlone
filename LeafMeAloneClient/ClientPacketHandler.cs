@@ -62,11 +62,11 @@ namespace Client
             void CreatePlayerAction(CreatePlayerPacket p)
             {
                 PlayerClient player = (PlayerClient)CreateObjectAction(p.createPacket);
-                player.Team = p.team;
+                player.PlayerTeam = p.team;
             }
 
             // What to do on game finish
-            void GameResultAction(MatchResultPacket p)
+            void GameResultAction(GameResultPacket p)
             {
                 client.ResetGameTimer();
                 if (client.GetPlayerTeam() == p.winningTeam)
@@ -77,13 +77,15 @@ namespace Client
                 {
                     GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Lose);
                 }
-
+                client.WinningTeam = p.winningTeam;
+                client.PendingRematchState = true;
             }
 
             void GameStartAction(MatchStartPacket p)
             {
                 client.StartMatchTimer(p.gameTime);
                 GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
+                client.PendingRematchState = false;
             }
 
             void SpectatorAction(SpectatorPacket p)
@@ -93,6 +95,11 @@ namespace Client
                 client.CreateMap();
             }
 
+            void StatReceiveAction(StatResultPacket p)
+            {
+                // TODO: DO STUFF NICK!
+            }
+
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
                 {
                     {PacketType.CreatePlayerPacket, (p) => CreatePlayerAction((CreatePlayerPacket) p)},
@@ -100,9 +107,10 @@ namespace Client
                     {PacketType.ObjectPacket, (p) => UpdateObjectAction((ObjectPacket) p) },
                     {PacketType.PlayerPacket, (p) => UpdatePlayerAction((PlayerPacket) p) },
                     {PacketType.DestroyObjectPacket, (p) => DestroyAction((DestroyObjectPacket) p)},
-                    {PacketType.GameResultPacket, (p) => GameResultAction((MatchResultPacket) p)},
+                    {PacketType.GameResultPacket, (p) => GameResultAction((GameResultPacket) p)},
                     {PacketType.MatchStartPacket, (p) => GameStartAction((MatchStartPacket)p)},
                     {PacketType.SpectatorPacket, (p) => SpectatorAction((SpectatorPacket)p)},
+                    {PacketType.StatResultPacket, (p) => StatReceiveAction((StatResultPacket)p)},
                 };
         }
 

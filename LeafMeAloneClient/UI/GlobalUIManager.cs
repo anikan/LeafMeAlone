@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
-using Client.UI;
 using Shared;
-using SpriteTextRenderer;
+using SlimDX;
 
-namespace Client
+namespace Client.UI
 {
     public static class GlobalUIManager
     {
@@ -15,11 +13,11 @@ namespace Client
         public static UITeams Teams;
         public static UIGameWLState GameWinLossState;
         public static UICulled Culled;
-        public static UI.UI Tool;
+        private static Client.UI.UI LeafBlowerTool, FlameThrowerTool;
         public static UIFindTeammate TeammateUI;
 
 
-        public static List<UI.UI> UIList = new List<UI.UI>();
+        public static List<Client.UI.UI> UIList = new List<Client.UI.UI>();
 
         /// <summary>
         /// Initialize UI Elements.
@@ -32,42 +30,34 @@ namespace Client
             GameWinLossState = new UIGameWLState();
             Culled = new UICulled();
 
-            if (GraphicsManager.ActivePlayer != null)
-            {
-                //Tool
-                Tool = new UI.UI("Leaf Blower", UIManagerSpriteRenderer.TextType.BOLD,
-                   RectangleF.Empty, TextAlignment.Bottom | TextAlignment.Left, Color.White);
-                Tool.SetUpdateAction(() =>
+            const int xSize = 300;
+            const int ySize = 75;
+            LeafBlowerTool = new Client.UI.UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
+            FlameThrowerTool = new Client.UI.UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
+
+            
+                LeafBlowerTool.SetUpdateAction(() =>
                 {
-                    switch (GraphicsManager.ActivePlayer.ToolEquipped)
+                    if (GraphicsManager.ActivePlayer != null)
                     {
-                        case ToolType.SAME:
-                            break;
-                        case ToolType.BLOWER:
-                            Tool.UIText.Text = "Leaf Blower";
-                            switch (GraphicsManager.ActivePlayer.ActiveToolMode)
-                            {
-                                case ToolMode.PRIMARY:
-                                    break;
-                                case ToolMode.SECONDARY:
-                                    Tool.UIText.Text = "Leaf Suctionery Thing";
-                                    break;
-                            }
-                            break;
-                        case ToolType.THROWER:
-                            Tool.UIText.Text = "Flame Thrower";
-                            break;
+                        LeafBlowerTool.UITexture.Enabled = GraphicsManager.ActivePlayer.ToolEquipped == ToolType.BLOWER;
+                        LeafBlowerTool.UITexture.Position = new Vector2(0,Screen.Height - ySize);
+                    }
+                });
+
+                FlameThrowerTool.SetUpdateAction(() =>
+                {
+                    if (GraphicsManager.ActivePlayer != null)
+                    {
+                        FlameThrowerTool.UITexture.Enabled =
+                            GraphicsManager.ActivePlayer.ToolEquipped == ToolType.THROWER;
+                        FlameThrowerTool.UITexture.Position = new Vector2(0, Screen.Height - ySize);
                     }
                 });
 
                 TeammateUI = new UIFindTeammate();
 
-                UIList.AddRange(new UI.UI[] { fps, gameTimer, GameWinLossState, Culled, Tool, TeammateUI });
-            }
-            else
-            {
-                UIList.AddRange(new UI.UI[] { fps, gameTimer, GameWinLossState, Culled });
-            }
+                UIList.AddRange(new[] { fps, gameTimer, GameWinLossState, Culled, LeafBlowerTool,FlameThrowerTool, TeammateUI });
 
         }
 

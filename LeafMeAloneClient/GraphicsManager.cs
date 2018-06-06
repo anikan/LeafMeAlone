@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Client.UI;
 using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;
@@ -140,7 +141,8 @@ namespace Client
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
             }
-            LeafClient.Fire?.Update(delta_t);
+            GraphicGameObject.Fire?.Update(delta_t);
+
         }
 
         public static void Draw()

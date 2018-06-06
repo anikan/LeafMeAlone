@@ -46,6 +46,7 @@ namespace Client
         private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
         private int _currAnim, _overridedAnim;
         public UIHealth healthUI;
+        public UINickname nicknameUI;
 
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
@@ -77,6 +78,10 @@ namespace Client
 
             // set to idle animation by default
             SwitchAnimation(_animIdle);
+
+            nicknameUI = new UINickname(this,this.Name);
+
+            Burnable = true;
         }
 
         /// <summary>
@@ -364,6 +369,7 @@ namespace Client
             bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
 
             base.UpdateFromPacket(packet.ObjData);
+            Console.WriteLine($"Burning for player {Id} is {Burning}");
 
             // If death state changes, reset tint.
             if (Dead != packet.Dead)
@@ -596,15 +602,28 @@ namespace Client
 
         public override void Draw()
         {
+
+
             base.Draw();
-            if(healthUI == null)
+            //if the object is currently burning, draw the fire on them.
+            if (Burning)
+            {
+                Transform t = new Transform { Position = Transform.Position + new Vector3(0, 9, 0), Scale = new Vector3(1, 1, 1) };
+                GraphicsManager.DrawParticlesThisFrame(Fire, t);
+            }
+
+            if (healthUI == null)
                 healthUI = new UIHealth(this, Team);
             healthUI?.Update();
+            nicknameUI?.Update();
+
+
+
         }
 
         public override void Die()
         {
-            GameClient.instance.playerClients.Remove(this);
+            healthUI = null;
             base.Die();
         }
     }

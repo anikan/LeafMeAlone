@@ -75,10 +75,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AntTweakBar.NET, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\AntTweakBar.NET.dll</HintPath>
-    </Reference>
     <Reference Include="AssimpNet, Version=3.3.2.0, Culture=neutral, PublicKeyToken=3edc10cb77b1bca2, processorArchitecture=MSIL">
       <HintPath>..\packages\AssimpNet.3.3.2\lib\net45\AssimpNet.dll</HintPath>
     </Reference>
@@ -160,7 +156,6 @@
     <Compile Include="Shader.cs" />
     <Compile Include="UI\UIGameWLState.cs" />
     <Compile Include="UI\UIHealth.cs" />
-    <Compile Include="UI\UIManagerAntTweakBar.cs" />
     <Compile Include="UI\UIManagerSpriteRenderer.cs" />
     <Compile Include="UI\UITeams.cs" />
     <Compile Include="UI\UITimer.cs" />

@@ -155,8 +155,7 @@ namespace Client
             // Draw everythhing.
             Render();
             
-
-            GraphicsRenderer.BarContext.Draw();
+            
             GlobalUIManager.Update();
             UIManagerSpriteRenderer.Update();
             UIManagerSpriteRenderer.SpriteRenderer.Flush();

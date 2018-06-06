@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using Shared;
-using SlimDX;
 using SpriteTextRenderer;
 
 namespace Client.UI

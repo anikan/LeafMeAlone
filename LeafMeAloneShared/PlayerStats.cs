@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,66 +7,88 @@ using System.Threading.Tasks;
 
 namespace Shared
 {
+    [ProtoContract]
     public class PlayerStats
     {
 
+        [ProtoMember(1)]
         public int playerId;
 
         // How many leaves were set on fire. STATUS: DONE.
+        [ProtoMember(2)]
         public int numLeavesSetOnFire;
 
         // How many players you set on fire. STATUS: 
+        [ProtoMember(3)]
         public int numEnemiesSetOnFire;
 
+        [ProtoMember(4)]
         public int numTeammateSetOnFire;
 
         // How many leaves were destroyed. STATUS: DONE.
+        [ProtoMember(5)]
         public int numLeavesDestroyed;
 
         // Number of leaves the player extinguished. STATUS: DONE
+        [ProtoMember(6)]
         public int numLeavesExtinguished;
 
         // Number of leaves stolen. STATUS: DONE
+        [ProtoMember(7)]
         public int numLeavesStolen;
 
         // Number of leaves claimed. STATUS: DONE
+        [ProtoMember(8)]
         public int numLeavesClaimed;
 
         // Number of players killed. STATUS: DONE
+        [ProtoMember(9)]
         public int numEnemyKills;
 
+        [ProtoMember(10)]
         public int numTeammateKills;
 
         // Number of times died. STATUS: DONE
+        [ProtoMember(11)]
         public int numDeaths;
 
         // Fire damage dealt to players. STATUS: DONE
+        [ProtoMember(12)]
         public float fireDamageDealtToEnemies;
 
+        [ProtoMember(13)]
         public float fireDamageDealtToTeammates;
 
         // Fire damage dealt to leaves. STATUS: DONE
+        [ProtoMember(14)]
         public float fireDamageDealtToLeaves;
 
         // Total damage taken. STATUS: DONE
+        [ProtoMember(15)]
         public float damageTaken;
 
         // Times extinguished teammate. STATUS: DONE
+        [ProtoMember(16)]
         public int timesTeammateExtinguished;
 
         // Times you blew away your own leaves. STATUS: DONE.
+        [ProtoMember(17)]
         public int numberOfOwnLeavesBlownAway;
 
         // Times you burned your own leaves. STATUS: DONE.
+        [ProtoMember(18)]
         public int numberOfOwnLeavesDestroyed;
 
         // How many leaves you pushed to the other player's team.
+        [ProtoMember(19)]
         public int numLeavesClaimedForEnemy;
 
         // Number of times you've been killed by your teammate.
+        [ProtoMember(20)]
         public int timesKilledByTeammate;
 
         // Number of times you were killed by the enemy.
+        [ProtoMember(21)]
         public int timesKilledByEnemy;
 
 

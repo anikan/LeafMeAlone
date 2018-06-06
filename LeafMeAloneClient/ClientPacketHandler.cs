@@ -93,6 +93,11 @@ namespace Client
                 client.CreateMap();
             }
 
+            void StatReceiveAction(StatResultPacket p)
+            {
+                // TODO: DO STUFF NICK!
+            }
+
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()
                 {
                     {PacketType.CreatePlayerPacket, (p) => CreatePlayerAction((CreatePlayerPacket) p)},
@@ -103,6 +108,7 @@ namespace Client
                     {PacketType.GameResultPacket, (p) => GameResultAction((GameResultPacket) p)},
                     {PacketType.MatchStartPacket, (p) => GameStartAction((MatchStartPacket)p)},
                     {PacketType.SpectatorPacket, (p) => SpectatorAction((SpectatorPacket)p)},
+                    {PacketType.StatResultPacket, (p) => StatReceiveAction((StatResultPacket)p)},
                 };
         }
 

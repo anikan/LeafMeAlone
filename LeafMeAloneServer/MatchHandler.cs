@@ -68,7 +68,13 @@ namespace Server
         private void EndMatch(Team winningTeam)
         {
             GameResultPacket donePacket = new GameResultPacket(winningTeam.name);
+
             network.SendAll(PacketUtil.Serialize(donePacket));
+            foreach (PlayerServer player in GameServer.instance.playerServerList )
+            {
+                network.SendAll(PacketUtil.Serialize(new StatResultPacket(player.playerStats)));
+            }
+
             game.GetLeafListAsObjects().ForEach(l => { l.Burning = true; });
             match.StopMatch();
             matchResetTimer.Start();

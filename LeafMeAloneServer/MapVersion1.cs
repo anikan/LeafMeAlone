@@ -94,6 +94,7 @@ namespace Server
             float uHeight = Constants.MAP_HEIGHT / 3.0f;
             float uWidth = Constants.MAP_WIDTH / 7.0f;
 
+            // Basically just create a U. Don't question it.
             for (float x = leftUBound; x < (leftUBound + uWidth); x+=Constants.TREE_RADIUS)
             {
 

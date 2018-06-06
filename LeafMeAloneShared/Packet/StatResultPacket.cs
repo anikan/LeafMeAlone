@@ -11,7 +11,7 @@ namespace Shared.Packet
     public class StatResultPacket : BasePacket
     {
         [ProtoMember(1)]
-        PlayerStats stats;
+        public PlayerStats stats;
 
         public StatResultPacket() : base(PacketType.StatResultPacket) { }
         public StatResultPacket(PlayerStats stats) : base(PacketType.StatResultPacket)

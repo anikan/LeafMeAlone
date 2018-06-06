@@ -97,7 +97,7 @@ namespace Client
 
             void StatReceiveAction(StatResultPacket p)
             {
-                // TODO: DO STUFF NICK!
+                GlobalUIManager.GameWinLossState.SetStats(p.stats);
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()

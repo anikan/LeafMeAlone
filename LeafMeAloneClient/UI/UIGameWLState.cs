@@ -9,7 +9,6 @@ namespace Client.UI
     {
         public UI LeafStatsUI, ShameStatsUI, PlayerStatsUI;
 
-
         /// <summary>
         /// Winning or losing state.
         /// </summary>
@@ -44,23 +43,17 @@ namespace Client.UI
         /// <param name="s"></param>
         public void SetState(WinLoseState s)
         {
-            PlayerStats st = new PlayerStats();
             currWinLoseState = s;
             switch (currWinLoseState)
             {
                 case WinLoseState.Win:
                     UIText.Text = Constants.WinText;
                     UIText.Color = Color.Green;
-                    LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
-                    PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
-                    ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
+                  
                     break;
                 case WinLoseState.Lose:
                     UIText.Text = Constants.LoseText;
                     UIText.Color = Color.Red;
-                    LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
-                    PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
-                    ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
                     break;
                 case WinLoseState.None:
                     UIText.Text = String.Empty;
@@ -70,6 +63,13 @@ namespace Client.UI
                     throw new ArgumentOutOfRangeException(nameof(s), s, null);
             }
 
+        }
+
+        public void SetStats(PlayerStats st)
+        {
+            LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
+            PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
+            ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
         }
 
 

@@ -41,6 +41,12 @@ namespace Client
 
         private ClientPacketHandler clientPacketHandler;
 
+        // make win logic easier to handle
+        // check if the current match is over and new match is not started
+        public bool PendingRematchState = false;
+        public TeamName WinningTeam = TeamName.BLUE;
+
+
         // All leaves in the scene. 
         public List<LeafClient> leaves;
 
@@ -116,7 +122,7 @@ namespace Client
 
         internal TeamName GetPlayerTeam()
         {
-            return ActivePlayer.Team;
+            return ActivePlayer.PlayerTeam;
         }
         
         private void DoGameLoop()
@@ -177,7 +183,7 @@ namespace Client
 
             this.clientPacketHandler = new ClientPacketHandler(this);
 
-            // Initialize frame timer
+            // Initialize frame ElapsedTime
             FrameTimer = new Stopwatch();
             FrameTimer.Start();
 
@@ -240,7 +246,7 @@ namespace Client
             AudioManager.Update();
             AnimationManager.Update(delta);
 
-            // Restart the frame timer.
+            // Restart the frame ElapsedTime.
             FrameTimer.Restart();
 
             //AudioManager.UpdateSourceLocation(_audioBGM, Camera.CameraPosition);

@@ -12,7 +12,7 @@ namespace Client.UI
         {
             foreach (PlayerClient client in GameClient.instance.playerClients)
             {
-                if (client != GraphicsManager.ActivePlayer && client.Team == GraphicsManager.ActivePlayer.Team)
+                if (client != GraphicsManager.ActivePlayer && client.PlayerTeam == GraphicsManager.ActivePlayer.PlayerTeam)
                 {
                     Teammate = client;
                     break;
@@ -53,7 +53,7 @@ namespace Client.UI
             {
                 foreach (PlayerClient client in GameClient.instance.playerClients)
                 {
-                    if (client != GraphicsManager.ActivePlayer && client.Team == GraphicsManager.ActivePlayer.Team)
+                    if (client != GraphicsManager.ActivePlayer && client.PlayerTeam == GraphicsManager.ActivePlayer.PlayerTeam)
                     {
                         Teammate = client;
                         break;

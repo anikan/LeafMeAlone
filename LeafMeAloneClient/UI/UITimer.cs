@@ -41,7 +41,7 @@ namespace Client
                 OnTimerCompleted?.Invoke();
             }
         }
-        //Restart timer.
+        //Restart ElapsedTime.
         public void Restart(float timetoCountInSeconds)
         {
             TimeRemaining = timetoCountInSeconds;
@@ -49,7 +49,7 @@ namespace Client
         }
 
         /// <summary>
-        /// Reset the timer
+        /// Reset the ElapsedTime
         /// </summary>
         public void End()
         {
@@ -59,7 +59,7 @@ namespace Client
         }
 
         /// <summary>
-        /// Start the timer
+        /// Start the ElapsedTime
         /// </summary>
         /// <param name="timeToCountInSeconds">Amount to start at</param>
         public void Start(float timeToCountInSeconds)

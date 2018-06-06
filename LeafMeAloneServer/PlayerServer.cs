@@ -78,6 +78,24 @@ namespace Server
                 Health += Constants.HEALTH_REGEN_RATE * deltaTime;
             }
 
+            //If the player is using the flamethrower, slow them down.
+            if (ActiveToolMode == ToolMode.PRIMARY || ActiveToolMode == ToolMode.SECONDARY)
+            {
+                if (ToolEquipped == ToolType.THROWER)
+                {
+
+                    currentSpeed = THROWER_SPEED;
+
+                }
+                else
+                {
+                    currentSpeed = PLAYER_SPEED;
+                }
+            }
+            else
+            {
+                currentSpeed = PLAYER_SPEED;
+            }
         }
 
         /// <summary>
@@ -113,21 +131,6 @@ namespace Server
                         gameObject.HitByTool(GetToolTransform(), ToolEquipped, ActiveToolMode);
 
                     }
-
-                    if (ToolEquipped == ToolType.THROWER)
-                    {
-
-                        currentSpeed = THROWER_SPEED;
-
-                    }
-                    else
-                    {
-                        currentSpeed = PLAYER_SPEED;
-                    }
-                }
-                else
-                {
-                    currentSpeed = PLAYER_SPEED;
                 }
             }
         }

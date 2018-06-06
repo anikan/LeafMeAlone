@@ -179,14 +179,13 @@ namespace Server
 
         public void SendWorldUpdateToAllClients()
         {
-            List<GameObjectServer> gameObjects = GameServer.instance.gameObjectDict.Values.ToList();
+            List<GameObjectServer> gameObjects = GameServer.instance.GetInteractableObjects();
 
             List<byte> allPackets = new List<byte>();
 
             for (int i = 0; i < gameObjects.Count; i++)
             {
                 GameObjectServer objectToSend = gameObjects[i];
-
 
                 //Send an update if the object is not a leaf or if the leaf has been modified.
                 if ((objectToSend is LeafServer && objectToSend.Modified) || (objectToSend is PlayerServer))

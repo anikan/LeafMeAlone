@@ -117,10 +117,14 @@ namespace Server
                 networkServer.PlayerPackets.Clear();
 
                 UpdateObjects(deltaTime);
-                
+
+                //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after object updates");
+
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
                 toDestroyQueue.Clear();
+
+                //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after send updates");
 
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
@@ -165,16 +169,27 @@ namespace Server
         public void UpdateObjects(float deltaTime)
         {
             //TestPhysics();
-
+            
             List<GameObjectServer> toUpdateList = GetInteractableObjects();
+
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} before {toUpdateList.Count} object updates");
+
             //This foreach loop hurts my soul. May consider making it normal for loop.
-            foreach (GameObjectServer toUpdate in toUpdateList)
+            for (int i = 0; i < toUpdateList.Count; i++)
             {
-                toUpdate.Update(deltaTime);
+                toUpdateList[i].Update(deltaTime);
+
+                
             }
+
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after initial object updates");
+
 
             // Add the effects of the player tools.
             AddPlayerToolEffects();
+
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after tool object updates");
+
         }
 
         public PlayerServer CreateNewPlayer()

@@ -132,8 +132,6 @@ namespace Server
         /// <param name="newPosition"></param>
         public bool TryMoveObject(Vector3 newPosition, int stacklevel = 0)
         {
-            Stopwatch s = new Stopwatch();
-            s.Start();
             bool ret = true;
             // Save the original position of this object.
             Vector3 OriginalPosition = Transform.Position;
@@ -141,7 +139,7 @@ namespace Server
             // First, update the position.
             Transform.Position = newPosition;
 
-            // First, we need all the game objects on the server.
+            // First, we need all the colliding objects on the server.
             List<GameObjectServer> allObjects = GameServer.instance.GetColliderObjects();
 
             // Iterate through all the objects.
@@ -203,11 +201,7 @@ namespace Server
             //The object moved, it's been modified.
             Modified = true;
 
-            EnsureSafePosition();
-
-            if (s.ElapsedMilliseconds > 0)
-                //Console.WriteLine($"TryMoveObject finished in: {s.ElapsedMilliseconds}.");
-            s.Stop();
+            //EnsureSafePosition(); 
 
             return ret;
         }
@@ -242,7 +236,7 @@ namespace Server
             Vector3 OriginalPosition = Transform.Position;
 
             // First, we need all the game objects on the server.
-            List<GameObjectServer> allObjects = GameServer.instance.GetGameObjectList();
+            List<GameObjectServer> allObjects = GameServer.instance.GetColliderObjects();
 
             // Iterate through all the objects.
             for (int i = 0; i < allObjects.Count; i++)

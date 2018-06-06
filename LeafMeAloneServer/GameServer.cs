@@ -286,6 +286,8 @@ namespace Server
             // Set the leaf's initial rotation.
             newLeaf.Transform.Rotation.Y = rotation;
 
+            newLeaf.EnsureSafePosition();
+
             // Add this leaf to the leaf list and object dictionary.
             newLeaf.Register();
 

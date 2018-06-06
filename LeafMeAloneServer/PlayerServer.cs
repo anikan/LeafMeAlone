@@ -40,7 +40,6 @@ namespace Server
             Radius = PLAYER_RADIUS;
             colliderType = ColliderType.CIRCLE;
             JumpToRandomSpawn();
-
         }
 
         private void JumpToRandomSpawn()

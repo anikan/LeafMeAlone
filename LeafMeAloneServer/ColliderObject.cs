@@ -195,8 +195,6 @@ namespace Server
             //The object moved, it's been modified.
             Modified = true;
 
-            //EnsureSafePosition(); 
-
             return true;
         }
 

@@ -7,7 +7,7 @@ namespace Client.UI
 {
     public class UIGameWLState : UI
     {
-        public UI StatsUI;
+        public UI LeafStatsUI, ShameStatsUI, PlayerStatsUI;
 
 
         /// <summary>
@@ -29,8 +29,12 @@ namespace Client.UI
             RectangleF.Empty, TextAlignment.HorizontalCenter | TextAlignment.Top, Color.Transparent)
         {
             SetState(WinLoseState.None);
-            StatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(0,0,0,70), 
-                TextAlignment.Top | TextAlignment.HorizontalCenter, Color.White);
+            LeafStatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(25, 0, 0, 0),
+                TextAlignment.Left | TextAlignment.VerticalCenter, Color.White);
+            PlayerStatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(0, 0, 0, 0),
+                TextAlignment.VerticalCenter | TextAlignment.HorizontalCenter, Color.White);
+            ShameStatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(0, 0, -25, 0),
+                TextAlignment.Right | TextAlignment.VerticalCenter, Color.White);
         }
 
 
@@ -47,15 +51,20 @@ namespace Client.UI
                 case WinLoseState.Win:
                     UIText.Text = Constants.WinText;
                     UIText.Color = Color.Green;
-                    StatsUI.UIText.Text = st.ToString();
+                    LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
+                    PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
+                    ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
                     break;
                 case WinLoseState.Lose:
                     UIText.Text = Constants.LoseText;
                     UIText.Color = Color.Red;
-                    StatsUI.UIText.Text = st.ToString();
+                    LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
+                    PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
+                    ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
                     break;
                 case WinLoseState.None:
                     UIText.Text = String.Empty;
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(s), s, null);

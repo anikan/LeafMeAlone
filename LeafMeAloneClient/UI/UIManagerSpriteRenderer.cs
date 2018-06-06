@@ -161,7 +161,7 @@ namespace Client.UI
                     TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
                     break;
                 case TextType.SMALL:
-                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 18);
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 20);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(t), t, null);

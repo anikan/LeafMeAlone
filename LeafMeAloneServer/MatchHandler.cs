@@ -12,6 +12,7 @@ namespace Server
     /// </summary>
     internal class MatchHandler
     {
+        public static MatchHandler instance;
         private Stopwatch matchResetTimer; // the timer for match reset
         public static Match match;
         private NetworkServer network;
@@ -23,6 +24,13 @@ namespace Server
         /// </summary>
         public MatchHandler(Match toHandle, NetworkServer networkHandler, GameServer game )
         {
+            if (instance != null)
+            {
+                Console.WriteLine("DOUBLE INSTANTIATING MATCH HANDLER!");
+            }
+
+            instance = this;
+            
             match = toHandle;
             network = networkHandler;
             this.game = game;
@@ -61,7 +69,7 @@ namespace Server
         {
             GameResultPacket donePacket = new GameResultPacket(winningTeam.name);
             network.SendAll(PacketUtil.Serialize(donePacket));
-            game.GetLeafListAsObjects().ForEach(l => l.Burning = true);
+            game.GetLeafListAsObjects().ForEach(l => { l.Burning = true; });
             match.StopMatch();
             matchResetTimer.Start();
         }

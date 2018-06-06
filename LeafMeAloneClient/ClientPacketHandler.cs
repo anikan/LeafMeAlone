@@ -77,6 +77,7 @@ namespace Client
                 {
                     GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Lose);
                 }
+
             }
 
             void GameStartAction(MatchStartPacket p)

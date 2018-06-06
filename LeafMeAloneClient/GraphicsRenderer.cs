@@ -377,7 +377,7 @@ namespace Client
                     DebugForm.Show();
 #endif
             };
-
+            InitializeComponent(Form);
         }
         /// <summary>
         /// Method called when the form is resized by the user.

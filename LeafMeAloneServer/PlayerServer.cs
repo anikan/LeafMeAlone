@@ -235,47 +235,7 @@ namespace Server
             ActiveToolMode = ToolMode.NONE;
         }
 
-        /// <summary>
-        /// For fun printing of the stats. Can be used for UI too.
-        /// </summary>
-        /// <returns></returns>
-        public string GetStatsString()
-        {
 
-            string returnString = string.Format("\nPlayer {0} Stats -----------------------\n", Id);
-
-            returnString += "\n-- Leaf Stats --\n";
-
-            returnString += string.Format("Leaves Claimed: {0}\n", playerStats.numLeavesClaimed);
-            returnString += string.Format("Leaves Stolen: {0}\n", playerStats.numLeavesStolen);
-            returnString += string.Format("Leaves Extinguished: {0}\n", playerStats.numLeavesExtinguished);
-            returnString += string.Format("Leaves Set On Fire: {0}\n", playerStats.numLeavesSetOnFire);
-            returnString += string.Format("Leaves Destroyed: {0}\n", playerStats.numLeavesDestroyed);
-            returnString += string.Format("Total Damage Done To Leaves: {0}\n", playerStats.fireDamageDealtToLeaves);
-
-            returnString += "\n-- Player Stats --\n";
-
-            returnString += string.Format("Enemy Kills: {0}\n", playerStats.numEnemyKills);
-            returnString += string.Format("Enemies Set On Fire: {0}\n", playerStats.numEnemiesSetOnFire);
-            returnString += string.Format("Times Extinguished Teammate: {0}\n", playerStats.timesTeammateExtinguished);
-            returnString += string.Format("Fire Damage Done To Enemeis: {0}\n", playerStats.fireDamageDealtToEnemies);
-            returnString += string.Format("Deaths By Enemy: {0}\n", playerStats.timesKilledByEnemy);
-            returnString += string.Format("Total Damage Taken: {0}\n", playerStats.damageTaken);
-
-            returnString += "\n-- Shame Stats --\n";
-
-            returnString += string.Format("Own Leaves Blown Out Of Team: {0}\n", playerStats.numberOfOwnLeavesBlownAway);
-            returnString += string.Format("Own Leaves Destroyed: {0}\n", playerStats.numberOfOwnLeavesDestroyed);
-            returnString += string.Format("Leaves Claimed For Enemy: {0}\n", playerStats.numLeavesClaimedForEnemy);
-            returnString += string.Format("Times Set Teammate on Fire: {0}\n", playerStats.numTeammateSetOnFire);
-            returnString += string.Format("Times Killed Teammate: {0}\n", playerStats.numTeammateKills);
-            returnString += string.Format("Times Killed By Teammate: {0}\n", playerStats.timesKilledByTeammate);
-
-            returnString += "\n---------------------------------------\n";
-
-            return returnString;
-
-        }
 
     }
 }

@@ -62,7 +62,7 @@ namespace Client
             void CreatePlayerAction(CreatePlayerPacket p)
             {
                 PlayerClient player = (PlayerClient)CreateObjectAction(p.createPacket);
-                player.Team = p.team;
+                player.PlayerTeam = p.team;
             }
 
             // What to do on game finish
@@ -77,13 +77,15 @@ namespace Client
                 {
                     GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Lose);
                 }
-
+                client.WinningTeam = p.winningTeam;
+                client.PendingRematchState = true;
             }
 
             void GameStartAction(MatchStartPacket p)
             {
                 client.StartMatchTimer(p.gameTime);
                 GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
+                client.PendingRematchState = false;
             }
 
             void SpectatorAction(SpectatorPacket p)

@@ -669,6 +669,15 @@ namespace Client {
         }
 
         /// <summary>
+        /// Check for the duration of the animation in seconds
+        /// </summary>
+        /// <param name="index"></param>
+        public double GetAnimationDuration(int index)
+        {
+            return scene.Animations[index].DurationInTicks / scene.Animations[index].TicksPerSecond;
+        }
+
+        /// <summary>
         /// Find the name of an animation by name
         /// </summary>
         /// <param name="index"></param>

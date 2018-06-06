@@ -8,7 +8,7 @@ using SlimDX;
 
 namespace Client
 {
-    public class FlameThrowerParticleSystem : ParticleSystem
+    public class FlameThrowerParticleSystem : NormalParticleSystem
     {  
         public float FlameInitSpeed = 40.0f;
         public float FlameAcceleration = 15.0f;

@@ -32,8 +32,7 @@ namespace Server
         public float Bounciness = 0.0f;
 
         public bool CanPush;
-
-
+        
         // Force, applied each tick and then reset.
         // Affects through the ApplyForce() function.
         public Vector3 Force;

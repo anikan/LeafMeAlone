@@ -83,9 +83,17 @@ namespace Client
 
             IPAddress ipAddress = IPAddress.Loopback;
             if (args.Length > 0)
-            {
-                IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
-                ipAddress = ipHostInfo.AddressList[0];
+            {/*
+                try
+                {
+                    ipAddress = IPAddress.Parse(args[0]);
+                }
+
+                catch (FormatException e)
+                {*/
+                    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+                    ipAddress = ipHostInfo.AddressList[0];
+                //}
             }
 
             // Create a new camera with a specified offset.
@@ -147,8 +155,7 @@ namespace Client
             // Draw everythhing.
             Render();
             
-
-            GraphicsRenderer.BarContext.Draw();
+            
             GlobalUIManager.Update();
             UIManagerSpriteRenderer.Update();
             UIManagerSpriteRenderer.SpriteRenderer.Flush();

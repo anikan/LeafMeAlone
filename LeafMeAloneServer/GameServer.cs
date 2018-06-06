@@ -34,8 +34,6 @@ namespace Server
 
         private int playerSpawnIndex = 0;
 
-        private Stopwatch testTimer;
-
         private Random rnd;
 
         // Whether game is running on net or not
@@ -56,11 +54,9 @@ namespace Server
             development = !networked;
 
             timer = new Stopwatch();
-            testTimer = new Stopwatch();
             rnd = new Random();
 
             timer.Start();
-            testTimer.Start();
 
             networkServer = new NetworkServer(networked);
             matchHandler = new MatchHandler(Match.DefaultMatch, networkServer, this);
@@ -99,6 +95,9 @@ namespace Server
         {
             while (true)
             {
+                float deltaTime = timer.ElapsedMilliseconds / 1000.0f;
+
+                timer.Restart();
 
                 //Check if a client wants to connect.
                 networkServer.CheckForConnections();
@@ -117,21 +116,23 @@ namespace Server
                 //Clear list for next frame.
                 networkServer.PlayerPackets.Clear();
 
-                UpdateObjects(timer.ElapsedMilliseconds / 1000.0f);
+                UpdateObjects(deltaTime);
+
+                //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after object updates");
 
                 //Send object data to all clients.
                 networkServer.SendWorldUpdateToAllClients();
                 toDestroyQueue.Clear();
 
+                //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after send updates");
+
                 if ((int)(TICK_TIME - timer.ElapsedMilliseconds) < 0)
                 {
-                    //     Console.WriteLine("Warning: Server is falling behind.");
+                    Console.WriteLine($"Warning: Server is falling behind. Took {timer.ElapsedMilliseconds} ms");
                 }
 
-                timer.Restart();
-
                 //Sleep for the rest of this tick.
-                System.Threading.Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
+                Thread.Sleep(Math.Max(0, (int)(TICK_TIME - timer.ElapsedMilliseconds)));
             }
         }
 
@@ -168,16 +169,26 @@ namespace Server
         public void UpdateObjects(float deltaTime)
         {
             //TestPhysics();
+            
+            List<GameObjectServer> toUpdateList = GetInteractableObjects();
 
-            List<GameObjectServer> toUpdateList = gameObjectDict.Values.ToList();
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} before {toUpdateList.Count} object updates");
+
             //This foreach loop hurts my soul. May consider making it normal for loop.
-            foreach (GameObjectServer toUpdate in toUpdateList)
+            for (int i = 0; i < toUpdateList.Count; i++)
             {
-                toUpdate.Update(deltaTime);
+                toUpdateList[i].Update(deltaTime);
+
+                
             }
+
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after initial object updates");
+
 
             // Add the effects of the player tools.
             AddPlayerToolEffects();
+
+            //Console.WriteLine($"Timer at {timer.ElapsedMilliseconds} after tool object updates");
 
         }
 
@@ -275,6 +286,8 @@ namespace Server
             // Set the leaf's initial rotation.
             newLeaf.Transform.Rotation.Y = rotation;
 
+            newLeaf.EnsureSafePosition();
+
             // Add this leaf to the leaf list and object dictionary.
             newLeaf.Register();
 
@@ -287,16 +300,18 @@ namespace Server
         /// </summary>
         public void AddPlayerToolEffects()
         {
-
             // Iterate through all players.
             for (int i = 0; i < playerServerList.Count; i++)
             {
-
                 // Get this player.
                 PlayerServer player = playerServerList[i];
 
-                // Affect all objects within range of the player.
-                player.AffectObjectsInToolRange(gameObjectDict.Values.ToList());
+                //Only check if tools are active.
+                if (player.ActiveToolMode != ToolMode.NONE)
+                {
+                    // Affect all objects within range of the player.
+                    player.AffectObjectsInToolRange(GetInteractableObjects());
+                }
 
             }
         }
@@ -356,6 +371,42 @@ namespace Server
             }
 
             return leaves;
+        }
+
+        /// <summary>
+        /// Get list of players and leaves.
+        /// </summary>
+        /// <returns></returns>
+        public List<GameObjectServer> GetInteractableObjects()
+        {
+            List<GameObjectServer> gameObjects = GetGameObjectList();
+            List<GameObjectServer> interactableGameObjects = new List<GameObjectServer>();
+
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                if (gameObjects[i] is LeafServer || gameObjects[i] is PlayerServer)
+                {
+                    interactableGameObjects.Add(gameObjects[i]);
+                }
+            }
+
+            return interactableGameObjects;
+        }
+
+        public List<GameObjectServer> GetColliderObjects()
+        {
+            List<GameObjectServer> gameObjects = GetGameObjectList();
+            List<GameObjectServer> colliderGameObjects = new List<GameObjectServer>();
+
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                if (gameObjects[i] is TreeServer || gameObjects[i] is PlayerServer)
+                {
+                    colliderGameObjects.Add(gameObjects[i]);
+                }
+            }
+
+            return colliderGameObjects;
         }
     }
 }

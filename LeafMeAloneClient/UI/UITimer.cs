@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Timers;
-using AntTweakBar;
-using SlimDX;
 using SpriteTextRenderer;
 
 namespace Client

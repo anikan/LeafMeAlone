@@ -104,7 +104,6 @@ namespace Server
             Radius = PLAYER_RADIUS;
             colliderType = ColliderType.CIRCLE;
             JumpToRandomSpawn();
-
         }
 
         private void JumpToRandomSpawn()
@@ -165,11 +164,9 @@ namespace Server
         /// <param name="allObjects">A list of all objects in the game.</param>
         public void AffectObjectsInToolRange(List<GameObjectServer> allObjects)
         {
-
             // Iterate through all objects.
             for (int j = 0; j < allObjects.Count; j++)
             {
-
                 //Get the current object.
                 GameObjectServer gameObject = allObjects[j];
 

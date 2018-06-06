@@ -186,7 +186,8 @@ namespace Server
                 {
 
                     // Get the force of this tool.
-                    float toolForce = toolInfo.Force * 0.5f;
+                    float toolForce = toolInfo.Force * 0.25f;
+                    float toolRange = toolInfo.Range * 0.5f;
 
                     // Get the vector from the player to the object.
                     Vector3 objToPlayer = toolTransform.Position - Transform.Position;
@@ -194,7 +195,7 @@ namespace Server
                     float distance = objToPlayer.Length();
 
                     // Divide the vector by the range of the tool to normalize it.
-                    objToPlayer /= toolInfo.Range;
+                    objToPlayer /= toolRange;
 
                     // Multiply tool force by distance so that it's stronger on objects that are closer.
                     // Also make sure denominator can't be zero.

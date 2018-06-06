@@ -351,8 +351,15 @@ namespace Server
             ToolInfo equippedToolInfo = Tool.GetToolInfo(player.ToolEquipped);
             Transform toolTransform = player.GetToolTransform();
 
+            float toolRange = equippedToolInfo.Range;
+
+            if (player.ToolEquipped == ToolType.BLOWER && player.ActiveToolMode == ToolMode.SECONDARY)
+            {
+                toolRange *= 0.5f;
+            }
+
             // Check if the leaf is within range of the player.
-            if (GetDistanceToTool(toolTransform) <= equippedToolInfo.Range)
+            if (GetDistanceToTool(toolTransform) <= toolRange)
             {
                 // Get the forward vector of the player.
                 Vector3 ToolForward = toolTransform.Forward;

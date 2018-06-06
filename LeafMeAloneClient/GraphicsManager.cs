@@ -141,7 +141,7 @@ namespace Client
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
             }
-            LeafClient.Fire?.Update(delta_t);
+            GraphicGameObject.Fire?.Update(delta_t);
 
         }
 

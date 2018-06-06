@@ -35,17 +35,14 @@ namespace Shared
         public bool Burning
         {
             // Just see if burn frames is more than zero.
-            get
-            {
-                return burnFrames > 0;
-            }
-            
+            get => burnFrames > 0;
+
             // To set burning, just set the burn frames to 1 or 0.
             set
             {
                 if (Burnable)
                 {
-                    burnFrames = (value == true) ? 1 : 0;
+                    burnFrames = value ? 1 : 0;
                 }
                 else
                 {

@@ -147,19 +147,9 @@ namespace Client
         public virtual void Draw()
         {
             model?.Draw();
-
-            //if the object is currently burning, draw the fire on them.
-            if (Burning)
-            {
-                Transform t = new Transform {Position = Transform.Position,Scale =  new Vector3(1,1,1)};
-                GraphicsManager.DrawParticlesThisFrame(Fire,t);
-            }
-
+            
             // If we're debugging, draw the pivot cube.
-            if (PivotCube != null)
-            {
-                PivotCube.Draw();
-            }
+            PivotCube?.Draw();
         }
 
         /// <summary>

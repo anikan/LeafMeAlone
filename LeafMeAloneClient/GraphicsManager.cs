@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Client.UI;
 using Shared;
 using SlimDX;
 using SlimDX.Direct3D11;

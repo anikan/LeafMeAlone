@@ -13,6 +13,70 @@ namespace Server
     public class PlayerServer : PhysicsObject, IPlayer
     {
 
+        public struct Stats
+        {
+            // How many leaves were set on fire. STATUS: DONE.
+            public int numLeavesSetOnFire;
+
+            // How many players you set on fire. STATUS: 
+            public int numEnemiesSetOnFire;
+
+            public int numTeammateSetOnFire;
+
+            // How many leaves were destroyed. STATUS: DONE.
+            public int numLeavesDestroyed;
+
+            // Number of leaves the player extinguished. STATUS: DONE
+            public int numLeavesExtinguished;
+
+            // Number of leaves stolen. STATUS: DONE
+            public int numLeavesStolen;
+
+            // Number of leaves claimed. STATUS: DONE
+            public int numLeavesClaimed;
+
+            // Number of players killed. STATUS: DONE
+            public int numEnemyKills;
+
+            public int numTeammateKills;
+
+            // Number of times died. STATUS: DONE
+            public int numDeaths;
+
+            // Fire damage dealt to players. STATUS: DONE
+            public float fireDamageDealtToEnemies;
+
+            public float fireDamageDealtToTeammates;
+
+            // Fire damage dealt to leaves. STATUS: DONE
+            public float fireDamageDealtToLeaves;
+
+            // Total damage taken. STATUS: DONE
+            public float damageTaken;
+
+            // Times extinguished teammate. STATUS: DONE
+            public int timesTeammateExtinguished;
+
+            // Times you blew away your own leaves. STATUS: DONE.
+            public int numberOfOwnLeavesBlownAway;
+
+            // Times you burned your own leaves. STATUS: DONE.
+            public int numberOfOwnLeavesDestroyed;
+
+            // How many leaves you pushed to the other player's team.
+            public int numLeavesClaimedForEnemy;
+
+            // Number of times you've been killed by your teammate.
+            public int timesKilledByTeammate;
+
+            // Number of times you were killed by the enemy.
+            public int timesKilledByEnemy;
+
+        }
+
+        // Stats for the player.
+        public Stats playerStats;
+
         // Constant values of the player.
         public const float PLAYER_MASS = 0.1f;
         public const float PLAYER_RADIUS = 3.0f;
@@ -79,6 +143,8 @@ namespace Server
                 Health += Constants.HEALTH_REGEN_RATE * deltaTime;
             }
 
+            //Console.WriteLine(GetStatsString());
+
         }
 
         /// <summary>
@@ -113,7 +179,7 @@ namespace Server
                     if (gameObject != this && gameObject.IsInPlayerToolRange(this))
                     {
                         // Hit the object.
-                        gameObject.HitByTool(GetToolTransform(), ToolEquipped, ActiveToolMode);
+                        gameObject.HitByTool(this, GetToolTransform(), ToolEquipped, ActiveToolMode);
 
                     }
 
@@ -188,12 +254,12 @@ namespace Server
         /// <param name="toolTransform">Position of the other player.</param>
         /// <param name="toolType">Type of tool hit by.</param>
         /// <param name="toolMode">Tool mode hit by.</param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
 
             if (!Dead)
             {
-                base.HitByTool(toolTransform, toolType, toolMode);
+                base.HitByTool(player, toolTransform, toolType, toolMode);
             }
         }
 
@@ -202,6 +268,9 @@ namespace Server
         /// </summary>
         public override void Die()
         {
+
+            base.Die();
+
             Dead = true;
             Burning = false;
             Burnable = false;
@@ -226,5 +295,48 @@ namespace Server
             Collidable = true;
             ActiveToolMode = ToolMode.NONE;
         }
+
+        /// <summary>
+        /// For fun printing of the stats. Can be used for UI too.
+        /// </summary>
+        /// <returns></returns>
+        public string GetStatsString()
+        {
+
+            string returnString = string.Format("\nPlayer {0} Stats -----------------------\n", Id);
+
+            returnString += "\n-- Leaf Stats --\n";
+
+            returnString += string.Format("Leaves Claimed: {0}\n", playerStats.numLeavesClaimed);
+            returnString += string.Format("Leaves Stolen: {0}\n", playerStats.numLeavesStolen);
+            returnString += string.Format("Leaves Extinguished: {0}\n", playerStats.numLeavesExtinguished);
+            returnString += string.Format("Leaves Set On Fire: {0}\n", playerStats.numLeavesSetOnFire);
+            returnString += string.Format("Leaves Destroyed: {0}\n", playerStats.numLeavesDestroyed);
+            returnString += string.Format("Total Damage Done To Leaves: {0}\n", playerStats.fireDamageDealtToLeaves);
+
+            returnString += "\n-- Player Stats --\n";
+
+            returnString += string.Format("Enemy Kills: {0}\n", playerStats.numEnemyKills);
+            returnString += string.Format("Enemies Set On Fire: {0}\n", playerStats.numEnemiesSetOnFire);
+            returnString += string.Format("Times Extinguished Teammate: {0}\n", playerStats.timesTeammateExtinguished);
+            returnString += string.Format("Fire Damage Done To Enemeis: {0}\n", playerStats.fireDamageDealtToEnemies);
+            returnString += string.Format("Deaths By Enemy: {0}\n", playerStats.timesKilledByEnemy);
+            returnString += string.Format("Total Damage Taken: {0}\n", playerStats.damageTaken);
+
+            returnString += "\n-- Shame Stats --\n";
+
+            returnString += string.Format("Own Leaves Blown Out Of Team: {0}\n", playerStats.numberOfOwnLeavesBlownAway);
+            returnString += string.Format("Own Leaves Destroyed: {0}\n", playerStats.numberOfOwnLeavesDestroyed);
+            returnString += string.Format("Leaves Claimed For Enemy: {0}\n", playerStats.numLeavesClaimedForEnemy);
+            returnString += string.Format("Times Set Teammate on Fire: {0}\n", playerStats.numTeammateSetOnFire);
+            returnString += string.Format("Times Killed Teammate: {0}\n", playerStats.numTeammateKills);
+            returnString += string.Format("Times Killed By Teammate: {0}\n", playerStats.timesKilledByTeammate);
+
+            returnString += "\n---------------------------------------\n";
+
+            return returnString;
+
+        }
+
     }
 }

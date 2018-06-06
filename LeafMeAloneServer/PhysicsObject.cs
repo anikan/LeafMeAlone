@@ -146,10 +146,10 @@ namespace Server
         /// <param name="toolTransform">Position of the player that hit this object.</param>
         /// <param name="toolType">Type of tool equipped.</param>
         /// <param name="toolMode">Mode (primary or secondary) of tool equipped.</param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             // Call the base's HitByTool function (burns the object)
-            base.HitByTool(toolTransform, toolType, toolMode);
+            base.HitByTool(player, toolTransform, toolType, toolMode);
 
             // Get information about the tool that was used on this object.
             ToolInfo toolInfo = Tool.GetToolInfo(toolType);

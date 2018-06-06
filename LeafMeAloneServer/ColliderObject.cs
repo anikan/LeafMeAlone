@@ -56,11 +56,11 @@ namespace Server
         /// <param name="toolTransform"></param>
         /// <param name="toolType"></param>
         /// <param name="toolMode"></param>
-        public override void HitByTool(Transform toolTransform, ToolType toolType, ToolMode toolMode)
+        public override void HitByTool(PlayerServer player, Transform toolTransform, ToolType toolType, ToolMode toolMode)
         {
             if (Collidable)
             {
-                base.HitByTool(toolTransform, toolType, toolMode);
+                base.HitByTool(player, toolTransform, toolType, toolMode);
             }
         }
 

@@ -130,6 +130,8 @@ namespace Client
                         Client.Init(new NetworkClient(ipAddress));
                         GraphicsRenderer.Panel1.Visible = false;
                         GraphicsRenderer.Panel1.Hide();
+                        GraphicsRenderer.pictureBox1.Visible = false;
+                        GraphicsRenderer.pictureBox1.Hide();
                         GraphicsRenderer.Form.Focus();
                     }
                 };

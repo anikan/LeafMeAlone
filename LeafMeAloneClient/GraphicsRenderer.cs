@@ -10,6 +10,7 @@ using Device = SlimDX.Direct3D11.Device;
 using Resource = SlimDX.Direct3D11.Resource;
 using System.Windows.Forms;
 using Client.UI;
+using Shared;
 using Button = System.Windows.Forms.Button;
 using Screen = System.Windows.Forms.Screen;
 
@@ -55,6 +56,7 @@ namespace Client
         public static TextBox ipTextbox;
         public static Label ipLabel;
         public static Button connectButton;
+        public static PictureBox pictureBox1;
         #endregion
 
         
@@ -163,6 +165,7 @@ namespace Client
             ipTextbox = new TextBox();
             ipLabel = new Label();
             connectButton = new Button();
+            pictureBox1 = new PictureBox();
             // 
             // Panel1
             // 
@@ -249,6 +252,15 @@ namespace Client
             connectButton.Text = "Connect";
             connectButton.UseVisualStyleBackColor = true;
 
+            pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            pictureBox1.Image = new Bitmap(Constants.Logo);
+            pictureBox1.Location = new System.Drawing.Point(0, 45);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new System.Drawing.Size(784, 516);
+            pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            pictureBox1.TabIndex = 1;
+            pictureBox1.TabStop = false;
+
 
             nicknameTextbox.AcceptsReturn = true;
             connectButton.NotifyDefault(true);
@@ -291,6 +303,7 @@ namespace Client
             // Form1
             // 
             FormToShowOn.Controls.Add(Panel1);
+            FormToShowOn.Controls.Add(pictureBox1);
 
         }
         /// <summary>

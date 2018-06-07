@@ -146,7 +146,7 @@ namespace Server
         /// <returns></returns>
         private bool SufficientPlayersConnected()
         {
-            return (development && playerServerList.Count == 4) || (!development && playerServerList.Count == 4);
+            return (development && playerServerList.Count == 1) || (!development && playerServerList.Count == 4);
         }
 
         private void HandleIncomingPackets()

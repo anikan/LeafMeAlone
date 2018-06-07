@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Timers;
 
 namespace Server
 {
@@ -17,6 +18,7 @@ namespace Server
         public static Match match;
         private NetworkServer network;
         private GameServer game;
+        private Timer statsTimer;
 
 
         /// <summary>
@@ -35,6 +37,18 @@ namespace Server
             network = networkHandler;
             this.game = game;
             matchResetTimer = new Stopwatch();
+            statsTimer = new Timer
+            {
+                AutoReset = true,
+                Interval = 1000
+            };
+            statsTimer.Elapsed += (sender, args) =>
+            {
+                foreach (PlayerServer player in GameServer.instance.playerServerList)
+                {
+                    network.SendAll(PacketUtil.Serialize(new StatResultPacket(player.playerStats, player.Id)));
+                }
+            };
         }
 
         /// <summary>
@@ -45,6 +59,9 @@ namespace Server
         {
             match.StartMatch(Constants.MATCH_TIME);
             network.SendAll(PacketUtil.Serialize(new MatchStartPacket(Constants.MATCH_TIME)));
+
+            statsTimer.Enabled = true;
+            statsTimer.Start();
         }
 
         /// <summary>
@@ -56,6 +73,7 @@ namespace Server
             foreach (PlayerServer player in game.playerServerList)
             {
                 player.Reset();
+                player.playerStats = new PlayerStats();
             }
             matchResetTimer.Reset();
             StartMatch();
@@ -70,9 +88,10 @@ namespace Server
             GameResultPacket donePacket = new GameResultPacket(winningTeam.name);
 
             network.SendAll(PacketUtil.Serialize(donePacket));
-            foreach (PlayerServer player in GameServer.instance.playerServerList )
+
+            foreach (PlayerServer player in GameServer.instance.playerServerList)
             {
-            network.SendAll(PacketUtil.Serialize(new StatResultPacket(player.playerStats,player.Id)));
+                network.SendAll(PacketUtil.Serialize(new StatResultPacket(player.playerStats,player.Id)));
             }
 
             game.GetLeafListAsObjects().ForEach(l => { l.Burning = true; });
@@ -88,7 +107,7 @@ namespace Server
         {
             return (match.GetTimeElapsed().Seconds < Constants.MATCH_INIT_TIME);
         }
-
+        
         /// <summary>
         /// Checks the match status and responds accordingly.
         /// </summary>

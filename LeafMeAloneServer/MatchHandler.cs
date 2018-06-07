@@ -44,7 +44,6 @@ namespace Server
             };
             statsTimer.Elapsed += (sender, args) =>
             {
-                currentTimePassed = matchResetTimer.Elapsed.Seconds;
                 foreach (PlayerServer player in GameServer.instance.playerServerList)
                 {
                     network.SendAll(PacketUtil.Serialize(new StatResultPacket(player.playerStats, player.Id)));
@@ -108,8 +107,7 @@ namespace Server
         {
             return (match.GetTimeElapsed().Seconds < Constants.MATCH_INIT_TIME);
         }
-
-        private int currentTimePassed = 0;
+        
         /// <summary>
         /// Checks the match status and responds accordingly.
         /// </summary>

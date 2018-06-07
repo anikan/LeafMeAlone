@@ -632,6 +632,7 @@ namespace Client
 
         public override void Die()
         {
+            healthUI.UITexture.Enabled = false;
             healthUI = null;
             base.Die();
         }

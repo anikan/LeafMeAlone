@@ -68,7 +68,10 @@ namespace Client
         /// </summary>
         public void Update()
         {
-            GlobalUIManager.GameWinLossState.SetStats(null);
+            GlobalUIManager.GameWinLossState.SetStats(!GameClient.instance.PendingRematchState
+                ? null
+                : GraphicsManager.ActivePlayer.stats);
+
             // Iterate through all keys pressed.
             for (int i = 0; i < KeysPressed.Count; i++)
             {

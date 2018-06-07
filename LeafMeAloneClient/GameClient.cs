@@ -200,7 +200,6 @@ namespace Client
             UIManagerSpriteRenderer.SpriteRenderer.Flush();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             GlobalUIManager.fps.StopAndCalculateFps();
-            UICulled.Culled = 0;
             AudioManager.Update();
 
         }

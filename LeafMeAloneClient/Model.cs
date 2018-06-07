@@ -182,7 +182,6 @@ namespace Client
             if (meshesOffScreen == modelBoundingBoxes.Count)
             {
                 IsCulled = true;
-                UICulled.Culled++;
                 return;
             }
             IsCulled = false;

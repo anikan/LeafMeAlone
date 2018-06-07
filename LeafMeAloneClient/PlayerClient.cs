@@ -48,6 +48,8 @@ namespace Client
         public UIHealth healthUI;
         public UINickname nicknameUI;
 
+        public PlayerStats stats;
+
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
         {
@@ -630,6 +632,7 @@ namespace Client
 
         public override void Die()
         {
+            healthUI.UITexture.Enabled = false;
             healthUI = null;
             base.Die();
         }

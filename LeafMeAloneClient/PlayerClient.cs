@@ -371,7 +371,6 @@ namespace Client
             bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
 
             base.UpdateFromPacket(packet.ObjData);
-            Console.WriteLine($"Burning for player {Id} is {Burning}");
 
             // If death state changes, reset tint.
             if (Dead != packet.Dead)

@@ -15,6 +15,7 @@ namespace Shared
         public const string BlueHealth = @"../../Textures/BlueHealth.png";
         public const string LeafToolTip = @"../../Textures/LeafblowerTooltip.png";
         public const string FlameToolTip = @"../../Textures/FlamethrowerTooltip.png";
+        public const string TeammateIndicator = @"../../Textures/SquirrelHead.png";
         public const string Logo = @"../../Textures/Logo.png";
 
 

@@ -24,6 +24,8 @@ namespace Client.UI
         /// </summary>
         public static void Init()
         {
+            TeammateUI = new UIFindTeammate();
+
             fps = new UIFramesPersecond();
             gameTimer = new UITimer(60);
             Teams = new UITeams();
@@ -55,9 +57,7 @@ namespace Client.UI
                     }
                 });
 
-                TeammateUI = new UIFindTeammate();
-
-                UIList.AddRange(new[] { fps, gameTimer, GameWinLossState, Culled, LeafBlowerTool,FlameThrowerTool, TeammateUI });
+                UIList.AddRange(new[] { TeammateUI, fps, gameTimer, GameWinLossState, Culled, LeafBlowerTool,FlameThrowerTool });
 
         }
 

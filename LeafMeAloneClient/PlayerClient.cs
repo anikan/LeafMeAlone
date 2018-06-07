@@ -43,12 +43,15 @@ namespace Client
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction, _audioVoice;
-        private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
+        private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose;
+
         private int _currAnim, _overridedAnim;
         public UIHealth healthUI;
         public UINickname nicknameUI;
 
         public PlayerStats stats;
+
+        
 
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
@@ -62,7 +65,7 @@ namespace Client
             FlameThrower.EnableGeneration(false);
             LeafBlower.EnableGeneration(false);
             Suction.EnableGeneration(false);
-
+            
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
             _audioWind = AudioManager.GetNewSource();
@@ -77,8 +80,7 @@ namespace Client
             _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), timeScale);
             _animVictory = AnimationManager.AddAnimation(Constants.PlayerVictoryAnim, new Vector3(scale), timeScale);
             _animLose = AnimationManager.AddAnimation(Constants.PlayerDefeatAnim, new Vector3(scale), timeScale);
-            _animHurt = AnimationManager.AddAnimation(Constants.PlayerHurtAnim, new Vector3(scale), 2f);
-
+            
             // set to idle animation by default
             SwitchAnimation(_animIdle);
 
@@ -497,6 +499,8 @@ namespace Client
 
         private bool playedEndGameVoice = false;
         private bool playedDeathVoice = false;
+        private float _hurtTimer = 0f;
+        public bool PlayingHurtVoice = false;
 
         /// <summary>
         /// Evaluate audio logic
@@ -598,26 +602,31 @@ namespace Client
                 if (!Dead) playedDeathVoice = false;
                 if (playedEndGameVoice) AudioManager.StopAudio(_audioVoice);
                 playedEndGameVoice = false;
-
+                PlayingHurtVoice = false;
 
                 if (Dead && !playedDeathVoice)
                 {
                     AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceDeath, false);
                     playedDeathVoice = true;
                 }
+                else if (hurt)
+                {
+                    if (!AudioManager.IsSourcePlaying(_audioVoice) && _hurtTimer > 0.6f)
+                    {
+                        _hurtTimer = 0f;
+                        AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceHurt, false);
+
+                    }
+
+                    PlayingHurtVoice = AudioManager.IsSourcePlaying(_audioVoice);
+                    
+                }
                 else if (!prevUsingFlame && currUsingFlame)
                 {
                     AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceFlameLaugh, false);
                 }
 
-                if (!AudioManager.IsSourcePlaying(_audioVoice))
-                {
-                    if (hurt)
-                    {
-                        AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceHurt, false);
-                    }
 
-                }
             }
         }
 
@@ -646,6 +655,7 @@ namespace Client
             Suction.SetVelocity(-Transform.Forward * SUCTION_SPEED);
             Suction.Update(deltaTime);
 
+            if (!PlayingHurtVoice) _hurtTimer += deltaTime;
         }
 
         /// <summary>

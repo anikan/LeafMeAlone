@@ -37,7 +37,7 @@ namespace Client
         /// ActiveCamera contains the currently active camera.
         /// </summary>
         public static Camera ActiveCamera;
-
+        
         // Current player.
         public static PlayerClient ActivePlayer;
 
@@ -133,6 +133,7 @@ namespace Client
 
         // the offset of the camera from the player. Can be changed anytime to update the camera
         public static Vector3 PlayerToCamOffset = GameClient.CAMERA_OFFSET;
+        private static float _deathShakeCounter = 0f;
 
         public static void Update(float delta_t)
         {
@@ -141,6 +142,29 @@ namespace Client
             {
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
+
+                // reset counter if player is not dead
+                if (!ActivePlayer.Dead)
+                {
+                    _deathShakeCounter = 0f;
+                }
+
+                // burning shake a bit while hurt voice is played
+                if (ActivePlayer.PlayingHurtVoice)
+                {
+                    ActiveCamera.StartScreenShake(0.5f);
+                }
+                // do deathshake for 1 second
+                else if (ActivePlayer.Dead && _deathShakeCounter < .5f)
+                {
+                    ActiveCamera.StartScreenShake(3f);
+                    _deathShakeCounter += delta_t;
+                }
+                // dont do shaking in other situasions
+                else
+                {
+                    ActiveCamera.StopScreenShake();
+                }
             }
 
             GraphicGameObject.Fire?.Update(delta_t);

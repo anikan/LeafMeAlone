@@ -3,6 +3,10 @@ using SpriteTextRenderer;
 
 namespace Client.UI
 {
+
+    /// <summary>
+    /// Not being used, but good for debugging.
+    /// </summary>
     public class UICulled : UI
     {
         //how many culled objects are there?

@@ -98,8 +98,8 @@ namespace Client
 
             void StatReceiveAction(StatResultPacket p)
             {
-                if(p.PlayerID == GraphicsManager.ActivePlayer.Id)
-                    GlobalUIManager.GameWinLossState.SetStats(p.stats);
+                if (p.PlayerID == GraphicsManager.ActivePlayer.Id)
+                    GraphicsManager.ActivePlayer.stats = p.stats;
             }
 
             packetHandlers = new Dictionary<PacketType, Action<BasePacket>>()

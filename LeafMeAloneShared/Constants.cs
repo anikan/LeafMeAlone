@@ -143,6 +143,14 @@ namespace Shared
         public const float MAX_SECONDS_BURNING = 10.0f;
 
         public const float PLAYER_HEALTH = 10.0f;
+
+        public const float DEFAULT_VOLUME = 8.0f;
+        public const float VOLUME_INCREASE = 0.1f;
+
+        public const string STATS_DIRECTORY = "../../../Stats/";
+        public const string STATS_PREFIX = "Stats_";
+
         public const float HEALTH_REGEN_RATE = 1.0f;
+
     }
 }

@@ -2,6 +2,7 @@
 using System.Drawing;
 using Shared;
 using SpriteTextRenderer;
+using System.IO;
 
 namespace Client.UI
 {
@@ -73,16 +74,17 @@ namespace Client.UI
             }
             else
             {
-            LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
-            PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
-            ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
+                LeafStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.LeafStats);
+                PlayerStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.PlayerStats);
+                ShameStatsUI.UIText.Text = st.ToString(PlayerStats.PlayerStatsEnum.ShameStats);
+
             }
         }
-
 
         public override void Update()
         {
             
         }
+
     }
 }

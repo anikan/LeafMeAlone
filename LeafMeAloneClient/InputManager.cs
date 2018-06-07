@@ -50,7 +50,10 @@ namespace Client
                 {Keys.D2, () => { userPlayer.RequestToolEquip(ToolType.THROWER);  } },
                 {Keys.Space, () => { userPlayer.RequestCycleTool(); } },
                 {Keys.Q, () => { userPlayer.RequestCycleTool();  } },
-                {Keys.Tab, () => { GlobalUIManager.GameWinLossState.SetStats(GraphicsManager.ActivePlayer.stats);}}
+                {Keys.Up, () => { GameClient.instance.ChangeVolume(1); } },
+                {Keys.Down, () => {GameClient.instance.ChangeVolume(-1); } },
+                {Keys.Tab, () => { GlobalUIManager.GameWinLossState.SetStats(GraphicsManager.ActivePlayer.stats);}},
+                {Keys.F5, () => {GameClient.instance.SaveStats(GraphicsManager.ActivePlayer.stats);  } }
             };
 
             // Dictionary to keep track of what functions should be called by what mouse presses

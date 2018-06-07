@@ -45,6 +45,8 @@ TestResult.xml
 [Rr]eleasePS/
 dlldata.c
 
+[Ss]tats/
+
 # Benchmark Results
 BenchmarkDotNet.Artifacts/
 

@@ -44,6 +44,7 @@ namespace Client
         private ClientPacketHandler clientPacketHandler;
 
         private bool HasInitted = false;
+        bool hasConnected = false;
 
         // make win logic easier to handle
         // check if the current match is over and new match is not started
@@ -93,7 +94,6 @@ namespace Client
 
                 // Initialize static classes
                 GraphicsRenderer.Init();
-                bool hasConnected = false;
 
                 //catch (FormatException e)
                 //{
@@ -115,9 +115,9 @@ namespace Client
 
             GraphicsRenderer.connectButton.Click += (sender, eventArgs) =>
                 {
-                    if (!hasConnected)
+                    if (!Client.hasConnected)
                     {
-                        hasConnected = true;
+                        Client.hasConnected = true;
                         IPAddress ipAddress = IPAddress.Loopback;
                             if (GraphicsRenderer.networkedCheckbox.Checked)
                             {
@@ -162,7 +162,21 @@ namespace Client
             GraphicsRenderer.DeviceContext.ClearDepthStencilView(
                 GraphicsRenderer.DepthView, DepthStencilClearFlags.Depth,
                 1.0f, 0);
-            
+
+            if (NetworkClient.PendingReset)
+            {
+                HasInitted = false;
+                hasConnected = false;
+                NetworkClient.PendingReset = false;
+                GraphicsRenderer.Panel1.Visible = true;
+                GraphicsRenderer.Panel1.Show();
+                GraphicsRenderer.pictureBox1.Visible = true;
+                GraphicsRenderer.pictureBox1.Show();
+                GraphicsRenderer.Panel1.Focus();
+                return;
+            }
+
+
             // Receive any packets from the server.
             ReceivePackets();
             // If there's an active player right now.

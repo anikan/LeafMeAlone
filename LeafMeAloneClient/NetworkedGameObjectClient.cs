@@ -40,8 +40,9 @@ namespace Client
             ObjectPacket objPacket = packet as ObjectPacket;
 
             // Set the initial positions of the object.
-            Moving = !(Transform.Position.X == objPacket.PositionX 
-                       && Transform.Position.Z == objPacket.PositionZ);
+            float epsilon = 0.001f;
+            Moving = !( Math.Abs(Transform.Position.X - objPacket.PositionX) < epsilon
+                       &&  Math.Abs(Transform.Position.Z - objPacket.PositionZ) < epsilon );
 
             Transform.Position.X = objPacket.PositionX;
             Transform.Position.Z = objPacket.PositionZ;

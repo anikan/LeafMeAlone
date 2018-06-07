@@ -63,25 +63,36 @@ namespace Shared
         /// <summary>
         /// Sounds/Audio files
         /// </summary>
-        public const string Bgm = @"../../Sound/OptionalForestAmbient.wav";
+        public const string BirdChirping =      @"../../Sound/OptionalForestAmbient.wav";
+                
+        public const string BackgroundMusic =   @"../../Sound/BackgroundMusic.wav";
+
         public const string FlameThrowerStart = @"../../Sound/FlameThrower_Start.wav";
-        public const string FlameThrowerLoop = @"../../Sound/FlameThrower_Loop.wav";
-        public const string FlameThrowerEnd = @"../../Sound/FlameThrower_End.wav";
+        public const string FlameThrowerLoop =  @"../../Sound/FlameThrower_Loop.wav";
+        public const string FlameThrowerEnd =   @"../../Sound/FlameThrower_End.wav";
 
-        public const string LeafBlowerStart = @"../../Sound/LeafBlower_Start.wav";
-        public const string LeafBlowerLoop = @"../../Sound/LeafBlower_Loop.wav";
-        public const string LeafBlowerEnd = @"../../Sound/LeafBlower_End.wav";
+        public const string LeafBlowerStart =   @"../../Sound/LeafBlower_Start.wav";
+        public const string LeafBlowerLoop =    @"../../Sound/LeafBlower_Loop.wav";
+        public const string LeafBlowerEnd =     @"../../Sound/LeafBlower_End.wav";
 
-        public const string SuctionStart = @"../../Sound/Suction_Start.wav";
-        public const string SuctionLoop = @"../../Sound/Suction_Loop.wav";
-        public const string SuctionEnd = @"../../Sound/Suction_End.wav";
+        public const string SuctionStart =      @"../../Sound/Suction_Start.wav";
+        public const string SuctionLoop =       @"../../Sound/Suction_Loop.wav";
+        public const string SuctionEnd =        @"../../Sound/Suction_End.wav";
 
-        public const string LeafIgniting = @"../../Sound/Leaf_Igniting.wav";
-        public const string LeafBurning = @"../../Sound/Leaf_Burning.wav";
-        public const string LeafBurnup = @"../../Sound/Leaf_Burnup.wav";
-        public const string LeafPutoff = @"../../Sound/Leaf_Putoff.wav";
+        public const string LeafIgniting =      @"../../Sound/Leaf_Igniting.wav";
+        public const string LeafBurning =       @"../../Sound/Leaf_Burning.wav";
+        public const string LeafBurnup =        @"../../Sound/Leaf_Burnup.wav";
+        public const string LeafPutoff =        @"../../Sound/Leaf_Putoff.wav";
 
-        public const string PlayerFootstep = @"../../Sound/Footsteps.wav";
+        public const string LeafMoving =        @"../../Sound/Leaf_Moving.wav";
+
+        public const string SqVoiceDeath =      @"../../Sound/Squirrel/Death.wav";
+        public const string SqVoiceDefeat =     @"../../Sound/Squirrel/Defeat.wav";
+        public const string SqVoiceFlameLaugh = @"../../Sound/Squirrel/FlamethrowerLaugh.wav";
+        public const string SqVoiceHurt =       @"../../Sound/Squirrel/Hurt.wav";
+        public const string SqVoiceVictory =    @"../../Sound/Squirrel/Victory.wav";
+
+        public const string PlayerFootstep =    @"../../Sound/Footsteps.wav";
 
         /// <summary>
         /// Map Constants

@@ -149,8 +149,8 @@ namespace Client
                     _deathShakeCounter = 0f;
                 }
 
-                // burning shake a bit
-                if (ActivePlayer.Burning)
+                // burning shake a bit while hurt voice is played
+                if (ActivePlayer.PlayingHurtVoice)
                 {
                     ActiveCamera.StartScreenShake(0.5f);
                 }

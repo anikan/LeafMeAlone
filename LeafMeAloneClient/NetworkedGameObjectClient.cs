@@ -51,14 +51,6 @@ namespace Client
             // Set the initial burning status.
             Burning = objPacket.Burning;
             Health = objPacket.Health;
-
-            //If the player is burning then change the leaf color.
-            if (Burning)
-            {
-                //Console.WriteLine(deltaHealth);
-                CurrentTint = new Vector3(1,1,1) * ((Health / Constants.LEAF_HEALTH) * .7f + .3f);
-                //Debug.Log(CurrentTint.ToString());
-            }
         }
     }
 }

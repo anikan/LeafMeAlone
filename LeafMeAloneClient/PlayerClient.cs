@@ -48,6 +48,8 @@ namespace Client
         public UIHealth healthUI;
         public UINickname nicknameUI;
 
+        public PlayerStats stats;
+
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
         {

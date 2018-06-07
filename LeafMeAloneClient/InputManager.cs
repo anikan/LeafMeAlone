@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Shared;
 using SlimDX;
 using System.Windows.Forms;
+using Client.UI;
 
 namespace Client
 {
@@ -48,7 +49,8 @@ namespace Client
                 {Keys.D1, () => { userPlayer.RequestToolEquip(ToolType.BLOWER); } },
                 {Keys.D2, () => { userPlayer.RequestToolEquip(ToolType.THROWER);  } },
                 {Keys.Space, () => { userPlayer.RequestCycleTool(); } },
-                {Keys.Q, () => { userPlayer.RequestCycleTool();  } }
+                {Keys.Q, () => { userPlayer.RequestCycleTool();  } },
+                {Keys.Tab, () => { GlobalUIManager.GameWinLossState.SetStats(GraphicsManager.ActivePlayer.stats);}}
             };
 
             // Dictionary to keep track of what functions should be called by what mouse presses
@@ -66,7 +68,7 @@ namespace Client
         /// </summary>
         public void Update()
         {
-
+            GlobalUIManager.GameWinLossState.SetStats(null);
             // Iterate through all keys pressed.
             for (int i = 0; i < KeysPressed.Count; i++)
             {

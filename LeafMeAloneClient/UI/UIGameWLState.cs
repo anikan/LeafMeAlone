@@ -3,6 +3,8 @@ using System.Drawing;
 using Shared;
 using SpriteTextRenderer;
 using System.IO;
+using SlimDX;
+using SlimDX.X3DAudio;
 
 namespace Client.UI
 {
@@ -29,12 +31,23 @@ namespace Client.UI
             new RectangleF(0,70,0,0), TextAlignment.HorizontalCenter | TextAlignment.Top, Color.Transparent)
         {
             SetState(WinLoseState.None);
-            LeafStatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(25, 0, 0, 0),
+            LeafStatsUI = new UI("", UIManagerSpriteRenderer.TextType.MASSIVE, new RectangleF(25, 0, 0, 0),
                 TextAlignment.Left | TextAlignment.VerticalCenter, Color.White);
-            PlayerStatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(0, 0, 0, 0),
+            PlayerStatsUI = new UI("", UIManagerSpriteRenderer.TextType.MASSIVE, new RectangleF(0, 0, 0, 0),
                 TextAlignment.VerticalCenter | TextAlignment.HorizontalCenter, Color.White);
-            ShameStatsUI = new UI("", UIManagerSpriteRenderer.TextType.SMALL, new RectangleF(0, 0, -25, 0),
+            ShameStatsUI = new UI("", UIManagerSpriteRenderer.TextType.MASSIVE, new RectangleF(0, 0, -25, 0),
                 TextAlignment.Right | TextAlignment.VerticalCenter, Color.White);
+
+            float oldWidth = Screen.Width;
+            LeafStatsUI.UIText.Fontsize = PlayerStatsUI.UIText.Fontsize = ShameStatsUI.UIText.Fontsize = 20;
+
+            GraphicsRenderer.Form.Resize += (sender, args) =>
+            {
+                LeafStatsUI.UIText.Fontsize = (int)(LeafStatsUI.UIText.Fontsize * (Screen.Width / oldWidth));
+                PlayerStatsUI.UIText.Fontsize = (int)(PlayerStatsUI.UIText.Fontsize * (Screen.Width / oldWidth));
+                ShameStatsUI.UIText.Fontsize = (int)(ShameStatsUI.UIText.Fontsize * (Screen.Width / oldWidth));
+                oldWidth = Screen.Width;
+            };
         }
 
 
@@ -80,11 +93,6 @@ namespace Client.UI
 
             }
         }
-
-        public override void Update()
-        {
-            
-        }
-
+        
     }
 }

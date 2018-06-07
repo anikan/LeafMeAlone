@@ -213,9 +213,9 @@ namespace Client
         /// </summary>
         /// <param name="capacity"> capacity of the audio source list to be used </param>
         /// <returns> the ID of the new pool </returns>
-        public static int NewSourcePool(int capacity)
+        public static int NewSourcePool(int capacity, float volume = 1.0f)
         {
-            _allPools.Add(new AudioSourcePool(capacity, _audio));
+            _allPools.Add(new AudioSourcePool(capacity, _audio, volume));
             
             _countPools++;
             return _countPools - 1;
@@ -266,11 +266,12 @@ namespace Client
         /// </summary>
         /// <param name="capacity"> the number of sources in this pool </param>
         /// <param name="audio"> the audio system that needs to be used </param>
-        public AudioSourcePool(int capacity, AudioSystem audio)
+        public AudioSourcePool(int capacity, AudioSystem audio, float volume = 1.0f)
         {
             Src = new List<int>();
             Avail = new List<bool>();
             SrcMap = new Dictionary<int, int>();
+            _audio = audio;
 
             for (int i = 0; i < capacity; i++)
             {
@@ -278,9 +279,9 @@ namespace Client
                 Src.Add(src);
                 Avail.Add(true);
                 SrcMap[src] = i;
+                _audio.SetSourceVolume(src, volume);
             }
 
-            _audio = audio;
         }
 
         /// <summary>

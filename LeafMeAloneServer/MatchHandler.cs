@@ -74,6 +74,7 @@ namespace Server
             foreach (PlayerServer player in game.playerServerList)
             {
                 player.Reset();
+                player.playerStats = new PlayerStats();
             }
             matchResetTimer.Reset();
             StartMatch();

@@ -42,7 +42,7 @@ namespace Client
         private InverseParticleSystem Suction;
 
         // For the audio control
-        private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
+        private int _audioFootstep, _audioFlame, _audioWind, _audioSuction, _audioVoice;
         private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
         private int _currAnim, _overridedAnim;
         public UIHealth healthUI;
@@ -67,6 +67,7 @@ namespace Client
             _audioFlame = AudioManager.GetNewSource();
             _audioWind = AudioManager.GetNewSource();
             _audioSuction = AudioManager.GetNewSource();
+            _audioVoice = AudioManager.GetNewSource();
 
             // Create new animations
             float scale = .07f;
@@ -371,6 +372,7 @@ namespace Client
             float prevHealth = Health;
             bool prevEquipThrower = ToolEquipped == ToolType.THROWER;
             bool prevEquipBlower = ToolEquipped == ToolType.BLOWER;
+            bool prevDeath = Health <= 0;
 
             base.UpdateFromPacket(packet.ObjData);
 
@@ -394,9 +396,10 @@ namespace Client
             bool hurt = prevHealth > Health;
             bool currEquipThrower = ToolEquipped == ToolType.THROWER;
             bool currEquipBlower = ToolEquipped == ToolType.BLOWER;
+            bool currDeath = Health <= 0;
 
-            EvaluateAnimation(prevMoving, currMoving, prevEquipBlower, currEquipBlower, prevEquipThrower, currEquipThrower, hurt);
-            EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction);
+            EvaluateAnimation(prevMoving, currMoving, prevEquipBlower, currEquipBlower, prevEquipThrower, currEquipThrower);
+            EvaluateAudio(prevMoving, currMoving, prevUsingFlame, currUsingFlame, prevUsingWind, currUsingWind, prevUsingSuction, currUsingSuction, hurt, prevDeath, currDeath);
 
             // Depending on death state, show model
             if (Dead)
@@ -460,7 +463,7 @@ namespace Client
         /// <param name="prevEquipThrower"> is the flame thrower equipped previously? </param>
         /// <param name="currEquipThrower"> is the flame thrower equipped currently? </param>
         /// <param name="hurt"> is the player hurt? </param>
-        private void EvaluateAnimation(bool prevMoving, bool currMoving, bool prevEquipBlower, bool currEquipBlower, bool prevEquipThrower, bool currEquipThrower, bool hurt)
+        private void EvaluateAnimation(bool prevMoving, bool currMoving, bool prevEquipBlower, bool currEquipBlower, bool prevEquipThrower, bool currEquipThrower)
         {
             // win/lose animation
             if (GameClient.instance.PendingRematchState)
@@ -489,7 +492,8 @@ namespace Client
             
         }
 
-        
+        private bool playedEndGameVoice = false;
+        private bool playedDeathVoice = false;
 
         /// <summary>
         /// Evaluate audio logic
@@ -505,7 +509,8 @@ namespace Client
         public void EvaluateAudio(bool prevMoving, bool currMoving,
             bool prevUsingFlame, bool currUsingFlame,
             bool prevUsingWind, bool currUsingWind,
-            bool prevUsingSuction, bool currUsingSuction)
+            bool prevUsingSuction, bool currUsingSuction, bool hurt,
+            bool prevDeath, bool currDeath)
         {
             AudioManager.UpdateSourceLocation(_audioFlame, Transform.Position);
             AudioManager.UpdateSourceLocation(_audioWind, Transform.Position);
@@ -565,6 +570,51 @@ namespace Client
             {
                 AudioManager.StopAudio(_audioSuction);
                 AudioManager.PlayAudio(_audioSuction, Constants.SuctionEnd, false);
+            }
+
+            // Squirrel voice audio logic
+            if (GameClient.instance.PendingRematchState)
+            {
+                if (!playedEndGameVoice)
+                {
+                    if (_team == GameClient.instance.WinningTeam)
+                    {
+                        AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceVictory, true);
+
+                    }
+                    else
+                    {
+                        AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceDefeat, true);
+
+                    }
+                    playedEndGameVoice = true;
+                }
+            }
+            else
+            {
+                if (!Dead) playedDeathVoice = false;
+                if (playedEndGameVoice) AudioManager.StopAudio(_audioVoice);
+                playedEndGameVoice = false;
+
+
+                if (Dead && !playedDeathVoice)
+                {
+                    AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceDeath, false);
+                    playedDeathVoice = true;
+                }
+                else if (!prevUsingFlame && currUsingFlame)
+                {
+                    AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceFlameLaugh, false);
+                }
+
+                if (!AudioManager.IsSourcePlaying(_audioVoice))
+                {
+                    if (hurt)
+                    {
+                        AudioManager.PlayAudio(_audioVoice, Constants.SqVoiceHurt, false);
+                    }
+
+                }
             }
         }
 

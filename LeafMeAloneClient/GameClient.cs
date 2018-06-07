@@ -16,6 +16,7 @@ using Shared.Packet;
 using SlimDX.DirectWrite;
 using SpriteTextRenderer;
 using TextBlockRenderer = SpriteTextRenderer.SlimDX.TextBlockRenderer;
+using System.IO;
 
 namespace Client
 {
@@ -571,11 +572,55 @@ namespace Client
 
         }
 
+        /// <summary>
+        /// Change the volume, either increase or decrease.
+        /// </summary>
+        /// <param name="sign">-1 or 1, depending on volume increase / decrease. </param>
         public void ChangeVolume(int sign)
         {
 
+            // Clamp the sign to -1 or 1. Would be so much easier if Math.Clamp was a thing.
+            if (sign < 0)
+            {
+                sign = -1;
+            }
+            else if (sign > 0)
+            {
+                sign = 1;
+            }
+            
+            // Increase the volume.
             volume += (sign * Constants.VOLUME_INCREASE);
+
+            // Set the volume.
             AudioManager.SetListenerVolume(volume);
+        }
+
+
+        /// <summary>
+        /// Save player stats to file.
+        /// </summary>
+        /// <param name="st">Player stats</param>
+        public void SaveStats(PlayerStats st)
+        {
+            // Make the Stats directory if it doesn't exist.
+            if (!Directory.Exists(Constants.STATS_DIRECTORY))
+            {
+                Directory.CreateDirectory(Constants.STATS_DIRECTORY);
+            }
+
+            // The current date time, with format string.
+            string dateTime = DateTime.Now.ToString("hh-mm-ss_dd_MM_yyyy");
+
+            // String for the file to save.
+            string fileString = Constants.STATS_PREFIX + dateTime + ".txt";
+
+            // Full path to save.
+            string fullPath = Constants.STATS_DIRECTORY + fileString;
+
+            // Write all the stats to the designated file.
+            File.WriteAllText(fullPath, st.ToString());
+
         }
     }
 }

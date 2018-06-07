@@ -148,6 +148,9 @@ namespace Shared
         public const float DEFAULT_VOLUME = 8.0f;
         public const float VOLUME_INCREASE = 0.1f;
 
+        public const string STATS_DIRECTORY = "../../../Stats/";
+        public const string STATS_PREFIX = "Stats_";
+
 
     }
 }

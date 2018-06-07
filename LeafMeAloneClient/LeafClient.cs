@@ -17,21 +17,25 @@ namespace Client
     class LeafClient : NetworkedGameObjectClient
     {
         private int _audioBurning;
+        private int _audioMoving;
 
         public LeafClient(CreateObjectPacket createPacket) : base(createPacket, Constants.LeafModel)
         {
             _audioBurning = -1;
+            _audioMoving = -1;
             Burnable = true;
         }
 
         public override void UpdateFromPacket(BasePacket packet)
         {
             bool prevBurning = Burning;
+            bool prevMoving = Moving;
             base.UpdateFromPacket(packet);
             bool currBurning = Burning;
+            bool currMoving = Moving;    
 
             if (_audioBurning != -1) AudioManager.UpdateSourceLocation(_audioBurning, Transform.Position);
-            EvaluateAudio(prevBurning, currBurning);
+            EvaluateAudio(prevBurning, currBurning, prevMoving, currMoving);
             
             //If the leaf is burning then change the leaf color.
             if (Burning)
@@ -45,12 +49,12 @@ namespace Client
         /// </summary>
         /// <param name="prevBurning"> leaf previously burning? </param>
         /// <param name="currBurning"> leaf currently burning? </param>
-        public void EvaluateAudio(bool prevBurning, bool currBurning)
+        public void EvaluateAudio(bool prevBurning, bool currBurning, bool prevMoving, bool currMoving)
         {
             // start burning audio
             if (!prevBurning && currBurning)
             {
-                _audioBurning = AudioManager.UseNextPoolSource(GameClient.instance.leafAudioPoolId);
+                _audioBurning = AudioManager.UseNextPoolSource(GameClient.instance.AudioPoolLeafBurning);
                 if (_audioBurning != -1)
                 {
                     AudioManager.StopAudio(_audioBurning);
@@ -61,9 +65,26 @@ namespace Client
             // start putoff audio
             else if (prevBurning && !currBurning && _audioBurning != -1)
             {
-                AudioManager.RemoveSourceQueue(_audioBurning);
-                AudioManager.PlayPoolSourceThenFree(GameClient.instance.leafAudioPoolId, _audioBurning, Constants.LeafPutoff);
+                AudioManager.StopAudio(_audioBurning);
+                AudioManager.PlayPoolSourceThenFree(GameClient.instance.AudioPoolLeafBurning, _audioBurning, Constants.LeafPutoff);
                 _audioBurning = -1;
+            }
+
+            // play moving sounds
+            if (!prevMoving && currMoving)
+            {
+                _audioMoving = AudioManager.UseNextPoolSource(GameClient.instance.AudioPoolLeafMoving);
+                if (_audioMoving != -1)
+                {
+                    AudioManager.PlayAudio(_audioMoving, Constants.LeafMoving);
+                }
+            }
+            // stop moving sounds
+            else if (_audioMoving != -1 && !AudioManager.IsSourcePlaying(_audioMoving))
+            {
+                AudioManager.StopAudio(_audioMoving);
+                AudioManager.FreeSource(GameClient.instance.AudioPoolLeafMoving, _audioMoving);
+                _audioMoving = -1;
             }
         }
 
@@ -75,7 +96,7 @@ namespace Client
             if (_audioBurning != -1)
             {
                 AudioManager.RemoveSourceQueue(_audioBurning);
-                AudioManager.PlayPoolSourceThenFree(GameClient.instance.leafAudioPoolId, _audioBurning, Constants.LeafBurnup);
+                AudioManager.PlayPoolSourceThenFree(GameClient.instance.AudioPoolLeafBurning, _audioBurning, Constants.LeafBurnup);
                 _audioBurning = -1;
             }
         }

@@ -77,7 +77,7 @@ namespace Client
         /// <summary>
         /// The ID of the audio pool to be used by all the leaves collectively
         /// </summary>
-        public int leafAudioPoolId;
+        public int AudioPoolLeafBurning, AudioPoolLeafMoving;
         public const int LeafAudioCapacity = 50;
 
         // The active camera in the scene.
@@ -241,7 +241,8 @@ namespace Client
             NetworkedGameObjects = new Dictionary<int, NetworkedGameObjectClient>();
             NonNetworkedGameObjects = new List<NonNetworkedGameObjectClient>();
 
-            leafAudioPoolId = AudioManager.NewSourcePool(LeafAudioCapacity);
+            AudioPoolLeafBurning = AudioManager.NewSourcePool(LeafAudioCapacity, 0.6f);
+            AudioPoolLeafMoving = AudioManager.NewSourcePool(LeafAudioCapacity);
 
             _audioBGM = AudioManager.GetNewSource();
             AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);

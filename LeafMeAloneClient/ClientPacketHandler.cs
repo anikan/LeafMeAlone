@@ -77,8 +77,15 @@ namespace Client
                 {
                     GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.Lose);
                 }
+
+                // Save the player stats to file when the game ends.
+                GameClient.instance.SaveStats(GraphicsManager.ActivePlayer.stats);
+
                 client.WinningTeam = p.winningTeam;
                 client.PendingRematchState = true;
+
+
+
             }
 
             void GameStartAction(MatchStartPacket p)

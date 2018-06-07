@@ -376,6 +376,9 @@ namespace Client
 
             base.UpdateFromPacket(packet.ObjData);
 
+            //Set the player color based on health.
+            CurrentTint = new Vector3(1, 1, 1) * ((Health / Constants.PLAYER_HEALTH) * .7f + .3f);
+
             // If death state changes, reset tint.
             if (Dead != packet.Dead)
             {

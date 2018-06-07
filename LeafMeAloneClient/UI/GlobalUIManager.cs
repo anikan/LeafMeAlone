@@ -12,7 +12,6 @@ namespace Client.UI
         public static UITimer gameTimer;
         public static UITeams Teams;
         public static UIGameWLState GameWinLossState;
-        public static UICulled Culled;
         private static Client.UI.UI LeafBlowerTool, FlameThrowerTool;
         public static UIFindTeammate TeammateUI;
 
@@ -30,8 +29,6 @@ namespace Client.UI
             gameTimer = new UITimer(60);
             Teams = new UITeams();
             GameWinLossState = new UIGameWLState();
-            Culled = new UICulled();
-
             const int xSize = 300;
             const int ySize = 75;
             LeafBlowerTool = new Client.UI.UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
@@ -57,7 +54,7 @@ namespace Client.UI
                     }
                 });
 
-                UIList.AddRange(new[] { TeammateUI, fps, gameTimer, GameWinLossState, Culled, LeafBlowerTool,FlameThrowerTool });
+                UIList.AddRange(new[] { TeammateUI, fps, gameTimer, GameWinLossState, LeafBlowerTool,FlameThrowerTool });
 
         }
 

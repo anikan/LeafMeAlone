@@ -404,7 +404,7 @@ namespace Server
         {
 
             // If there is a valid player that set this on fire.
-            if (PlayerThatSetThisOnFire != null)
+            if (PlayerThatSetThisOnFire != null && LastPlayerInteracted != null)
             {
                 // If this is a leaf.
                 if (this is LeafServer)

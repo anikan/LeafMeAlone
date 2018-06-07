@@ -32,6 +32,12 @@ namespace Client
 
             if (_audioBurning != -1) AudioManager.UpdateSourceLocation(_audioBurning, Transform.Position);
             EvaluateAudio(prevBurning, currBurning);
+            
+            //If the leaf is burning then change the leaf color.
+            if (Burning)
+            {
+                CurrentTint = new Vector3(1, 1, 1) * ((Health / Constants.LEAF_HEALTH) * .7f + .3f);
+            }
         }
 
         /// <summary>

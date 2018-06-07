@@ -238,7 +238,7 @@ namespace Server
             byte[] data = PacketUtil.Serialize(createPlayPack);
             Send(clientSocket, data);
             MatchStartPacket informStart = 
-                new MatchStartPacket(MatchHandler.instance.GetMatch().GetTimeElapsed().Milliseconds);
+                new MatchStartPacket((float)(Constants.MATCH_TIME - MatchHandler.instance.GetMatch().GetTimeElapsed().TotalSeconds));
             Send(clientSocket, PacketUtil.Serialize(informStart));
         }
 

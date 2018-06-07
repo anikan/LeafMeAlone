@@ -37,7 +37,7 @@ namespace Client
         /// ActiveCamera contains the currently active camera.
         /// </summary>
         public static Camera ActiveCamera;
-
+        
         // Current player.
         public static PlayerClient ActivePlayer;
 
@@ -141,6 +141,7 @@ namespace Client
             {
                 ActiveCamera.MoveCameraAbsolute(ActivePlayer.Transform.Position + PlayerToCamOffset,
                     ActivePlayer.Transform.Position);
+
             }
 
             GraphicGameObject.Fire?.Update(delta_t);

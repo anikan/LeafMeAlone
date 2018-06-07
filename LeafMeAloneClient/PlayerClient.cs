@@ -50,6 +50,8 @@ namespace Client
 
         public PlayerStats stats;
 
+        
+
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)
         {
@@ -62,7 +64,7 @@ namespace Client
             FlameThrower.EnableGeneration(false);
             LeafBlower.EnableGeneration(false);
             Suction.EnableGeneration(false);
-
+            
             _audioFootstep = AudioManager.GetNewSource();
             _audioFlame = AudioManager.GetNewSource();
             _audioWind = AudioManager.GetNewSource();

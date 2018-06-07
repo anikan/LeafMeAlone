@@ -89,6 +89,7 @@ namespace Client
 
         private Match activeMatch = Match.DefaultMatch;
 
+        private int _audioChirping;
         private int _audioBGM;
 
         private RequestPacket lastRequest = null;
@@ -244,9 +245,19 @@ namespace Client
             AudioPoolLeafBurning = AudioManager.NewSourcePool(LeafAudioCapacity, 0.6f);
             AudioPoolLeafMoving = AudioManager.NewSourcePool(LeafAudioCapacity);
 
-            _audioBGM = AudioManager.GetNewSource();
-            AudioManager.PlayAudio(_audioBGM, Constants.Bgm, true);
-            AudioManager.SetSourceVolume(_audioBGM, 0.05f);
+            // Bird chirping ambient sound
+            _audioChirping = AudioManager.GetNewSource();
+            AudioManager.PlayAudio(_audioChirping, Constants.BirdChirping, true);
+            AudioManager.SetSourceVolume(_audioChirping, 0.05f);
+
+            // BGM
+            if (File.Exists(Constants.BackgroundMusic))
+            {
+                _audioBGM = AudioManager.GetNewSource();
+                AudioManager.PlayAudio(_audioBGM, Constants.BackgroundMusic, true);
+                AudioManager.SetSourceVolume(_audioBGM, 0.1f);
+            }
+
             HasInitted = true;
         }
 
@@ -315,7 +326,7 @@ namespace Client
             // Restart the frame ElapsedTime.
             FrameTimer.Restart();
 
-            //AudioManager.UpdateSourceLocation(_audioBGM, Camera.CameraPosition);
+            //AudioManager.UpdateSourceLocation(_audioChirping, Camera.CameraPosition);
         }
 
         /// <summary>

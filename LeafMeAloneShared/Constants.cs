@@ -63,7 +63,10 @@ namespace Shared
         /// <summary>
         /// Sounds/Audio files
         /// </summary>
-        public const string Bgm =               @"../../Sound/OptionalForestAmbient.wav";
+        public const string BirdChirping =      @"../../Sound/OptionalForestAmbient.wav";
+                
+        public const string BackgroundMusic =   @"../../Sound/BackgroundMusic.wav";
+
         public const string FlameThrowerStart = @"../../Sound/FlameThrower_Start.wav";
         public const string FlameThrowerLoop =  @"../../Sound/FlameThrower_Loop.wav";
         public const string FlameThrowerEnd =   @"../../Sound/FlameThrower_End.wav";

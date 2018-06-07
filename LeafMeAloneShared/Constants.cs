@@ -145,6 +145,9 @@ namespace Shared
         public const float PLAYER_HEALTH = 10.0f;
         public const float HEALTH_REGEN_RATE = 0.01f;
 
+        public const float DEFAULT_VOLUME = 8.0f;
+        public const float VOLUME_INCREASE = 0.1f;
+
 
     }
 }

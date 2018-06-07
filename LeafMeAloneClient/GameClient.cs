@@ -87,6 +87,8 @@ namespace Client
 
         public static GameClient instance;
 
+        private float volume = Constants.DEFAULT_VOLUME;
+
         private static void Main(String[] args)
         {
             //Process.Start("..\\..\\..\\LeafMeAloneServer\\bin\\Debug\\LeafMeAloneServer.exe");
@@ -228,7 +230,10 @@ namespace Client
             {
                 Console.WriteLine("WARNING: Attempting to double instantiate GameClient!");
             }
+
             instance = this;
+
+            AudioManager.SetListenerVolume(volume);
 
             // TEMPORARY: Add the particle system to non-networked game objects.
             //NonNetworkedGameObjects.Add(p);
@@ -564,6 +569,13 @@ namespace Client
             GameObject[] leaves = GetLeafList().ToArray();
             return leaves.ToList<GameObject>();
 
+        }
+
+        public void ChangeVolume(int sign)
+        {
+
+            volume += (sign * Constants.VOLUME_INCREASE);
+            AudioManager.SetListenerVolume(volume);
         }
     }
 }

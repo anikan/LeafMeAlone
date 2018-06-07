@@ -9,6 +9,7 @@ using System.Security.AccessControl;
 using System.Threading;
 using Shared;
 using Shared.Packet;
+using AsyncCallback = System.AsyncCallback;
 
 namespace Client
 {
@@ -46,6 +47,7 @@ namespace Client
         private static ManualResetEvent receiveDone =
             new ManualResetEvent(false);
 
+        public static bool PendingReset = false;
         // The response from the remote device.  
         public String response = String.Empty;
 
@@ -120,6 +122,8 @@ namespace Client
         /// <param name="asyncResult">Stores the receive result.</param>
         public void ReceiveCallback(IAsyncResult asyncResult)
         {
+            try
+            {
             // Retrieve the state object and the client socket   
             // from the asynchronous state object.  
             StateObject state = (StateObject)asyncResult.AsyncState;
@@ -138,6 +142,14 @@ namespace Client
             client.BeginReceive(
                 state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReceiveCallback), state);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("Unable to reach server. Returning to main menu!");
+                //Debug.Log(e.Message);
+                //Debug.Log(e.StackTrace);
+                PendingReset = true;
+            }
         }
 
         /// <summary>
@@ -185,8 +197,19 @@ namespace Client
         {
             //Console.WriteLine(BitConverter.ToString(data));
             // Begin sending the data to the remote device.  
+
+            try
+            { 
             client.BeginSend(data, 0, data.Length, 0,
                 new AsyncCallback(SendCallback), client);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("Unable to reach server. Returning to main menu!");
+                //Debug.Log(e.Message);
+                //Debug.Log(e.StackTrace);
+                PendingReset = true;
+            }
         }
 
         /// <summary>

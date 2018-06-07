@@ -121,9 +121,9 @@ namespace Client
                         IPAddress ipAddress = IPAddress.Loopback;
                             if (GraphicsRenderer.networkedCheckbox.Checked)
                             {
-                                //ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
-                                var ipHostEntry = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
-                                ipAddress = ipHostEntry.AddressList[0];
+                                ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
+                               // var ipHostEntry = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
+                               // ipAddress = ipHostEntry.AddressList[0];
                                 Console.WriteLine($" ip is {ipAddress.ToString()}");
                             }
 

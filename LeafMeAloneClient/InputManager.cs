@@ -48,7 +48,8 @@ namespace Client
                 {Keys.D1, () => { userPlayer.RequestToolEquip(ToolType.BLOWER); } },
                 {Keys.D2, () => { userPlayer.RequestToolEquip(ToolType.THROWER);  } },
                 {Keys.Space, () => { userPlayer.RequestCycleTool(); } },
-                {Keys.Q, () => { userPlayer.RequestCycleTool();  } }
+                {Keys.Q, () => { userPlayer.RequestCycleTool();  } },
+                {Keys.Tab, () => { GlobalUIManager.} }
             };
 
             // Dictionary to keep track of what functions should be called by what mouse presses

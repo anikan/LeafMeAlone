@@ -19,6 +19,8 @@ namespace Client
 
         public bool StoppedRequesting = true;
 
+        public PlayerStats playerStats;
+
         // Struct to contain all player info that will send via packets
         public struct PlayerRequestInfo
         {

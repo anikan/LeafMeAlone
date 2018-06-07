@@ -111,7 +111,7 @@ namespace Client
             {
                 Vector3 perp = Vector3.Normalize(Vector3.Cross(m_CameraLookAt - m_CameraPosition, m_CameraUp));
                 Vector3 offset = perp * _screenShakeMagnitude * (rng.NextFloat() / 2f + .5f);
-                Matrix rotation = Matrix.RotationAxis(perp, rng.NextFloat() * 2f * (float) Math.PI);
+                Matrix rotation = Matrix.RotationAxis(m_CameraLookAt-m_CameraPosition, rng.NextFloat() * 2f * (float) Math.PI);
                 offset = Vector3.TransformCoordinate(offset, rotation);
                 m_ViewMatrix = Matrix.LookAtLH(m_CameraPosition + offset, m_CameraLookAt + offset, m_CameraUp);
             }

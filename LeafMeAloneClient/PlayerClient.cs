@@ -43,7 +43,7 @@ namespace Client
 
         // For the audio control
         private int _audioFootstep, _audioFlame, _audioWind, _audioSuction;
-        private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose, _animHurt;
+        private int _animWalkThrower, _animWalkBlower, _animIdle, _animVictory, _animLose;
         private int _currAnim, _overridedAnim;
         public UIHealth healthUI;
         public UINickname nicknameUI;
@@ -78,8 +78,7 @@ namespace Client
             _animIdle = AnimationManager.AddAnimation(Constants.PlayerIdleAnim, new Vector3(scale), timeScale);
             _animVictory = AnimationManager.AddAnimation(Constants.PlayerVictoryAnim, new Vector3(scale), timeScale);
             _animLose = AnimationManager.AddAnimation(Constants.PlayerDefeatAnim, new Vector3(scale), timeScale);
-            _animHurt = AnimationManager.AddAnimation(Constants.PlayerHurtAnim, new Vector3(scale), 2f);
-
+            
             // set to idle animation by default
             SwitchAnimation(_animIdle);
 

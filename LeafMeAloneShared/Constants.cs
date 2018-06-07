@@ -143,8 +143,6 @@ namespace Shared
         public const float MAX_SECONDS_BURNING = 10.0f;
 
         public const float PLAYER_HEALTH = 10.0f;
-        public const float HEALTH_REGEN_RATE = 0.01f;
-
-
+        public const float HEALTH_REGEN_RATE = 1.0f;
     }
 }

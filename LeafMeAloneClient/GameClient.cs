@@ -50,6 +50,12 @@ namespace Client
         public bool PendingRematchState = false;
         public TeamName WinningTeam = TeamName.BLUE;
 
+        //Keeps track of when the client can send a packet.
+        private Stopwatch sendTimer = new Stopwatch();
+
+        //Amount of ms to wait before sending a new packet.
+        private float sendDelay = 16.6f;
+
 
         // All leaves in the scene. 
         public List<LeafClient> leaves;
@@ -112,7 +118,7 @@ namespace Client
 
             GameClient Client = new GameClient();
             GlobalUIManager.Init();
-
+            
             GraphicsRenderer.connectButton.Click += (sender, eventArgs) =>
                 {
                     if (!hasConnected)
@@ -171,8 +177,14 @@ namespace Client
                 // Update input events.
                 InputManager.Update();
 
-                // Send any packets to the server.
-                SendRequest();
+                //If enough time has passed since the last packet, send.
+                if (sendTimer.ElapsedMilliseconds > sendDelay)
+                {
+                    // Send any packets to the server.
+                    SendRequest();
+
+                    sendTimer.Restart();
+                }
             }
 
 
@@ -229,11 +241,7 @@ namespace Client
             }
             instance = this;
 
-            // TEMPORARY: Add the particle system to non-networked game objects.
-            //NonNetworkedGameObjects.Add(p);
-
-            // Receive the response from the remote device.  
-            //networkClient.Receive();
+            sendTimer.Start();
         }
 
         // Create a map on the client and add it to the objects.

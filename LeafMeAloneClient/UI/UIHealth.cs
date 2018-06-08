@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using Shared;
 using SlimDX;
 using SpriteTextRenderer;
@@ -29,25 +30,31 @@ namespace Client.UI
 
             UITexture.Position = GraphicsManager.WorldToScreenPoint(FollowGameObject.Transform.Position) - new Vector2(UITexture.Size.X / 2f, UITexture.Size.Y + delta) - alignHealthBar;
         }
-
     }
-    public class UINickname
-    {
-        private readonly GameObject FollowGameObject;
 
-        private readonly float delta = 100f;
-        public UINickname(GameObject followGameObject, string nickname)
+    public class UIThreeTwoOne
+    {
+        private int time = 3;
+        private Stopwatch watch;
+        public UIThreeTwoOne()
         {
-            FollowGameObject = followGameObject;
+            watch = new Stopwatch();
+        }
+
+        public void Start()
+        {
+            watch.Reset();
+            watch.Start();
         }
 
         public void Update()
         {
-            var p = GraphicsManager.WorldToScreenPoint(FollowGameObject.Transform.Position) - new Vector2(30,150);
-            UIManagerSpriteRenderer.EnsureTypeExists(UIManagerSpriteRenderer.TextType.NORMAL);
-            UIManagerSpriteRenderer.TextRenderers[UIManagerSpriteRenderer.TextType.NORMAL]
-                .DrawString(FollowGameObject.Name, p, new Color4(Color.AliceBlue));
+            if ((int)watch.Elapsed.TotalSeconds >= 3 || watch.IsRunning == false)
+            {
+                watch.Stop();
+                return;
+            }
+            UIManagerSpriteRenderer.DrawText((time - watch.Elapsed.Seconds).ToString(),UIManagerSpriteRenderer.TextType.SIZE300FONT,new RectangleF(0,0,Screen.Width,Screen.Height),TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter,Color.AliceBlue, 200 );
         }
-
     }
 }

@@ -83,9 +83,6 @@ namespace Client
 
                 client.WinningTeam = p.winningTeam;
                 client.PendingRematchState = true;
-
-
-
             }
 
             void GameStartAction(MatchStartPacket p)
@@ -94,6 +91,7 @@ namespace Client
                 GlobalUIManager.GameWinLossState.SetState(UI.UIGameWLState.WinLoseState.None);
                 GlobalUIManager.GameWinLossState.SetStats(null);
                 client.PendingRematchState = false;
+                GlobalUIManager.Countdown.Start();
             }
 
             void SpectatorAction(SpectatorPacket p)

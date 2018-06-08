@@ -60,7 +60,7 @@ namespace Shared
         /// <summary>
         /// Name can be given to gameobjects for debugging purposes.
         /// </summary>
-        public string Name;
+        public string Name = "";
 
         public Transform Transform;
         public int Id { get; set; }

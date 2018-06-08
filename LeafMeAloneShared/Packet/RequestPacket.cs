@@ -22,10 +22,12 @@ namespace Shared.Packet
         public ToolType ToolRequest;
         [ProtoMember(6)]
         public ToolMode ToolMode;
+        [ProtoMember(7)]
+        public string Name;
 
         public RequestPacket() : base(PacketType.RequestPacket) { }
         public RequestPacket(float deltaX, float deltaZ, float deltaRot, IdPacket idData, 
-            ToolType toolReq, ToolMode toolMode) : base(PacketType.RequestPacket)
+            ToolType toolReq, ToolMode toolMode, string name) : base(PacketType.RequestPacket)
         {
             DeltaX = deltaX;
             DeltaZ = deltaZ;
@@ -33,6 +35,7 @@ namespace Shared.Packet
             IdData = idData;
             ToolRequest = toolReq;
             ToolMode = toolMode;
+            Name = name;
         }
 
         public int GetId()

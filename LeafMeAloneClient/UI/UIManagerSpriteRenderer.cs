@@ -21,7 +21,8 @@ namespace Client.UI
             NORMAL,
             SMALL,
             COMIC_SANS,
-            MASSIVE
+            MASSIVE,
+            SIZE300FONT
         }
 
         public static SpriteRenderer SpriteRenderer;
@@ -36,7 +37,7 @@ namespace Client.UI
         /// </summary>
         public static void Init()
         {
-            SpriteRenderer = new SpriteRenderer(GraphicsRenderer.Device);
+            SpriteRenderer = new SpriteRenderer(GraphicsRenderer.Device) { AllowReorder = true };
         }
         #region Text
 
@@ -52,10 +53,17 @@ namespace Client.UI
         /// <summary>
         /// Draw text for 1 frame.
         /// </summary>
-        public static void DrawText(string text, TextType type, RectangleF pos, TextAlignment alignment, Color color)
+        public static void DrawText(string text, TextType type, RectangleF pos, TextAlignment alignment, Color color, int font)
         {
             EnsureTypeExists(type);
-            TextRenderers[type].DrawString(text, pos, alignment, new Color4(color));
+            if (font == 0)
+            {
+                TextRenderers[type].DrawString(text, pos, alignment, new Color4(color));
+            }
+            else
+            {
+                TextRenderers[type].DrawString(text, pos, alignment, font, new Color4(color), CoordinateType.Absolute);
+            }
         }
 
         /// <summary>
@@ -64,8 +72,8 @@ namespace Client.UI
         public static Vector2 GetTextWidth(string text, TextType type)
         {
             EnsureTypeExists(type);
-           var textWid = TextRenderers[type].MeasureString(text);
-            return new Vector2(textWid.Size.X,textWid.Size.Y);
+            var textWid = TextRenderers[type].MeasureString(text);
+            return new Vector2(textWid.Size.X, textWid.Size.Y);
         }
 
 
@@ -128,13 +136,13 @@ namespace Client.UI
         {
             foreach (DrawableString str in textPerFrame)
             {
-                DrawText(str.Text, str.Type, new RectangleF(0 + str.Offset.X, 0 + str.Offset.Y, GraphicsRenderer.Form.ClientSize.Width + str.Offset.Width, GraphicsRenderer.Form.ClientSize.Height + str.Offset.Height), str.Alignment, str.Color);
+                DrawText(str.Text, str.Type, new RectangleF(0 + str.Offset.X, 0 + str.Offset.Y, GraphicsRenderer.Form.ClientSize.Width + str.Offset.Width, GraphicsRenderer.Form.ClientSize.Height + str.Offset.Height), str.Alignment, str.Color, str.Fontsize);
             }
             foreach (DrawableTexture tex in texturesPerFrame)
             {
                 if (tex.Enabled)
                     DrawTexture(tex.View, tex.Position, tex.Size, tex.Rotation);
-                
+
             }
         }
 
@@ -159,6 +167,9 @@ namespace Client.UI
                     break;
                 case TextType.MASSIVE:
                     TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
+                    break;
+                case TextType.SIZE300FONT:
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 300);
                     break;
                 case TextType.SMALL:
                     TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 20);

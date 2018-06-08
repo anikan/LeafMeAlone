@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
@@ -304,6 +305,9 @@ namespace Client
             // 
             FormToShowOn.Controls.Add(Panel1);
             FormToShowOn.Controls.Add(pictureBox1);
+            int pnum = Process.GetProcessesByName("LeafMeAloneClient").Length;
+            var positions = new[] {new Vector2(0, 0), new Vector2(800, 0), new Vector2(0, 600), new Vector2(800, 600) };
+            FormToShowOn.SetDesktopLocation((int)positions[(pnum-1) % 4].X, (int)positions[(pnum-1) % 4].Y);
 
         }
         /// <summary>

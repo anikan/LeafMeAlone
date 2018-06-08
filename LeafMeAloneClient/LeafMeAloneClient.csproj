@@ -158,6 +158,7 @@
     <Compile Include="UI\UIGameWLState.cs" />
     <Compile Include="UI\UIHealth.cs" />
     <Compile Include="UI\UIManagerSpriteRenderer.cs" />
+    <Compile Include="UI\UINickname.cs" />
     <Compile Include="UI\UITeams.cs" />
     <Compile Include="UI\UITimer.cs" />
     <Compile Include="VertexBoneData.cs" />

@@ -314,7 +314,10 @@ namespace Client
             CountLeaves();
 
             // Update all objects within the player's range with a tint.
-            ActivePlayer.TintObjectsInRange();
+            if (ActivePlayer != null)
+            {
+                ActivePlayer.TintObjectsInRange();
+            }
 
             // Update the graphics manager.
             GraphicsManager.Update(delta);

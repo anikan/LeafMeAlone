@@ -126,6 +126,11 @@ namespace Server
             Socket listener = (Socket)ar.AsyncState;
             Socket clientSocket = listener.EndAccept(ar);
 
+            //Sending match time first so it's processed first. 
+            MatchStartPacket informStart =
+                new MatchStartPacket((float)(Constants.MATCH_TIME - MatchHandler.instance.GetMatch().GetTimeElapsed().TotalSeconds));
+            Send(clientSocket, PacketUtil.Serialize(informStart));
+
             // Create a new player and send them the world 
             SendWorldToClient(clientSocket);
             if (GameServer.instance.playerServerList.Count < Constants.NUM_PLAYERS)
@@ -237,9 +242,7 @@ namespace Server
             // Create createObjectPacket, send to client
             byte[] data = PacketUtil.Serialize(createPlayPack);
             Send(clientSocket, data);
-            MatchStartPacket informStart = 
-                new MatchStartPacket((float)(Constants.MATCH_TIME - MatchHandler.instance.GetMatch().GetTimeElapsed().TotalSeconds));
-            Send(clientSocket, PacketUtil.Serialize(informStart));
+
         }
 
         /// <summary>

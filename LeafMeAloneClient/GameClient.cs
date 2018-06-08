@@ -659,8 +659,9 @@ namespace Client
                 File.WriteAllText(fullPath, st.ToString());
             }
 
-            catch (FileLoadException e)
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 Console.WriteLine("File already in use");
             }
         }

@@ -51,7 +51,16 @@ namespace Client
 
         public PlayerStats stats;
 
-        
+        public void DeleteAllParticleSystems()
+        {
+            FlameThrower.Enabled = false;
+            LeafBlower.Enabled = false;
+            Suction.Enabled = false;
+            FlameThrower.EnableGeneration(false);
+            LeafBlower.EnableGeneration(false);
+            Suction.EnableGeneration(false);
+
+        }
 
         public PlayerClient(CreateObjectPacket createPacket) :
             base(createPacket, Constants.PlayerModel)

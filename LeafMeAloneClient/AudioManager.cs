@@ -125,6 +125,14 @@ namespace Client
             }
         }
 
+        public static void RemoveAllAudio()
+        {
+            foreach (var allQueueFile in _allQueueFiles)
+            {
+                _allQueueFiles.Remove(allQueueFile.Key);
+            }
+        }
+
         /// <summary>
         /// stop playing the audio associated to the source
         /// </summary>

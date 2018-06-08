@@ -177,6 +177,12 @@ namespace Client
                 GraphicsRenderer.panel1.Visible = true;
                 GraphicsRenderer.panel1.Show();
                 GraphicsRenderer.panel1.Focus();
+                AudioManager.RemoveAllAudio();
+                playerClients.ForEach(player =>
+                {
+                    player.DeleteAllParticleSystems();
+                });
+                playerClients.Clear();
                 return;
             }
 

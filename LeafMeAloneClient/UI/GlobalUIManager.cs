@@ -14,6 +14,7 @@ namespace Client.UI
         public static UIGameWLState GameWinLossState;
         private static Client.UI.UI LeafBlowerTool, FlameThrowerTool;
         public static UIFindTeammate TeammateUI;
+        public static UIThreeTwoOne Countdown;
 
 
         public static List<Client.UI.UI> UIList = new List<Client.UI.UI>();
@@ -31,6 +32,7 @@ namespace Client.UI
             GameWinLossState = new UIGameWLState();
             LeafBlowerTool = new UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(0,0), 0);
             FlameThrowerTool = new UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(0,0), 0);
+            Countdown = new UIThreeTwoOne();
 
             const float takeUp = 1f / 8f;
             const float sizeportion = 1649f / 375f;
@@ -70,6 +72,7 @@ namespace Client.UI
             {
                 ui.Update();
             }
+            Countdown.Update();
         }
     }
 }

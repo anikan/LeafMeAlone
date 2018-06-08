@@ -1,4 +1,6 @@
-﻿using Shared;
+﻿using System.Diagnostics;
+using System.Drawing;
+using Shared;
 using SlimDX;
 using SpriteTextRenderer;
 
@@ -28,6 +30,31 @@ namespace Client.UI
 
             UITexture.Position = GraphicsManager.WorldToScreenPoint(FollowGameObject.Transform.Position) - new Vector2(UITexture.Size.X / 2f, UITexture.Size.Y + delta) - alignHealthBar;
         }
+    }
 
+    public class UIThreeTwoOne
+    {
+        private int time = 3;
+        private Stopwatch watch;
+        public UIThreeTwoOne()
+        {
+            watch = new Stopwatch();
+        }
+
+        public void Start()
+        {
+            watch.Reset();
+            watch.Start();
+        }
+
+        public void Update()
+        {
+            if ((int)watch.Elapsed.TotalSeconds >= 3 || watch.IsRunning == false)
+            {
+                watch.Stop();
+                return;
+            }
+            UIManagerSpriteRenderer.DrawText((time - watch.Elapsed.Seconds).ToString(),UIManagerSpriteRenderer.TextType.SIZE300FONT,new RectangleF(0,0,Screen.Width,Screen.Height),TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter,Color.AliceBlue, 200 );
+        }
     }
 }

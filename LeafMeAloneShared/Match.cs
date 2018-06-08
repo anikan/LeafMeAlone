@@ -224,7 +224,8 @@ namespace Shared
                 }
             }
 
-            if (matchTimer.Elapsed.Seconds > matchTime || maxLeaves > Constants.WIN_LEAF_NUM)
+            //Console.WriteLine($"Matchtime :{matchTimer.Elapsed.TotalSeconds} , maxTime: {matchTime}");
+            if (matchTimer.Elapsed.TotalSeconds > matchTime || maxLeaves > Constants.WIN_LEAF_NUM)
             {
                 return winningTeam;
             }

@@ -389,8 +389,6 @@ namespace Client
 
             int objId = createPacket.ObjData.IdData.ObjectId;
             
-
-            
             // Create a new packet depending on it's type.
             switch (createPacket.ObjectType)
             {
@@ -476,7 +474,6 @@ namespace Client
             // Note: This should be last!
             ActivePlayer.ResetRequests();
         }
-
 
         /// <summary>
         /// Sets up the input manager and relevant input events.
@@ -655,9 +652,17 @@ namespace Client
             // Full path to save.
             string fullPath = Constants.STATS_DIRECTORY + fileString;
 
-            // Write all the stats to the designated file.
-            File.WriteAllText(fullPath, st.ToString());
+            try
+            {
+                // Write all the stats to the designated file.
+                File.WriteAllText(fullPath, st.ToString());
+            }
 
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("File already in use");
+            }
         }
     }
 }

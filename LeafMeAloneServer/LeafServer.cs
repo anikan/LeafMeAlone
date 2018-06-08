@@ -16,7 +16,7 @@ namespace Server
         /// <summary>
         /// Create a new leaf on the server.
         /// </summary>
-        public LeafServer() : base(ObjectType.LEAF, Constants.LEAF_HEALTH, Constants.LEAF_MASS, Constants.LEAF_BOUNCIENESS)
+        public LeafServer() : base(ObjectType.LEAF, Constants.LEAF_HEALTH, Constants.LEAF_MASS, Constants.LEAF_BOUNCINESS)
         {
             Burnable = true;
             Radius = Constants.LEAF_RADIUS;

@@ -83,9 +83,6 @@ namespace Client
 
                 client.WinningTeam = p.winningTeam;
                 client.PendingRematchState = true;
-
-
-
             }
 
             void GameStartAction(MatchStartPacket p)

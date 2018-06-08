@@ -93,11 +93,17 @@ namespace Shared
         public const string SqVoiceVictory =    @"../../Sound/Squirrel/Victory.wav";
 
         public const string PlayerFootstep =    @"../../Sound/Footsteps.wav";
+        public const string CountdownAll = @"../../Sound/Countdown.wav";
+        public const string CountdownThree = @"../../Sound/Countdown_Three";
+        public const string CountdownTwo = @"../../Sound/Countdown_Two";
+        public const string CountdownOne = @"../../Sound/Countdown_One";
+        public const string CountdownGo = @"../../Sound/Countdown_Go";
+
 
         /// <summary>
         /// Map Constants
         /// </summary>
-        
+
         // Height of the world floor.
         public const float FLOOR_HEIGHT = -10.0f;
 

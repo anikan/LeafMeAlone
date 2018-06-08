@@ -45,11 +45,15 @@ namespace Client.UI
         {
             watch.Reset();
             watch.Start();
+
+            int src = AudioManager.GetNewSource();
+            AudioManager.SetSourceVolume(src, 0.2f);
+            AudioManager.PlayAudio(src, Constants.CountdownAll, false);
         }
 
         public void Update()
         {
-            if ((int)watch.Elapsed.TotalSeconds >= 3 || watch.IsRunning == false)
+            if ((int)watch.Elapsed.TotalSeconds >= time || watch.IsRunning == false)
             {
                 watch.Stop();
                 return;

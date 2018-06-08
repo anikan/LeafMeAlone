@@ -152,7 +152,7 @@ namespace Client
                 // burning shake a bit while hurt voice is played
                 if (ActivePlayer.PlayingHurtVoice)
                 {
-                    ActiveCamera.StartScreenShake(0.5f);
+                    ActiveCamera.StartScreenShake(0.25f);
                 }
                 // do deathshake for 1 second
                 else if (ActivePlayer.Dead && _deathShakeCounter < .5f)

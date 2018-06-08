@@ -36,6 +36,9 @@ namespace Client.UI
     {
         private int time = 3;
         private Stopwatch watch;
+        private int audioSrc;
+        private int playedSound = 0;
+
         public UIThreeTwoOne()
         {
             watch = new Stopwatch();
@@ -46,9 +49,8 @@ namespace Client.UI
             watch.Reset();
             watch.Start();
 
-            int src = AudioManager.GetNewSource();
-            AudioManager.SetSourceVolume(src, 0.2f);
-            AudioManager.PlayAudio(src, Constants.CountdownAll, false);
+            audioSrc = AudioManager.GetNewSource();
+            AudioManager.SetSourceVolume(audioSrc, 0.2f);
         }
 
         public void Update()
@@ -56,9 +58,38 @@ namespace Client.UI
             if ((int)watch.Elapsed.TotalSeconds >= time || watch.IsRunning == false)
             {
                 watch.Stop();
+                if (playedSound != 0)
+                {
+                    AudioManager.PlayAudio(audioSrc, Constants.CountdownGo);
+                    playedSound = 0;
+                }
                 return;
             }
             UIManagerSpriteRenderer.DrawText((time - watch.Elapsed.Seconds).ToString(),UIManagerSpriteRenderer.TextType.SIZE300FONT,new RectangleF(0,0,Screen.Width,Screen.Height),TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter,Color.AliceBlue, 200 );
+
+            // simple countdown sequence
+            for (int i = time; i >= 0; i--)
+            {
+                if (time - watch.Elapsed.Seconds == i && playedSound != i)
+                {
+                    switch (i)
+                    {
+                        case 3:
+                            AudioManager.PlayAudio(audioSrc, Constants.CountdownThree);
+                            break;
+                        case 2:
+                            AudioManager.PlayAudio(audioSrc, Constants.CountdownTwo);
+                            break;
+                        case 1:
+                            AudioManager.PlayAudio(audioSrc, Constants.CountdownOne);
+                            break;
+                        default:
+                            break;
+                    }
+                    playedSound = i;
+                    break;
+                }
+            }
         }
     }
 }

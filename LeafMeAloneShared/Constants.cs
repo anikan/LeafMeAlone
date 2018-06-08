@@ -94,10 +94,10 @@ namespace Shared
 
         public const string PlayerFootstep =    @"../../Sound/Footsteps.wav";
         public const string CountdownAll = @"../../Sound/Countdown.wav";
-        public const string CountdownThree = @"../../Sound/Countdown_Three";
-        public const string CountdownTwo = @"../../Sound/Countdown_Two";
-        public const string CountdownOne = @"../../Sound/Countdown_One";
-        public const string CountdownGo = @"../../Sound/Countdown_Go";
+        public const string CountdownThree = @"../../Sound/Countdown_Three.wav";
+        public const string CountdownTwo = @"../../Sound/Countdown_Two.wav";
+        public const string CountdownOne = @"../../Sound/Countdown_One.wav";
+        public const string CountdownGo = @"../../Sound/Countdown_Go.wav";
 
 
         /// <summary>

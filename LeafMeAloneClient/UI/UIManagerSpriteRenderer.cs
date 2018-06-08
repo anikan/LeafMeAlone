@@ -21,7 +21,8 @@ namespace Client.UI
             NORMAL,
             SMALL,
             COMIC_SANS,
-            MASSIVE
+            MASSIVE,
+            SIZE300FONT
         }
 
         public static SpriteRenderer SpriteRenderer;
@@ -166,6 +167,9 @@ namespace Client.UI
                     break;
                 case TextType.MASSIVE:
                     TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 50);
+                    break;
+                case TextType.SIZE300FONT:
+                    TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 300);
                     break;
                 case TextType.SMALL:
                     TextRenderers[t] = new TextBlockRenderer(SpriteRenderer, Constants.GlobalFont, FontWeight.Normal, SlimDX.DirectWrite.FontStyle.Normal, FontStretch.Normal, 20);

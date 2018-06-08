@@ -28,6 +28,7 @@ namespace Client
 
         private float minCap = .3f;
 
+        public bool modifiedHue = false;
 
         public Vector3 CurrentTint
         {

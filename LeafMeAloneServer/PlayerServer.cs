@@ -130,8 +130,8 @@ namespace Server
                 if (ActiveToolMode == ToolMode.PRIMARY || ActiveToolMode == ToolMode.SECONDARY)
                 {
                     // Check if it's within tool range, and that it's not the current player.
-                    if (gameObject != this && gameObject.IsInPlayerToolRange(this))
-                    {
+                    if (gameObject != this && gameObject.IsWithinToolRange(GetToolTransform(), ToolEquipped, ActiveToolMode))
+                    { 
                         // Hit the object.
                         gameObject.HitByTool(this, GetToolTransform(), ToolEquipped, ActiveToolMode);
 
@@ -236,8 +236,5 @@ namespace Server
             Collidable = true;
             ActiveToolMode = ToolMode.NONE;
         }
-
-
-
     }
 }

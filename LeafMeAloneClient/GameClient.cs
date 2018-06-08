@@ -38,7 +38,7 @@ namespace Client
         private InputManager InputManager;
 
         // Dictionary of all game objects in the game.
-        private Dictionary<int, NetworkedGameObjectClient> NetworkedGameObjects;
+        public Dictionary<int, NetworkedGameObjectClient> NetworkedGameObjects;
 
         private List<NonNetworkedGameObjectClient> NonNetworkedGameObjects;
 
@@ -317,6 +317,9 @@ namespace Client
             TintLeaves();
             CountLeaves();
 
+            // Update all objects within the player's range with a tint.
+            ActivePlayer.TintObjectsInRange();
+
             // Update the graphics manager.
             GraphicsManager.Update(delta);
             AudioManager.Update();
@@ -566,8 +569,6 @@ namespace Client
                     GlobalUIManager.Teams.Team2_Leaves.UIText.Text = leafCount.ToString();
                 }
             }
-
-
         }
 
         /// <summary>
@@ -597,6 +598,7 @@ namespace Client
             // Return all the leaves.
             return allLeaves;
         }
+
 
         public List<GameObject> GetLeafListAsGameObjects()
         {

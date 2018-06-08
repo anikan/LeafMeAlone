@@ -49,7 +49,6 @@ namespace Client
         public static Matrix ProjectionMatrix;
         
         #region FormConnections
-        public static Panel Panel1;
         public static SplitContainer splitContainer1;
         public static Label nicknameLabel;
         public static CheckBox networkedCheckbox;
@@ -57,7 +56,7 @@ namespace Client
         public static TextBox ipTextbox;
         public static Label ipLabel;
         public static Button connectButton;
-        public static PictureBox pictureBox1;
+        public static Panel panel1;
         #endregion
 
         
@@ -158,109 +157,99 @@ namespace Client
 
         private static void InitializeComponent(Form FormToShowOn)
         {
-            Panel1 = new Panel();
-            splitContainer1 = new SplitContainer();
-            networkedCheckbox = new CheckBox();
-            nicknameLabel = new Label();
-            nicknameTextbox = new TextBox();
-            ipTextbox = new TextBox();
-            ipLabel = new Label();
-            connectButton = new Button();
-            pictureBox1 = new PictureBox();
+           
+            panel1 = new System.Windows.Forms.Panel();
+            connectButton = new System.Windows.Forms.Button();
+            networkedCheckbox = new System.Windows.Forms.CheckBox();
+            ipTextbox = new System.Windows.Forms.TextBox();
+            ipLabel = new System.Windows.Forms.Label();
+            nicknameTextbox = new System.Windows.Forms.TextBox();
+            nicknameLabel = new System.Windows.Forms.Label();
+
+            // panel1
             // 
-            // Panel1
-            // 
-            Panel1.Controls.Add(splitContainer1);
-            Panel1.Dock = DockStyle.Top;
-            Panel1.Location = new Point(0, 0);
-            Panel1.Name = "Panel1";
-            Panel1.Size = new Size(784, 45);
-            Panel1.TabIndex = 0;
-            // 
-            // splitContainer1
-            // 
-            splitContainer1.Dock = DockStyle.Fill;
-            splitContainer1.Location = new Point(0, 0);
-            splitContainer1.Name = "splitContainer1";
-            // 
-            // splitContainer1.Panel1
-            // 
-            splitContainer1.Panel1.Controls.Add(nicknameTextbox);
-            splitContainer1.Panel1.Controls.Add(nicknameLabel);
-            // 
-            // splitContainer1.Panel2
-            // 
-            splitContainer1.Panel2.Controls.Add(connectButton);
-            splitContainer1.Panel2.Controls.Add(networkedCheckbox);
-            splitContainer1.Panel2.Controls.Add(ipTextbox);
-            splitContainer1.Panel2.Controls.Add(ipLabel);
-            splitContainer1.Size = new Size(784, 45);
-            splitContainer1.SplitterDistance = 224;
-            splitContainer1.TabIndex = 0;
-            // 
-            // networkedCheckbox
-            // 
-            networkedCheckbox.AutoSize = true;
-            networkedCheckbox.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-            networkedCheckbox.Location = new Point(240, 9);
-            networkedCheckbox.Name = "networkedCheckbox";
-            networkedCheckbox.Size = new Size(109, 29);
-            networkedCheckbox.TabIndex = 0;
-            networkedCheckbox.Text = "Networked";
-            networkedCheckbox.UseVisualStyleBackColor = true;
-            // 
-            // nicknameLabel
-            // 
-            nicknameLabel.AutoSize = true;
-            nicknameLabel.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-            nicknameLabel.Location = new Point(3, 9);
-            nicknameLabel.Name = "nicknameLabel";
-            nicknameLabel.Size = new Size(76, 25);
-            nicknameLabel.TabIndex = 0;
-            nicknameLabel.Text = "Nickname";
-            // 
-            // nicknameTextbox
-            // 
-            nicknameTextbox.Location = new Point(77, 13);
-            nicknameTextbox.Name = "nicknameTextbox";
-            nicknameTextbox.Size = new Size(142, 20);
-            nicknameTextbox.TabIndex = 1;
-            // 
-            // ipTextbox
-            // 
-            ipTextbox.Location = new Point(89, 13);
-            ipTextbox.Name = "ipTextbox";
-            ipTextbox.Size = new Size(142, 20);
-            ipTextbox.TabIndex = 3;
-            // 
-            // ipLabel
-            // 
-            ipLabel.AutoSize = true;
-            ipLabel.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-            ipLabel.Location = new Point(3, 9);
-            ipLabel.Name = "ipLabel";
-            ipLabel.Size = new Size(87, 25);
-            ipLabel.TabIndex = 2;
-            ipLabel.Text = "IP Address";
+            panel1.BackgroundImage = new Bitmap(Constants.Logo);
+            panel1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            panel1.Controls.Add(connectButton);
+            panel1.Controls.Add(networkedCheckbox);
+            panel1.Controls.Add(ipTextbox);
+            panel1.Controls.Add(ipLabel);
+            panel1.Controls.Add(nicknameTextbox);
+            panel1.Controls.Add(nicknameLabel);
+            panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            panel1.Location = new System.Drawing.Point(0, 0);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(784, 561);
+            panel1.TabIndex = 9;
             // 
             // connectButton
             // 
-            connectButton.Font = new Font("Dimbo", 15.75F, FontStyle.Regular, GraphicsUnit.Point, ((byte)(0)));
-            connectButton.Location = new Point(352, 3);
+            connectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            connectButton.BackColor = System.Drawing.Color.LightGray;
+            connectButton.Font = new System.Drawing.Font("Dimbo", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            connectButton.Location = new System.Drawing.Point(585, 4);
             connectButton.Name = "connectButton";
-            connectButton.Size = new Size(199, 39);
-            connectButton.TabIndex = 4;
+            connectButton.Size = new System.Drawing.Size(196, 39);
+            connectButton.TabIndex = 14;
             connectButton.Text = "Connect";
-            connectButton.UseVisualStyleBackColor = true;
+            connectButton.UseVisualStyleBackColor = false;
+            // 
+            // networkedCheckbox
+            // 
+            networkedCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            networkedCheckbox.AutoSize = true;
+            networkedCheckbox.BackColor = System.Drawing.Color.Transparent;
+            networkedCheckbox.Font = new System.Drawing.Font("Dimbo", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            networkedCheckbox.ForeColor = System.Drawing.Color.White;
+            networkedCheckbox.Location = new System.Drawing.Point(480, 9);
+            networkedCheckbox.Name = "networkedCheckbox";
+            networkedCheckbox.Size = new System.Drawing.Size(109, 29);
+            networkedCheckbox.TabIndex = 11;
+            networkedCheckbox.Text = "Networked";
+            networkedCheckbox.UseVisualStyleBackColor = false;
+            // 
+            // ipTextbox
+            // 
+            ipTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            ipTextbox.Location = new System.Drawing.Point(332, 13);
+            ipTextbox.Name = "ipTextbox";
+            ipTextbox.Size = new System.Drawing.Size(142, 20);
+            ipTextbox.TabIndex = 13;
+            // 
+            // ipLabel
+            // 
+            ipLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            ipLabel.AutoSize = true;
+            ipLabel.BackColor = System.Drawing.Color.Transparent;
+            ipLabel.Font = new System.Drawing.Font("Dimbo", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            ipLabel.ForeColor = System.Drawing.Color.White;
+            ipLabel.Location = new System.Drawing.Point(239, 11);
+            ipLabel.Name = "ipLabel";
+            ipLabel.Size = new System.Drawing.Size(87, 25);
+            ipLabel.TabIndex = 12;
+            ipLabel.Text = "IP Address";
+            // 
+            // nicknameTextbox
+            // 
+            nicknameTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            nicknameTextbox.Location = new System.Drawing.Point(91, 13);
+            nicknameTextbox.Name = "nicknameTextbox";
+            nicknameTextbox.Size = new System.Drawing.Size(142, 20);
+            nicknameTextbox.TabIndex = 10;
+            // 
+            // nicknameLabel
+            // 
+            nicknameLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            nicknameLabel.AutoSize = true;
+            nicknameLabel.BackColor = System.Drawing.Color.Transparent;
+            nicknameLabel.Font = new System.Drawing.Font("Dimbo", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            nicknameLabel.ForeColor = System.Drawing.Color.White;
+            nicknameLabel.Location = new System.Drawing.Point(9, 11);
+            nicknameLabel.Name = "nicknameLabel";
+            nicknameLabel.Size = new System.Drawing.Size(76, 25);
+            nicknameLabel.TabIndex = 9;
+            nicknameLabel.Text = "Nickname";
 
-            pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            pictureBox1.Image = new Bitmap(Constants.Logo);
-            pictureBox1.Location = new System.Drawing.Point(0, 45);
-            pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new System.Drawing.Size(784, 516);
-            pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            pictureBox1.TabIndex = 1;
-            pictureBox1.TabStop = false;
 
 
             nicknameTextbox.AcceptsReturn = true;
@@ -303,8 +292,7 @@ namespace Client
             // 
             // Form1
             // 
-            FormToShowOn.Controls.Add(Panel1);
-            FormToShowOn.Controls.Add(pictureBox1);
+            FormToShowOn.Controls.Add(panel1);
             int pnum = Process.GetProcessesByName("LeafMeAloneClient").Length;
             var positions = new[] {new Vector2(0, 0), new Vector2(800, 0), new Vector2(0, 600), new Vector2(800, 600) };
             FormToShowOn.SetDesktopLocation((int)positions[(pnum-1) % 4].X, (int)positions[(pnum-1) % 4].Y);

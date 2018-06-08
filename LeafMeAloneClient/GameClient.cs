@@ -136,10 +136,8 @@ namespace Client
 
                         Client.Init(new NetworkClient(ipAddress));
 
-                        GraphicsRenderer.Panel1.Visible = false;
-                        GraphicsRenderer.Panel1.Hide();
-                        GraphicsRenderer.pictureBox1.Visible = false;
-                        GraphicsRenderer.pictureBox1.Hide();
+                        GraphicsRenderer.panel1.Visible = false;
+                        GraphicsRenderer.panel1.Hide();
                         GraphicsRenderer.Form.Focus();
                     }
                 };
@@ -176,11 +174,9 @@ namespace Client
                 HasInitted = false;
                 hasConnected = false;
                 NetworkClient.PendingReset = false;
-                GraphicsRenderer.Panel1.Visible = true;
-                GraphicsRenderer.Panel1.Show();
-                GraphicsRenderer.pictureBox1.Visible = true;
-                GraphicsRenderer.pictureBox1.Show();
-                GraphicsRenderer.Panel1.Focus();
+                GraphicsRenderer.panel1.Visible = true;
+                GraphicsRenderer.panel1.Show();
+                GraphicsRenderer.panel1.Focus();
                 return;
             }
 

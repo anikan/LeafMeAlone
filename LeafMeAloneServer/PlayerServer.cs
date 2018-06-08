@@ -108,7 +108,7 @@ namespace Server
         /// </summary>
         private void TryRespawn()
         {
-            if (Dead && deathClock.Elapsed.Seconds > Constants.DEATH_TIME)
+            if (Dead && deathClock.Elapsed.TotalSeconds > Constants.DEATH_TIME)
             {
                 deathClock.Reset();
                 Reset();

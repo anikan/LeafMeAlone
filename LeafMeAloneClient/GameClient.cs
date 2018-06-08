@@ -224,10 +224,10 @@ namespace Client
 
         public void Init(NetworkClient client)
         {
-            this.networkClient = client;
+            networkClient = client;
             networkClient.StartClient();
 
-            this.clientPacketHandler = new ClientPacketHandler(this);
+            clientPacketHandler = new ClientPacketHandler(this);
 
             // Initialize frame ElapsedTime
             FrameTimer = new Stopwatch();

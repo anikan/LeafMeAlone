@@ -60,5 +60,6 @@ namespace Shared.Packet
                    (thisPacket.DeltaRot == otherPacket.DeltaRot) && (IdPacket.equals(thisPacket.IdData, otherPacket.IdData)) &&
                    (thisPacket.ToolRequest == otherPacket.ToolRequest) && (thisPacket.ToolMode == otherPacket.ToolMode);
         }
+
     }
 }

@@ -200,7 +200,7 @@ namespace Client
 
             try
             {
-                client.Send(data, 0, data.Length, 0,
+                client.BeginSend(data, 0, data.Length, 0,
                     new AsyncCallback(SendCallback), client);
             }
             catch (SocketException e)

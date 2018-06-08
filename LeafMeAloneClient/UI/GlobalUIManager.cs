@@ -14,6 +14,7 @@ namespace Client.UI
         public static UIGameWLState GameWinLossState;
         private static Client.UI.UI LeafBlowerTool, FlameThrowerTool;
         public static UIFindTeammate TeammateUI;
+        public static UIThreeTwoOne Countdown;
 
 
         public static List<Client.UI.UI> UIList = new List<Client.UI.UI>();
@@ -29,32 +30,36 @@ namespace Client.UI
             gameTimer = new UITimer(60);
             Teams = new UITeams();
             GameWinLossState = new UIGameWLState();
-            const int xSize = 300;
-            const int ySize = 75;
-            LeafBlowerTool = new Client.UI.UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
-            FlameThrowerTool = new Client.UI.UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(xSize,ySize), 0);
+            LeafBlowerTool = new UI(Constants.LeafToolTip, Vector2.Zero, new Vector2(0,0), 0);
+            FlameThrowerTool = new UI(Constants.FlameToolTip, Vector2.Zero, new Vector2(0,0), 0);
+            Countdown = new UIThreeTwoOne();
 
-            
-                LeafBlowerTool.SetUpdateAction(() =>
+            const float takeUp = 1f / 8f;
+            const float sizeportion = 1649f / 375f;
+            LeafBlowerTool.SetUpdateAction(() =>
                 {
+                    float xSize = Screen.Height * takeUp * sizeportion;
+                    float ySize = Screen.Height * takeUp;
                     if (GraphicsManager.ActivePlayer != null)
                     {
                         LeafBlowerTool.UITexture.Enabled = GraphicsManager.ActivePlayer.ToolEquipped == ToolType.BLOWER;
                         LeafBlowerTool.UITexture.Position = new Vector2(0,Screen.Height - ySize);
+                        LeafBlowerTool.UITexture.Size = new Vector2(xSize, ySize);
                     }
                 });
-
-                FlameThrowerTool.SetUpdateAction(() =>
+            FlameThrowerTool.SetUpdateAction(() =>
                 {
+                    float xSize = Screen.Height * takeUp * sizeportion;
+                    float ySize = Screen.Height * takeUp;
                     if (GraphicsManager.ActivePlayer != null)
                     {
-                        FlameThrowerTool.UITexture.Enabled =
-                            GraphicsManager.ActivePlayer.ToolEquipped == ToolType.THROWER;
+                        FlameThrowerTool.UITexture.Enabled = GraphicsManager.ActivePlayer.ToolEquipped == ToolType.THROWER;
                         FlameThrowerTool.UITexture.Position = new Vector2(0, Screen.Height - ySize);
+                        FlameThrowerTool.UITexture.Size = new Vector2(xSize,ySize);
                     }
                 });
 
-                UIList.AddRange(new[] { TeammateUI, fps, gameTimer, GameWinLossState, LeafBlowerTool,FlameThrowerTool });
+                UIList.AddRange(new[] { GameWinLossState,TeammateUI, fps, gameTimer, LeafBlowerTool,FlameThrowerTool });
 
         }
 
@@ -67,6 +72,7 @@ namespace Client.UI
             {
                 ui.Update();
             }
+            Countdown.Update();
         }
     }
 }

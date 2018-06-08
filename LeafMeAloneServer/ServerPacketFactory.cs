@@ -37,7 +37,7 @@ namespace Server
         internal static PlayerPacket CreatePlayerPacket(PlayerServer player)
         {
             return new PlayerPacket(NewObjectPacket(player), player.ActiveToolMode, player.ToolEquipped,
-                player.Dead);
+                player.Dead, player.Name);
         }
     }
 }

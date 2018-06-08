@@ -94,11 +94,11 @@ namespace Server
                     FlamethrowerActivelyBurning = false;
                 }
 
-                // If not actively being burned this frame, set burn frames to just 1.
+                // If not actively being burned this frame, drop burn frames by 1, capping at one.
                 else
                 {
-                    // Set to 1.
-                    burnFrames = 1;
+                    // Subtract by 1 or set to 1 if at 1 already.
+                    burnFrames = Math.Max(1, burnFrames-1);
                 }
 
                 // If we've been blowing on the object for the desired period of time, extinguish it.
@@ -320,71 +320,6 @@ namespace Server
             {
                 blowFrames = 0;
             }
-        }
-
-        /// <summary>
-        /// Gets the distance of this object to the player.
-        /// </summary>
-        /// <param name="player">The player to check</param>
-        /// <returns>The distance from the object to the player</returns>
-        public float GetDistanceToTool(Transform toolTransform)
-        {
-
-            // Get the vector between the two.
-            Vector3 VectorBetween = Transform.Position - toolTransform.Position;
-            VectorBetween.Y = 0.0f;
-
-            // Calculate the length.
-            return VectorBetween.Length();
-
-        }
-
-        /// <summary>
-        /// Checks if this object is is within range of the player's tool, and should be affected.
-        /// </summary>
-        /// <param name="player">The player to check</param>
-        /// <returns>True if within range, false if not.</returns>
-        public bool IsInPlayerToolRange(PlayerServer player)
-        {
-            //  Console.WriteLine("Checking object with ID " + Id  + " and type " + this.GetType().ToString());
-            // Get the player's equipped tool.
-            ToolInfo equippedToolInfo = Tool.GetToolInfo(player.ToolEquipped);
-            Transform toolTransform = player.GetToolTransform();
-
-            float toolRange = equippedToolInfo.Range;
-
-            if (player.ToolEquipped == ToolType.BLOWER && player.ActiveToolMode == ToolMode.SECONDARY)
-            {
-                toolRange *= 0.5f;
-            }
-
-            // Check if the leaf is within range of the player.
-            if (GetDistanceToTool(toolTransform) <= toolRange)
-            {
-                // Get the forward vector of the player.
-                Vector3 ToolForward = toolTransform.Forward;
-                ToolForward.Y = 0.0f;
-
-                // Get the vector from the tool to the leaf.
-                Vector3 ToolToObject = Transform.Position - toolTransform.Position;
-                ToolToObject.Y = 0.0f;
-
-                // Get dot product of the two vectors and the product of their magnitudes.
-                float dot = Vector3.Dot(ToolForward, ToolToObject);
-                float mag = ToolForward.Length() * ToolToObject.Length();
-
-                // Calculate the angle between the two vectors.
-                float angleBetween = (float)Math.Acos(dot / mag);
-                angleBetween *= (180.0f / (float)Math.PI);
-
-                //  Console.WriteLine(string.Format("{0} {1}: Angle between is {2}, must be {3} before hit", this.GetType().ToString(), Id, angleBetween, equippedToolInfo.ConeAngle / 2.0f));
-
-                // Return true if the leaf is within the cone angle, false otherwise. 
-                return (angleBetween <= (equippedToolInfo.ConeAngle / 2.0f));
-
-            }
-
-            return false;
         }
 
         /// <summary>

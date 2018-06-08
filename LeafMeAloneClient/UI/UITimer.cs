@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Timers;
+using Shared;
 using SpriteTextRenderer;
 
 namespace Client.UI
@@ -19,11 +21,15 @@ namespace Client.UI
         public float TimeRemaining { get; private set; }
 
         private readonly Timer t;
+        private Stopwatch actualTime = new Stopwatch();
+
+        private float startingTime;
 
         public UITimer(float timeToCountInSeconds) : base(TimeSpan.FromSeconds(timeToCountInSeconds).ToString(TimeFormatting), UIManagerSpriteRenderer.TextType.BOLD,
             new RectangleF(0, 0, 0, 0), TextAlignment.Top | TextAlignment.HorizontalCenter, Color.White)
         {
             t = new Timer(tickDelta * 1000f);
+         
             t.Elapsed += Timer_Tick;
             TimeRemaining = timeToCountInSeconds;
         }
@@ -31,7 +37,7 @@ namespace Client.UI
         //Tick every 100 milliseconds.
         public void Timer_Tick(object o, ElapsedEventArgs elapsedEvent)
         {
-            TimeRemaining -= tickDelta;
+            TimeRemaining = (float)(startingTime - actualTime.Elapsed.TotalSeconds);
             var time = TimeSpan.FromSeconds(TimeRemaining);
             UIText.Text = time.ToString(TimeFormatting);
 
@@ -42,9 +48,12 @@ namespace Client.UI
             }
         }
         //Restart ElapsedTime.
-        public void Restart(float timetoCountInSeconds)
+        public void Restart(float timeToCountInSeconds)
         {
-            TimeRemaining = timetoCountInSeconds;
+            actualTime.Restart();
+
+            TimeRemaining = timeToCountInSeconds;
+            startingTime = timeToCountInSeconds;
             t.Start();
         }
 
@@ -66,7 +75,12 @@ namespace Client.UI
         {
             t.AutoReset = true;
             t.Enabled = true;
-            TimeRemaining = timeToCountInSeconds;
+
+            actualTime.Restart();
+
+            startingTime = timeToCountInSeconds;
+
+            TimeRemaining = (float)(startingTime - actualTime.Elapsed.TotalSeconds);
             var time = TimeSpan.FromSeconds(TimeRemaining);
             UIText.Text = time.ToString(TimeFormatting);
             t.Start();

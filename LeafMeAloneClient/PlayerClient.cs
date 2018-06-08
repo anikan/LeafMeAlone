@@ -83,8 +83,7 @@ namespace Client
             
             // set to idle animation by default
             SwitchAnimation(_animIdle);
-
-            nicknameUI = new UINickname(this,this.Name);
+            nicknameUI = new UINickname(this,Name);
 
             Burnable = true;
         }
@@ -288,6 +287,45 @@ namespace Client
         }
 
         /// <summary>
+        /// Tints all object sin the player's range.
+        /// </summary>
+        public void TintObjectsInRange()
+        {
+
+            // Get the networked objects.
+            foreach (NetworkedGameObjectClient obj in GameClient.instance.NetworkedGameObjects.Values)
+            {
+
+                // If leaf or player.
+                if (obj is LeafClient)
+                {
+
+                    // If it's within the tool range.
+                    if (obj.IsWithinToolRange(GetToolTransform(), ToolEquipped, ActiveToolMode))
+                    {
+
+                        // If we haven't already modified this object.
+                        if (!modifiedHue)
+                        {
+                            // Increase the hue.
+                            obj.CurrentHue += Constants.SELECTION_HUE;
+
+                            // Now modified.
+                            obj.modifiedHue = true;
+                        }
+                    }
+
+                    // If it's not within range and it's hue has been modified, reset it.
+                    else if (modifiedHue)
+                    {
+                        obj.CurrentHue -= Constants.SELECTION_HUE;
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Requests the player to look at a specified position, using mouse on screen space calculations.
         /// </summary>
         /// <param name="position">Screenspace position to look at.</param>
@@ -378,6 +416,9 @@ namespace Client
 
             base.UpdateFromPacket(packet.ObjData);
 
+            if(GraphicsManager.ActivePlayer != this)
+                Name = packet.Name ?? "";
+
             //Set the player color based on health.
             CurrentTint = new Vector3(1, 1, 1) * ((Health / Constants.PLAYER_HEALTH) * .7f + .3f);
 
@@ -412,12 +453,14 @@ namespace Client
                 model.Enabled = false;
                 if (healthUI != null)
                     healthUI.UITexture.Enabled = false;
+                nicknameUI.enabled = false;
             }
             else
             {
                 model.Enabled = true;
                 if (healthUI != null)
                     healthUI.UITexture.Enabled = true;
+                nicknameUI.enabled = true;
             }
 
             FlameThrower.EnableGeneration(false);
@@ -684,12 +727,10 @@ namespace Client
 
             if (healthUI == null)
                 healthUI = new UIHealth(this, PlayerTeam);
-            if(healthUI == null)
-                healthUI = new UIHealth(this, PlayerTeam);
+            //if (nicknameUI == null)
+            //    nicknameUI = new UINickname(this, Name);
             healthUI?.Update();
             nicknameUI?.Update();
-
-
 
         }
 
@@ -697,6 +738,7 @@ namespace Client
         {
             healthUI.UITexture.Enabled = false;
             healthUI = null;
+            nicknameUI.enabled = false;
             base.Die();
         }
     }

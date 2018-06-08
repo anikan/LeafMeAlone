@@ -142,7 +142,7 @@ namespace Shared
         public const float LEAF_HEALTH = 8.0f;
         public const float LEAF_MASS = 0.1f;
         public const float LEAF_RADIUS = 0.0f;
-        public const float LEAF_BOUNCIENESS = 0.8f;
+        public const float LEAF_BOUNCINESS = 0.8f;
 
         public const float LEAF_ROTATE_SPEED = 0.2f;
 
@@ -162,6 +162,8 @@ namespace Shared
         public const string STATS_PREFIX = "Stats_";
 
         public const float HEALTH_REGEN_RATE = 1.0f;
+
+        public static Vector3 SELECTION_HUE = new Vector3(0.0f, 1.0f, 0.0f);
 
     }
 }

@@ -38,7 +38,7 @@ namespace Client
         private InputManager InputManager;
 
         // Dictionary of all game objects in the game.
-        private Dictionary<int, NetworkedGameObjectClient> NetworkedGameObjects;
+        public Dictionary<int, NetworkedGameObjectClient> NetworkedGameObjects;
 
         private List<NonNetworkedGameObjectClient> NonNetworkedGameObjects;
 
@@ -105,12 +105,12 @@ namespace Client
                 // Initialize static classes
                 GraphicsRenderer.Init();
 
-                //catch (FormatException e)
-                //{
-                //    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
-                //    ipAddress = ipHostInfo.AddressList[0];
-                //}
-           // }
+            //catch (FormatException e)
+            //{
+            //    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+            //    ipAddress = ipHostInfo.AddressList[0];
+            //}
+            // }
 
             // Create a new camera with a specified offset.
             Camera activeCamera =
@@ -122,7 +122,6 @@ namespace Client
 
             GameClient Client = new GameClient();
             GlobalUIManager.Init();
-            
             GraphicsRenderer.connectButton.Click += (sender, eventArgs) =>
                 {
                     if (!Client.hasConnected)
@@ -132,12 +131,11 @@ namespace Client
                             if (GraphicsRenderer.networkedCheckbox.Checked)
                             {
                                 ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
-                                //var ipHostEntry = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
-                                //ipAddress = ipHostEntry.AddressList[0];
-                                Console.WriteLine($" ip is {ipAddress.ToString()}");
+                                Console.WriteLine($@" ip is {ipAddress.ToString()}");
                             }
 
                         Client.Init(new NetworkClient(ipAddress));
+
                         GraphicsRenderer.Panel1.Visible = false;
                         GraphicsRenderer.Panel1.Hide();
                         GraphicsRenderer.pictureBox1.Visible = false;
@@ -216,6 +214,7 @@ namespace Client
             GlobalUIManager.Update();
             UIManagerSpriteRenderer.Update();
             UIManagerSpriteRenderer.SpriteRenderer.Flush();
+            UIManagerSpriteRenderer.SpriteRenderer.ClearReorderBuffer();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             GlobalUIManager.fps.StopAndCalculateFps();
             AudioManager.Update();
@@ -318,6 +317,9 @@ namespace Client
             TintLeaves();
             CountLeaves();
 
+            // Update all objects within the player's range with a tint.
+            ActivePlayer.TintObjectsInRange();
+
             // Update the graphics manager.
             GraphicsManager.Update(delta);
             AudioManager.Update();
@@ -389,8 +391,6 @@ namespace Client
         {
 
             int objId = createPacket.ObjData.IdData.ObjectId;
-            
-
             
             // Create a new packet depending on it's type.
             switch (createPacket.ObjectType)
@@ -477,7 +477,6 @@ namespace Client
             // Note: This should be last!
             ActivePlayer.ResetRequests();
         }
-
 
         /// <summary>
         /// Sets up the input manager and relevant input events.
@@ -570,8 +569,6 @@ namespace Client
                     GlobalUIManager.Teams.Team2_Leaves.UIText.Text = leafCount.ToString();
                 }
             }
-
-
         }
 
         /// <summary>
@@ -601,6 +598,7 @@ namespace Client
             // Return all the leaves.
             return allLeaves;
         }
+
 
         public List<GameObject> GetLeafListAsGameObjects()
         {
@@ -656,9 +654,17 @@ namespace Client
             // Full path to save.
             string fullPath = Constants.STATS_DIRECTORY + fileString;
 
-            // Write all the stats to the designated file.
-            File.WriteAllText(fullPath, st.ToString());
+            try
+            {
+                // Write all the stats to the designated file.
+                File.WriteAllText(fullPath, st.ToString());
+            }
 
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("File already in use");
+            }
         }
     }
 }

@@ -130,8 +130,8 @@ namespace Server
                 if (ActiveToolMode == ToolMode.PRIMARY || ActiveToolMode == ToolMode.SECONDARY)
                 {
                     // Check if it's within tool range, and that it's not the current player.
-                    if (gameObject != this && gameObject.IsInPlayerToolRange(this))
-                    {
+                    if (gameObject != this && gameObject.IsWithinToolRange(GetToolTransform(), ToolEquipped, ActiveToolMode))
+                    { 
                         // Hit the object.
                         gameObject.HitByTool(this, GetToolTransform(), ToolEquipped, ActiveToolMode);
 
@@ -171,6 +171,8 @@ namespace Server
             //Save movement request and normalize it so that we only move once per tick.
             moveRequest = new Vector3(packet.DeltaX, 0.0f, packet.DeltaZ);
             moveRequest.Normalize();
+
+            Name = packet.Name;
 
             Transform.Rotation.Y = packet.DeltaRot;
 
@@ -234,8 +236,5 @@ namespace Server
             Collidable = true;
             ActiveToolMode = ToolMode.NONE;
         }
-
-
-
     }
 }

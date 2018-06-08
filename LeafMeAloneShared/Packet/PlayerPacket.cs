@@ -33,13 +33,17 @@ namespace Shared.Packet
         [ProtoMember(4)]
         public bool Dead;
 
+        [ProtoMember(5)]
+        public string Name;
+
         public PlayerPacket() : base(PacketType.PlayerPacket) { }
-        public PlayerPacket(ObjectPacket objData, ToolMode activeToolMode, ToolType toolEquipped, bool dead) : base(PacketType.PlayerPacket)
+        public PlayerPacket(ObjectPacket objData, ToolMode activeToolMode, ToolType toolEquipped, bool dead, string name) : base(PacketType.PlayerPacket)
         {
             ObjData = objData;
             ActiveToolMode = activeToolMode;
             ToolEquipped = toolEquipped;
             Dead = dead;
+            Name = name;
         }
 
         public int GetId()

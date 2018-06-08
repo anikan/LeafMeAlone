@@ -287,6 +287,45 @@ namespace Client
         }
 
         /// <summary>
+        /// Tints all object sin the player's range.
+        /// </summary>
+        public void TintObjectsInRange()
+        {
+
+            // Get the networked objects.
+            foreach (NetworkedGameObjectClient obj in GameClient.instance.NetworkedGameObjects.Values)
+            {
+
+                // If leaf or player.
+                if (obj is LeafClient || obj is PlayerClient)
+                {
+
+                    // If it's within the tool range.
+                    if (obj.IsWithinToolRange(GetToolTransform(), ToolEquipped, ActiveToolMode))
+                    {
+
+                        // If we haven't already modified this object.
+                        if (!modifiedHue)
+                        {
+                            // Increase the hue.
+                            obj.CurrentHue += Constants.SELECTION_HUE;
+
+                            // Now modified.
+                            obj.modifiedHue = true;
+                        }
+                    }
+
+                    // If it's not within range and it's hue has been modified, reset it.
+                    else if (modifiedHue)
+                    {
+                        obj.CurrentHue -= Constants.SELECTION_HUE;
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Requests the player to look at a specified position, using mouse on screen space calculations.
         /// </summary>
         /// <param name="position">Screenspace position to look at.</param>

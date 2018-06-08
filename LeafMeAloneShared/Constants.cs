@@ -163,5 +163,7 @@ namespace Shared
 
         public const float HEALTH_REGEN_RATE = 1.0f;
 
+        public static Vector3 SELECTION_HUE = new Vector3(0.0f, 1.0f, 0.0f);
+
     }
 }

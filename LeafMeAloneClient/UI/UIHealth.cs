@@ -54,7 +54,6 @@ namespace Client.UI
 
                 int src = AudioManager.GetNewSource();
                 AudioManager.SetSourceVolume(src, 0.2f);
-                AudioManager.PlayAudio(src, Constants.CountdownAll, false);
             }
         }
 

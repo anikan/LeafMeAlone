@@ -117,7 +117,7 @@ namespace Client
                 new Camera(CAMERA_OFFSET, Vector3.Zero, Vector3.UnitY);
             GraphicsManager.Init(activeCamera);
             AudioManager.Init();
-            AudioManager.SetListenerVolume(8.0f);
+            AudioManager.SetListenerVolume(4.0f);
             AnimationManager.Init();
 
             GameClient Client = new GameClient();

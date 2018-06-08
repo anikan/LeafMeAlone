@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using Shared;
 using SlimDX;
@@ -42,6 +43,9 @@ namespace Client.UI
         public UIThreeTwoOne()
         {
             watch = new Stopwatch();
+
+            audioSrc = AudioManager.GetNewSource();
+            AudioManager.SetSourceVolume(audioSrc, 0.01f);
         }
 
         public void Start()
@@ -51,9 +55,6 @@ namespace Client.UI
             {
                 watch.Reset();
                 watch.Start();
-
-                int src = AudioManager.GetNewSource();
-                AudioManager.SetSourceVolume(src, 0.2f);
             }
         }
 
@@ -71,28 +72,27 @@ namespace Client.UI
             }
             UIManagerSpriteRenderer.DrawText((time - watch.Elapsed.Seconds).ToString(),UIManagerSpriteRenderer.TextType.SIZE300FONT,new RectangleF(0,0,Screen.Width,Screen.Height),TextAlignment.HorizontalCenter | TextAlignment.VerticalCenter,Color.AliceBlue, 200 );
 
-            // simple countdown sequence
-            for (int i = time; i >= 0; i--)
+            int countleft = time - watch.Elapsed.Seconds;
+
+            if ( countleft > 0 && playedSound != countleft)
             {
-                if (time - watch.Elapsed.Seconds == i && playedSound != i)
+                Console.WriteLine(countleft);
+                switch (countleft)
                 {
-                    switch (i)
-                    {
-                        case 3:
-                            AudioManager.PlayAudio(audioSrc, Constants.CountdownThree);
-                            break;
-                        case 2:
-                            AudioManager.PlayAudio(audioSrc, Constants.CountdownTwo);
-                            break;
-                        case 1:
-                            AudioManager.PlayAudio(audioSrc, Constants.CountdownOne);
-                            break;
-                        default:
-                            break;
-                    }
-                    playedSound = i;
-                    break;
+                    case 3:
+                        AudioManager.PlayAudio(audioSrc, Constants.CountdownThree);
+                        break;
+                    case 2:
+                        AudioManager.PlayAudio(audioSrc, Constants.CountdownTwo);
+                        break;
+                    case 1:
+                        AudioManager.PlayAudio(audioSrc, Constants.CountdownOne);
+                        break;
+                    default:
+                        break;
                 }
+
+                playedSound = countleft;
             }
         }
     }

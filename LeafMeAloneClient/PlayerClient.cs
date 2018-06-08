@@ -98,7 +98,6 @@ namespace Client
 
             model = AnimationManager.GetAnimatedModel(animId, repeat, false, index);
             Transform.Scale = AnimationManager.GetScale(animId);
-
             if (PlayerTeam == TeamName.BLUE)
             {
                 model.UseAltColor(new Color3(.4f, .4f, 1.2f));

@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Shared;
+﻿using Shared;
 using SlimDX;
 using SpriteTextRenderer;
 
@@ -28,25 +27,6 @@ namespace Client.UI
 
 
             UITexture.Position = GraphicsManager.WorldToScreenPoint(FollowGameObject.Transform.Position) - new Vector2(UITexture.Size.X / 2f, UITexture.Size.Y + delta) - alignHealthBar;
-        }
-
-    }
-    public class UINickname
-    {
-        private readonly GameObject FollowGameObject;
-
-        private readonly float delta = 100f;
-        public UINickname(GameObject followGameObject, string nickname)
-        {
-            FollowGameObject = followGameObject;
-        }
-
-        public void Update()
-        {
-            var p = GraphicsManager.WorldToScreenPoint(FollowGameObject.Transform.Position) - new Vector2(30,150);
-            UIManagerSpriteRenderer.EnsureTypeExists(UIManagerSpriteRenderer.TextType.NORMAL);
-            UIManagerSpriteRenderer.TextRenderers[UIManagerSpriteRenderer.TextType.NORMAL]
-                .DrawString(FollowGameObject.Name, p, new Color4(Color.AliceBlue));
         }
 
     }

@@ -172,6 +172,8 @@ namespace Server
             moveRequest = new Vector3(packet.DeltaX, 0.0f, packet.DeltaZ);
             moveRequest.Normalize();
 
+            Name = packet.Name;
+
             Transform.Rotation.Y = packet.DeltaRot;
 
             if (packet.ToolRequest != ToolType.SAME)

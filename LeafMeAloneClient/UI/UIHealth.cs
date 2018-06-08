@@ -43,12 +43,16 @@ namespace Client.UI
 
         public void Start()
         {
-            watch.Reset();
-            watch.Start();
+            if ((GameClient.instance.playerClients.Count == 1 && !GraphicsRenderer.networkedCheckbox.Checked) 
+                || (GameClient.instance.playerClients.Count == 4 && GraphicsRenderer.networkedCheckbox.Checked))
+            {
+                watch.Reset();
+                watch.Start();
 
-            int src = AudioManager.GetNewSource();
-            AudioManager.SetSourceVolume(src, 0.2f);
-            AudioManager.PlayAudio(src, Constants.CountdownAll, false);
+                int src = AudioManager.GetNewSource();
+                AudioManager.SetSourceVolume(src, 0.2f);
+                AudioManager.PlayAudio(src, Constants.CountdownAll, false);
+            }
         }
 
         public void Update()

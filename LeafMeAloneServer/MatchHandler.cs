@@ -105,7 +105,7 @@ namespace Server
         /// <returns>Whether the match is initializing</returns>
         internal bool MatchInitializing()
         {
-            return (match.GetTimeElapsed().Seconds < Constants.MATCH_INIT_TIME);
+            return (match.GetTimeElapsed().TotalSeconds < Constants.MATCH_INIT_TIME);
         }
         
         /// <summary>
@@ -114,7 +114,7 @@ namespace Server
         internal void DoMatchStatusUpdates()
         {
             // Check for match restart
-            if (matchResetTimer.IsRunning && matchResetTimer.Elapsed.Seconds > Constants.MATCH_RESET_TIME)
+            if (matchResetTimer.IsRunning && matchResetTimer.Elapsed.TotalSeconds > Constants.MATCH_RESET_TIME)
             {
                 matchResetTimer.Reset();
                 RestartMatch();

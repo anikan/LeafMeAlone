@@ -60,7 +60,7 @@ namespace Server
         public void StartListening()
         {
             // Data buffer for incoming data.  
-            byte[] bytes = new Byte[1024];
+            byte[] bytes = new Byte[StateObject.BufferSize];
             IPAddress ipAddress = IPAddress.Loopback;
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
@@ -237,7 +237,7 @@ namespace Server
             // Create createObjectPacket, send to client
             byte[] data = PacketUtil.Serialize(createPlayPack);
             Send(clientSocket, data);
-            MatchStartPacket informStart = 
+            MatchStartPacket informStart =
                 new MatchStartPacket(MatchHandler.instance.GetMatch().GetTimeElapsed().Milliseconds);
             Send(clientSocket, PacketUtil.Serialize(informStart));
         }
@@ -308,10 +308,9 @@ namespace Server
                 // Get full packet and add it to the queue 
                 byte[] packetData = ByteReceivedQueue.GetRange(PacketUtil.PACK_HEAD_SIZE, packetSize).ToArray();
                 byte[] fullPacket = headerByteBuf.Concat(packetData).ToArray();
-                BasePacket packet = PacketUtil.Deserialize(fullPacket);
-                PlayerPackets.Add((RequestPacket)packet);
+                RequestPacket packet = (RequestPacket)PacketUtil.Deserialize(fullPacket);
+                PlayerPackets.Add(packet);
 
-                // Remove the read data 
                 lock (ByteReceivedQueue)
                 {
                     ByteReceivedQueue.RemoveRange(0, packetSize + PacketUtil.PACK_HEAD_SIZE);

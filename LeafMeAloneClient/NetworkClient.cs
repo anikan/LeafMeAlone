@@ -124,24 +124,24 @@ namespace Client
         {
             try
             {
-            // Retrieve the state object and the client socket   
-            // from the asynchronous state object.  
-            StateObject state = (StateObject)asyncResult.AsyncState;
-            Socket client = state.workSocket;
+                // Retrieve the state object and the client socket   
+                // from the asynchronous state object.  
+                StateObject state = (StateObject)asyncResult.AsyncState;
+                Socket client = state.workSocket;
 
-            // Read data from the remote device.  
-            int bytesRead = client.EndReceive(asyncResult);
+                // Read data from the remote device.  
+                int bytesRead = client.EndReceive(asyncResult);
 
-            // There might be more data, so store the data received so far.  
-            lock (ByteReceivedQueue)
-            {
-                ByteReceivedQueue.AddRange(state.buffer.Take(bytesRead));
-            }
+                // There might be more data, so store the data received so far.  
+                lock (ByteReceivedQueue)
+                {
+                    ByteReceivedQueue.AddRange(state.buffer.Take(bytesRead));
+                }
 
-            //  Start listening again
-            client.BeginReceive(
-                state.buffer, 0, StateObject.BufferSize, 0,
-                new AsyncCallback(ReceiveCallback), state);
+                //  Start listening again
+                client.BeginReceive(
+                    state.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReceiveCallback), state);
             }
             catch (SocketException e)
             {
@@ -199,9 +199,9 @@ namespace Client
             // Begin sending the data to the remote device.  
 
             try
-            { 
-            client.BeginSend(data, 0, data.Length, 0,
-                new AsyncCallback(SendCallback), client);
+            {
+                client.Send(data, 0, data.Length, 0,
+                    new AsyncCallback(SendCallback), client);
             }
             catch (SocketException e)
             {

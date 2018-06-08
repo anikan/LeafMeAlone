@@ -146,6 +146,8 @@ namespace Server
         /// <returns></returns>
         private bool SufficientPlayersConnected()
         {
+            Console.WriteLine($"Development Mode: {development.ToString()}");
+            Console.WriteLine($"Players Connected: {playerServerList.Count}");
             return (development && playerServerList.Count == 1) || (!development && playerServerList.Count == 4);
         }
 

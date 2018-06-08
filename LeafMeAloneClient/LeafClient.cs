@@ -33,8 +33,7 @@ namespace Client
             base.UpdateFromPacket(packet);
             bool currBurning = Burning;
             bool currMoving = Moving;    
-
-            if (_audioBurning != -1) AudioManager.UpdateSourceLocation(_audioBurning, Transform.Position);
+            
             EvaluateAudio(prevBurning, currBurning, prevMoving, currMoving);
             
             //If the leaf is burning then change the leaf color.
@@ -51,6 +50,16 @@ namespace Client
         /// <param name="currBurning"> leaf currently burning? </param>
         public void EvaluateAudio(bool prevBurning, bool currBurning, bool prevMoving, bool currMoving)
         {
+            if (_audioBurning != -1)
+            {
+                AudioManager.UpdateSourceLocation(_audioBurning, Transform.Position);
+            }
+
+            if (_audioMoving != -1)
+            {
+                AudioManager.UpdateSourceLocation(_audioMoving, Transform.Position);
+            }
+
             // start burning audio
             if (!prevBurning && currBurning)
             {

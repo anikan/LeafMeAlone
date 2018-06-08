@@ -297,7 +297,7 @@ namespace Client
             {
 
                 // If leaf or player.
-                if (obj is LeafClient || obj is PlayerClient)
+                if (obj is LeafClient)
                 {
 
                     // If it's within the tool range.

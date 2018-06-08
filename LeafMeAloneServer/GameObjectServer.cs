@@ -94,11 +94,11 @@ namespace Server
                     FlamethrowerActivelyBurning = false;
                 }
 
-                // If not actively being burned this frame, set burn frames to just 1.
+                // If not actively being burned this frame, drop burn frames by 1, capping at one.
                 else
                 {
-                    // Set to 1.
-                    burnFrames = 1;
+                    // Subtract by 1 or set to 1 if at 1 already.
+                    burnFrames = Math.Max(1, burnFrames-1);
                 }
 
                 // If we've been blowing on the object for the desired period of time, extinguish it.

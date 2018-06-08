@@ -26,7 +26,8 @@ namespace Client
             return new RequestPacket(
                 deltaX, deltaZ, deltaRot, new IdPacket(player.Id), 
                 player.PlayerRequests.EquipToolRequest,
-                player.PlayerRequests.ActiveToolMode
+                player.PlayerRequests.ActiveToolMode,
+                player.Name
                 );
         }
 

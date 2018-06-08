@@ -83,8 +83,7 @@ namespace Client
             
             // set to idle animation by default
             SwitchAnimation(_animIdle);
-
-            nicknameUI = new UINickname(this,this.Name);
+            nicknameUI = new UINickname(this,Name);
 
             Burnable = true;
         }
@@ -378,6 +377,9 @@ namespace Client
 
             base.UpdateFromPacket(packet.ObjData);
 
+            if(GraphicsManager.ActivePlayer != this)
+                Name = packet.Name ?? "";
+
             //Set the player color based on health.
             CurrentTint = new Vector3(1, 1, 1) * ((Health / Constants.PLAYER_HEALTH) * .7f + .3f);
 
@@ -412,12 +414,14 @@ namespace Client
                 model.Enabled = false;
                 if (healthUI != null)
                     healthUI.UITexture.Enabled = false;
+                nicknameUI.enabled = false;
             }
             else
             {
                 model.Enabled = true;
                 if (healthUI != null)
                     healthUI.UITexture.Enabled = true;
+                nicknameUI.enabled = true;
             }
 
             FlameThrower.EnableGeneration(false);
@@ -684,12 +688,10 @@ namespace Client
 
             if (healthUI == null)
                 healthUI = new UIHealth(this, PlayerTeam);
-            if(healthUI == null)
-                healthUI = new UIHealth(this, PlayerTeam);
+            //if (nicknameUI == null)
+            //    nicknameUI = new UINickname(this, Name);
             healthUI?.Update();
             nicknameUI?.Update();
-
-
 
         }
 
@@ -697,6 +699,7 @@ namespace Client
         {
             healthUI.UITexture.Enabled = false;
             healthUI = null;
+            nicknameUI.enabled = false;
             base.Die();
         }
     }

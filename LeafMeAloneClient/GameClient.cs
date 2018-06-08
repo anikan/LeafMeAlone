@@ -105,12 +105,12 @@ namespace Client
                 // Initialize static classes
                 GraphicsRenderer.Init();
 
-                //catch (FormatException e)
-                //{
-                //    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
-                //    ipAddress = ipHostInfo.AddressList[0];
-                //}
-           // }
+            //catch (FormatException e)
+            //{
+            //    IPHostEntry ipHostInfo = Dns.GetHostEntry(args[0]);
+            //    ipAddress = ipHostInfo.AddressList[0];
+            //}
+            // }
 
             // Create a new camera with a specified offset.
             Camera activeCamera =
@@ -122,7 +122,6 @@ namespace Client
 
             GameClient Client = new GameClient();
             GlobalUIManager.Init();
-            
             GraphicsRenderer.connectButton.Click += (sender, eventArgs) =>
                 {
                     if (!Client.hasConnected)
@@ -132,12 +131,11 @@ namespace Client
                             if (GraphicsRenderer.networkedCheckbox.Checked)
                             {
                                 ipAddress = IPAddress.Parse(GraphicsRenderer.ipTextbox.Text);
-                                //var ipHostEntry = Dns.GetHostEntry(GraphicsRenderer.ipTextbox.Text);
-                                //ipAddress = ipHostEntry.AddressList[0];
-                                Console.WriteLine($" ip is {ipAddress.ToString()}");
+                                Console.WriteLine($@" ip is {ipAddress.ToString()}");
                             }
 
                         Client.Init(new NetworkClient(ipAddress));
+
                         GraphicsRenderer.Panel1.Visible = false;
                         GraphicsRenderer.Panel1.Hide();
                         GraphicsRenderer.pictureBox1.Visible = false;
@@ -216,6 +214,7 @@ namespace Client
             GlobalUIManager.Update();
             UIManagerSpriteRenderer.Update();
             UIManagerSpriteRenderer.SpriteRenderer.Flush();
+            UIManagerSpriteRenderer.SpriteRenderer.ClearReorderBuffer();
             GraphicsRenderer.SwapChain.Present(0, PresentFlags.None);
             GlobalUIManager.fps.StopAndCalculateFps();
             AudioManager.Update();

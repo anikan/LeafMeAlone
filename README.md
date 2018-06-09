@@ -32,14 +32,14 @@ This project took _____ to complete
 
 ## Acknowledgement
 
-Team Name: C3b3rus
-
-Anish Kannan - Project Architect and Manager\
-Connor Smith - Physics and Gameplay Engineer\
-Kristin Agcaoili - UI, 3D Model, and Audio Artist\ 
-Maxwell Bland - Network and Gameplay Engineer\
-Nicholas Crow - Engine and UI Engineer\
-Yiming Cai - Engine, Sound and Animation Engineer\
+Team Name: C3b3rus \
+\
+Anish Kannan - Project Architect and Manager \
+Connor Smith - Physics and Gameplay Engineer \
+Kristin Agcaoili - UI, 3D Model, and Audio Artist \
+Maxwell Bland - Network and Gameplay Engineer \
+Nicholas Crow - Engine and UI Engineer \
+Yiming Cai - Engine, Sound and Animation Engineer \
 
 
 ## Links

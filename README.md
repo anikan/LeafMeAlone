@@ -34,15 +34,15 @@ This project took _____ to complete
 
 Team Name: C3b3rus
 
-Anish Kannan - Project Architect and Manager
-Connor Smith - Physics and Gameplay Engineer
-Kristin Agcaoili - UI, 3D Model, and Audio Artist 
-Maxwell Bland - Network and Gameplay Engineer
-Nicholas Crow - Engine and UI Engineer
-Yiming Cai - Engine, Sound and Animation Engineer
+Anish Kannan - Project Architect and Manager\
+Connor Smith - Physics and Gameplay Engineer\
+Kristin Agcaoili - UI, 3D Model, and Audio Artist\ 
+Maxwell Bland - Network and Gameplay Engineer\
+Nicholas Crow - Engine and UI Engineer\
+Yiming Cai - Engine, Sound and Animation Engineer\
 
 
 ## Links
 
-Visit our progression blogs at https://cse125.ucsd.edu/2018/cse125g3/ 
+Visit our progression blogs at https://cse125.ucsd.edu/2018/cse125g3/ \
 Visit our Github Repository at https://github.com/anikan/LeafMeAlone/ 

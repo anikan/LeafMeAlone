@@ -39,7 +39,7 @@ Connor Smith - Physics and Gameplay Engineer \
 Kristin Agcaoili - UI, 3D Model, and Audio Artist \
 Maxwell Bland - Network and Gameplay Engineer \
 Nicholas Crow - Engine and UI Engineer \
-Yiming Cai - Engine, Sound and Animation Engineer \
+Yiming Cai - Engine, Sound and Animation Engineer
 
 
 ## Links

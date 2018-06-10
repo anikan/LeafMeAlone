@@ -38,7 +38,7 @@ Anish Kannan - Project Architect and Manager \
 Connor Smith - Physics and Gameplay Engineer \
 Kristin Agcaoili - UI, 3D Model, and Audio Artist \
 Maxwell Bland - Network and Gameplay Engineer \
-Nicholas Crow - Engine and UI Engineer \
+Nicholas Crow - Engine, Particle, and UI Engineer \
 Yiming Cai - Engine, Sound and Animation Engineer
 
 

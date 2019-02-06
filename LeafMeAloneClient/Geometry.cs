@@ -336,7 +336,7 @@ namespace Client {
                     }
                 }
 
-                // for bones not inside the meshes...?
+                // for bones not inside the meshes...? jasdkl;fja;lskdjkfl
                 foreach (var boneName in _allBoneLookup.Keys.Where(b =>
                     _allBones.All(b1 => b1.BoneName != b) && b.StartsWith("Bone")))
                 {

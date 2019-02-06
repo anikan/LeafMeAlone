@@ -2,6 +2,7 @@
 
 LeafMeAlone is a competitive leaf blowing action game. Players are squirrels armed with leaf blowers and flamethrowers and must hoard as many leaves as possible.
 
+![Flamethrowers, fauna, and flora, oh my](Media/Gameplay.jpg)
 
 ## Requirements
 
